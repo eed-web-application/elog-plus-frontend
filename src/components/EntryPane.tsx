@@ -3,6 +3,7 @@ import { Entry, createEntry, fetchLogbooks, followUp } from "../api";
 import Select from "./Select";
 import { Button, IconButton, Input, InputInvalid } from "./base";
 import cn from "classnames";
+import EntryRow from "./EntryRow";
 
 function EntryForm({
   onEntryCreated,
@@ -78,51 +79,65 @@ function EntryForm({
   }
 
   return (
-    <form noValidate onSubmit={submit}>
-      <label className="text-gray-500 block mb-2">
-        Title
+    <>
+      <form noValidate onSubmit={submit}>
+        <label className="text-gray-500 block mb-2">
+          Title
+          <input
+            required
+            type="text"
+            className={cn(
+              Input,
+              invalid.includes("title") && InputInvalid,
+              "block w-full"
+            )}
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            onBlur={() => validate("title")}
+          />
+        </label>
+        <label className="text-gray-500 block mb-2">
+          Logbook
+          <Select
+            required
+            containerClassName="block w-full"
+            className="w-full"
+            options={logbooks || []}
+            isLoading={!logbooks}
+            value={logbook}
+            setValue={setLogbook}
+            invalid={invalid.includes("logbook")}
+            onBlur={() => validate("logbook")}
+          />
+        </label>
+        <label className="text-gray-500 block mb-2">
+          Text
+          <textarea
+            onChange={(e) => setText(e.currentTarget.value)}
+            value={text}
+            placeholder=""
+            className={cn(Input, "block w-full h-48")}
+          />
+        </label>
         <input
-          required
-          type="text"
-          className={cn(
-            Input,
-            invalid.includes("title") && InputInvalid,
-            "block w-full"
-          )}
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          onBlur={() => validate("title")}
+          type="submit"
+          className={cn(Button, "block ml-auto mt-2")}
+          value="Create"
         />
-      </label>
-      <label className="text-gray-500 block mb-2">
-        Logbook
-        <Select
-          required
-          containerClassName="block w-full"
-          className="w-full"
-          options={logbooks || []}
-          isLoading={!logbooks}
-          value={logbook}
-          setValue={setLogbook}
-          invalid={invalid.includes("logbook")}
-          onBlur={() => validate("logbook")}
-        />
-      </label>
-      <label className="text-gray-500 block mb-2">
-        Text
-        <textarea
-          onChange={(e) => setText(e.currentTarget.value)}
-          value={text}
-          placeholder=""
-          className={cn(Input, "block w-full h-48")}
-        />
-      </label>
-      <input
-        type="submit"
-        className={cn(Button, "block ml-auto mt-2")}
-        value="Create"
-      />
-    </form>
+      </form>
+      {followingUp && (
+        <>
+          <h3 className="text-lg mt-2 mb-2">Following up:</h3>
+          <EntryRow
+            className="bg-gray-100"
+            entry={followingUp}
+            showDate
+            readonly
+            previewing
+          />
+        </>
+      )}
+    </>
   );
 }
 
