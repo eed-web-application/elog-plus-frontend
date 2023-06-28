@@ -1,6 +1,6 @@
 import { Fragment, useEffect, useState } from "react";
 import cn from "classnames";
-import { Entry, EntrySummary, fetchEntries } from "./api";
+import { EntrySummary, fetchEntries } from "./api";
 import Filters, { Filters as FiltersObject } from "./components/Filters";
 import Navbar from "./components/Navbar";
 import EntryRow from "./components/EntryRow";
