@@ -1,6 +1,7 @@
 import cn from "classnames";
 import { useState } from "react";
 import Spinner from "./Spinner";
+import { Input } from "./base";
 
 export interface Props {
   selected: string[];
@@ -33,7 +34,7 @@ export default function LogbookSelect({
     <>
       <input
         type="search"
-        className="block pl-2.5 p-2 text-gray-900 bg-gray-50 border border-gray-300 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 w-64 rounded-t-lg"
+        className={cn("block w-64 rounded-b-none", Input)}
         placeholder="Search..."
         autoFocus
         onChange={(e) => setSearch(e.target.value)}

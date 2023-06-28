@@ -1,7 +1,13 @@
 import elogLogo from "../assets/temp_elog_logo.png";
 import cn from "classnames";
+import { Button, Input } from "./base";
 
-export default function Navbar({ className }: { className?: string }) {
+interface Props {
+  className?: string;
+  onNewEntry: () => void;
+}
+
+export default function Navbar({ className, onNewEntry }: Props) {
   return (
     <div className={cn("flex flex-wrap", className)}>
       <button className="text-center mb-3 w-full sm:mb-0 sm:w-auto">
@@ -11,7 +17,7 @@ export default function Navbar({ className }: { className?: string }) {
         <div className="relative w-full">
           <input
             type="search"
-            className="block pl-2.5 p-2 w-full text-gray-900 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+            className={cn("block w-full", Input)}
             placeholder="Search..."
             required
           />
@@ -37,7 +43,7 @@ export default function Navbar({ className }: { className?: string }) {
           </button>
         </div>
       </form>
-      <button className="px-2.5 bg-blue-500 rounded-lg text-white border border-blue-500 hover:bg-blue-600 focus:ring-2 focus:outline-none focus:ring-blue-300">
+      <button className={cn(Button)} onClick={onNewEntry}>
         New Entry
       </button>
     </div>

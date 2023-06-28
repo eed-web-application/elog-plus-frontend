@@ -6,12 +6,13 @@ import Navbar from "./components/Navbar";
 import EntryRow from "./components/EntryRow";
 import { useEntriesStore } from "./entriesStore";
 import Spinner from "./components/Spinner";
-import EntryView from "./components/EntryView";
+import EntryPane from "./components/EntryPane";
 
 function App() {
   const [entries, setEntries] = useState<EntrySummary[] | null>(null);
   const [selected, setSelected] = useState<Entry | null>(null);
-  const [fullscreen, setFullscreen] = useState(false);
+  const [drafting, setDrafting] = useState(false);
+  const [paneFullscreen, setPaneFullscreen] = useState(false);
   const [filters, setFilters] = useState<FiltersObject>({ logbooks: [] });
   const { getOrFetch } = useEntriesStore();
 
@@ -26,18 +27,35 @@ function App() {
 
   let currentDay: number | undefined;
 
+  const paneOpen = selected || drafting;
+
+  function closePane() {
+    setSelected(null);
+    setDrafting(false);
+  }
+
+  function openNewEntryPane() {
+    setDrafting(true);
+    setSelected(null);
+  }
+
+  async function createdEntry(id: string) {
+    const entry = await getOrFetch(id);
+    setSelected(entry);
+  }
+
   return (
     <div className="max-h-screen flex flex-col">
       <div className="p-3 shadow z-10">
         <div className="container m-auto">
-          <Navbar className="mb-3" />
+          <Navbar className="mb-3" onNewEntry={openNewEntryPane} />
           <Filters filters={filters} setFilters={setFilters} />
         </div>
       </div>
       <div className="flex-1 flex overflow-hidden">
         <div
           className={cn(
-            selected && !fullscreen ? "w-1/2" : "w-full",
+            paneOpen && !paneFullscreen ? "w-1/2" : "w-full",
             Boolean(entries) && "bg-gray-100",
             "px-3 overflow-y-auto rounded-lg"
           )}
@@ -77,12 +95,13 @@ function App() {
             <Spinner large className="mt-4 m-auto" />
           )}
         </div>
-        {selected && (
-          <EntryView
-            entry={selected}
-            fullscreen={fullscreen}
-            setFullscreen={setFullscreen}
-            onCancel={() => setSelected(null)}
+        {paneOpen && (
+          <EntryPane
+            entry={selected || undefined}
+            fullscreen={paneFullscreen}
+            setFullscreen={setPaneFullscreen}
+            onCancel={closePane}
+            onEntryCreated={createdEntry}
           />
         )}
       </div>

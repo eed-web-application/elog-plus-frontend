@@ -22,6 +22,14 @@ export interface Entry extends EntrySummary {
   attachments: string[];
 }
 
+export interface EntryForm {
+  title: string;
+  text: string;
+  logbook: string;
+  tags: string[];
+  attachments: string[];
+}
+
 export async function fetchLogbooks(): Promise<string[]> {
   // Since the logbooks should be static, we can memoize them
   if (logbooks) {
@@ -39,7 +47,7 @@ export async function fetchEntries(
 ): Promise<EntrySummary[]> {
   const res = await fetch(
     `logs?${new URLSearchParams({
-      page: "1",
+      page: "0",
       size: "25",
       logbook: logbooks.join(","),
     }).toString()}`
@@ -50,6 +58,16 @@ export async function fetchEntries(
 
 export async function fetchEntry(id: string): Promise<Entry> {
   const res = await fetch(`logs/${id}`);
+  const data = await res.json();
+  return data.payload;
+}
+
+export async function createEntry(entry: EntryForm): Promise<string> {
+  const res = await fetch(`logs`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(entry),
+  });
   const data = await res.json();
   return data.payload;
 }
