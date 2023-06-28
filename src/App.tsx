@@ -25,7 +25,7 @@ function App() {
     setSelected(entry);
   }
 
-  let currentDay: number | undefined;
+  let currentDate: string | undefined;
 
   const paneOpen = selected || drafting;
 
@@ -63,16 +63,16 @@ function App() {
           {entries ? (
             <>
               {entries.map((entry) => {
-                const entryDate = new Date(entry.logDate);
                 let dateHeader;
 
-                if (entryDate.getDate() !== currentDay) {
+                const entryDate = entry.logDate.substring(0, 10);
+                if (entryDate !== currentDate) {
                   dateHeader = (
                     <h3
-                      key={entryDate.getDate()}
+                      key={entry.logDate}
                       className="text-lg mt-2 pb-1 border-b"
                     >
-                      {entryDate.toLocaleDateString("en-us", {
+                      {new Date(entry.logDate).toLocaleDateString("en-us", {
                         weekday: "long",
                         year: "numeric",
                         month: "short",
@@ -80,7 +80,8 @@ function App() {
                       })}
                     </h3>
                   );
-                  currentDay = entryDate.getDate();
+
+                  currentDate = entryDate;
                 }
 
                 return (
