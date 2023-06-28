@@ -8,12 +8,14 @@ export interface Props {
   entry: EntrySummary;
   className?: string;
   onSelected: (id: string) => void;
+  onFollowUp: () => void;
 }
 
 export default function EntryRow({
   entry,
   className,
   onSelected,
+  onFollowUp,
 }: PropsWithChildren<Props>) {
   const [previewing, setPreviewing] = useState(false);
   const [bodyContent, setBodyContent] = useState<string | null>(null);
@@ -24,6 +26,11 @@ export default function EntryRow({
     const fullEntry = await getOrFetch(entry.id);
     setBodyContent(fullEntry.text);
     setPreviewing((previewing) => !previewing);
+  }
+
+  function followUp(e: React.MouseEvent<SVGSVGElement, MouseEvent>) {
+    e.stopPropagation();
+    onFollowUp();
   }
 
   return (
@@ -75,6 +82,7 @@ export default function EntryRow({
             strokeWidth={1.5}
             stroke="currentColor"
             tabIndex={0}
+            onClick={followUp}
             className={cn(IconButton, "p-1 mr-2 rotate-180")}
           >
             <path

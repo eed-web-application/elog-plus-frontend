@@ -6,14 +6,13 @@ import Navbar from "./components/Navbar";
 import EntryRow from "./components/EntryRow";
 import { useEntriesStore } from "./entriesStore";
 import Spinner from "./components/Spinner";
-import EntryPane from "./components/EntryPane";
+import EntryPane, { PaneKind } from "./components/EntryPane";
 
 function App() {
   const [entries, setEntries] = useState<EntrySummary[] | null>(null);
-  const [selected, setSelected] = useState<Entry | null>(null);
-  const [drafting, setDrafting] = useState(false);
   const [paneFullscreen, setPaneFullscreen] = useState(false);
   const [filters, setFilters] = useState<FiltersObject>({ logbooks: [] });
+  const [entryPane, setEntryPane] = useState<null | PaneKind>(null);
   const { getOrFetch } = useEntriesStore();
 
   useEffect(() => {
@@ -22,26 +21,27 @@ function App() {
 
   async function select(entryId: string) {
     const entry = await getOrFetch(entryId);
-    setSelected(entry);
+    setEntryPane(["viewingEntry", entry]);
   }
 
   let currentDate: string | undefined;
 
-  const paneOpen = selected || drafting;
-
   function closePane() {
-    setSelected(null);
-    setDrafting(false);
+    setEntryPane(null);
   }
 
   function openNewEntryPane() {
-    setDrafting(true);
-    setSelected(null);
+    setEntryPane(["newEntry"]);
   }
 
   async function createdEntry(id: string) {
     const entry = await getOrFetch(id);
-    setSelected(entry);
+    setEntryPane(["viewingEntry", entry]);
+  }
+
+  async function followUp(id: string) {
+    const entry = await getOrFetch(id);
+    setEntryPane(["followingUp", entry]);
   }
 
   return (
@@ -55,7 +55,7 @@ function App() {
       <div className="flex-1 flex overflow-hidden">
         <div
           className={cn(
-            paneOpen && !paneFullscreen ? "w-1/2" : "w-full",
+            entryPane && !paneFullscreen ? "w-1/2" : "w-full",
             Boolean(entries) && "bg-gray-100",
             "px-3 overflow-y-auto rounded-lg"
           )}
@@ -87,7 +87,11 @@ function App() {
                 return (
                   <Fragment key={entry.id}>
                     {dateHeader}
-                    <EntryRow entry={entry} onSelected={select} />
+                    <EntryRow
+                      entry={entry}
+                      onSelected={select}
+                      onFollowUp={() => followUp(entry.id)}
+                    />
                   </Fragment>
                 );
               })}
@@ -96,9 +100,9 @@ function App() {
             <Spinner large className="mt-4 m-auto" />
           )}
         </div>
-        {paneOpen && (
+        {entryPane && (
           <EntryPane
-            entry={selected || undefined}
+            kind={entryPane}
             fullscreen={paneFullscreen}
             setFullscreen={setPaneFullscreen}
             onCancel={closePane}

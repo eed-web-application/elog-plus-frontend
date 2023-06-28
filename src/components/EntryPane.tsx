@@ -1,16 +1,20 @@
 import { FormEvent, useEffect, useState } from "react";
-import { Entry, createEntry, fetchLogbooks } from "../api";
+import { Entry, createEntry, fetchLogbooks, followUp } from "../api";
 import Select from "./Select";
 import { Button, IconButton, Input, InputInvalid } from "./base";
 import cn from "classnames";
 
 function EntryForm({
   onEntryCreated,
+  followingUp,
 }: {
   onEntryCreated: (id: string) => void;
+  followingUp?: Entry;
 }) {
   const [logbooks, setLogbooks] = useState<null | string[]>(null);
-  const [logbook, setLogbook] = useState<null | string>(null);
+  const [logbook, setLogbook] = useState<null | string>(
+    followingUp?.logbook || null
+  );
   const [title, setTitle] = useState<string>("");
   const [text, setText] = useState<string>("");
 
@@ -56,13 +60,19 @@ function EntryForm({
       return;
     }
 
-    const id = await createEntry({
+    let id;
+    const entry = {
       text,
       title,
       logbook: logbook as string,
       attachments: [],
       tags: [],
-    });
+    };
+    if (followingUp) {
+      id = await followUp(followingUp.id, entry);
+    } else {
+      id = await createEntry(entry);
+    }
 
     onEntryCreated(id);
   }
@@ -116,8 +126,13 @@ function EntryForm({
   );
 }
 
+export type PaneKind =
+  | ["followingUp", Entry]
+  | ["newEntry"]
+  | ["viewingEntry", Entry];
+
 export interface Props {
-  entry?: Entry;
+  kind: PaneKind;
   fullscreen: boolean;
   setFullscreen: (fullscreen: boolean) => void;
   onCancel: () => void;
@@ -125,12 +140,21 @@ export interface Props {
 }
 
 export default function EntryPane({
-  entry,
+  kind,
   fullscreen,
   setFullscreen,
   onCancel,
   onEntryCreated,
 }: Props) {
+  let headerText;
+  if (kind[0] === "viewingEntry") {
+    headerText = kind[1].title;
+  } else if (kind[0] === "followingUp") {
+    headerText = "Following Up: " + kind[1].title;
+  } else {
+    headerText = "New Entry";
+  }
+
   return (
     <>
       <div
@@ -187,7 +211,7 @@ export default function EntryPane({
           )}
 
           <div className="flex-1 text-center overflow-hidden text-ellipsis whitespace-nowrap">
-            {entry?.title || "New Entry"}
+            {headerText}
           </div>
 
           {fullscreen || (
@@ -211,9 +235,13 @@ export default function EntryPane({
         </div>
         <div
           className="p-3 pt-2"
-          dangerouslySetInnerHTML={entry ? { __html: entry.text } : undefined}
+          dangerouslySetInnerHTML={
+            kind[0] === "viewingEntry" ? { __html: kind[1].text } : undefined
+          }
         >
-          {entry ? undefined : <EntryForm onEntryCreated={onEntryCreated} />}
+          {kind[0] === "viewingEntry" ? undefined : (
+            <EntryForm onEntryCreated={onEntryCreated} followingUp={kind[1]} />
+          )}
         </div>
       </div>
       <div

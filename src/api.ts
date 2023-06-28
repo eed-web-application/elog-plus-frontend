@@ -62,8 +62,27 @@ export async function fetchEntry(id: string): Promise<Entry> {
   return data.payload;
 }
 
+export async function fetchFollowUps(id: string): Promise<Entry> {
+  const res = await fetch(`logs/${id}/follow-up`);
+  const data = await res.json();
+  return data.payload;
+}
+
 export async function createEntry(entry: EntryForm): Promise<string> {
-  const res = await fetch(`logs`, {
+  const res = await fetch("logs", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(entry),
+  });
+  const data = await res.json();
+  return data.payload;
+}
+
+export async function followUp(
+  followingUp: string,
+  entry: EntryForm
+): Promise<string> {
+  const res = await fetch(`logs/${followingUp}/follow-up`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(entry),
