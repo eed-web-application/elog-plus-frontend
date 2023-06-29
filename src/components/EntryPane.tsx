@@ -132,8 +132,7 @@ function EntryForm({
             className="bg-gray-100"
             entry={followingUp}
             showDate
-            readonly
-            previewing
+            expandedDefault
           />
         </>
       )}

@@ -32,10 +32,10 @@ export default function EntryList<E extends EntrySummary>({
   return (
     <>
       {isLoading ? (
-        <Spinner large className="mt-4 m-auto" />
+        <Spinner large className="my-4 m-auto" />
       ) : (
         <>
-          {entries.map((entry) => {
+          {entries.map((entry, index) => {
             let dateHeader;
 
             const entryDate = entry.logDate.substring(0, 10);
@@ -57,10 +57,11 @@ export default function EntryList<E extends EntrySummary>({
             return (
               <Fragment key={entry.id}>
                 {dateHeader}
-                <div className="border-b">
+                <div className={index === entries.length - 1 ? "" : "border-b"}>
                   <EntryRow
                     entry={entry}
                     previewable={previewable}
+                    showFollowUps
                     expandedDefault={expandPreviewsDefault}
                     showDate={showEntryDates}
                     onSelect={onSelect ? () => onSelect(entry) : undefined}

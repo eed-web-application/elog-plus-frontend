@@ -2,23 +2,26 @@ import cn from "classnames";
 import { PropsWithChildren, useEffect, useState } from "react";
 import { IconButton } from "./base";
 import { useEntriesStore } from "../entriesStore";
-import { Entry, EntrySummary } from "../api";
+import { Entry, EntrySummary, fetchFollowUps } from "../api";
+import EntryList from "./EntryList";
 
 export interface Props {
   entry: EntrySummary | Entry;
   className?: string;
   previewable?: boolean;
+  showFollowUps: boolean;
   expandedDefault?: boolean;
   showDate?: boolean;
-  onSelect?: () => void;
-  onFollowUp?: () => void;
-  onSupersede?: () => void;
+  onSelect?: (entry: EntrySummary) => void;
+  onFollowUp?: (entry: EntrySummary) => void;
+  onSupersede?: (entry: EntrySummary) => void;
 }
 
 export default function EntryRow({
   entry,
   className,
   previewable,
+  showFollowUps,
   expandedDefault,
   showDate,
   onSelect,
@@ -26,6 +29,8 @@ export default function EntryRow({
   onSupersede,
 }: PropsWithChildren<Props>) {
   const [expanded, setExpanded] = useState(Boolean(expandedDefault));
+  const [followUps, setFollowUps] = useState<EntrySummary[] | null>(null);
+
   const [bodyContent, setBodyContent] = useState<string | null>(
     "text" in entry ? entry.text : null
   );
@@ -43,27 +48,30 @@ export default function EntryRow({
       const fullEntry = await getOrFetch(entry.id);
       setBodyContent(fullEntry.text);
     }
+    if (!followUps) {
+      setFollowUps(await fetchFollowUps(entry.id));
+    }
     setExpanded((expanded) => !expanded);
   }
 
   function supersede(e: React.MouseEvent<HTMLElement, MouseEvent>) {
     e.stopPropagation();
-    onSupersede?.();
+    onSupersede?.(entry);
   }
 
   function followUp(e: React.MouseEvent<SVGSVGElement, MouseEvent>) {
     e.stopPropagation();
-    onFollowUp?.();
+    onFollowUp?.(entry);
   }
 
   return (
     <>
       <div
         tabIndex={0}
-        onClick={() => onSelect?.()}
+        onClick={() => onSelect?.(entry)}
         className={cn(
           "flex items-center",
-          onSelect && "cursor-pointer",
+          onSelect && "cursor-pointer hover:bg-gray-50",
           className
         )}
       >
@@ -155,17 +163,34 @@ export default function EntryRow({
         </div>
       </div>
       {expanded && (
-        <div
-          className={cn(
-            "p-2 bg-gray-100 preview",
-            bodyContent || "text-gray-500"
+        <>
+          <div
+            className={cn(
+              "p-2 bg-gray-100 preview",
+              bodyContent || "text-gray-500"
+            )}
+            dangerouslySetInnerHTML={
+              bodyContent ? { __html: bodyContent } : undefined
+            }
+          >
+            {bodyContent ? undefined : "No body content"}
+          </div>
+          {(followUps || []).length !== 0 && (
+            <div className="ml-12 border-l">
+              {showFollowUps && (
+                <EntryList
+                  entries={followUps || []}
+                  isLoading={!followUps}
+                  previewable
+                  showEntryDates
+                  onSelect={onSelect}
+                  onFollowUp={onFollowUp}
+                  onSupersede={onSupersede}
+                />
+              )}
+            </div>
           )}
-          dangerouslySetInnerHTML={
-            bodyContent ? { __html: bodyContent } : undefined
-          }
-        >
-          {bodyContent ? undefined : "No body content"}
-        </div>
+        </>
       )}
     </>
   );

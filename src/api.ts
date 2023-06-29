@@ -62,9 +62,12 @@ export async function fetchEntry(id: string): Promise<Entry> {
   return data.payload;
 }
 
-export async function fetchFollowUps(id: string): Promise<Entry> {
+export async function fetchFollowUps(id: string): Promise<EntrySummary[]> {
   const res = await fetch(`logs/${id}/follow-up`);
   const data = await res.json();
+  if (data.errorCode !== 0) {
+    return [];
+  }
   return data.payload;
 }
 
