@@ -4,8 +4,7 @@ import cn from "classnames";
 import EntryRow from "./EntryRow";
 import Spinner from "./Spinner";
 
-export interface Props<E extends EntrySummary>
-  extends Omit<HTMLProps<HTMLDivElement>, "onSelect"> {
+export interface Props<E extends EntrySummary> {
   entries: E[];
   isLoading?: boolean;
   previewable?: boolean;
@@ -27,20 +26,11 @@ export default function EntryList<E extends EntrySummary>({
   onSelect,
   onFollowUp,
   onSupersede,
-  className,
-  ...rest
 }: Props<E>) {
   let currentDate: string | undefined;
 
   return (
-    <div
-      className={cn(
-        isLoading && "bg-gray-100",
-        className,
-        "px-3 overflow-y-auto rounded-lg"
-      )}
-      {...rest}
-    >
+    <>
       {isLoading ? (
         <Spinner large className="mt-4 m-auto" />
       ) : (
@@ -83,6 +73,6 @@ export default function EntryList<E extends EntrySummary>({
           })}
         </>
       )}
-    </div>
+    </>
   );
 }

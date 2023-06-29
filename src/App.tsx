@@ -51,16 +51,22 @@ function App() {
         </div>
       </div>
       <div className="flex-1 flex overflow-hidden">
-        <EntryList
-          entries={entries || []}
-          isLoading={!entries}
-          previewable
-          showDayHeaders
-          onSelect={select}
-          onFollowUp={followUp}
-          onSupersede={() => undefined}
-          className={entryPane && !paneFullscreen ? "w-1/2" : "w-full"}
-        />
+        <div
+          className={cn(
+            entryPane && !paneFullscreen ? "w-1/2" : "w-full",
+            "border-r px-3 overflow-y-auto"
+          )}
+        >
+          <EntryList
+            entries={entries || []}
+            isLoading={!entries}
+            previewable
+            showDayHeaders
+            onSelect={select}
+            onFollowUp={followUp}
+            onSupersede={() => undefined}
+          />
+        </div>
         {entryPane && (
           <EntryPane
             kind={entryPane}
