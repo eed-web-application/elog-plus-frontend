@@ -7,6 +7,7 @@ import EntryRow from "./components/EntryRow";
 import { useEntriesStore } from "./entriesStore";
 import Spinner from "./components/Spinner";
 import EntryPane, { PaneKind } from "./components/EntryPane";
+import EntryList from "./components/EntryList";
 
 function App() {
   const [entries, setEntries] = useState<EntrySummary[] | null>(null);
@@ -18,14 +19,6 @@ function App() {
   useEffect(() => {
     fetchEntries(filters.logbooks).then((entries) => setEntries(entries));
   }, [filters]);
-
-  async function select(entryId: string) {
-    const entry = await getOrFetch(entryId);
-    setEntryPane(["viewingEntry", entry]);
-  }
-
-  let currentDate: string | undefined;
-
   function closePane() {
     setEntryPane(null);
   }
@@ -39,9 +32,14 @@ function App() {
     setEntryPane(["viewingEntry", entry]);
   }
 
-  async function followUp(id: string) {
-    const entry = await getOrFetch(id);
-    setEntryPane(["followingUp", entry]);
+  async function select(entry: EntrySummary) {
+    const fullEntry = await getOrFetch(entry.id);
+    setEntryPane(["viewingEntry", fullEntry]);
+  }
+
+  async function followUp(entry: EntrySummary) {
+    const fullEntry = await getOrFetch(entry.id);
+    setEntryPane(["followingUp", fullEntry]);
   }
 
   return (
@@ -53,53 +51,16 @@ function App() {
         </div>
       </div>
       <div className="flex-1 flex overflow-hidden">
-        <div
-          className={cn(
-            entryPane && !paneFullscreen ? "w-1/2" : "w-full",
-            Boolean(entries) && "bg-gray-100",
-            "px-3 overflow-y-auto rounded-lg"
-          )}
-        >
-          {entries ? (
-            <>
-              {entries.map((entry) => {
-                let dateHeader;
-
-                const entryDate = entry.logDate.substring(0, 10);
-                if (entryDate !== currentDate) {
-                  dateHeader = (
-                    <h3
-                      key={entry.logDate}
-                      className="text-lg mt-2 pb-1 border-b"
-                    >
-                      {new Date(entry.logDate).toLocaleDateString("en-us", {
-                        weekday: "long",
-                        year: "numeric",
-                        month: "short",
-                        day: "numeric",
-                      })}
-                    </h3>
-                  );
-
-                  currentDate = entryDate;
-                }
-
-                return (
-                  <Fragment key={entry.id}>
-                    {dateHeader}
-                    <EntryRow
-                      entry={entry}
-                      onSelected={select}
-                      onFollowUp={() => followUp(entry.id)}
-                    />
-                  </Fragment>
-                );
-              })}
-            </>
-          ) : (
-            <Spinner large className="mt-4 m-auto" />
-          )}
-        </div>
+        <EntryList
+          entries={entries || []}
+          isLoading={!entries}
+          previewable
+          showDayHeaders
+          onSelect={select}
+          onFollowUp={followUp}
+          onSupersede={() => undefined}
+          className={entryPane && !paneFullscreen ? "w-1/2" : "w-full"}
+        />
         {entryPane && (
           <EntryPane
             kind={entryPane}

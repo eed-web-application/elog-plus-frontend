@@ -7,23 +7,25 @@ import { Entry, EntrySummary } from "../api";
 export interface Props {
   entry: EntrySummary | Entry;
   className?: string;
-  onSelected?: (id: string) => void;
-  onFollowUp?: () => void;
-  readonly?: boolean;
-  previewing?: boolean;
+  previewable?: boolean;
+  expandedDefault?: boolean;
   showDate?: boolean;
+  onSelect?: () => void;
+  onFollowUp?: () => void;
+  onSupersede?: () => void;
 }
 
 export default function EntryRow({
   entry,
   className,
-  onSelected,
-  onFollowUp,
-  readonly,
-  previewing: previewingDefault,
+  previewable,
+  expandedDefault,
   showDate,
+  onSelect,
+  onFollowUp,
+  onSupersede,
 }: PropsWithChildren<Props>) {
-  const [previewing, setPreviewing] = useState(Boolean(previewingDefault));
+  const [expanded, setExpanded] = useState(Boolean(expandedDefault));
   const [bodyContent, setBodyContent] = useState<string | null>(
     "text" in entry ? entry.text : null
   );
@@ -35,13 +37,18 @@ export default function EntryRow({
 
   const { getOrFetch } = useEntriesStore();
 
-  async function preview(e: React.MouseEvent<SVGSVGElement, MouseEvent>) {
+  async function toggleExpand(e: React.MouseEvent<SVGSVGElement, MouseEvent>) {
     e.stopPropagation();
     if (!("text" in entry)) {
       const fullEntry = await getOrFetch(entry.id);
       setBodyContent(fullEntry.text);
     }
-    setPreviewing((previewing) => !previewing);
+    setExpanded((expanded) => !expanded);
+  }
+
+  function supersede(e: React.MouseEvent<HTMLElement, MouseEvent>) {
+    e.stopPropagation();
+    onSupersede?.();
   }
 
   function followUp(e: React.MouseEvent<SVGSVGElement, MouseEvent>) {
@@ -53,10 +60,10 @@ export default function EntryRow({
     <>
       <div
         tabIndex={0}
-        onClick={() => onSelected?.(entry.id)}
+        onClick={() => onSelect?.()}
         className={cn(
           "border-b flex items-center",
-          readonly || "cursor-pointer",
+          onSelect && "cursor-pointer",
           className
         )}
       >
@@ -84,11 +91,14 @@ export default function EntryRow({
             ))}
           </div>
         </div>
-
-        {readonly || (
-          <div className="flex">
-            {/* Used a container, so the icon doesn't get crop due to rounded-full */}
-            <div className={cn(IconButton, "rounded-full mr-2")} tabIndex={0}>
+        <div className="flex">
+          {/* Used a container, so the icon doesn't get crop due to rounded-full */}
+          {onSupersede && (
+            <div
+              className={cn(IconButton, "rounded-full mr-2")}
+              tabIndex={0}
+              onClick={supersede}
+            >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
@@ -104,7 +114,9 @@ export default function EntryRow({
                 />
               </svg>
             </div>
+          )}
 
+          {onFollowUp && (
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
@@ -121,6 +133,8 @@ export default function EntryRow({
                 d="M15 15l6-6m0 0l-6-6m6 6H9a6 6 0 000 12h3"
               />
             </svg>
+          )}
+          {previewable && (
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
@@ -128,8 +142,8 @@ export default function EntryRow({
               strokeWidth={1.5}
               stroke="currentColor"
               tabIndex={0}
-              className={cn(IconButton, { "rotate-180": previewing })}
-              onClick={preview}
+              className={cn(IconButton, { "rotate-180": expanded })}
+              onClick={toggleExpand}
             >
               <path
                 strokeLinecap="round"
@@ -137,10 +151,10 @@ export default function EntryRow({
                 d="M19.5 8.25l-7.5 7.5-7.5-7.5"
               />
             </svg>
-          </div>
-        )}
+          )}
+        </div>
       </div>
-      {previewing && (
+      {expanded && (
         <div
           className={cn(
             "p-2 bg-gray-200 preview",
