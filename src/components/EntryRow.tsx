@@ -62,7 +62,7 @@ export default function EntryRow({
         tabIndex={0}
         onClick={() => onSelect?.()}
         className={cn(
-          "border-b flex items-center",
+          "flex items-center",
           onSelect && "cursor-pointer",
           className
         )}
@@ -157,7 +157,7 @@ export default function EntryRow({
       {expanded && (
         <div
           className={cn(
-            "p-2 bg-gray-200 preview",
+            "p-2 bg-gray-100 preview",
             bodyContent || "text-gray-500"
           )}
           dangerouslySetInnerHTML={

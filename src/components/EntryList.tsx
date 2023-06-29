@@ -57,17 +57,21 @@ export default function EntryList<E extends EntrySummary>({
             return (
               <Fragment key={entry.id}>
                 {dateHeader}
-                <EntryRow
-                  entry={entry}
-                  previewable={previewable}
-                  expandedDefault={expandPreviewsDefault}
-                  showDate={showEntryDates}
-                  onSelect={onSelect ? () => onSelect(entry) : undefined}
-                  onFollowUp={onFollowUp ? () => onFollowUp(entry) : undefined}
-                  onSupersede={
-                    onSupersede ? () => onSupersede(entry) : undefined
-                  }
-                />
+                <div className="border-b">
+                  <EntryRow
+                    entry={entry}
+                    previewable={previewable}
+                    expandedDefault={expandPreviewsDefault}
+                    showDate={showEntryDates}
+                    onSelect={onSelect ? () => onSelect(entry) : undefined}
+                    onFollowUp={
+                      onFollowUp ? () => onFollowUp(entry) : undefined
+                    }
+                    onSupersede={
+                      onSupersede ? () => onSupersede(entry) : undefined
+                    }
+                  />
+                </div>
               </Fragment>
             );
           })}
