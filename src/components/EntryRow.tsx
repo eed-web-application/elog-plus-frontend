@@ -9,7 +9,7 @@ export interface Props {
   entry: EntrySummary | Entry;
   className?: string;
   previewable?: boolean;
-  showFollowUps: boolean;
+  showFollowUps?: boolean;
   expandedDefault?: boolean;
   showDate?: boolean;
   onSelect?: (entry: EntrySummary) => void;
