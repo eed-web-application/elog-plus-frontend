@@ -175,19 +175,17 @@ export default function EntryRow({
           >
             {bodyContent ? undefined : "No body content"}
           </div>
-          {(followUps || []).length !== 0 && (
+          {showFollowUps && (
             <div className="ml-12 border-l">
-              {showFollowUps && (
-                <EntryList
-                  entries={followUps || []}
-                  isLoading={!followUps}
-                  previewable
-                  showEntryDates
-                  onSelect={onSelect}
-                  onFollowUp={onFollowUp}
-                  onSupersede={onSupersede}
-                />
-              )}
+              <EntryList
+                entries={followUps || []}
+                isLoading={!followUps}
+                previewable
+                showEntryDates
+                onSelect={onSelect}
+                onFollowUp={onFollowUp}
+                onSupersede={onSupersede}
+              />
             </div>
           )}
         </>
