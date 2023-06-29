@@ -8,7 +8,7 @@ import EntryList from "./EntryList";
 export interface Props {
   entry: EntrySummary | Entry;
   className?: string;
-  previewable?: boolean;
+  expandable?: boolean;
   showFollowUps?: boolean;
   expandedDefault?: boolean;
   showDate?: boolean;
@@ -20,7 +20,7 @@ export interface Props {
 export default function EntryRow({
   entry,
   className,
-  previewable,
+  expandable,
   showFollowUps,
   expandedDefault,
   showDate,
@@ -142,7 +142,7 @@ export default function EntryRow({
               />
             </svg>
           )}
-          {previewable && (
+          {expandable && (
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
@@ -165,10 +165,7 @@ export default function EntryRow({
       {expanded && (
         <>
           <div
-            className={cn(
-              "p-2 bg-gray-100 preview",
-              bodyContent || "text-gray-500"
-            )}
+            className={cn("p-2 bg-gray-100", bodyContent || "text-gray-500")}
             dangerouslySetInnerHTML={
               bodyContent ? { __html: bodyContent } : undefined
             }
@@ -180,7 +177,7 @@ export default function EntryRow({
               <EntryList
                 entries={followUps || []}
                 isLoading={!followUps}
-                previewable
+                expandable
                 showEntryDates
                 onSelect={onSelect}
                 onFollowUp={onFollowUp}

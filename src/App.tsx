@@ -63,7 +63,7 @@ function App() {
           <EntryList
             entries={entries || []}
             isLoading={!entries}
-            previewable
+            expandable
             showDayHeaders
             onSelect={select}
             onFollowUp={followUp}

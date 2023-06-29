@@ -88,7 +88,7 @@ function EntryForm({
     <>
       {entryPreview && (
         <div className="border-b pb-2">
-          <EntryRow entry={entryPreview} showDate previewable showFollowUps />
+          <EntryRow entry={entryPreview} showDate expandable showFollowUps />
         </div>
       )}
       <form noValidate onSubmit={submit} className="mt-3">

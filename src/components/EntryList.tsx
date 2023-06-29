@@ -6,8 +6,8 @@ import Spinner from "./Spinner";
 export interface Props {
   entries: EntrySummary[];
   isLoading?: boolean;
-  previewable?: boolean;
-  expandPreviewsDefault?: boolean;
+  expandable?: boolean;
+  expandDefault?: boolean;
   showDayHeaders?: boolean;
   showEntryDates?: boolean;
   onSelect?: (entry: EntrySummary) => void;
@@ -18,8 +18,8 @@ export interface Props {
 export default function EntryList({
   entries,
   isLoading,
-  previewable,
-  expandPreviewsDefault,
+  expandable,
+  expandDefault,
   showDayHeaders,
   showEntryDates,
   onSelect,
@@ -59,9 +59,9 @@ export default function EntryList({
                 <div className={index === entries.length - 1 ? "" : "border-b"}>
                   <EntryRow
                     entry={entry}
-                    previewable={previewable}
+                    expandable={expandable}
                     showFollowUps
-                    expandedDefault={expandPreviewsDefault}
+                    expandedDefault={expandDefault}
                     showDate={showEntryDates}
                     onSelect={onSelect ? (entry) => onSelect(entry) : undefined}
                     onFollowUp={
