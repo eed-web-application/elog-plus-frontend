@@ -3,9 +3,7 @@ import cn from "classnames";
 import { EntrySummary, fetchEntries } from "./api";
 import Filters, { Filters as FiltersObject } from "./components/Filters";
 import Navbar from "./components/Navbar";
-import EntryRow from "./components/EntryRow";
 import { useEntriesStore } from "./entriesStore";
-import Spinner from "./components/Spinner";
 import EntryPane, { PaneKind } from "./components/EntryPane";
 import EntryList from "./components/EntryList";
 
@@ -42,6 +40,11 @@ function App() {
     setEntryPane(["followingUp", fullEntry]);
   }
 
+  async function supersede(entry: EntrySummary) {
+    const fullEntry = await getOrFetch(entry.id);
+    setEntryPane(["superseding", fullEntry]);
+  }
+
   return (
     <div className="max-h-screen flex flex-col">
       <div className="p-3 shadow z-10">
@@ -64,7 +67,7 @@ function App() {
             showDayHeaders
             onSelect={select}
             onFollowUp={followUp}
-            onSupersede={() => undefined}
+            onSupersede={supersede}
           />
         </div>
         {entryPane && (

@@ -93,3 +93,16 @@ export async function followUp(
   const data = await res.json();
   return data.payload;
 }
+
+export async function supersede(
+  superseding: string,
+  entry: EntryForm
+): Promise<string> {
+  const res = await fetch(`logs/${superseding}/supersede`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(entry),
+  });
+  const data = await res.json();
+  return data.payload;
+}

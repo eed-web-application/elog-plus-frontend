@@ -1,5 +1,5 @@
 import { FormEvent, useEffect, useState } from "react";
-import { Entry, createEntry, fetchLogbooks, followUp } from "../api";
+import { Entry, createEntry, fetchLogbooks, followUp, supersede } from "../api";
 import Select from "./Select";
 import { Button, IconButton, Input, InputInvalid } from "./base";
 import cn from "classnames";
@@ -8,13 +8,15 @@ import EntryRow from "./EntryRow";
 function EntryForm({
   onEntryCreated,
   followingUp,
+  superseding,
 }: {
   onEntryCreated: (id: string) => void;
   followingUp?: Entry;
+  superseding?: Entry;
 }) {
   const [logbooks, setLogbooks] = useState<null | string[]>(null);
   const [logbook, setLogbook] = useState<null | string>(
-    followingUp?.logbook || null
+    followingUp?.logbook || superseding?.logbook || null
   );
   const [title, setTitle] = useState<string>("");
   const [text, setText] = useState<string>("");
@@ -71,6 +73,8 @@ function EntryForm({
     };
     if (followingUp) {
       id = await followUp(followingUp.id, entry);
+    } else if (superseding) {
+      id = await supersede(superseding.id, entry);
     } else {
       id = await createEntry(entry);
     }
@@ -78,11 +82,13 @@ function EntryForm({
     onEntryCreated(id);
   }
 
+  const entryPreview = followingUp || superseding;
+
   return (
     <>
-      {followingUp && (
+      {entryPreview && (
         <div className="border-b pb-2">
-          <EntryRow entry={followingUp} showDate previewable showFollowUps />
+          <EntryRow entry={entryPreview} showDate previewable showFollowUps />
         </div>
       )}
       <form noValidate onSubmit={submit} className="mt-3">
@@ -101,7 +107,7 @@ function EntryForm({
             onBlur={() => validate("title")}
           />
         </label>
-        {!followingUp && (
+        {!followingUp && !superseding && (
           <label className="text-gray-500 block mb-2">
             Logbook
             <Select
@@ -139,7 +145,8 @@ function EntryForm({
 export type PaneKind =
   | ["followingUp", Entry]
   | ["newEntry"]
-  | ["viewingEntry", Entry];
+  | ["viewingEntry", Entry]
+  | ["superseding", Entry];
 
 export interface Props {
   kind: PaneKind;
@@ -161,8 +168,19 @@ export default function EntryPane({
     headerText = kind[1].title;
   } else if (kind[0] === "followingUp") {
     headerText = "Follow up";
+  } else if (kind[0] === "superseding") {
+    headerText = "Supersede";
   } else {
     headerText = "New Entry";
+  }
+
+  let body;
+  if (kind[0] === "followingUp") {
+    body = <EntryForm onEntryCreated={onEntryCreated} followingUp={kind[1]} />;
+  } else if (kind[0] === "superseding") {
+    body = <EntryForm onEntryCreated={onEntryCreated} superseding={kind[1]} />;
+  } else if (kind[0] === "newEntry") {
+    body = <EntryForm onEntryCreated={onEntryCreated} />;
   }
 
   return (
@@ -249,9 +267,7 @@ export default function EntryPane({
             kind[0] === "viewingEntry" ? { __html: kind[1].text } : undefined
           }
         >
-          {kind[0] === "viewingEntry" ? undefined : (
-            <EntryForm onEntryCreated={onEntryCreated} followingUp={kind[1]} />
-          )}
+          {body}
         </div>
       </div>
       <div
