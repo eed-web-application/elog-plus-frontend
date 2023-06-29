@@ -12,8 +12,8 @@ dependencies:
     specifier: ^6.4.0
     version: 6.4.0
   '@fortawesome/react-fontawesome':
-    specifier: github:fortawesome/react-fontawesome
-    version: github.com/fortawesome/react-fontawesome/976c1adc59934b34e52b11c03dda4bd69831a6df(@fortawesome/fontawesome-svg-core@6.4.0)(react@18.2.0)
+    specifier: ^0.2.0
+    version: 0.2.0(@fortawesome/fontawesome-svg-core@6.4.0)(react@18.2.0)
   classnames:
     specifier: ^2.3.2
     version: 2.3.2
@@ -595,6 +595,17 @@ packages:
     requiresBuild: true
     dependencies:
       '@fortawesome/fontawesome-common-types': 6.4.0
+    dev: false
+
+  /@fortawesome/react-fontawesome@0.2.0(@fortawesome/fontawesome-svg-core@6.4.0)(react@18.2.0):
+    resolution: {integrity: sha512-uHg75Rb/XORTtVt7OS9WoK8uM276Ufi7gCzshVWkUJbHhh3svsUUeqXerrM96Wm7fRiDzfKRwSoahhMIkGAYHw==}
+    peerDependencies:
+      '@fortawesome/fontawesome-svg-core': ~1 || ~6
+      react: '>=16.3'
+    dependencies:
+      '@fortawesome/fontawesome-svg-core': 6.4.0
+      prop-types: 15.8.1
+      react: 18.2.0
     dev: false
 
   /@humanwhocodes/config-array@0.11.10:
@@ -2256,18 +2267,4 @@ packages:
     dependencies:
       react: 18.2.0
       use-sync-external-store: 1.2.0(react@18.2.0)
-    dev: false
-
-  github.com/fortawesome/react-fontawesome/976c1adc59934b34e52b11c03dda4bd69831a6df(@fortawesome/fontawesome-svg-core@6.4.0)(react@18.2.0):
-    resolution: {tarball: https://codeload.github.com/fortawesome/react-fontawesome/tar.gz/976c1adc59934b34e52b11c03dda4bd69831a6df}
-    id: github.com/fortawesome/react-fontawesome/976c1adc59934b34e52b11c03dda4bd69831a6df
-    name: '@fortawesome/react-fontawesome'
-    version: 0.2.0
-    peerDependencies:
-      '@fortawesome/fontawesome-svg-core': ~1 || ~6
-      react: '>=16.3'
-    dependencies:
-      '@fortawesome/fontawesome-svg-core': 6.4.0
-      prop-types: 15.8.1
-      react: 18.2.0
     dev: false
