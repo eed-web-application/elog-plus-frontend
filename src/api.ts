@@ -106,3 +106,16 @@ export async function supersede(
   const data = await res.json();
   return data.payload;
 }
+
+export async function uploadAttachment(file: File) {
+  const formData = new FormData();
+
+  formData.append("uploadFile", file);
+
+  const res = await fetch("attachment", {
+    method: "POST",
+    body: formData,
+  });
+  const data = await res.json();
+  return data.payload;
+}
