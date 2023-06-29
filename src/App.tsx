@@ -1,4 +1,4 @@
-import { Fragment, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import cn from "classnames";
 import { EntrySummary, fetchEntries } from "./api";
 import Filters, { Filters as FiltersObject } from "./components/Filters";

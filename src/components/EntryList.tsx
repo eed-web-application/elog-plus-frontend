@@ -1,22 +1,21 @@
-import { Fragment, HTMLProps } from "react";
+import { Fragment } from "react";
 import { EntrySummary } from "../api";
-import cn from "classnames";
 import EntryRow from "./EntryRow";
 import Spinner from "./Spinner";
 
-export interface Props<E extends EntrySummary> {
-  entries: E[];
+export interface Props {
+  entries: EntrySummary[];
   isLoading?: boolean;
   previewable?: boolean;
   expandPreviewsDefault?: boolean;
   showDayHeaders?: boolean;
   showEntryDates?: boolean;
-  onSelect?: (entry: E) => void;
-  onFollowUp?: (entry: E) => void;
-  onSupersede?: (entry: E) => void;
+  onSelect?: (entry: EntrySummary) => void;
+  onFollowUp?: (entry: EntrySummary) => void;
+  onSupersede?: (entry: EntrySummary) => void;
 }
 
-export default function EntryList<E extends EntrySummary>({
+export default function EntryList({
   entries,
   isLoading,
   previewable,
@@ -26,7 +25,7 @@ export default function EntryList<E extends EntrySummary>({
   onSelect,
   onFollowUp,
   onSupersede,
-}: Props<E>) {
+}: Props) {
   let currentDate: string | undefined;
 
   return (
@@ -64,12 +63,12 @@ export default function EntryList<E extends EntrySummary>({
                     showFollowUps
                     expandedDefault={expandPreviewsDefault}
                     showDate={showEntryDates}
-                    onSelect={onSelect ? () => onSelect(entry) : undefined}
+                    onSelect={onSelect ? (entry) => onSelect(entry) : undefined}
                     onFollowUp={
-                      onFollowUp ? () => onFollowUp(entry) : undefined
+                      onFollowUp ? (entry) => onFollowUp(entry) : undefined
                     }
                     onSupersede={
-                      onSupersede ? () => onSupersede(entry) : undefined
+                      onSupersede ? (entry) => onSupersede(entry) : undefined
                     }
                   />
                 </div>
