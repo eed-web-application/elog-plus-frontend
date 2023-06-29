@@ -80,7 +80,12 @@ function EntryForm({
 
   return (
     <>
-      <form noValidate onSubmit={submit}>
+      {followingUp && (
+        <div className="border-b pb-2">
+          <EntryRow entry={followingUp} showDate previewable showFollowUps />
+        </div>
+      )}
+      <form noValidate onSubmit={submit} className="mt-3">
         <label className="text-gray-500 block mb-2">
           Title
           <input
@@ -96,20 +101,22 @@ function EntryForm({
             onBlur={() => validate("title")}
           />
         </label>
-        <label className="text-gray-500 block mb-2">
-          Logbook
-          <Select
-            required
-            containerClassName="block w-full"
-            className="w-full"
-            options={logbooks || []}
-            isLoading={!logbooks}
-            value={logbook}
-            setValue={setLogbook}
-            invalid={invalid.includes("logbook")}
-            onBlur={() => validate("logbook")}
-          />
-        </label>
+        {!followingUp && (
+          <label className="text-gray-500 block mb-2">
+            Logbook
+            <Select
+              required
+              containerClassName="block w-full"
+              className="w-full"
+              options={logbooks || []}
+              isLoading={!logbooks}
+              value={logbook}
+              setValue={setLogbook}
+              invalid={invalid.includes("logbook")}
+              onBlur={() => validate("logbook")}
+            />
+          </label>
+        )}
         <label className="text-gray-500 block mb-2">
           Text
           <textarea
@@ -125,17 +132,6 @@ function EntryForm({
           value="Create"
         />
       </form>
-      {followingUp && (
-        <>
-          <h3 className="text-lg mt-2 mb-2">Following up:</h3>
-          <EntryRow
-            className="bg-gray-100"
-            entry={followingUp}
-            showDate
-            expandedDefault
-          />
-        </>
-      )}
     </>
   );
 }
@@ -164,7 +160,7 @@ export default function EntryPane({
   if (kind[0] === "viewingEntry") {
     headerText = kind[1].title;
   } else if (kind[0] === "followingUp") {
-    headerText = "Following Up: " + kind[1].title;
+    headerText = "Follow up";
   } else {
     headerText = "New Entry";
   }
