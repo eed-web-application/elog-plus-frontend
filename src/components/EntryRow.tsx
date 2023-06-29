@@ -1,5 +1,5 @@
 import cn from "classnames";
-import { PropsWithChildren, useState } from "react";
+import { PropsWithChildren, useEffect, useState } from "react";
 import { IconButton } from "./base";
 import { useEntriesStore } from "../entriesStore";
 import { Entry, EntrySummary } from "../api";
@@ -27,13 +27,17 @@ export default function EntryRow({
   const [bodyContent, setBodyContent] = useState<string | null>(
     "text" in entry ? entry.text : null
   );
+  useEffect(() => {
+    if ("text" in entry) {
+      setBodyContent(entry.text);
+    }
+  }, [entry]);
+
   const { getOrFetch } = useEntriesStore();
 
   async function preview(e: React.MouseEvent<SVGSVGElement, MouseEvent>) {
     e.stopPropagation();
-    if ("text" in entry) {
-      setBodyContent(entry.text);
-    } else {
+    if (!("text" in entry)) {
       const fullEntry = await getOrFetch(entry.id);
       setBodyContent(fullEntry.text);
     }
