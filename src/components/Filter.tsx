@@ -1,10 +1,11 @@
 import cn from "classnames";
-import { PropsWithChildren, useState } from "react";
+import { PropsWithChildren, useRef, useState } from "react";
 import {
   useFloating,
   useDismiss,
   useInteractions,
-  offset,
+  arrow,
+  shift,
 } from "@floating-ui/react";
 import { MouseEvent } from "react";
 
@@ -25,6 +26,8 @@ export default function Filter({
   className,
 }: PropsWithChildren<Props>) {
   const [isOpen, setIsOpen] = useState(false);
+  const arrowRef = useRef(null);
+
   const { refs, floatingStyles, context } = useFloating({
     open: isOpen,
     onOpenChange: (isOpen) => {
@@ -33,22 +36,27 @@ export default function Filter({
       }
       setIsOpen(isOpen);
     },
-    placement: "bottom-start",
+    placement: "bottom",
 
     middleware: [
-      offset(({ rects }) => {
-        return -rects.reference.height;
+      shift(),
+      arrow({
+        element: arrowRef,
       }),
     ],
   });
 
   function onClick() {
-    setIsOpen(true);
+    if (!isOpen) {
+      onClose?.();
+    }
+    setIsOpen((isOpen) => !isOpen);
   }
 
   function disable(e: MouseEvent<SVGSVGElement>) {
     e.stopPropagation();
     onDisable?.();
+    setIsOpen(false);
   }
 
   const dismiss = useDismiss(context);
@@ -107,7 +115,7 @@ export default function Filter({
         <div
           ref={refs.setFloating}
           style={floatingStyles}
-          className="absolute left-0 top-0 z-10 shadow bg-white rounded-lg"
+          className="mx-3 m-1 shadow bg-white rounded-lg"
           {...getFloatingProps()}
         >
           {children}

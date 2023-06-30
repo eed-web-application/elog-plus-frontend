@@ -27,14 +27,14 @@ export default function Filters({ filters, setFilters }: Props) {
   }, [logbooks]);
 
   function logbookFilterLabel() {
-    if (filters.logbooks.length === 0) {
+    if (stagedFilters.logbooks.length === 0) {
       return "Logbook";
     }
 
-    let out = filters.logbooks[0];
-    if (filters.logbooks.length > 1) {
-      out += ` and ${filters.logbooks.length - 1} other`;
-      if (filters.logbooks.length > 2) {
+    let out = stagedFilters.logbooks[0];
+    if (stagedFilters.logbooks.length > 1) {
+      out += ` and ${stagedFilters.logbooks.length - 1} other`;
+      if (stagedFilters.logbooks.length > 2) {
         out += "s";
       }
     }
@@ -47,8 +47,8 @@ export default function Filters({ filters, setFilters }: Props) {
       <Filter
         className="mr-3"
         label={logbookFilterLabel()}
-        enabled={filters.logbooks.length !== 0}
-        onDisable={() => setFilters({ ...filters, logbooks: [] })}
+        enabled={stagedFilters.logbooks.length !== 0}
+        onDisable={() => setFilters({ ...stagedFilters, logbooks: [] })}
         onClose={() => setFilters(stagedFilters)}
       >
         <LogbookSelect
