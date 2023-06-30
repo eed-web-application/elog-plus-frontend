@@ -1,8 +1,4 @@
 import {
-  FontAwesomeIcon,
-  FontAwesomeIconProps,
-} from "@fortawesome/react-fontawesome";
-import {
   faFileImage,
   faFileAudio,
   faFileVideo,
@@ -16,6 +12,7 @@ import {
   faFile,
   IconDefinition,
 } from "@fortawesome/free-solid-svg-icons";
+import FaIcon, { FaIconProps } from "./FaIcon";
 
 // https://gist.github.com/colemanw/9c9a12aae16a4bfe2678de86b661d922
 const iconClasses: { [key: string]: IconDefinition } = {
@@ -44,7 +41,7 @@ const iconClasses: { [key: string]: IconDefinition } = {
   "application/zip": faFileArchive,
 };
 
-export interface Props extends Omit<FontAwesomeIconProps, "icon"> {
+export interface Props extends Omit<FaIconProps, "icon"> {
   mimeType: string;
 }
 
@@ -55,5 +52,5 @@ export default function AttachmentIcon({ mimeType, ...rest }: Props) {
 
   const icon = candidate ? candidate[1] : faFile;
 
-  return <FontAwesomeIcon {...rest} icon={icon} />;
+  return <FaIcon {...rest} icon={icon} />;
 }
