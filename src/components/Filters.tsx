@@ -24,7 +24,7 @@ export default function Filters({ filters, setFilters }: Props) {
     if (!logbooks) {
       fetchLogbooks().then((logbooks) => setLogbooks(logbooks));
     }
-  }, []);
+  }, [logbooks]);
 
   function logbookFilterLabel() {
     if (filters.logbooks.length === 0) {
