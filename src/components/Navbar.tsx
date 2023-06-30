@@ -10,9 +10,9 @@ export default function Navbar({
 }: HTMLProps<HTMLDivElement>) {
   return (
     <div className={cn("flex flex-wrap", className)} {...rest}>
-      <button className="text-center mb-3 w-full sm:mb-0 sm:w-auto">
+      <Link to="/" className="text-center mb-3 w-full sm:mb-0 sm:w-auto">
         <img src={elogLogo} className="inline" alt="SLAC E-LOG logo" />
-      </button>
+      </Link>
       <form className="flex-1 mr-2 sm:mx-2">
         <div className="relative w-full">
           <input
