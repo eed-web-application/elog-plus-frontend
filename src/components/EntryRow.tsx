@@ -5,6 +5,7 @@ import { IconButton } from "./base";
 import { useEntriesStore } from "../entriesStore";
 import { Entry, EntrySummary, fetchFollowUps } from "../api";
 import EntryList from "./EntryList";
+import Tag from "./Tag";
 
 export interface Props {
   entry: EntrySummary | Entry;
@@ -89,13 +90,11 @@ export default function EntryRow({
             <div className="truncate leading-[1.2]">{entry.title}</div>
           )}
           <div className="flex items-center h-5">
-            <div className="text-sm text-gray-500 leading-none ">
+            <div className="text-sm text-gray-500 leading-none truncate">
               {entry.author}
             </div>
-            {entry.tags?.map((tag) => (
-              <div className="ml-2 border-gray-400 px-1.5 py-0.5 border text-sm leading-none rounded-full">
-                {tag}
-              </div>
+            {entry.tags.map((tag) => (
+              <Tag className="ml-1.5">{tag}</Tag>
             ))}
           </div>
         </div>

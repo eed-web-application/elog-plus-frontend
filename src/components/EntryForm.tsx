@@ -13,6 +13,7 @@ import Select from "./Select";
 import { Button, Input, InputInvalid } from "./base";
 import EntryRow from "./EntryRow";
 import AttachmentIcon from "./AttachmentIcon";
+import MultiSelect from "./MultiSelect";
 
 type Attachment = {
   id: null | string;
@@ -96,6 +97,7 @@ export default function EntryForm({
   );
   const [title, setTitle] = useState<string>("");
   const [text, setText] = useState<string>("");
+  const [tags, setTags] = useState<string[]>([]);
   const [attachments, setAttachments] = useState<Attachment[]>([]);
 
   const validators = {
@@ -249,6 +251,14 @@ export default function EntryForm({
             value={text}
             placeholder=""
             className={cn(Input, "block w-full h-48")}
+          />
+        </label>
+        <label className="text-gray-500 block mb-2">
+          Tags
+          <MultiSelect
+            options={["tag-1", "tag-2", "tag-3"]}
+            value={tags}
+            setValue={setTags}
           />
         </label>
         <label className="text-gray-500 block mb-2">
