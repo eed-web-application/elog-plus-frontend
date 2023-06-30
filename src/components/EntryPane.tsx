@@ -3,7 +3,9 @@ import cn from "classnames";
 import { useDropzone } from "react-dropzone";
 import {
   Entry,
+  EntrySummary,
   createEntry,
+  fetchFollowUps,
   fetchLogbooks,
   followUp,
   supersede,
@@ -13,6 +15,7 @@ import Select from "./Select";
 import { Button, IconButton, Input, InputInvalid } from "./base";
 import EntryRow from "./EntryRow";
 import AttachmentIcon from "./AttachmentIcon";
+import EntryList from "./EntryList";
 
 type Attachment = {
   id: null | string;
@@ -302,6 +305,8 @@ export interface Props {
   setFullscreen: (fullscreen: boolean) => void;
   onCancel: () => void;
   onEntryCreated: (id: string) => void;
+  onFollowUp: (entry: EntrySummary) => void;
+  onSelect: (entry: EntrySummary) => void;
 }
 
 export default function EntryPane({
@@ -310,7 +315,13 @@ export default function EntryPane({
   setFullscreen,
   onCancel,
   onEntryCreated,
+  onFollowUp,
+  onSelect,
 }: Props) {
+  const [followUps, setFollowUps] = useState<{
+    [id: string]: EntrySummary[] | null;
+  }>({});
+
   let headerText;
   if (kind[0] === "viewingEntry") {
     headerText = kind[1].title;
@@ -329,7 +340,21 @@ export default function EntryPane({
     body = <EntryForm onEntryCreated={onEntryCreated} superseding={kind[1]} />;
   } else if (kind[0] === "newEntry") {
     body = <EntryForm onEntryCreated={onEntryCreated} />;
+  } else if (!kind[1].text) {
+    body = <div className="text-gray-500">No entry text</div>;
   }
+
+  useEffect(() => {
+    if (kind[0] === "viewingEntry") {
+      setFollowUps((followUps) => ({ ...followUps, [kind[1].id]: null }));
+      fetchFollowUps(kind[1].id).then((entryFollowUps) => {
+        setFollowUps((followUps) => ({
+          ...followUps,
+          [kind[1].id]: entryFollowUps,
+        }));
+      });
+    }
+  }, [kind]);
 
   return (
     <>
@@ -412,11 +437,33 @@ export default function EntryPane({
         <div
           className="p-3 pt-2"
           dangerouslySetInnerHTML={
-            kind[0] === "viewingEntry" ? { __html: kind[1].text } : undefined
+            kind[0] === "viewingEntry" && kind[1].text
+              ? { __html: kind[1].text }
+              : undefined
           }
         >
           {body}
         </div>
+        {kind[0] === "viewingEntry" && (
+          <>
+            <button
+              className={cn(Button, "mb-3 mr-3 block ml-auto")}
+              onClick={() => onFollowUp(kind[1])}
+            >
+              Follow up
+            </button>
+            <div className="px-3 border-t pt-3">
+              <EntryList
+                entries={followUps[kind[1].id] || []}
+                isLoading={!followUps[kind[1].id]}
+                emptyLabel="No follow ups"
+                showEntryDates
+                onSelect={onSelect}
+                expandable
+              />
+            </div>
+          </>
+        )}
       </div>
       <div
         className={cn(

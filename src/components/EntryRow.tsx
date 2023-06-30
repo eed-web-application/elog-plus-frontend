@@ -170,7 +170,7 @@ export default function EntryRow({
               bodyContent ? { __html: bodyContent } : undefined
             }
           >
-            {bodyContent ? undefined : "No body content"}
+            {bodyContent ? undefined : "No entry text"}
           </div>
           {showFollowUps && (
             <div className="ml-12 border-l">

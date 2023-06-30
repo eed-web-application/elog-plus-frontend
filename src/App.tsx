@@ -62,6 +62,7 @@ function App() {
         >
           <EntryList
             entries={entries || []}
+            emptyLabel="No entries found"
             isLoading={!entries}
             expandable
             showDayHeaders
@@ -77,6 +78,8 @@ function App() {
             setFullscreen={setPaneFullscreen}
             onCancel={closePane}
             onEntryCreated={createdEntry}
+            onFollowUp={followUp}
+            onSelect={select}
           />
         )}
       </div>
