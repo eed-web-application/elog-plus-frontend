@@ -176,6 +176,7 @@ export default function EntryRow({
             <div className="ml-12 border-l">
               <EntryList
                 entries={followUps || []}
+                emptyLabel=""
                 isLoading={!followUps}
                 expandable
                 showEntryDates
