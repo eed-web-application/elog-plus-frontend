@@ -8,12 +8,12 @@ export interface Props {
   emptyLabel: string;
   isLoading?: boolean;
   expandable?: boolean;
+  selectable?: boolean;
   expandDefault?: boolean;
   showDayHeaders?: boolean;
   showEntryDates?: boolean;
-  onSelect?: (entry: EntrySummary) => void;
-  onFollowUp?: (entry: EntrySummary) => void;
-  onSupersede?: (entry: EntrySummary) => void;
+  allowFollowUp?: boolean;
+  allowSupersede?: boolean;
 }
 
 export default function EntryList({
@@ -21,12 +21,12 @@ export default function EntryList({
   emptyLabel,
   isLoading,
   expandable,
+  selectable,
   expandDefault,
   showDayHeaders,
   showEntryDates,
-  onSelect,
-  onFollowUp,
-  onSupersede,
+  allowFollowUp,
+  allowSupersede,
 }: Props) {
   let currentDate: string | undefined;
 
@@ -66,16 +66,12 @@ export default function EntryList({
               <EntryRow
                 entry={entry}
                 expandable={expandable}
+                selectable={selectable}
                 showFollowUps
                 expandedDefault={expandDefault}
                 showDate={showEntryDates}
-                onSelect={onSelect ? (entry) => onSelect(entry) : undefined}
-                onFollowUp={
-                  onFollowUp ? (entry) => onFollowUp(entry) : undefined
-                }
-                onSupersede={
-                  onSupersede ? (entry) => onSupersede(entry) : undefined
-                }
+                allowFollowUp={allowFollowUp}
+                allowSupersede={allowSupersede}
               />
             </div>
           </Fragment>

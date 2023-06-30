@@ -1,15 +1,15 @@
-import elogLogo from "../assets/temp_elog_logo.png";
 import cn from "classnames";
+import { Link } from "react-router-dom";
+import elogLogo from "../assets/temp_elog_logo.png";
 import { Button, Input } from "./base";
+import { HTMLProps } from "react";
 
-interface Props {
-  className?: string;
-  onNewEntry: () => void;
-}
-
-export default function Navbar({ className, onNewEntry }: Props) {
+export default function Navbar({
+  className,
+  ...rest
+}: HTMLProps<HTMLDivElement>) {
   return (
-    <div className={cn("flex flex-wrap", className)}>
+    <div className={cn("flex flex-wrap", className)} {...rest}>
       <button className="text-center mb-3 w-full sm:mb-0 sm:w-auto">
         <img src={elogLogo} className="inline" alt="SLAC E-LOG logo" />
       </button>
@@ -43,9 +43,9 @@ export default function Navbar({ className, onNewEntry }: Props) {
           </button>
         </div>
       </form>
-      <button className={cn(Button)} onClick={onNewEntry}>
+      <Link to="/new-entry" className={cn(Button)}>
         New Entry
-      </button>
+      </Link>
     </div>
   );
 }

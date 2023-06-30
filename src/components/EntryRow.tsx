@@ -1,5 +1,6 @@
 import cn from "classnames";
 import { PropsWithChildren, useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { IconButton } from "./base";
 import { useEntriesStore } from "../entriesStore";
 import { Entry, EntrySummary, fetchFollowUps } from "../api";
@@ -8,25 +9,25 @@ import EntryList from "./EntryList";
 export interface Props {
   entry: EntrySummary | Entry;
   className?: string;
+  selectable?: boolean;
   expandable?: boolean;
   showFollowUps?: boolean;
   expandedDefault?: boolean;
   showDate?: boolean;
-  onSelect?: (entry: EntrySummary) => void;
-  onFollowUp?: (entry: EntrySummary) => void;
-  onSupersede?: (entry: EntrySummary) => void;
+  allowFollowUp?: boolean;
+  allowSupersede?: boolean;
 }
 
 export default function EntryRow({
   entry,
   className,
   expandable,
+  selectable,
   showFollowUps,
   expandedDefault,
   showDate,
-  onSelect,
-  onFollowUp,
-  onSupersede,
+  allowFollowUp,
+  allowSupersede,
 }: PropsWithChildren<Props>) {
   const [expanded, setExpanded] = useState(Boolean(expandedDefault));
   const [followUps, setFollowUps] = useState<EntrySummary[] | null>(null);
@@ -44,6 +45,7 @@ export default function EntryRow({
 
   async function toggleExpand(e: React.MouseEvent<SVGSVGElement, MouseEvent>) {
     e.stopPropagation();
+
     if (!("text" in entry)) {
       const fullEntry = await getOrFetch(entry.id);
       setBodyContent(fullEntry.text);
@@ -54,24 +56,12 @@ export default function EntryRow({
     setExpanded((expanded) => !expanded);
   }
 
-  function supersede(e: React.MouseEvent<HTMLElement, MouseEvent>) {
-    e.stopPropagation();
-    onSupersede?.(entry);
-  }
-
-  function followUp(e: React.MouseEvent<SVGSVGElement, MouseEvent>) {
-    e.stopPropagation();
-    onFollowUp?.(entry);
-  }
-
   return (
     <>
       <div
-        tabIndex={0}
-        onClick={() => onSelect?.(entry)}
         className={cn(
           "flex items-center",
-          onSelect && "cursor-pointer hover:bg-gray-50",
+          selectable && "cursor-pointer relative hover:bg-gray-50",
           className
         )}
       >
@@ -87,7 +77,17 @@ export default function EntryRow({
           <div className="leading-none">{entry.logDate.substring(11, 16)}</div>
         </div>
         <div className="flex-1 flex flex-col py-1 overflow-hidden">
-          <div className="truncate leading-[1.2]">{entry.title}</div>
+          {selectable ? (
+            <Link
+              to={`/${entry.id}`}
+              // see https://inclusive-components.design/cards/
+              className="truncate leading-[1.2] after:absolute after:left-0 after:right-0 after:bottom-0 after:top-0"
+            >
+              {entry.title}
+            </Link>
+          ) : (
+            <div className="truncate leading-[1.2]">{entry.title}</div>
+          )}
           <div className="flex items-center h-5">
             <div className="text-sm text-gray-500 leading-none ">
               {entry.author}
@@ -101,11 +101,12 @@ export default function EntryRow({
         </div>
         <div className="flex">
           {/* Used a container, so the icon doesn't get crop due to rounded-full */}
-          {onSupersede && (
-            <div
-              className={cn(IconButton, "rounded-full mr-2")}
+          {allowSupersede && (
+            <Link
+              to={`/${entry.id}/supersede`}
+              className={cn(IconButton, "rounded-full mr-2 z-0")}
               tabIndex={0}
-              onClick={supersede}
+              onClick={(e) => e.stopPropagation()}
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -121,26 +122,29 @@ export default function EntryRow({
                   className="absolute "
                 />
               </svg>
-            </div>
+            </Link>
           )}
 
-          {onFollowUp && (
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={1.5}
-              stroke="currentColor"
-              tabIndex={0}
-              onClick={followUp}
-              className={cn(IconButton, "p-1 mr-2 rotate-180")}
+          {allowFollowUp && (
+            <Link
+              to={`/${entry.id}/follow-up`}
+              className={cn(IconButton, "p-1 mr-2 rotate-180 z-0")}
+              onClick={(e) => e.stopPropagation()}
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M15 15l6-6m0 0l-6-6m6 6H9a6 6 0 000 12h3"
-              />
-            </svg>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={1.5}
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M15 15l6-6m0 0l-6-6m6 6H9a6 6 0 000 12h3"
+                />
+              </svg>
+            </Link>
           )}
           {expandable && (
             <svg
@@ -150,7 +154,7 @@ export default function EntryRow({
               strokeWidth={1.5}
               stroke="currentColor"
               tabIndex={0}
-              className={cn(IconButton, { "rotate-180": expanded })}
+              className={cn(IconButton, "z-0", { "rotate-180": expanded })}
               onClick={toggleExpand}
             >
               <path
@@ -178,11 +182,11 @@ export default function EntryRow({
                 entries={followUps || []}
                 emptyLabel=""
                 isLoading={!followUps}
+                selectable
                 expandable
                 showEntryDates
-                onSelect={onSelect}
-                onFollowUp={onFollowUp}
-                onSupersede={onSupersede}
+                allowFollowUp={allowFollowUp}
+                allowSupersede={allowSupersede}
               />
             </div>
           )}

@@ -3,19 +3,16 @@ import cn from "classnames";
 import { useDropzone } from "react-dropzone";
 import {
   Entry,
-  EntrySummary,
   createEntry,
-  fetchFollowUps,
   fetchLogbooks,
   followUp,
   supersede,
   uploadAttachment,
 } from "../api";
 import Select from "./Select";
-import { Button, IconButton, Input, InputInvalid } from "./base";
+import { Button, Input, InputInvalid } from "./base";
 import EntryRow from "./EntryRow";
 import AttachmentIcon from "./AttachmentIcon";
-import EntryList from "./EntryList";
 
 type Attachment = {
   id: null | string;
@@ -84,7 +81,7 @@ function AttachmentCard({
   );
 }
 
-function EntryForm({
+export default function EntryForm({
   onEntryCreated,
   followingUp,
   superseding,
@@ -207,7 +204,7 @@ function EntryForm({
   const entryPreview = followingUp || superseding;
 
   return (
-    <>
+    <div className="px-3">
       {entryPreview && (
         <div className="border-b pb-2">
           <EntryRow entry={entryPreview} showDate expandable showFollowUps />
@@ -289,188 +286,6 @@ function EntryForm({
           value="Create"
         />
       </form>
-    </>
-  );
-}
-
-export type PaneKind =
-  | ["followingUp", Entry]
-  | ["newEntry"]
-  | ["viewingEntry", Entry]
-  | ["superseding", Entry];
-
-export interface Props {
-  kind: PaneKind;
-  fullscreen: boolean;
-  setFullscreen: (fullscreen: boolean) => void;
-  onCancel: () => void;
-  onEntryCreated: (id: string) => void;
-  onFollowUp: (entry: EntrySummary) => void;
-  onSelect: (entry: EntrySummary) => void;
-}
-
-export default function EntryPane({
-  kind,
-  fullscreen,
-  setFullscreen,
-  onCancel,
-  onEntryCreated,
-  onFollowUp,
-  onSelect,
-}: Props) {
-  const [followUps, setFollowUps] = useState<{
-    [id: string]: EntrySummary[] | null;
-  }>({});
-
-  let headerText;
-  if (kind[0] === "viewingEntry") {
-    headerText = kind[1].title;
-  } else if (kind[0] === "followingUp") {
-    headerText = "Follow up";
-  } else if (kind[0] === "superseding") {
-    headerText = "Supersede";
-  } else {
-    headerText = "New Entry";
-  }
-
-  let body;
-  if (kind[0] === "followingUp") {
-    body = <EntryForm onEntryCreated={onEntryCreated} followingUp={kind[1]} />;
-  } else if (kind[0] === "superseding") {
-    body = <EntryForm onEntryCreated={onEntryCreated} superseding={kind[1]} />;
-  } else if (kind[0] === "newEntry") {
-    body = <EntryForm onEntryCreated={onEntryCreated} />;
-  } else if (!kind[1].text) {
-    body = <div className="text-gray-500">No entry text</div>;
-  }
-
-  useEffect(() => {
-    if (kind[0] === "viewingEntry") {
-      setFollowUps((followUps) => ({ ...followUps, [kind[1].id]: null }));
-      fetchFollowUps(kind[1].id).then((entryFollowUps) => {
-        setFollowUps((followUps) => ({
-          ...followUps,
-          [kind[1].id]: entryFollowUps,
-        }));
-      });
-    }
-  }, [kind]);
-
-  return (
-    <>
-      <div
-        className={cn(
-          "overflow-y-auto mx-auto container absolute left-0 right-0 top-0 bottom-0 bg-white z-30 mt-6 rounded-lg",
-          fullscreen ||
-            "sm:w-1/2 sm:relative sm:rounded-none sm:mt-0 sm:bg-transparent"
-        )}
-      >
-        <div className="flex items-center px-1 pt-1">
-          {fullscreen ? (
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={1.5}
-              stroke="currentColor"
-              className={IconButton}
-              tabIndex={0}
-              onClick={() => setFullscreen(false)}
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M6 18L18 6M6 6l12 12"
-              />
-            </svg>
-          ) : (
-            <>
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth={1.5}
-                stroke="currentColor"
-                className={IconButton}
-                tabIndex={0}
-                onClick={onCancel}
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M6 18L18 6M6 6l12 12"
-                  className="block sm:hidden"
-                />
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M8.25 4.5l7.5 7.5-7.5 7.5"
-                  className="hidden sm:block"
-                />
-              </svg>
-            </>
-          )}
-
-          <div className="flex-1 text-center overflow-hidden text-ellipsis whitespace-nowrap">
-            {headerText}
-          </div>
-
-          {fullscreen || (
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={1.5}
-              stroke="currentColor"
-              className={cn(IconButton, "sm:block hidden")}
-              tabIndex={0}
-              onClick={() => setFullscreen(true)}
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M3.75 3.75v4.5m0-4.5h4.5m-4.5 0L9 9M3.75 20.25v-4.5m0 4.5h4.5m-4.5 0L9 15M20.25 3.75h-4.5m4.5 0v4.5m0-4.5L15 9m5.25 11.25h-4.5m4.5 0v-4.5m0 4.5L15 15"
-              />
-            </svg>
-          )}
-        </div>
-        <div
-          className="p-3 pt-2"
-          dangerouslySetInnerHTML={
-            kind[0] === "viewingEntry" && kind[1].text
-              ? { __html: kind[1].text }
-              : undefined
-          }
-        >
-          {body}
-        </div>
-        {kind[0] === "viewingEntry" && (
-          <>
-            <button
-              className={cn(Button, "mb-3 mr-3 block ml-auto")}
-              onClick={() => onFollowUp(kind[1])}
-            >
-              Follow up
-            </button>
-            <div className="px-3 border-t pt-3">
-              <EntryList
-                entries={followUps[kind[1].id] || []}
-                isLoading={!followUps[kind[1].id]}
-                emptyLabel="No follow ups"
-                showEntryDates
-                onSelect={onSelect}
-                expandable
-              />
-            </div>
-          </>
-        )}
-      </div>
-      <div
-        className={cn(
-          "absolute left-0 right-0 bottom-0 top-0 bg-gray-500 bg-opacity-50 z-20",
-          fullscreen || "sm:hidden"
-        )}
-      />
-    </>
+    </div>
   );
 }
