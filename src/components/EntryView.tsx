@@ -3,6 +3,7 @@ import { Entry } from "../api";
 import { Link } from "react-router-dom";
 import { Button } from "./base";
 import EntryList from "./EntryList";
+import EntryBody from "./EntryBody";
 
 export interface Props {
   entry: Entry;
@@ -11,13 +12,8 @@ export interface Props {
 export default function EntryView({ entry }: Props) {
   return (
     <>
-      <div
-        className={cn("p-3 pt-2", entry.text || "text-gray-500")}
-        dangerouslySetInnerHTML={
-          entry.text ? { __html: entry.text } : undefined
-        }
-      >
-        {entry.text ? undefined : "No entry text"}
+      <div className={"p-3 pt-2"}>
+        <EntryBody entry={entry} />
       </div>
       <Link
         to={`/${entry.id}/follow-up`}

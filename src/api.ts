@@ -7,6 +7,18 @@ function fetch(url: string, options: RequestInit = {}) {
 
 let logbooks: string[] | undefined;
 
+export interface Attachment {
+  id: string;
+  fileName: string;
+  contentType: string;
+  previewState:
+    | "Waiting"
+    | "Processing"
+    | "Error"
+    | "PreviewNotAvailable"
+    | "Completed";
+}
+
 export interface EntrySummary {
   id: string;
   logbook: string;
@@ -19,7 +31,7 @@ export interface EntrySummary {
 export interface Entry extends EntrySummary {
   supersedeBy: string;
   text: string;
-  attachments: string[];
+  attachments: Attachment[];
   followUp: EntrySummary[];
 }
 
@@ -110,4 +122,12 @@ export async function uploadAttachment(file: File) {
   });
   const data = await res.json();
   return data.payload;
+}
+
+export function getAttachmentPreviewURL(id: string) {
+  return `${ENDPOINT}/attachment/${id}/preview.jpg`;
+}
+
+export function getAttachmentDownloadURL(id: string) {
+  return `${ENDPOINT}/attachment/${id}/download`;
 }
