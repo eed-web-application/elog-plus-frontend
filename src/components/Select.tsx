@@ -3,6 +3,7 @@ import cn from "classnames";
 import { Input, InputInvalid } from "./base";
 import { size, useFloating } from "@floating-ui/react";
 import Spinner from "./Spinner";
+import useSelectCursor from "../useSelectCursor";
 
 interface Props extends Omit<HTMLProps<HTMLInputElement>, "value"> {
   value: string | null;
@@ -53,6 +54,24 @@ export default function Select({
     }
   }, [value, isOpen]);
 
+  const {
+    cursor,
+    setCursor,
+    optionRefs,
+    onInputKeyDown: inputKeyDownCursorHandler,
+  } = useSelectCursor(filteredOptions.length);
+
+  function onInputKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
+    inputKeyDownCursorHandler(e);
+
+    if (e.code === "Enter") {
+      e.preventDefault();
+
+      setValue(filteredOptions[cursor]);
+      setSearch("");
+    }
+  }
+
   return (
     <div className={cn(containerClassName, "relative")}>
       <input
@@ -68,6 +87,7 @@ export default function Select({
           onBlur?.(e);
           setIsOpen(false);
         }}
+        onKeyDown={onInputKeyDown}
       />
       {
         <div
@@ -107,23 +127,32 @@ export default function Select({
               {isLoading ? <Spinner className="m-auto" /> : "No options"}
             </div>
           ) : (
-            filteredOptions.map((option) => (
-              <div
-                tabIndex={0}
-                key={option}
-                className={cn(
-                  "px-2 p-1  cursor-pointer",
-                  value == option
-                    ? "bg-blue-100 hover:bg-blue-200"
-                    : "hover:bg-gray-100"
-                )}
-                onMouseDown={() => {
-                  setValue(option);
-                }}
-              >
-                {option}
-              </div>
-            ))
+            filteredOptions.map((option, index) => {
+              const selected = value === option;
+              const focused = cursor === index;
+
+              return (
+                <div
+                  tabIndex={0}
+                  key={option}
+                  ref={(el) => (optionRefs.current[index] = el)}
+                  className={cn("px-2 p-1  cursor-pointer", {
+                    "bg-blue-200": selected && focused,
+                    "bg-gray-100": !selected && focused,
+                    "bg-blue-100 hover:bg-blue-200": selected && !focused,
+                    "hover:bg-gray-100": !selected && !focused,
+                  })}
+                  onMouseDown={() => {
+                    setValue(option);
+                  }}
+                  onMouseEnter={() => {
+                    setCursor(index);
+                  }}
+                >
+                  {option}
+                </div>
+              );
+            })
           )}
         </div>
       )}

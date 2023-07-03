@@ -2,6 +2,7 @@ import cn from "classnames";
 import { useState } from "react";
 import Spinner from "./Spinner";
 import { Input } from "./base";
+import useSelectCursor from "../useSelectCursor";
 
 export interface Props {
   selected: string[];
@@ -30,6 +31,23 @@ export default function LogbookSelect({
     }
   }
 
+  const {
+    onInputKeyDown: inputKeyDownCursorHandler,
+    optionRefs,
+    setCursor,
+    cursor,
+  } = useSelectCursor(filteredOptions.length);
+
+  function onInputKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
+    inputKeyDownCursorHandler(e);
+
+    if (e.code === "Enter") {
+      e.preventDefault();
+
+      selectOption(filteredOptions[cursor]);
+    }
+  }
+
   return (
     <>
       <input
@@ -38,6 +56,7 @@ export default function LogbookSelect({
         placeholder="Search..."
         autoFocus
         onChange={(e) => setSearch(e.target.value)}
+        onKeyDown={onInputKeyDown}
       />
       <div className="max-h-64 overflow-y-auto">
         {filteredOptions.length === 0 || isLoading ? (
@@ -45,23 +64,29 @@ export default function LogbookSelect({
             {isLoading ? <Spinner className="m-auto" /> : "No options"}
           </div>
         ) : (
-          filteredOptions.map((option) => (
-            <div
-              tabIndex={0}
-              key={option}
-              className={cn(
-                "px-2 p-1  cursor-pointer",
-                selected.includes(option)
-                  ? "bg-blue-100 hover:bg-blue-200"
-                  : "hover:bg-gray-100"
-              )}
-              // To prevent blur on search input
-              onMouseDown={(e) => e.preventDefault()}
-              onClick={() => selectOption(option)}
-            >
-              {option}
-            </div>
-          ))
+          filteredOptions.map((option, index) => {
+            const focused = cursor === index;
+            const optionSelected = selected.includes(option);
+            return (
+              <div
+                tabIndex={0}
+                key={option}
+                className={cn("px-2 p-1  cursor-pointer", {
+                  "bg-blue-200": optionSelected && focused,
+                  "bg-gray-100": !optionSelected && focused,
+                  "bg-blue-100 hover:bg-blue-200": optionSelected && !focused,
+                  "hover:bg-gray-100": !optionSelected && !focused,
+                })}
+                // To prevent blur on search input
+                onMouseDown={(e) => e.preventDefault()}
+                onClick={() => selectOption(option)}
+                onMouseEnter={() => setCursor(index)}
+                ref={(el) => (optionRefs.current[index] = el)}
+              >
+                {option}
+              </div>
+            );
+          })
         )}
       </div>
     </>

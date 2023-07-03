@@ -55,11 +55,12 @@ export default function MultiSelect({
     ],
   });
 
-  const [cursor, cursorInputProps] = useSelectCursor(
-    filteredOptions.length + (showCreateButton ? 1 : 0)
-  );
-
-  console.log(cursor);
+  const {
+    cursor,
+    optionRefs,
+    setCursor,
+    onInputKeyDown: inputKeyDownCursorHandler,
+  } = useSelectCursor(filteredOptions.length + (showCreateButton ? 1 : 0));
 
   function createCustomOption() {
     if (!search) {
@@ -80,6 +81,8 @@ export default function MultiSelect({
   }
 
   function onInputKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
+    inputKeyDownCursorHandler(e);
+
     if (e.code === "Enter") {
       e.preventDefault();
       if (cursor >= filteredOptions.length && showCreateButton) {
@@ -136,10 +139,7 @@ export default function MultiSelect({
             onBlur?.(e);
             setFocused(false);
           }}
-          onKeyDown={(e) => {
-            cursorInputProps.onKeyDown(e);
-            onInputKeyDown(e);
-          }}
+          onKeyDown={onInputKeyDown}
           size={search.length + 1}
         />
       </div>
@@ -183,6 +183,8 @@ export default function MultiSelect({
                       e.preventDefault();
                       toggleSelection(option);
                     }}
+                    onMouseEnter={() => setCursor(index)}
+                    ref={(el) => (optionRefs.current[index] = el)}
                   >
                     {option}
                   </div>
@@ -195,6 +197,10 @@ export default function MultiSelect({
                     cursor === filteredOptions.length && "bg-gray-100"
                   )}
                   onMouseDown={createCustomOption}
+                  onMouseEnter={() => setCursor(filteredOptions.length)}
+                  ref={(el) =>
+                    (optionRefs.current[filteredOptions.length] = el)
+                  }
                 >
                   <span className="text-gray-500">Create</span> {search}
                 </div>
