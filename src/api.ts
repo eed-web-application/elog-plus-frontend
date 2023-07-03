@@ -20,6 +20,7 @@ export interface Entry extends EntrySummary {
   supersedeBy: string;
   text: string;
   attachments: string[];
+  followUp: EntrySummary[];
 }
 
 export interface EntryForm {
@@ -57,17 +58,8 @@ export async function fetchEntries(
 }
 
 export async function fetchEntry(id: string): Promise<Entry> {
-  const res = await fetch(`logs/${id}`);
+  const res = await fetch(`logs/${id}?includeFollowUps=true`);
   const data = await res.json();
-  return data.payload;
-}
-
-export async function fetchFollowUps(id: string): Promise<EntrySummary[]> {
-  const res = await fetch(`logs/${id}/follow-up`);
-  const data = await res.json();
-  if (data.errorCode !== 0) {
-    return [];
-  }
   return data.payload;
 }
 

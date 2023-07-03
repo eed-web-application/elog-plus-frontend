@@ -1,14 +1,14 @@
 import cn from "classnames";
-import { PropsWithChildren, useEffect, useState } from "react";
+import { PropsWithChildren, useState } from "react";
 import { Link } from "react-router-dom";
 import { IconButton } from "./base";
 import { useEntriesStore } from "../entriesStore";
-import { Entry, EntrySummary, fetchFollowUps } from "../api";
+import { Entry, EntrySummary } from "../api";
 import EntryList from "./EntryList";
 import Tag from "./Tag";
 
 export interface Props {
-  entry: EntrySummary | Entry;
+  entry: EntrySummary;
   className?: string;
   selectable?: boolean;
   expandable?: boolean;
@@ -31,29 +31,14 @@ export default function EntryRow({
   allowSupersede,
 }: PropsWithChildren<Props>) {
   const [expanded, setExpanded] = useState(Boolean(expandedDefault));
-  const [followUps, setFollowUps] = useState<EntrySummary[] | null>(null);
-
-  const [bodyContent, setBodyContent] = useState<string | null>(
-    "text" in entry ? entry.text : null
-  );
-  useEffect(() => {
-    if ("text" in entry) {
-      setBodyContent(entry.text);
-    }
-  }, [entry]);
+  const [fullEntry, setFullEntry] = useState<Entry | null>(null);
 
   const { getOrFetch } = useEntriesStore();
 
   async function toggleExpand(e: React.MouseEvent<SVGSVGElement, MouseEvent>) {
     e.stopPropagation();
 
-    if (!("text" in entry)) {
-      const fullEntry = await getOrFetch(entry.id);
-      setBodyContent(fullEntry.text);
-    }
-    if (!followUps) {
-      setFollowUps(await fetchFollowUps(entry.id));
-    }
+    setFullEntry(await getOrFetch(entry.id));
     setExpanded((expanded) => !expanded);
   }
 
@@ -167,22 +152,21 @@ export default function EntryRow({
           )}
         </div>
       </div>
-      {expanded && (
+      {expanded && fullEntry && (
         <>
           <div
-            className={cn("p-2 bg-gray-100", bodyContent || "text-gray-500")}
+            className={cn("p-2 bg-gray-100", fullEntry.text || "text-gray-500")}
             dangerouslySetInnerHTML={
-              bodyContent ? { __html: bodyContent } : undefined
+              fullEntry.text ? { __html: fullEntry.text } : undefined
             }
           >
-            {bodyContent ? undefined : "No entry text"}
+            {fullEntry.text ? undefined : "No entry text"}
           </div>
           {showFollowUps && (
             <div className="ml-12 border-l">
               <EntryList
-                entries={followUps || []}
+                entries={fullEntry.followUp}
                 emptyLabel=""
-                isLoading={!followUps}
                 selectable
                 expandable
                 showEntryDates

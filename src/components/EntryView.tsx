@@ -1,6 +1,5 @@
-import { useEffect, useState } from "react";
 import cn from "classnames";
-import { Entry, EntrySummary, fetchFollowUps } from "../api";
+import { Entry } from "../api";
 import { Link } from "react-router-dom";
 import { Button } from "./base";
 import EntryList from "./EntryList";
@@ -10,21 +9,6 @@ export interface Props {
 }
 
 export default function EntryView({ entry }: Props) {
-  const [followUps, setFollowUps] = useState<{
-    [id: string]: EntrySummary[] | null;
-  }>({});
-
-  useEffect(() => {
-    setFollowUps((followUps) => ({ ...followUps, [entry.id]: null }));
-
-    fetchFollowUps(entry.id).then((entryFollowUps) => {
-      setFollowUps((followUps) => ({
-        ...followUps,
-        [entry.id]: entryFollowUps,
-      }));
-    });
-  }, [entry]);
-
   return (
     <>
       <div
@@ -43,8 +27,7 @@ export default function EntryView({ entry }: Props) {
       </Link>
       <div className="px-3 border-t pt-3">
         <EntryList
-          entries={followUps[entry.id] || []}
-          isLoading={!followUps[entry.id]}
+          entries={entry.followUp}
           emptyLabel="No follow ups"
           showEntryDates
           expandable
