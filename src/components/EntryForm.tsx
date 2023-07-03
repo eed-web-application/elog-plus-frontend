@@ -256,7 +256,7 @@ export default function EntryForm({
         <label className="text-gray-500 block mb-2">
           Tags
           <MultiSelect
-            options={["tag-1", "tag-2", "tag-3"]}
+            predefinedOptions={["tag-1", "tag-2", "tag-3"]}
             value={tags}
             setValue={setTags}
           />

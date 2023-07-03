@@ -1,32 +1,25 @@
-import {
-  Dispatch,
-  HTMLProps,
-  SetStateAction,
-  useEffect,
-  useState,
-} from "react";
+import { Dispatch, HTMLProps, SetStateAction, useState } from "react";
 import cn from "classnames";
 import { Input, InputInvalid } from "./base";
 import { size, useFloating } from "@floating-ui/react";
 import Spinner from "./Spinner";
 import Tag from "./Tag";
+import useSelectCursor from "../useSelectCursor";
 
 interface Props extends Omit<HTMLProps<HTMLInputElement>, "value"> {
   value: string[];
   setValue: Dispatch<SetStateAction<string[]>>;
-  options: string[];
+  predefinedOptions: string[];
   isLoading?: boolean;
-  containerClassName?: string;
   invalid?: boolean;
 }
 
-export default function Select({
+export default function MultiSelect({
   value,
   setValue,
-  options,
+  predefinedOptions,
   isLoading,
   className,
-  containerClassName,
   placeholder,
   invalid,
   onBlur,
@@ -36,9 +29,17 @@ export default function Select({
   const [search, setSearch] = useState("");
   const [focused, setFocused] = useState(false);
 
-  const filteredOptions = search
-    ? options.filter((option) => option.toLowerCase().includes(search))
-    : options;
+  const filteredOptions = predefinedOptions.filter(
+    (option) =>
+      (!search || option.toLowerCase().includes(search.toLowerCase())) &&
+      !value.includes(option)
+  );
+
+  const exactMatch = predefinedOptions.find(
+    (option) => option.toLowerCase() === search.toLowerCase()
+  );
+
+  const showCreateButton = search && !exactMatch;
 
   const { refs, floatingStyles } = useFloating({
     open: focused,
@@ -54,11 +55,42 @@ export default function Select({
     ],
   });
 
-  // useEffect(() => {
-  //   if (value && !isOpen) {
-  //     setSearch("");
-  //   }
-  // }, [value, isOpen]);
+  const [cursor, cursorInputProps] = useSelectCursor(
+    filteredOptions.length + (showCreateButton ? 1 : 0)
+  );
+
+  console.log(cursor);
+
+  function createCustomOption() {
+    if (!search) {
+      return;
+    }
+    setSearch("");
+    setValue((value) => [...value, search]);
+  }
+
+  function toggleSelection(option: string) {
+    if (value.includes(option)) {
+      setValue((value) =>
+        value.filter((otherOption) => otherOption !== option)
+      );
+    } else {
+      setValue((value) => [...value, option]);
+    }
+  }
+
+  function onInputKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
+    if (e.code === "Enter") {
+      e.preventDefault();
+      if (cursor >= filteredOptions.length && showCreateButton) {
+        createCustomOption();
+      } else if (cursor >= 0 && filteredOptions.length > 0) {
+        toggleSelection(filteredOptions[cursor]);
+      }
+    } else if (e.code === "Backspace" && search === "") {
+      setValue((selected) => selected.slice(0, selected.length - 1));
+    }
+  }
 
   return (
     <div
@@ -77,6 +109,9 @@ export default function Select({
             delectable
             className="mr-2"
             key={option}
+            onMouseDown={(e) => {
+              e.preventDefault();
+            }}
             onDelete={() =>
               setValue((value) =>
                 value.filter((otherOption) => otherOption !== option)
@@ -101,6 +136,11 @@ export default function Select({
             onBlur?.(e);
             setFocused(false);
           }}
+          onKeyDown={(e) => {
+            cursorInputProps.onKeyDown(e);
+            onInputKeyDown(e);
+          }}
+          size={search.length + 1}
         />
       </div>
 
@@ -124,34 +164,42 @@ export default function Select({
           style={floatingStyles}
           className="max-h-64 overflow-y-auto rounded-lg shadow mt-2 text-black bg-white z-10"
         >
-          {filteredOptions.length === 0 || isLoading ? (
-            <div className="text-gray-500 text-center w-full py-3">
-              {isLoading ? <Spinner className="m-auto" /> : "No options"}
+          {isLoading ? (
+            <div className="text-center w-full py-3">
+              <Spinner className="m-auto" />
             </div>
           ) : (
-            filteredOptions.map((option) => (
-              <div
-                tabIndex={0}
-                key={option}
-                className={cn(
-                  "px-2 p-1  cursor-pointer",
-                  value.includes(option)
-                    ? "bg-blue-100 hover:bg-blue-200"
-                    : "hover:bg-gray-100"
-                )}
-                onMouseDown={() => {
-                  if (value.includes(option)) {
-                    setValue((value) =>
-                      value.filter((otherOption) => otherOption !== option)
-                    );
-                  } else {
-                    setValue((value) => [...value, option]);
-                  }
-                }}
-              >
-                {option}
-              </div>
-            ))
+            <>
+              {filteredOptions.map((option, index) => {
+                return (
+                  <div
+                    tabIndex={0}
+                    key={option}
+                    className={cn(
+                      "px-2 p-1 cursor-pointer hover:bg-gray-100",
+                      cursor === index && "bg-gray-100"
+                    )}
+                    onMouseDown={(e) => {
+                      e.preventDefault();
+                      toggleSelection(option);
+                    }}
+                  >
+                    {option}
+                  </div>
+                );
+              })}
+              {showCreateButton && (
+                <div
+                  className={cn(
+                    "px-2 p-1 cursor-pointer hover:bg-gray-100",
+                    cursor === filteredOptions.length && "bg-gray-100"
+                  )}
+                  onMouseDown={createCustomOption}
+                >
+                  <span className="text-gray-500">Create</span> {search}
+                </div>
+              )}
+            </>
           )}
         </div>
       )}
