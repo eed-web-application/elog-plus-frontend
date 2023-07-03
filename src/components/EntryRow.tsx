@@ -94,7 +94,9 @@ export default function EntryRow({
               {entry.author}
             </div>
             {entry.tags.map((tag) => (
-              <Tag className="ml-1.5">{tag}</Tag>
+              <Tag key={tag} className="ml-1.5">
+                {tag}
+              </Tag>
             ))}
           </div>
         </div>

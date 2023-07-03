@@ -97,12 +97,13 @@ export default function EntryForm({
   );
   const [title, setTitle] = useState<string>("");
   const [text, setText] = useState<string>("");
-  const [tags, setTags] = useState<string[]>([]);
   const [attachments, setAttachments] = useState<Attachment[]>([]);
+  const [tags, setTags] = useState<string[]>([]);
 
   const validators = {
     title: () => Boolean(title),
     logbook: () => Boolean(logbook),
+    // Ensure all attachments are downloaded
     attachments: () => attachments.every((attachment) => attachment.id),
   };
 
@@ -149,7 +150,7 @@ export default function EntryForm({
       title,
       logbook: logbook as string,
       attachments: attachments.map(({ id }) => id) as string[],
-      tags: [],
+      tags,
     };
     if (followingUp) {
       id = await followUp(followingUp.id, entry);
@@ -256,7 +257,8 @@ export default function EntryForm({
         <label className="text-gray-500 block mb-2">
           Tags
           <MultiSelect
-            predefinedOptions={["tag-1", "tag-2", "tag-3"]}
+            // TODO: Get tags from the backend and put them here
+            predefinedOptions={[]}
             value={tags}
             setValue={setTags}
           />
