@@ -15,13 +15,21 @@ export default function EntryView({ entry }: Props) {
       <div className={"p-3 pt-2"}>
         <EntryBody entry={entry} />
       </div>
-      <Link
-        to={`/${entry.id}/follow-up`}
-        className={cn(Button, "mb-3 mr-3 block ml-auto w-fit")}
-      >
-        Follow up
-      </Link>
-      <div className="px-3 border-t pt-3">
+      <div className="text-right">
+        <Link
+          to={`/${entry.id}/supersede`}
+          className={cn(Button, "mb-3 mr-3 inline-block ml-auto w-fit")}
+        >
+          Supersede
+        </Link>
+        <Link
+          to={`/${entry.id}/follow-up`}
+          className={cn(Button, "mb-3 mr-3 inline-block ml-auto w-fit")}
+        >
+          Follow up
+        </Link>
+      </div>
+      <div className="p-3 border-t">
         <EntryList
           entries={entry.followUp}
           emptyLabel="No follow ups"
