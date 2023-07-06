@@ -35,7 +35,9 @@ export default function EntryBody({ entry }: Props) {
       ))}
       {attachments.length > 0 && (
         <>
-          <div className="mt-2 mb-1">Attachments</div>
+          <div className="mt-1 pt-1 mb-1 text-gray-500 border-t">
+            Attachments
+          </div>
           <div className="w-full overflow-hidden flex flex-wrap m-auto">
             {attachments.map((attachment) => (
               <AttachmentCard
