@@ -1,25 +1,26 @@
-import React, { HTMLProps } from "react";
+import React, { HTMLProps, forwardRef } from "react";
 import cn from "classnames";
 
 export interface Props extends HTMLProps<HTMLDivElement> {
   delectable?: boolean;
+  clickable?: boolean;
   onDelete?: (event: React.MouseEvent<SVGSVGElement, MouseEvent>) => void;
 }
 
-export default function Tag({
-  delectable,
-  className,
-  children,
-  onDelete,
-  ...rest
-}: Props) {
-  const base =
-    "border-gray-400 border text-sm rounded-full flex overflow-hidden justify-center items-center whitespace-nowrap w-fit";
+const Tag = forwardRef<HTMLDivElement, Props>(function Tag(
+  { delectable, clickable, className, children, onDelete, ...rest },
+  ref
+) {
+  const base = cn(
+    "border-gray-400 border text-sm rounded-full flex justify-center items-center whitespace-nowrap w-fit",
+    clickable && "hover:bg-gray-200"
+  );
 
   if (!delectable) {
     return (
       <div
         className={cn(base, "px-1.5 py-0.5 leading-none", className)}
+        ref={ref}
         {...rest}
       >
         {children}
@@ -28,7 +29,7 @@ export default function Tag({
   }
 
   return (
-    <div className={cn(base, className)} {...rest}>
+    <div className={cn(base, className)} ref={ref} {...rest}>
       <div className="pl-1.5 py-0.5 leading-none">{children}</div>
 
       {delectable && (
@@ -51,4 +52,6 @@ export default function Tag({
       )}
     </div>
   );
-}
+});
+
+export default Tag;
