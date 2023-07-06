@@ -1,4 +1,4 @@
-import { Fragment } from "react";
+import { Fragment, useCallback, useEffect, useMemo } from "react";
 import { EntrySummary } from "../api";
 import EntryRow from "./EntryRow";
 import Spinner from "./Spinner";
@@ -14,6 +14,7 @@ export interface Props {
   showEntryDates?: boolean;
   allowFollowUp?: boolean;
   allowSupersede?: boolean;
+  onBottomVisible?: () => void;
 }
 
 export default function EntryList({
@@ -27,14 +28,34 @@ export default function EntryList({
   showEntryDates,
   allowFollowUp,
   allowSupersede,
+  onBottomVisible,
 }: Props) {
   let currentDate: string | undefined;
 
-  if (isLoading) {
-    return <Spinner large className="my-4 m-auto" />;
-  }
+  const observer = useMemo(
+    () =>
+      new IntersectionObserver(([entry]) => {
+        if (entry.isIntersecting) {
+          onBottomVisible?.();
+        }
+      }),
+    [onBottomVisible]
+  );
 
-  if (entries.length === 0) {
+  const observe = useCallback(
+    (elem: HTMLDivElement | null) => {
+      if (elem) {
+        observer.observe(elem);
+      }
+    },
+    [observer]
+  );
+
+  useEffect(() => {
+    return () => observer.disconnect();
+  }, [observer]);
+
+  if (entries.length === 0 && !isLoading) {
     return <div className="text-gray-500 text-center">{emptyLabel}</div>;
   }
 
@@ -62,7 +83,10 @@ export default function EntryList({
         return (
           <Fragment key={entry.id}>
             {dateHeader}
-            <div className={index === entries.length - 1 ? "" : "border-b"}>
+            <div
+              className={index === entries.length - 1 ? "" : "border-b"}
+              ref={index === entries.length - 1 ? observe : undefined}
+            >
               <EntryRow
                 entry={entry}
                 expandable={expandable}
@@ -77,6 +101,8 @@ export default function EntryList({
           </Fragment>
         );
       })}
+
+      {isLoading && <Spinner large className="my-4 m-auto" />}
     </>
   );
 }

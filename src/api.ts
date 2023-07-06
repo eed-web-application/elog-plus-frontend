@@ -67,18 +67,32 @@ export async function fetchTags(): Promise<string[]> {
   return data.payload;
 }
 
-export async function fetchEntries(
-  logbooks: string[] = []
-): Promise<EntrySummary[]> {
-  const res = await fetch(
-    `logs/paging?${new URLSearchParams({
-      page: "0",
-      size: "25",
-      logbook: logbooks.join(","),
-    }).toString()}`
-  );
+export async function fetchEntries({
+  logbooks = [],
+  anchorDate,
+  numberBeforeAnchor,
+  numberAfterAnchor,
+}: {
+  logbooks?: string[];
+  anchorDate?: string;
+  numberBeforeAnchor?: number;
+  numberAfterAnchor: number;
+}): Promise<EntrySummary[]> {
+  const params: Record<string, string> = {
+    logbook: logbooks.join(","),
+    logsAfter: numberAfterAnchor.toString(),
+  };
+
+  if (anchorDate) {
+    params.anchorDate = anchorDate;
+  }
+  if (numberBeforeAnchor) {
+    params.logsBefore = numberBeforeAnchor.toString();
+  }
+
+  const res = await fetch(`logs?${new URLSearchParams(params).toString()}`);
   const data = await res.json();
-  return data.payload.content;
+  return data.payload;
 }
 
 export async function fetchEntry(id: string): Promise<Entry> {
