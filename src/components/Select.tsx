@@ -106,7 +106,7 @@ export default function Select({
             viewBox="0 0 24 24"
             strokeWidth="1.5"
             stroke="currentColor"
-            className="self-end ml-auto w-6 h-6 text-gray-500"
+            className="cursor-pointer self-end ml-auto w-6 h-6 text-gray-500"
           >
             <path
               strokeLinecap="round"
