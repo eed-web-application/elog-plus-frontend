@@ -6,6 +6,7 @@ import {
   Entry,
   createEntry,
   fetchLogbooks,
+  fetchTags,
   followUp,
   supersede,
   uploadAttachment,
@@ -30,13 +31,14 @@ export default function EntryForm({
   superseding?: Entry;
 }) {
   const [logbooks, setLogbooks] = useState<null | string[]>(null);
+  const [tags, setTags] = useState<null | string[]>(null);
   const [logbook, setLogbook] = useState<null | string>(
     followingUp?.logbook || superseding?.logbook || null
   );
   const [title, setTitle] = useState<string>("");
   const [text, setText] = useState<string>("");
   const [attachments, setAttachments] = useState<LocalAttachment[]>([]);
-  const [tags, setTags] = useState<string[]>([]);
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
 
   const validators = {
     title: () => Boolean(title),
@@ -51,9 +53,15 @@ export default function EntryForm({
 
   useEffect(() => {
     if (!logbooks) {
-      fetchLogbooks().then((logbooks) => setLogbooks(logbooks));
+      fetchLogbooks().then(setLogbooks);
     }
   }, [logbooks]);
+
+  useEffect(() => {
+    if (!tags) {
+      fetchTags().then(setTags);
+    }
+  }, [tags]);
 
   function validate(field: Field): boolean {
     if (validators[field]()) {
@@ -88,7 +96,7 @@ export default function EntryForm({
       title,
       logbook: logbook as string,
       attachments: attachments.map(({ id }) => id) as string[],
-      tags,
+      tags: selectedTags,
     };
     if (followingUp) {
       id = await followUp(followingUp.id, entry);
@@ -195,10 +203,10 @@ export default function EntryForm({
         <label className="text-gray-500 block mb-2">
           Tags
           <MultiSelect
-            // TODO: Get tags from the backend and put them here
-            predefinedOptions={[]}
-            value={tags}
-            setValue={setTags}
+            isLoading={!tags}
+            predefinedOptions={tags || []}
+            value={selectedTags}
+            setValue={setSelectedTags}
           />
         </label>
         <label className="text-gray-500 block mb-2">

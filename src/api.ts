@@ -5,7 +5,8 @@ function fetch(url: string, options: RequestInit = {}) {
   return window.fetch(`${ENDPOINT}/${url}`, options);
 }
 
-let logbooks: string[] | undefined;
+let memoizedLogbooks: string[] | undefined;
+let memoizedTags: string[] | undefined;
 
 export interface Attachment {
   id: string;
@@ -45,21 +46,32 @@ export interface EntryForm {
 
 export async function fetchLogbooks(): Promise<string[]> {
   // Since the logbooks should be static, we can memoize them
-  if (logbooks) {
-    return logbooks;
+  if (memoizedLogbooks) {
+    return memoizedLogbooks;
   }
 
   const res = await fetch("logbooks");
   const data = await res.json();
-  logbooks = data.payload.logbook;
+  memoizedLogbooks = data.payload.logbook;
   return data.payload.logbook;
+}
+
+export async function fetchTags(): Promise<string[]> {
+  if (memoizedTags) {
+    return memoizedTags;
+  }
+
+  const res = await fetch("logs/tags");
+  const data = await res.json();
+  memoizedTags = data.payload;
+  return data.payload;
 }
 
 export async function fetchEntries(
   logbooks: string[] = []
 ): Promise<EntrySummary[]> {
   const res = await fetch(
-    `logs?${new URLSearchParams({
+    `logs/paging?${new URLSearchParams({
       page: "0",
       size: "25",
       logbook: logbooks.join(","),

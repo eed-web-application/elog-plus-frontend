@@ -14,7 +14,7 @@ export default function Tag({
   ...rest
 }: Props) {
   const base =
-    "border-gray-400 border text-sm rounded-full flex overflow-hidden justify-center items-center";
+    "border-gray-400 border text-sm rounded-full flex overflow-hidden justify-center items-center whitespace-nowrap w-fit";
 
   if (!delectable) {
     return (

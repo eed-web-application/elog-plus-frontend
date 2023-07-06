@@ -41,6 +41,7 @@ export default function MultiSelect({
 
   const showCreateButton = search && !exactMatch;
 
+  // TODO: Update on resize
   const { refs, floatingStyles } = useFloating({
     open: focused,
     placement: "bottom-start",
@@ -89,6 +90,7 @@ export default function MultiSelect({
         createCustomOption();
       } else if (cursor >= 0 && filteredOptions.length > 0) {
         toggleSelection(filteredOptions[cursor]);
+        setSearch("");
       }
     } else if (e.code === "Backspace" && search === "") {
       setValue((selected) => selected.slice(0, selected.length - 1));
@@ -102,15 +104,15 @@ export default function MultiSelect({
         invalid && InputInvalid,
         focused && "outline-none ring-1 ring-blue-500 border-blue-500",
         className,
-        "flex"
+        "flex pb-1 pt-1"
       )}
       ref={refs.setReference}
     >
-      <div className="flex flex-wrap flex-1">
+      <div className="flex flex-wrap flex-1 items-center">
         {value.map((option) => (
           <Tag
             delectable
-            className="mr-2"
+            className="mr-2 my-1"
             key={option}
             onMouseDown={(e) => {
               e.preventDefault();
@@ -129,7 +131,7 @@ export default function MultiSelect({
           type="text"
           placeholder={value && !placeholder ? "" : placeholder}
           value={search}
-          className="flex-1 outline-none bg-transparent w-fit"
+          className="flex-1 outline-none bg-transparent w-fit my-1"
           onChange={(e) => setSearch(e.target.value)}
           onFocus={(e) => {
             onFocus?.(e);
