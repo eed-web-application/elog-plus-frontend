@@ -44,6 +44,13 @@ export interface EntryForm {
   attachments: string[];
 }
 
+// Java is weird and doesn't add the z at the end of its dates, so this is
+// what we gotta do
+function normalizeEntry(entry: EntrySummary) {
+  entry.logDate = entry.logDate + "Z";
+  return entry;
+}
+
 export async function fetchLogbooks(): Promise<string[]> {
   // Since the logbooks should be static, we can memoize them
   if (memoizedLogbooks) {
@@ -84,7 +91,8 @@ export async function fetchEntries({
   };
 
   if (anchorDate) {
-    params.anchorDate = anchorDate;
+    // Now, we have to remove the z added by normalizeEntry
+    params.anchorDate = anchorDate.split("Z")[0];
   }
   if (numberBeforeAnchor) {
     params.logsBefore = numberBeforeAnchor.toString();
@@ -92,12 +100,14 @@ export async function fetchEntries({
 
   const res = await fetch(`logs?${new URLSearchParams(params).toString()}`);
   const data = await res.json();
-  return data.payload;
+  console.log(data.payload);
+  return data.payload.map(normalizeEntry);
 }
 
 export async function fetchEntry(id: string): Promise<Entry> {
   const res = await fetch(`logs/${id}?includeFollowUps=true`);
   const data = await res.json();
+  data.payload.followUp = data.payload?.followUp.map(normalizeEntry);
   return data.payload;
 }
 

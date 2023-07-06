@@ -6,6 +6,7 @@ import {
   useInteractions,
   arrow,
   shift,
+  offset,
 } from "@floating-ui/react";
 import { MouseEvent } from "react";
 
@@ -15,6 +16,7 @@ export interface Props {
   onClose?: () => void;
   onDisable?: () => void;
   className?: string;
+  inline?: boolean;
 }
 
 export default function Filter({
@@ -24,9 +26,9 @@ export default function Filter({
   onClose,
   onDisable,
   className,
+  inline,
 }: PropsWithChildren<Props>) {
   const [isOpen, setIsOpen] = useState(false);
-  const arrowRef = useRef(null);
 
   const { refs, floatingStyles, context } = useFloating({
     open: isOpen,
@@ -36,13 +38,15 @@ export default function Filter({
       }
       setIsOpen(isOpen);
     },
-    placement: "bottom",
+    placement: inline ? "bottom-start" : "bottom-start",
 
     middleware: [
       shift(),
-      arrow({
-        element: arrowRef,
-      }),
+      inline
+        ? offset(({ rects }) => {
+            return -rects.reference.height / 2 - rects.floating.height / 2;
+          })
+        : undefined,
     ],
   });
 
@@ -115,7 +119,7 @@ export default function Filter({
         <div
           ref={refs.setFloating}
           style={floatingStyles}
-          className="mx-3 m-1 shadow bg-white rounded-lg"
+          className={cn(inline || "my-1", "shadow bg-white rounded-lg")}
           {...getFloatingProps()}
         >
           {children}

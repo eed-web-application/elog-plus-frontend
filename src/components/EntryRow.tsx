@@ -86,7 +86,13 @@ export default function EntryRow({
               })}
             </div>
           )}
-          <div className="leading-none">{entry.logDate.substring(11, 16)}</div>
+          <div className="leading-none">
+            {new Date(entry.logDate).toLocaleString("en-us", {
+              hour: "numeric",
+              minute: "numeric",
+              hour12: false,
+            })}
+          </div>
         </div>
         <div className="flex-1 flex flex-col py-1 overflow-hidden">
           {selectable ? (

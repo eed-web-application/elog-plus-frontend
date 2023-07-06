@@ -10,7 +10,10 @@ const ENTRIES_PER_LOAD = 25;
 export default function Home() {
   const [entries, setEntries] = useState<EntrySummary[]>([]);
   const [fetchingEntries, setFetchingEntries] = useState<boolean>(true);
-  const [filters, setFilters] = useState<FiltersObject>({ logbooks: [] });
+  const [filters, setFilters] = useState<FiltersObject>({
+    logbooks: [],
+    date: "",
+  });
   const [reachedBottom, setReachedBottom] = useState<boolean>(false);
 
   function onFiltersChanged(filters: FiltersObject) {
@@ -18,8 +21,20 @@ export default function Home() {
     setFilters(filters);
 
     setFetchingEntries(true);
+
+    let date;
+    if (filters.date) {
+      date = new Date(filters.date);
+      // Since we want to include all the entries in the same day of the date
+      // and the backend only returns entries before the date, we make sure the
+      // date is at the end of the day
+      date.setUTCHours(23, 59, 59, 999);
+      date = date.toISOString();
+    }
+
     fetchEntries({
       logbooks: filters.logbooks,
+      anchorDate: date,
       numberAfterAnchor: ENTRIES_PER_LOAD,
     }).then((entries) => {
       setEntries(entries);
