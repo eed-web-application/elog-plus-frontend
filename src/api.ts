@@ -100,7 +100,6 @@ export async function fetchEntries({
 
   const res = await fetch(`logs?${new URLSearchParams(params).toString()}`);
   const data = await res.json();
-  console.log(data.payload);
   return data.payload.map(normalizeEntry);
 }
 

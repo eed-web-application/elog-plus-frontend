@@ -42,7 +42,7 @@ export default function EntryRow({
   const [fullEntry, setFullEntry] = useState<Entry | null>(null);
   const [isTagsOpen, setIsTagsOpen] = useState(false);
 
-  const { getOrFetch } = useEntriesStore();
+  const getOrFetch = useEntriesStore((state) => state.getOrFetch);
 
   async function toggleExpand(e: React.MouseEvent<SVGSVGElement, MouseEvent>) {
     e.stopPropagation();

@@ -1,4 +1,4 @@
-import { Dispatch, HTMLProps, SetStateAction, useState } from "react";
+import { HTMLProps, useState } from "react";
 import cn from "classnames";
 import { Input, InputInvalid } from "./base";
 import { size, useFloating } from "@floating-ui/react";
@@ -8,7 +8,7 @@ import useSelectCursor from "../useSelectCursor";
 
 interface Props extends Omit<HTMLProps<HTMLInputElement>, "value"> {
   value: string[];
-  setValue: Dispatch<SetStateAction<string[]>>;
+  setValue: (value: string[]) => void;
   predefinedOptions: string[];
   isLoading?: boolean;
   invalid?: boolean;
@@ -68,16 +68,14 @@ export default function MultiSelect({
       return;
     }
     setSearch("");
-    setValue((value) => [...value, search]);
+    setValue([...value, search]);
   }
 
   function toggleSelection(option: string) {
     if (value.includes(option)) {
-      setValue((value) =>
-        value.filter((otherOption) => otherOption !== option)
-      );
+      setValue(value.filter((otherOption) => otherOption !== option));
     } else {
-      setValue((value) => [...value, option]);
+      setValue([...value, option]);
     }
   }
 

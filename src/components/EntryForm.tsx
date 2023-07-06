@@ -4,6 +4,7 @@ import { useDropzone } from "react-dropzone";
 import {
   Attachment,
   Entry,
+  EntryForm as EntryFormType,
   createEntry,
   fetchLogbooks,
   fetchTags,
@@ -16,6 +17,7 @@ import { Button, Input, InputInvalid } from "./base";
 import EntryRow from "./EntryRow";
 import MultiSelect from "./MultiSelect";
 import AttachmentCard from "./AttachmentCard";
+import { useDraftsStore } from "../draftsStore";
 
 type LocalAttachment = Omit<Attachment, "id" | "previewState"> & {
   id: null | string;
@@ -30,26 +32,46 @@ export default function EntryForm({
   followingUp?: Entry;
   superseding?: Entry;
 }) {
+  const {
+    newEntry,
+    getOrCreateSupersedingDraft,
+    getOrCreateFollowUpDraft,
+    updateSupersedingDraft,
+    updateFollowUpDraft,
+    updateNewEntry,
+  } = useDraftsStore();
   const [logbooks, setLogbooks] = useState<null | string[]>(null);
   const [tags, setTags] = useState<null | string[]>(null);
-  const [logbook, setLogbook] = useState<null | string>(
-    followingUp?.logbook || superseding?.logbook || null
-  );
-  const [title, setTitle] = useState<string>("");
-  const [text, setText] = useState<string>("");
   const [attachments, setAttachments] = useState<LocalAttachment[]>([]);
-  const [selectedTags, setSelectedTags] = useState<string[]>([]);
 
-  const validators = {
-    title: () => Boolean(title),
-    logbook: () => Boolean(logbook),
-    // Ensure all attachments are downloaded
-    attachments: () => attachments.every((attachment) => attachment.id),
-  };
+  function getDraft() {
+    if (superseding) {
+      return getOrCreateSupersedingDraft(superseding);
+    }
+    if (followingUp) {
+      return getOrCreateFollowUpDraft(followingUp);
+    }
+    return newEntry;
+  }
 
-  type Field = keyof typeof validators;
+  const [draft, setDraft] = useState<EntryFormType>(getDraft());
 
-  const [invalid, setInvalid] = useState<Field[]>([]);
+  useEffect(() => {
+    if (superseding) {
+      updateSupersedingDraft(superseding.id, draft);
+    } else if (followingUp) {
+      updateFollowUpDraft(followingUp.id, draft);
+    } else {
+      updateNewEntry(draft);
+    }
+  }, [
+    draft,
+    superseding,
+    followingUp,
+    updateSupersedingDraft,
+    updateFollowUpDraft,
+    updateNewEntry,
+  ]);
 
   useEffect(() => {
     if (!logbooks) {
@@ -62,6 +84,17 @@ export default function EntryForm({
       fetchTags().then(setTags);
     }
   }, [tags]);
+
+  const validators = {
+    title: () => Boolean(draft.title),
+    logbook: () => Boolean(draft.logbook),
+    // Ensure all attachments are downloaded
+    attachments: () => attachments.length === 0,
+  };
+
+  type Field = keyof typeof validators;
+
+  const [invalid, setInvalid] = useState<Field[]>([]);
 
   function validate(field: Field): boolean {
     if (validators[field]()) {
@@ -91,27 +124,24 @@ export default function EntryForm({
     }
 
     let id;
-    const entry = {
-      text,
-      title,
-      logbook: logbook as string,
-      attachments: attachments.map(({ id }) => id) as string[],
-      tags: selectedTags,
-    };
     if (followingUp) {
-      id = await followUp(followingUp.id, entry);
+      id = await followUp(followingUp.id, draft);
     } else if (superseding) {
-      id = await supersede(superseding.id, entry);
+      id = await supersede(superseding.id, draft);
     } else {
-      id = await createEntry(entry);
+      id = await createEntry(draft);
     }
 
     onEntryCreated(id);
   }
 
-  async function startUploadAttachment(file: File) {
+  async function startAttachmentUpload(file: File) {
     const id = await uploadAttachment(file);
 
+    setDraft((draft) => ({
+      ...draft,
+      attachments: [...draft.attachments, id],
+    }));
     setAttachments((attachments) => {
       const attachmentIndex = attachments.findIndex(
         ({ fileName }) => fileName === file.name
@@ -123,6 +153,12 @@ export default function EntryForm({
   }
 
   async function removeAttachment(attachment: LocalAttachment) {
+    if (attachment.id) {
+      setDraft((draft) => ({
+        ...draft,
+        attachments: draft.attachments.filter((id) => id !== attachment.id),
+      }));
+    }
     setAttachments((attachments) =>
       attachments.filter(({ fileName }) => fileName !== attachment.fileName)
     );
@@ -138,7 +174,7 @@ export default function EntryForm({
         return true;
       });
 
-      newFiles.forEach(startUploadAttachment);
+      newFiles.forEach(startAttachmentUpload);
 
       const newAttachments = newFiles.map((file) => ({
         id: null,
@@ -170,8 +206,10 @@ export default function EntryForm({
               invalid.includes("title") && InputInvalid,
               "block w-full"
             )}
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
+            value={draft.title}
+            onChange={(e) =>
+              setDraft((draft) => ({ ...draft, title: e.target.value }))
+            }
             onBlur={() => validate("title")}
           />
         </label>
@@ -184,8 +222,10 @@ export default function EntryForm({
               className="w-full"
               options={logbooks || []}
               isLoading={!logbooks}
-              value={logbook}
-              setValue={setLogbook}
+              value={draft.logbook}
+              setValue={(logbook) =>
+                setDraft((draft) => ({ ...draft, logbook: logbook || "" }))
+              }
               invalid={invalid.includes("logbook")}
               onBlur={() => validate("logbook")}
             />
@@ -196,15 +236,19 @@ export default function EntryForm({
           <MultiSelect
             isLoading={!tags}
             predefinedOptions={tags || []}
-            value={selectedTags}
-            setValue={setSelectedTags}
+            value={draft.tags}
+            setValue={(tags) =>
+              setDraft((draft) => ({ ...draft, tags: tags || [] }))
+            }
           />
         </label>
         <label className="text-gray-500 block mb-2">
           Text
           <textarea
-            onChange={(e) => setText(e.currentTarget.value)}
-            value={text}
+            value={draft.text}
+            onChange={(e) =>
+              setDraft((draft) => ({ ...draft, text: e.currentTarget.value }))
+            }
             placeholder=""
             className={cn(Input, "block w-full h-48")}
           />
