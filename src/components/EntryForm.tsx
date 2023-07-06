@@ -192,21 +192,21 @@ export default function EntryForm({
           </label>
         )}
         <label className="text-gray-500 block mb-2">
-          Text
-          <textarea
-            onChange={(e) => setText(e.currentTarget.value)}
-            value={text}
-            placeholder=""
-            className={cn(Input, "block w-full h-48")}
-          />
-        </label>
-        <label className="text-gray-500 block mb-2">
           Tags
           <MultiSelect
             isLoading={!tags}
             predefinedOptions={tags || []}
             value={selectedTags}
             setValue={setSelectedTags}
+          />
+        </label>
+        <label className="text-gray-500 block mb-2">
+          Text
+          <textarea
+            onChange={(e) => setText(e.currentTarget.value)}
+            value={text}
+            placeholder=""
+            className={cn(Input, "block w-full h-48")}
           />
         </label>
         <label className="text-gray-500 block mb-2">
