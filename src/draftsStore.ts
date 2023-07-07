@@ -8,9 +8,12 @@ interface DraftsState {
   supersedes: { [id: string]: EntryForm };
   getOrCreateFollowUpDraft: (entry: Entry) => EntryForm;
   getOrCreateSupersedingDraft: (entry: Entry) => EntryForm;
-  updateNewEntry: (draft: EntryForm) => void;
+  updateNewEntryDraft: (draft: EntryForm) => void;
   updateFollowUpDraft: (entryId: string, draft: EntryForm) => void;
   updateSupersedingDraft: (entryId: string, draft: EntryForm) => void;
+  removeNewEntryDraft: () => void;
+  removeFollowUpDraft: (entryId: string) => void;
+  removeSupersedingDraft: (entryId: string) => void;
 }
 
 const DEFAULT_DRAFT: EntryForm = {
@@ -40,7 +43,7 @@ export const useDraftsStore = create(
       getOrCreateSupersedingDraft(entry) {
         return get().supersedes[entry.id] || { ...entry };
       },
-      updateNewEntry(draft) {
+      updateNewEntryDraft(draft) {
         set({ newEntry: draft });
       },
       updateFollowUpDraft(entryId, draft) {
@@ -52,6 +55,23 @@ export const useDraftsStore = create(
         set((state) => ({
           supersedes: { ...state.supersedes, [entryId]: draft },
         }));
+      },
+      removeNewEntryDraft() {
+        set({ newEntry: { ...DEFAULT_DRAFT } });
+      },
+      removeFollowUpDraft(entryId) {
+        set((state) => {
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+          const { [entryId]: _removed, ...rest } = state.followUps;
+          return { supersedes: rest };
+        });
+      },
+      removeSupersedingDraft(entryId) {
+        set((state) => {
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+          const { [entryId]: _removed, ...rest } = state.supersedes;
+          return { supersedes: rest };
+        });
       },
     }),
     {

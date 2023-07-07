@@ -1,4 +1,4 @@
-import { FormEvent, useContext, useEffect, useState } from "react";
+import { FormEvent, useCallback, useContext, useEffect, useState } from "react";
 import cn from "classnames";
 import { useDropzone } from "react-dropzone";
 import {
@@ -39,14 +39,17 @@ export default function EntryForm({
     getOrCreateFollowUpDraft,
     updateSupersedingDraft,
     updateFollowUpDraft,
-    updateNewEntry,
+    updateNewEntryDraft,
+    removeFollowUpDraft,
+    removeSupersedingDraft,
+    removeNewEntryDraft,
   } = useDraftsStore();
   const [logbooks, setLogbooks] = useState<null | string[]>(null);
   const [tags, setTags] = useState<null | string[]>(null);
   const [attachments, setAttachments] = useState<LocalAttachment[]>([]);
   const refreshEntries = useContext(EntryRefreshContext);
 
-  function getDraft() {
+  const getDraft = useCallback(() => {
     if (superseding) {
       return getOrCreateSupersedingDraft(superseding);
     }
@@ -54,9 +57,19 @@ export default function EntryForm({
       return getOrCreateFollowUpDraft(followingUp);
     }
     return newEntry;
-  }
+  }, [
+    superseding,
+    followingUp,
+    getOrCreateSupersedingDraft,
+    getOrCreateFollowUpDraft,
+    newEntry,
+  ]);
 
   const [draft, setDraft] = useState<EntryFormType>(getDraft());
+
+  useEffect(() => {
+    setDraft(getDraft());
+  }, [setDraft, getDraft]);
 
   useEffect(() => {
     if (superseding) {
@@ -64,7 +77,7 @@ export default function EntryForm({
     } else if (followingUp) {
       updateFollowUpDraft(followingUp.id, draft);
     } else {
-      updateNewEntry(draft);
+      updateNewEntryDraft(draft);
     }
   }, [
     draft,
@@ -72,7 +85,7 @@ export default function EntryForm({
     followingUp,
     updateSupersedingDraft,
     updateFollowUpDraft,
-    updateNewEntry,
+    updateNewEntryDraft,
   ]);
 
   useEffect(() => {
@@ -128,10 +141,13 @@ export default function EntryForm({
     let id;
     if (followingUp) {
       id = await followUp(followingUp.id, draft);
+      removeFollowUpDraft(followingUp.id);
     } else if (superseding) {
       id = await supersede(superseding.id, draft);
+      removeSupersedingDraft(superseding.id);
     } else {
       id = await createEntry(draft);
+      removeNewEntryDraft();
     }
 
     refreshEntries();
