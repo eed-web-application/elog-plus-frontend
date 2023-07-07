@@ -5,12 +5,17 @@ import { Button } from "./base";
 import EntryList from "./EntryList";
 import EntryBody from "./EntryBody";
 import Tag from "./Tag";
+import AttachmentCard from "./AttachmentCard";
 
 export interface Props {
   entry: Entry;
 }
 
 export default function EntryView({ entry }: Props) {
+  const attachments = entry.attachments.filter(
+    (attachment) => attachment.previewState !== "Completed"
+  );
+
   return (
     <>
       <div className="p-3 pt-2">
@@ -40,8 +45,22 @@ export default function EntryView({ entry }: Props) {
             </div>
           </>
         )}
-        <EntryBody entry={entry} />
-        <div className="text-right border-t mt-1 pt-3">
+        <EntryBody borderBottom entry={entry} />
+        {attachments.length > 0 && (
+          <>
+            <div className="mt-1 mb-1 text-gray-500">Attachments</div>
+            <div className="w-full overflow-hidden flex flex-wrap m-auto border-b pb-1">
+              {attachments.map((attachment) => (
+                <AttachmentCard
+                  key={attachment.id}
+                  attachment={attachment}
+                  downloadable
+                />
+              ))}
+            </div>
+          </>
+        )}
+        <div className="text-right mt-1 pt-1">
           <Link
             to={`/${entry.id}/supersede`}
             className={cn(Button, "mr-3 inline-block ml-auto w-fit")}
@@ -50,7 +69,7 @@ export default function EntryView({ entry }: Props) {
           </Link>
           <Link
             to={`/${entry.id}/follow-up`}
-            className={cn(Button, "mr-3 inline-block ml-auto w-fit")}
+            className={cn(Button, "inline-block ml-auto w-fit")}
           >
             Follow up
           </Link>

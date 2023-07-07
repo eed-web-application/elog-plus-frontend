@@ -1,23 +1,30 @@
-import { Entry, getAttachmentPreviewURL } from "../api";
 import { Fragment } from "react";
-import AttachmentCard from "./AttachmentCard";
+import cn from "classnames";
+import {
+  Entry,
+  getAttachmentDownloadURL,
+  getAttachmentPreviewURL,
+} from "../api";
+import { IconButton } from "./base";
 
 interface Props {
   entry: Entry;
+  borderBottom?: boolean;
 }
 
-export default function EntryBody({ entry }: Props) {
+export default function EntryBody({ entry, borderBottom }: Props) {
   const figures = entry.attachments.filter(
     (attachment) => attachment.previewState === "Completed"
-  );
-  const attachments = entry.attachments.filter(
-    (attachment) => attachment.previewState !== "Completed"
   );
 
   return (
     <>
       <div
-        className={entry.text || "text-gray-500"}
+        className={cn(
+          entry.text || "text-gray-500",
+          (borderBottom || figures.length > 0) && "border-b",
+          "pb-1"
+        )}
         dangerouslySetInnerHTML={
           entry.text ? { __html: entry.text } : undefined
         }
@@ -31,24 +38,37 @@ export default function EntryBody({ entry }: Props) {
             src={getAttachmentPreviewURL(attachment.id)}
             className="w-full"
           />
+          <div
+            className={cn(
+              "flex items-center justify-between",
+              (borderBottom || index !== figures.length - 1) && "border-b"
+            )}
+          >
+            {attachment.fileName}
+
+            <a
+              className={IconButton}
+              download={attachment.fileName}
+              href={getAttachmentDownloadURL(attachment.id)}
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={1.5}
+                stroke="currentColor"
+                className="h-full w-full"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"
+                />
+              </svg>
+            </a>
+          </div>
         </Fragment>
       ))}
-      {attachments.length > 0 && (
-        <>
-          <div className="mt-1 pt-1 mb-1 text-gray-500 border-t">
-            Attachments
-          </div>
-          <div className="w-full overflow-hidden flex flex-wrap m-auto">
-            {attachments.map((attachment) => (
-              <AttachmentCard
-                key={attachment.id}
-                attachment={attachment}
-                downloadable
-              />
-            ))}
-          </div>
-        </>
-      )}
     </>
   );
 }

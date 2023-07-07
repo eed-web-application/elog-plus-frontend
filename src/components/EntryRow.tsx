@@ -14,6 +14,7 @@ import { useEntriesStore } from "../entriesStore";
 import { Entry, EntrySummary } from "../api";
 import EntryList from "./EntryList";
 import Tag from "./Tag";
+import EntryBody from "./EntryBody";
 
 export interface Props {
   entry: EntrySummary;
@@ -211,12 +212,12 @@ export default function EntryRow({
       {expanded && fullEntry && (
         <>
           <div
-            className={cn("p-2 bg-gray-100", fullEntry.text || "text-gray-500")}
-            dangerouslySetInnerHTML={
-              fullEntry.text ? { __html: fullEntry.text } : undefined
-            }
+            className={cn(
+              "p-2 pb-1 bg-gray-100",
+              fullEntry.text || "text-gray-500"
+            )}
           >
-            {fullEntry.text ? undefined : "No entry text"}
+            <EntryBody entry={fullEntry} />
           </div>
           {showFollowUps && (
             <div className="ml-12 border-l">
