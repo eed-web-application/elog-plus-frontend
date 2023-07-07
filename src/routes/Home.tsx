@@ -54,12 +54,14 @@ export default function Home() {
   }
 
   function onFiltersChange(filters: FiltersObject) {
+    window.location.hash = "";
     setReachedBottom(false);
     setFilters(filters);
     fetchWithFilters(filters, search);
   }
 
   function onSearchChange(search: string) {
+    window.location.hash = "";
     setReachedBottom(false);
     setSearch(search);
     fetchWithFilters(filters, search);
@@ -77,6 +79,8 @@ export default function Home() {
     }
 
     setFilters(DEFAULT_FILTERS);
+    setSearch("");
+
     setFetchingEntries(true);
     getOrFetch(entryId)
       .then((entry) =>
