@@ -83,7 +83,7 @@ export default function Home() {
 
   return (
     <EntryRefreshContext.Provider value={refresh}>
-      <div className="max-h-screen flex flex-col">
+      <div className="h-screen flex flex-col">
         <div className="p-3 shadow z-10">
           <div className="container m-auto">
             <Navbar className="mb-1" />
