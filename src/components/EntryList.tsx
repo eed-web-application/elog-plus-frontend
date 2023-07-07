@@ -60,7 +60,7 @@ export default function EntryList({
   }, [observer]);
 
   if (entries.length === 0 && !isLoading) {
-    return <div className="text-gray-500 text-center">{emptyLabel}</div>;
+    return <div className="text-gray-500 text-center pt-3">{emptyLabel}</div>;
   }
 
   return (
