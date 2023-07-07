@@ -31,9 +31,9 @@ export default function EntryView({ entry }: Props) {
         {entry.tags.length > 0 && (
           <>
             <div className="text-gray-500">Tags</div>
-            <div className="flex border-b pt-1 pb-2 mb-1">
+            <div className="flex flex-wrap border-b pb-2 mb-1">
               {entry.tags.map((tag) => (
-                <Tag key={tag} className="mr-1.5">
+                <Tag key={tag} className="mr-1.5 mt-1">
                   {tag}
                 </Tag>
               ))}
