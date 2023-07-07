@@ -1,12 +1,12 @@
 import cn from "classnames";
-import { PropsWithChildren, useRef, useState } from "react";
+import { PropsWithChildren, useState } from "react";
 import {
   useFloating,
   useDismiss,
   useInteractions,
-  arrow,
   shift,
   offset,
+  autoUpdate,
 } from "@floating-ui/react";
 import { MouseEvent } from "react";
 
@@ -41,13 +41,13 @@ export default function Filter({
     placement: inline ? "bottom-start" : "bottom-start",
 
     middleware: [
-      shift(),
       inline
         ? offset(({ rects }) => {
             return -rects.reference.height / 2 - rects.floating.height / 2;
           })
-        : undefined,
+        : shift(),
     ],
+    whileElementsMounted: autoUpdate,
   });
 
   function onClick() {
@@ -72,6 +72,9 @@ export default function Filter({
       <button
         className={cn(
           "flex items-center text-gray-500 border rounded-2xl pl-3 pr-2",
+          // It looks weird to have an inline element on top of the button
+          // and see the button creep through the side, so we make it invisible.
+          inline && isOpen && "invisible",
           enabled
             ? "bg-blue-100 border-blue-100 hover:bg-blue-200 hover:border-blue-200"
             : "bg-gray-50 border-gray-300 hover:bg-gray-200 hover:border-gray-400",
