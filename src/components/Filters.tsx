@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
-import { fetchLogbooks } from "../api.ts";
+import { fetchLogbooks, fetchTags } from "../api.ts";
 import Filter from "./Filter.tsx";
-import LogbookSelect from "./LogbookSelect.tsx";
+import FilterSelect from "./FilterSelect.tsx";
 import { Input } from "./base.ts";
+import Tag from "./Tag.tsx";
 
 export interface Filters {
   logbooks: string[];
+  tags: string[];
   date: string;
 }
 
@@ -16,12 +18,19 @@ export interface Props {
 
 export default function Filters({ filters, setFilters }: Props) {
   const [logbooks, setLogbooks] = useState<string[] | null>(null);
+  const [tags, setTags] = useState<string[] | null>(null);
 
   useEffect(() => {
     if (!logbooks) {
       fetchLogbooks().then((logbooks) => setLogbooks(logbooks));
     }
   }, [logbooks]);
+
+  useEffect(() => {
+    if (!tags) {
+      fetchTags().then((tags) => setTags(tags));
+    }
+  }, [tags]);
 
   function logbookFilterLabel() {
     if (filters.logbooks.length === 0) {
@@ -39,16 +48,51 @@ export default function Filters({ filters, setFilters }: Props) {
     return out;
   }
 
+  function tagFilterLabel() {
+    if (filters.tags.length === 0) {
+      return "Tags";
+    }
+
+    let andOtherText = "";
+
+    if (filters.tags.length > 2) {
+      andOtherText += ` and ${filters.tags.length - 2} other`;
+      if (filters.tags.length > 3) {
+        andOtherText += "s";
+      }
+    }
+
+    return (
+      <>
+        <div className="flex items-center">
+          {filters.tags?.slice(0, 2).map((tag, index) => (
+            <Tag
+              key={tag}
+              className={
+                (index !== 1 && index !== filters.tags.length - 1) ||
+                andOtherText
+                  ? "mr-1"
+                  : ""
+              }
+            >
+              {tag}
+            </Tag>
+          ))}
+          {andOtherText}
+        </div>
+      </>
+    );
+  }
+
   return (
-    <div className="flex">
+    <div className="flex flex-wrap">
       <Filter
-        className="mr-3"
+        className="mr-3 mt-2"
         label={logbookFilterLabel()}
         enabled={filters.logbooks.length !== 0}
         onDisable={() => setFilters({ ...filters, logbooks: [] })}
-        onClose={() => setFilters(filters)}
       >
-        <LogbookSelect
+        <FilterSelect
           selected={filters.logbooks}
           setSelected={(selected) =>
             setFilters({ ...filters, logbooks: selected })
@@ -58,7 +102,20 @@ export default function Filters({ filters, setFilters }: Props) {
         />
       </Filter>
       <Filter
-        className="mr-3"
+        className="mr-3 mt-2"
+        label={tagFilterLabel()}
+        enabled={filters.tags.length !== 0}
+        onDisable={() => setFilters({ ...filters, tags: [] })}
+      >
+        <FilterSelect
+          selected={filters.tags}
+          setSelected={(selected) => setFilters({ ...filters, tags: selected })}
+          isLoading={tags === null}
+          options={tags || []}
+        />
+      </Filter>
+      <Filter
+        className="mr-3 mt-2"
         label={
           filters.date
             ? new Date(filters.date).toLocaleDateString("en-us", {
@@ -71,7 +128,6 @@ export default function Filters({ filters, setFilters }: Props) {
         }
         enabled={Boolean(filters.date)}
         onDisable={() => setFilters({ ...filters, date: "" })}
-        onClose={() => setFilters(filters)}
         inline
       >
         <input

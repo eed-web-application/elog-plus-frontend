@@ -11,7 +11,7 @@ export interface Props {
   isLoading: boolean;
 }
 
-export default function LogbookSelect({
+export default function FilterSelect({
   selected,
   setSelected,
   options,

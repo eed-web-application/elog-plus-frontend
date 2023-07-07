@@ -13,6 +13,7 @@ export default function Home() {
   const [fetchingEntries, setFetchingEntries] = useState<boolean>(true);
   const [filters, setFilters] = useState<FiltersObject>({
     logbooks: [],
+    tags: [],
     date: "",
   });
   const [reachedBottom, setReachedBottom] = useState<boolean>(false);
@@ -85,7 +86,7 @@ export default function Home() {
       <div className="max-h-screen flex flex-col">
         <div className="p-3 shadow z-10">
           <div className="container m-auto">
-            <Navbar className="mb-3" />
+            <Navbar className="mb-1" />
             <Filters filters={filters} setFilters={onFiltersChanged} />
           </div>
         </div>

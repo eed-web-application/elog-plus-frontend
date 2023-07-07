@@ -1,5 +1,5 @@
 import cn from "classnames";
-import { PropsWithChildren, useState } from "react";
+import { PropsWithChildren, ReactNode, useState } from "react";
 import {
   useFloating,
   useDismiss,
@@ -12,7 +12,7 @@ import { MouseEvent } from "react";
 
 export interface Props {
   enabled: boolean;
-  label: string;
+  label: ReactNode;
   onClose?: () => void;
   onDisable?: () => void;
   className?: string;
@@ -84,7 +84,7 @@ export default function Filter({
         ref={refs.setReference}
         {...getReferenceProps()}
       >
-        <div className="py-1.5">{label}</div>
+        <div className="py-1.5 whitespace-nowrap">{label}</div>
         {enabled ? (
           <svg
             xmlns="http://www.w3.org/2000/svg"
