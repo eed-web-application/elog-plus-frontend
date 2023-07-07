@@ -2,24 +2,44 @@ import cn from "classnames";
 import { Link } from "react-router-dom";
 import elogLogo from "../assets/temp_elog_logo.png";
 import { Button, Input } from "./base";
-import { HTMLProps } from "react";
+import { HTMLProps, useEffect, useState } from "react";
+
+interface Props extends HTMLProps<HTMLDivElement> {
+  search: string;
+  onSearchChange: (search: string) => void;
+}
 
 export default function Navbar({
   className,
+  search,
+  onSearchChange,
   ...rest
-}: HTMLProps<HTMLDivElement>) {
+}: Props) {
+  const [stagedSearch, setStagedSearch] = useState(search);
+
+  useEffect(() => {
+    setStagedSearch(search);
+  }, [setStagedSearch, search]);
+
   return (
     <div className={cn("flex flex-wrap", className)} {...rest}>
       <Link to="/" className="text-center mb-3 w-full sm:mb-0 sm:w-auto">
         <img src={elogLogo} className="inline" alt="SLAC E-LOG logo" />
       </Link>
-      <form className="flex-1 mr-2 sm:mx-2">
+      <form
+        className="flex-1 mr-2 sm:mx-2"
+        onSubmit={(e) => {
+          e.preventDefault();
+          onSearchChange(stagedSearch);
+        }}
+      >
         <div className="relative w-full">
           <input
             type="search"
             className={cn("block w-full", Input)}
             placeholder="Search..."
-            required
+            value={stagedSearch}
+            onChange={(e) => setStagedSearch(e.target.value)}
           />
           <button
             type="submit"

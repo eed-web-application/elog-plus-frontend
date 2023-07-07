@@ -68,10 +68,13 @@ export async function fetchTags(): Promise<string[]> {
     return memoizedTags;
   }
 
-  const res = await fetch("logs/tags");
+  const res = await fetch("tags");
   const data = await res.json();
-  memoizedTags = data.payload;
-  return data.payload;
+  const tags = data.payload.map(
+    (tag: { name: string; id: string }) => tag.name
+  );
+  memoizedTags = tags;
+  return tags;
 }
 
 export async function fetchEntries({
@@ -79,15 +82,20 @@ export async function fetchEntries({
   anchorDate,
   numberBeforeAnchor,
   numberAfterAnchor,
+  search,
+  tags = [],
 }: {
   logbooks?: string[];
   anchorDate?: string;
   numberBeforeAnchor?: number;
   numberAfterAnchor: number;
+  search?: string;
+  tags?: string[];
 }): Promise<EntrySummary[]> {
   const params: Record<string, string> = {
     logbook: logbooks.join(","),
     logsAfter: numberAfterAnchor.toString(),
+    tags: tags.join(","),
   };
 
   if (anchorDate) {
@@ -96,6 +104,9 @@ export async function fetchEntries({
   }
   if (numberBeforeAnchor) {
     params.logsBefore = numberBeforeAnchor.toString();
+  }
+  if (search) {
+    params.textFilter = search;
   }
 
   const res = await fetch(`logs?${new URLSearchParams(params).toString()}`);

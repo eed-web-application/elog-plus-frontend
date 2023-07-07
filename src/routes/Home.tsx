@@ -16,10 +16,12 @@ export default function Home() {
     tags: [],
     date: "",
   });
+  const [search, setSearch] = useState("");
   const [reachedBottom, setReachedBottom] = useState<boolean>(false);
 
   function fetchWithFilters(
     filters: FiltersObject,
+    search: string,
     count: number = ENTRIES_PER_LOAD
   ) {
     setFetchingEntries(true);
@@ -36,6 +38,8 @@ export default function Home() {
 
     fetchEntries({
       logbooks: filters.logbooks,
+      tags: filters.tags,
+      search,
       anchorDate: date,
       numberAfterAnchor: count,
     }).then((entries) => {
@@ -44,10 +48,16 @@ export default function Home() {
     });
   }
 
-  function onFiltersChanged(filters: FiltersObject) {
+  function onFiltersChange(filters: FiltersObject) {
     setReachedBottom(false);
     setFilters(filters);
-    fetchWithFilters(filters);
+    fetchWithFilters(filters, search);
+  }
+
+  function onSearchChange(search: string) {
+    setReachedBottom(false);
+    setSearch(search);
+    fetchWithFilters(filters, search);
   }
 
   useEffect(() => {
@@ -78,7 +88,7 @@ export default function Home() {
   }
 
   async function refresh() {
-    fetchWithFilters(filters, entries.length);
+    fetchWithFilters(filters, search, entries.length);
   }
 
   return (
@@ -86,8 +96,12 @@ export default function Home() {
       <div className="h-screen flex flex-col">
         <div className="p-3 shadow z-10">
           <div className="container m-auto">
-            <Navbar className="mb-1" />
-            <Filters filters={filters} setFilters={onFiltersChanged} />
+            <Navbar
+              className="mb-1"
+              search={search}
+              onSearchChange={onSearchChange}
+            />
+            <Filters filters={filters} setFilters={onFiltersChange} />
           </div>
         </div>
         <div className="flex-1 flex overflow-hidden">
