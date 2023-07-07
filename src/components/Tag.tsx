@@ -29,7 +29,7 @@ const Tag = forwardRef<HTMLDivElement, Props>(function Tag(
   }
 
   return (
-    <div className={cn(base, className)} ref={ref} {...rest}>
+    <div className={cn(base, className, "overflow-hidden")} ref={ref} {...rest}>
       <div className="pl-1.5 py-0.5 leading-none">{children}</div>
 
       {delectable && (
@@ -39,7 +39,7 @@ const Tag = forwardRef<HTMLDivElement, Props>(function Tag(
           viewBox="0 0 24 24"
           strokeWidth={1.5}
           stroke="currentColor"
-          className="w-6 px-1 h-full hover:bg-gray-200"
+          className="w-7 px-1 hover:bg-gray-200"
           tabIndex={0}
           onClick={onDelete}
         >
