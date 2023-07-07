@@ -64,6 +64,7 @@ export default function EntryView({ entry }: Props) {
             emptyLabel="No follow ups"
             showEntryDates
             expandable
+            selectable
           />
         </div>
       )}
