@@ -1,4 +1,4 @@
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, useContext, useEffect, useState } from "react";
 import cn from "classnames";
 import { useDropzone } from "react-dropzone";
 import {
@@ -18,6 +18,7 @@ import EntryRow from "./EntryRow";
 import MultiSelect from "./MultiSelect";
 import AttachmentCard from "./AttachmentCard";
 import { useDraftsStore } from "../draftsStore";
+import EntryRefreshContext from "../EntryRefreshContext";
 
 type LocalAttachment = Omit<Attachment, "id" | "previewState"> & {
   id: null | string;
@@ -43,6 +44,7 @@ export default function EntryForm({
   const [logbooks, setLogbooks] = useState<null | string[]>(null);
   const [tags, setTags] = useState<null | string[]>(null);
   const [attachments, setAttachments] = useState<LocalAttachment[]>([]);
+  const refreshEntries = useContext(EntryRefreshContext);
 
   function getDraft() {
     if (superseding) {
@@ -132,6 +134,7 @@ export default function EntryForm({
       id = await createEntry(draft);
     }
 
+    refreshEntries();
     onEntryCreated(id);
   }
 

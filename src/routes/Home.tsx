@@ -4,6 +4,7 @@ import { EntrySummary, fetchEntries } from "../api";
 import Filters, { Filters as FiltersObject } from "../components/Filters";
 import Navbar from "../components/Navbar";
 import EntryList from "../components/EntryList";
+import EntryRefreshContext from "../EntryRefreshContext";
 
 const ENTRIES_PER_LOAD = 25;
 
@@ -16,10 +17,10 @@ export default function Home() {
   });
   const [reachedBottom, setReachedBottom] = useState<boolean>(false);
 
-  function onFiltersChanged(filters: FiltersObject) {
-    setReachedBottom(false);
-    setFilters(filters);
-
+  function fetchWithFilters(
+    filters: FiltersObject,
+    count: number = ENTRIES_PER_LOAD
+  ) {
     setFetchingEntries(true);
 
     let date;
@@ -35,11 +36,17 @@ export default function Home() {
     fetchEntries({
       logbooks: filters.logbooks,
       anchorDate: date,
-      numberAfterAnchor: ENTRIES_PER_LOAD,
+      numberAfterAnchor: count,
     }).then((entries) => {
       setEntries(entries);
       setFetchingEntries(false);
     });
+  }
+
+  function onFiltersChanged(filters: FiltersObject) {
+    setReachedBottom(false);
+    setFilters(filters);
+    fetchWithFilters(filters);
   }
 
   useEffect(() => {
@@ -69,30 +76,36 @@ export default function Home() {
     setFetchingEntries(false);
   }
 
+  async function refresh() {
+    fetchWithFilters(filters, entries.length);
+  }
+
   return (
-    <div className="max-h-screen flex flex-col">
-      <div className="p-3 shadow z-10">
-        <div className="container m-auto">
-          <Navbar className="mb-3" />
-          <Filters filters={filters} setFilters={onFiltersChanged} />
+    <EntryRefreshContext.Provider value={refresh}>
+      <div className="max-h-screen flex flex-col">
+        <div className="p-3 shadow z-10">
+          <div className="container m-auto">
+            <Navbar className="mb-3" />
+            <Filters filters={filters} setFilters={onFiltersChanged} />
+          </div>
+        </div>
+        <div className="flex-1 flex overflow-hidden">
+          <div className={"border-r px-3 overflow-y-auto flex-1"}>
+            <EntryList
+              entries={entries || []}
+              emptyLabel="No entries found"
+              isLoading={fetchingEntries}
+              selectable
+              expandable
+              showDayHeaders
+              allowFollowUp
+              allowSupersede
+              onBottomVisible={fetchMoreEntries}
+            />
+          </div>
+          <Outlet />
         </div>
       </div>
-      <div className="flex-1 flex overflow-hidden">
-        <div className={"border-r px-3 overflow-y-auto flex-1"}>
-          <EntryList
-            entries={entries || []}
-            emptyLabel="No entries found"
-            isLoading={fetchingEntries}
-            selectable
-            expandable
-            showDayHeaders
-            allowFollowUp
-            allowSupersede
-            onBottomVisible={fetchMoreEntries}
-          />
-        </div>
-        <Outlet />
-      </div>
-    </div>
+    </EntryRefreshContext.Provider>
   );
 }
