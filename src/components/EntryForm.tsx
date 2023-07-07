@@ -266,7 +266,7 @@ export default function EntryForm({
           <textarea
             value={draft.text}
             onChange={(e) =>
-              setDraft((draft) => ({ ...draft, text: e.currentTarget.value }))
+              setDraft((draft) => ({ ...draft, text: e.target.value }))
             }
             placeholder=""
             className={cn(Input, "block w-full h-48")}

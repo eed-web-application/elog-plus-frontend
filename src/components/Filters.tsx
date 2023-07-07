@@ -135,9 +135,7 @@ export default function Filters({ filters, setFilters }: Props) {
           type="date"
           autoFocus
           value={filters.date}
-          onChange={(e) =>
-            setFilters({ ...filters, date: e.currentTarget.value })
-          }
+          onChange={(e) => setFilters({ ...filters, date: e.target.value })}
         />
       </Filter>
     </div>
