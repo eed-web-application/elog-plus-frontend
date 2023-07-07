@@ -91,7 +91,7 @@ export default function MultiSelect({
         setSearch("");
       }
     } else if (e.code === "Backspace" && search === "") {
-      setValue((selected) => selected.slice(0, selected.length - 1));
+      setValue(value.slice(0, value.length - 1));
     }
   }
 
@@ -116,9 +116,7 @@ export default function MultiSelect({
               e.preventDefault();
             }}
             onDelete={() =>
-              setValue((value) =>
-                value.filter((otherOption) => otherOption !== option)
-              )
+              setValue(value.filter((otherOption) => otherOption !== option))
             }
           >
             {option}
