@@ -19,9 +19,9 @@ export default function Pane({
     <>
       <div
         className={cn(
-          "overflow-y-auto mx-auto container absolute left-0 right-0 top-0 bottom-0 bg-white z-30 mt-6 rounded-lg",
+          "overflow-y-auto mx-auto container absolute left-0 right-0 top-0 bottom-0 z-30 bg-white mt-6 rounded-lg",
           fullscreen ||
-            "sm:w-1/2 sm:relative sm:rounded-none sm:mt-0 sm:bg-transparent"
+            "sm:w-1/2 sm:relative sm:rounded-none sm:mt-0 sm:bg-transparent sm:z-auto"
         )}
       >
         <div className="flex items-center px-1 pt-1">
