@@ -1,5 +1,5 @@
 import cn from "classnames";
-import { PropsWithChildren, useState } from "react";
+import { PropsWithChildren, useCallback, useState } from "react";
 import { Link } from "react-router-dom";
 import {
   useDismiss,
@@ -19,6 +19,7 @@ import EntryBody from "./EntryBody";
 export interface Props {
   entry: EntrySummary;
   className?: string;
+  spotlight?: boolean;
   selectable?: boolean;
   expandable?: boolean;
   showFollowUps?: boolean;
@@ -26,18 +27,21 @@ export interface Props {
   showDate?: boolean;
   allowFollowUp?: boolean;
   allowSupersede?: boolean;
+  allowSpotlight?: boolean;
 }
 
 export default function EntryRow({
   entry,
   className,
-  expandable,
+  spotlight,
   selectable,
+  expandable,
   showFollowUps,
   expandedDefault,
   showDate,
   allowFollowUp,
   allowSupersede,
+  allowSpotlight,
 }: PropsWithChildren<Props>) {
   const [expanded, setExpanded] = useState(Boolean(expandedDefault));
   const [fullEntry, setFullEntry] = useState<Entry | null>(null);
@@ -69,12 +73,27 @@ export default function EntryRow({
     role,
   ]);
 
+  const rootRef = useCallback(
+    (elem: HTMLDivElement) => {
+      if (elem && spotlight) {
+        elem.scrollIntoView({
+          behavior: "auto",
+          block: "center",
+          inline: "center",
+        });
+      }
+    },
+    [spotlight]
+  );
+
   return (
     <>
       <div
+        ref={rootRef}
         className={cn(
           "flex items-center",
           selectable && "cursor-pointer relative hover:bg-gray-50",
+          spotlight && "bg-yellow-100",
           className
         )}
       >
@@ -143,7 +162,29 @@ export default function EntryRow({
           </div>
         </div>
         <div className="flex">
-          {/* Used a container, so the icon doesn't get crop due to rounded-full */}
+          {allowSpotlight && (
+            <Link
+              to={`#${entry.id}`}
+              className={cn(IconButton, "p-1 mr-2 z-0")}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={1.5}
+                stroke="currentColor"
+                className="w-6 h-6"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"
+                />
+              </svg>
+            </Link>
+          )}
+
           {allowSupersede && (
             <Link
               to={`/${entry.id}/supersede`}

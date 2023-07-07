@@ -6,6 +6,7 @@ import Spinner from "./Spinner";
 export interface Props {
   entries: EntrySummary[];
   emptyLabel: string;
+  spotlight?: string;
   isLoading?: boolean;
   expandable?: boolean;
   selectable?: boolean;
@@ -14,12 +15,14 @@ export interface Props {
   showEntryDates?: boolean;
   allowFollowUp?: boolean;
   allowSupersede?: boolean;
+  allowSpotlight?: boolean;
   onBottomVisible?: () => void;
 }
 
 export default function EntryList({
   entries,
   emptyLabel,
+  spotlight,
   isLoading,
   expandable,
   selectable,
@@ -28,6 +31,7 @@ export default function EntryList({
   showEntryDates,
   allowFollowUp,
   allowSupersede,
+  allowSpotlight,
   onBottomVisible,
 }: Props) {
   let currentDate: string | undefined;
@@ -89,6 +93,7 @@ export default function EntryList({
             >
               <EntryRow
                 entry={entry}
+                spotlight={spotlight === entry.id}
                 expandable={expandable}
                 selectable={selectable}
                 showFollowUps
@@ -96,6 +101,7 @@ export default function EntryList({
                 showDate={showEntryDates}
                 allowFollowUp={allowFollowUp}
                 allowSupersede={allowSupersede}
+                allowSpotlight={allowSpotlight}
               />
             </div>
           </Fragment>

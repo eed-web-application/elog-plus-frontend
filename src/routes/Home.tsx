@@ -1,23 +1,28 @@
 import { useEffect, useState } from "react";
-import { Outlet } from "react-router-dom";
+import { Outlet, useLocation } from "react-router-dom";
 import { EntrySummary, fetchEntries } from "../api";
 import Filters, { Filters as FiltersObject } from "../components/Filters";
 import Navbar from "../components/Navbar";
 import EntryList from "../components/EntryList";
 import EntryRefreshContext from "../EntryRefreshContext";
+import { useEntriesStore } from "../entriesStore";
 
 const ENTRIES_PER_LOAD = 25;
+const DEFAULT_FILTERS = {
+  logbooks: [],
+  tags: [],
+  date: "",
+};
 
 export default function Home() {
   const [entries, setEntries] = useState<EntrySummary[]>([]);
   const [fetchingEntries, setFetchingEntries] = useState<boolean>(true);
-  const [filters, setFilters] = useState<FiltersObject>({
-    logbooks: [],
-    tags: [],
-    date: "",
-  });
+  const [filters, setFilters] = useState<FiltersObject>(DEFAULT_FILTERS);
   const [search, setSearch] = useState("");
   const [reachedBottom, setReachedBottom] = useState<boolean>(false);
+
+  const getOrFetch = useEntriesStore((state) => state.getOrFetch);
+  const { hash } = useLocation();
 
   function fetchWithFilters(
     filters: FiltersObject,
@@ -59,6 +64,34 @@ export default function Home() {
     setSearch(search);
     fetchWithFilters(filters, search);
   }
+
+  useEffect(() => {
+    const entryId = hash?.slice(1);
+
+    if (!entryId) {
+      return;
+    }
+
+    if (entries.some((entry) => entry.id === entryId)) {
+      return;
+    }
+
+    setFilters(DEFAULT_FILTERS);
+    setFetchingEntries(true);
+    getOrFetch(entryId)
+      .then((entry) =>
+        fetchEntries({
+          logbooks: [],
+          anchorDate: entry.logDate,
+          numberAfterAnchor: ENTRIES_PER_LOAD,
+          numberBeforeAnchor: ENTRIES_PER_LOAD,
+        })
+      )
+      .then((entries) => {
+        setEntries(entries);
+        setFetchingEntries(false);
+      });
+  }, [hash, entries, getOrFetch]);
 
   useEffect(() => {
     fetchEntries({
@@ -116,6 +149,7 @@ export default function Home() {
               allowFollowUp
               allowSupersede
               onBottomVisible={fetchMoreEntries}
+              spotlight={hash?.slice(1) || undefined}
             />
           </div>
           <Outlet />

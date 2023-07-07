@@ -84,6 +84,7 @@ export default function EntryView({ entry }: Props) {
             showEntryDates
             expandable
             selectable
+            allowSpotlight
           />
         </div>
       )}
