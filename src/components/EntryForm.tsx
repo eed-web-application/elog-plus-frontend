@@ -6,6 +6,7 @@ import {
   Entry,
   EntryForm as EntryFormType,
   createEntry,
+  createTag,
   fetchLogbooks,
   fetchTags,
   followUp,
@@ -137,6 +138,10 @@ export default function EntryForm({
     if (invalid) {
       return;
     }
+
+    await Promise.all(
+      draft.tags.filter((tag) => !tags?.includes(tag)).map(createTag)
+    );
 
     let id;
     if (followingUp) {

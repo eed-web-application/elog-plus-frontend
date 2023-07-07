@@ -63,6 +63,14 @@ export async function fetchLogbooks(): Promise<string[]> {
   return data.payload.logbook;
 }
 
+export async function createTag(tag: string) {
+  await fetch("tags", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ name: tag }),
+  });
+}
+
 export async function fetchTags(): Promise<string[]> {
   if (memoizedTags) {
     return memoizedTags;
