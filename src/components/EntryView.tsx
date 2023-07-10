@@ -75,12 +75,22 @@ export default function EntryView({ entry }: Props) {
           </Link>
         </div>
       </div>
+      {entry.history && entry.history.length > 0 && (
+        <div className="p-3 border-t">
+          <div className="text-gray-500">History</div>
+          <EntryList
+            entries={entry.history}
+            showEntryDates
+            expandable
+            selectable
+          />
+        </div>
+      )}
       {entry.followUp.length > 0 && (
         <div className="p-3 border-t">
           <div className="text-gray-500">Follow ups</div>
           <EntryList
             entries={entry.followUp}
-            emptyLabel="No follow ups"
             showEntryDates
             expandable
             selectable

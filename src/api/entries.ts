@@ -14,6 +14,7 @@ export interface Entry extends EntrySummary {
   text: string;
   attachments: Attachment[];
   followUp: EntrySummary[];
+  history?: EntrySummary[];
 }
 
 export interface EntryForm {
@@ -69,7 +70,7 @@ export async function fetchEntries({
 
 export async function fetchEntry(id: string): Promise<Entry> {
   const data = await fetch(`logs/${id}`, {
-    params: { includeFollowUps: "true" },
+    params: { includeFollowUps: "true", includeHistory: "true" },
   });
 
   data.followUp = data.followUp.map(normalizeEntry);
