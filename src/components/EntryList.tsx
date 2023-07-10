@@ -5,7 +5,7 @@ import Spinner from "./Spinner";
 
 export interface Props {
   entries: EntrySummary[];
-  emptyLabel: string;
+  emptyLabel?: string;
   spotlight?: string;
   isLoading?: boolean;
   expandable?: boolean;
@@ -59,7 +59,7 @@ export default function EntryList({
     return () => observer.disconnect();
   }, [observer]);
 
-  if (entries.length === 0 && !isLoading) {
+  if (entries.length === 0 && !isLoading && emptyLabel) {
     return <div className="text-gray-500 text-center pt-3">{emptyLabel}</div>;
   }
 

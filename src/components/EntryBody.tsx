@@ -10,27 +10,34 @@ import { IconButton } from "./base";
 interface Props {
   entry: Entry;
   borderBottom?: boolean;
+  showEmptyLabel?: boolean;
 }
 
-export default function EntryBody({ entry, borderBottom }: Props) {
+export default function EntryBody({
+  entry,
+  borderBottom,
+  showEmptyLabel,
+}: Props) {
   const figures = entry.attachments.filter(
     (attachment) => attachment.previewState === "Completed"
   );
 
   return (
     <>
-      <div
-        className={cn(
-          entry.text || "text-gray-500",
-          (borderBottom || figures.length > 0) && "border-b",
-          "pb-1"
-        )}
-        dangerouslySetInnerHTML={
-          entry.text ? { __html: entry.text } : undefined
-        }
-      >
-        {entry.text ? undefined : "No entry text"}
-      </div>
+      {(showEmptyLabel || entry.text) && (
+        <div
+          className={cn(
+            entry.text || "text-gray-500",
+            (borderBottom || figures.length > 0) && "border-b",
+            "pb-1"
+          )}
+          dangerouslySetInnerHTML={
+            entry.text ? { __html: entry.text } : undefined
+          }
+        >
+          {entry.text ? undefined : "No entry text"}
+        </div>
+      )}
       {figures.map((attachment, index) => (
         <Fragment key={attachment.id}>
           <div className="mt-2 mb-1 text-gray-500">Figure {index + 1}</div>

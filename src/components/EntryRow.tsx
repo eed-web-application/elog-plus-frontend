@@ -258,13 +258,12 @@ export default function EntryRow({
               fullEntry.text || "text-gray-500"
             )}
           >
-            <EntryBody entry={fullEntry} />
+            <EntryBody entry={fullEntry} showEmptyLabel />
           </div>
           {showFollowUps && (
             <div className="ml-12 border-l">
               <EntryList
                 entries={fullEntry.followUp}
-                emptyLabel=""
                 selectable
                 expandable
                 showEntryDates
