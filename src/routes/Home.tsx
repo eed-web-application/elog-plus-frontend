@@ -23,12 +23,13 @@ export default function Home() {
 
   const { hash } = useLocation();
   const spotlight = hash?.slice(1);
-  const { refreshEntries, isLoading, entries, getMoreEntries } = useEntries({
-    ...filters,
-    searchText,
-    spotlight,
-    onSpotlightFetched: resetSearch,
-  });
+  const { refreshEntries, isLoading, entries, getMoreEntries, reachedBottom } =
+    useEntries({
+      ...filters,
+      searchText,
+      spotlight,
+      onSpotlightFetched: resetSearch,
+    });
 
   function onFiltersChange(filters: FiltersObject) {
     window.location.hash = "";
@@ -65,7 +66,7 @@ export default function Home() {
               showFollowUps
               allowFollowUp
               allowSupersede
-              onBottomVisible={getMoreEntries}
+              onBottomVisible={reachedBottom ? undefined : getMoreEntries}
               spotlight={hash?.slice(1) || undefined}
             />
           </div>

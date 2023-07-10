@@ -21,6 +21,7 @@ export default function useEntries({
 }: Params) {
   const [entries, setEntries] = useState<EntrySummary[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [reachedBottom, setReachedBottom] = useState<boolean>(false);
   const getOrFetch = useEntriesStore((state) => state.getOrFetch);
 
   const fetchSurroundingSpotlight = useCallback(async () => {
@@ -36,6 +37,7 @@ export default function useEntries({
       numberBeforeAnchor,
       numberAfterAnchor: ENTRIES_PER_FETCH,
     });
+
     setIsLoading(false);
     setEntries(newEntries);
   }, [spotlight, getOrFetch]);
@@ -67,8 +69,13 @@ export default function useEntries({
       anchorDate: dateDayEnd,
       numberAfterAnchor: ENTRIES_PER_FETCH,
     });
+
     setIsLoading(false);
     setEntries(newEntries);
+
+    if (newEntries.length !== ENTRIES_PER_FETCH) {
+      setReachedBottom(true);
+    }
   }, [searchText, logbooks, tags, date, setIsLoading, setEntries]);
 
   const getMoreEntries = useCallback(async () => {
@@ -83,6 +90,10 @@ export default function useEntries({
         numberAfterAnchor: ENTRIES_PER_FETCH,
       });
 
+      if (newEntries.length !== ENTRIES_PER_FETCH) {
+        setReachedBottom(true);
+      }
+
       setIsLoading(false);
       setEntries((entries) => entries.concat(newEntries));
     }
@@ -90,7 +101,8 @@ export default function useEntries({
 
   useEffect(() => {
     refreshEntries();
+    setReachedBottom(false);
   }, [refreshEntries]);
 
-  return { entries, isLoading, refreshEntries, getMoreEntries };
+  return { entries, isLoading, refreshEntries, getMoreEntries, reachedBottom };
 }
