@@ -55,7 +55,7 @@ export default function EntryForm({
     if (followingUp) {
       return [
         state.followUps[followingUp.id] || DEFAULT_DRAFT,
-        (draft: Draft) => state.updateSupersedingDraft(followingUp.id, draft),
+        (draft: Draft) => state.updateFollowUpDraft(followingUp.id, draft),
         () => state.removeFollowUpDraft(followingUp.id),
       ];
     }
