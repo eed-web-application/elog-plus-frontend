@@ -1,22 +1,28 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import { Entry, EntryForm } from "./api";
+import { Attachment, Entry, EntryForm } from "./api";
+
+export type LocalUploadedAttachment = Omit<Attachment, "previewState">;
+
+export type Draft = Omit<EntryForm, "attachments"> & {
+  attachments: LocalUploadedAttachment[];
+};
 
 interface DraftsState {
-  newEntry: EntryForm;
-  followUps: { [id: string]: EntryForm };
-  supersedes: { [id: string]: EntryForm };
-  getOrCreateFollowUpDraft: (entry: Entry) => EntryForm;
-  getOrCreateSupersedingDraft: (entry: Entry) => EntryForm;
-  updateNewEntryDraft: (draft: EntryForm) => void;
-  updateFollowUpDraft: (entryId: string, draft: EntryForm) => void;
-  updateSupersedingDraft: (entryId: string, draft: EntryForm) => void;
+  newEntry: Draft;
+  followUps: { [id: string]: Draft };
+  supersedes: { [id: string]: Draft };
+  getOrCreateFollowUpDraft: (entry: Entry) => Draft;
+  getOrCreateSupersedingDraft: (entry: Entry) => Draft;
+  updateNewEntryDraft: (draft: Draft) => void;
+  updateFollowUpDraft: (entryId: string, draft: Draft) => void;
+  updateSupersedingDraft: (entryId: string, draft: Draft) => void;
   removeNewEntryDraft: () => void;
   removeFollowUpDraft: (entryId: string) => void;
   removeSupersedingDraft: (entryId: string) => void;
 }
 
-const DEFAULT_DRAFT: EntryForm = {
+const DEFAULT_DRAFT: Draft = {
   title: "",
   text: "",
   logbook: "",

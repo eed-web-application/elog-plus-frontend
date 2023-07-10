@@ -1,8 +1,14 @@
-import { FormEvent, useCallback, useContext, useEffect, useState } from "react";
+import {
+  FormEvent,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import cn from "classnames";
 import { useDropzone } from "react-dropzone";
 import {
-  Attachment,
   Entry,
   EntryForm as EntryFormType,
   createEntry,
@@ -18,12 +24,12 @@ import { Button, Input, InputInvalid } from "./base";
 import EntryRow from "./EntryRow";
 import MultiSelect from "./MultiSelect";
 import AttachmentCard from "./AttachmentCard";
-import { useDraftsStore } from "../draftsStore";
+import { Draft, LocalUploadedAttachment, useDraftsStore } from "../draftsStore";
 import EntryRefreshContext from "../EntryRefreshContext";
 
-type LocalAttachment = Omit<Attachment, "id" | "previewState"> & {
-  id: null | string;
-};
+type LocalAttachment = {
+  id?: string;
+} & Omit<LocalUploadedAttachment, "id">;
 
 export default function EntryForm({
   onEntryCreated,
@@ -47,10 +53,12 @@ export default function EntryForm({
   } = useDraftsStore();
   const [logbooks, setLogbooks] = useState<null | string[]>(null);
   const [tags, setTags] = useState<null | string[]>(null);
-  const [attachments, setAttachments] = useState<LocalAttachment[]>([]);
   const refreshEntries = useContext(EntryRefreshContext);
+  const [attachmentsUploading, setAttachmentsUploading] = useState<
+    LocalAttachment[]
+  >([]);
 
-  const getDraft = useCallback(() => {
+  const draft = useMemo(() => {
     if (superseding) {
       return getOrCreateSupersedingDraft(superseding);
     }
@@ -66,28 +74,24 @@ export default function EntryForm({
     newEntry,
   ]);
 
-  const [draft, setDraft] = useState<EntryFormType>(getDraft());
-
-  useEffect(() => {
-    setDraft(getDraft());
-  }, [setDraft, getDraft]);
-
-  useEffect(() => {
-    if (superseding) {
-      updateSupersedingDraft(superseding.id, draft);
-    } else if (followingUp) {
-      updateFollowUpDraft(followingUp.id, draft);
-    } else {
-      updateNewEntryDraft(draft);
-    }
-  }, [
-    draft,
-    superseding,
-    followingUp,
-    updateSupersedingDraft,
-    updateFollowUpDraft,
-    updateNewEntryDraft,
-  ]);
+  const setDraft = useCallback(
+    (draft: Draft) => {
+      if (superseding) {
+        updateSupersedingDraft(superseding.id, draft);
+      } else if (followingUp) {
+        updateFollowUpDraft(followingUp.id, draft);
+      } else {
+        updateNewEntryDraft(draft);
+      }
+    },
+    [
+      superseding,
+      followingUp,
+      updateSupersedingDraft,
+      updateFollowUpDraft,
+      updateNewEntryDraft,
+    ]
+  );
 
   useEffect(() => {
     if (!logbooks) {
@@ -105,7 +109,7 @@ export default function EntryForm({
     title: () => Boolean(draft.title),
     logbook: () => Boolean(draft.logbook),
     // Ensure all attachments are downloaded
-    attachments: () => attachments.length === 0,
+    attachments: () => attachmentsUploading.length === 0,
   };
 
   type Field = keyof typeof validators;
@@ -143,15 +147,24 @@ export default function EntryForm({
       draft.tags.filter((tag) => !tags?.includes(tag)).map(createTag)
     );
 
+    const newEntry: EntryFormType = {
+      ...draft,
+      attachments: draft.attachments.map(
+        // We have already verified that all the ids are non null in the
+        // attachment validator, so this is fine
+        (attachment) => attachment.id as string
+      ),
+    };
+
     let id;
     if (followingUp) {
-      id = await followUp(followingUp.id, draft);
+      id = await followUp(followingUp.id, newEntry);
       removeFollowUpDraft(followingUp.id);
     } else if (superseding) {
-      id = await supersede(superseding.id, draft);
+      id = await supersede(superseding.id, newEntry);
       removeSupersedingDraft(superseding.id);
     } else {
-      id = await createEntry(draft);
+      id = await createEntry(newEntry);
       removeNewEntryDraft();
     }
 
@@ -160,57 +173,54 @@ export default function EntryForm({
   }
 
   async function startAttachmentUpload(file: File) {
+    if (
+      attachmentsUploading.some(
+        (attachment) => attachment.fileName === file.name
+      )
+    ) {
+      alert("Can't upload two files with the same name at the same time");
+      return;
+    }
+
+    setAttachmentsUploading((attachments) => [
+      ...attachments,
+      { fileName: file.name, contentType: file.type },
+    ]);
+
     const id = await uploadAttachment(file);
 
-    setDraft((draft) => ({
+    setAttachmentsUploading((attachments) =>
+      attachments.filter((attachment) => attachment.fileName !== file.name)
+    );
+    setDraft({
       ...draft,
-      attachments: [...draft.attachments, id],
-    }));
-    setAttachments((attachments) => {
-      const attachmentIndex = attachments.findIndex(
-        ({ fileName }) => fileName === file.name
-      );
-      const newAttachments = attachments.slice();
-      newAttachments[attachmentIndex].id = id;
-      return newAttachments;
+      attachments: [
+        ...draft.attachments,
+        { fileName: file.name, contentType: file.type, id },
+      ],
     });
   }
 
   async function removeAttachment(attachment: LocalAttachment) {
     if (attachment.id) {
-      setDraft((draft) => ({
+      setDraft({
         ...draft,
-        attachments: draft.attachments.filter((id) => id !== attachment.id),
-      }));
+        attachments: draft.attachments.filter(({ id }) => id !== attachment.id),
+      });
+      return;
     }
-    setAttachments((attachments) =>
-      attachments.filter(({ fileName }) => fileName !== attachment.fileName)
-    );
   }
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop: (acceptedFiles) => {
-      const newFiles = acceptedFiles.filter((file) => {
-        if (attachments.find(({ fileName }) => fileName === file.name)) {
-          alert("Can't upload two files with the same name");
-          return false;
-        }
-        return true;
-      });
-
-      newFiles.forEach(startAttachmentUpload);
-
-      const newAttachments = newFiles.map((file) => ({
-        id: null,
-        contentType: file.type,
-        fileName: file.name,
-      }));
-
-      setAttachments((attachments) => attachments.concat(newAttachments));
+      acceptedFiles.forEach(startAttachmentUpload);
     },
   });
 
   const entryPreview = followingUp || superseding;
+  const attachments = (draft.attachments as LocalAttachment[]).concat(
+    attachmentsUploading
+  );
 
   return (
     <div className="px-3">
@@ -231,9 +241,7 @@ export default function EntryForm({
               "block w-full"
             )}
             value={draft.title}
-            onChange={(e) =>
-              setDraft((draft) => ({ ...draft, title: e.target.value }))
-            }
+            onChange={(e) => setDraft({ ...draft, title: e.target.value })}
             onBlur={() => validate("title")}
           />
         </label>
@@ -248,7 +256,7 @@ export default function EntryForm({
               isLoading={!logbooks}
               value={draft.logbook}
               setValue={(logbook) =>
-                setDraft((draft) => ({ ...draft, logbook: logbook || "" }))
+                setDraft({ ...draft, logbook: logbook || "" })
               }
               invalid={invalid.includes("logbook")}
               onBlur={() => validate("logbook")}
@@ -261,18 +269,14 @@ export default function EntryForm({
             isLoading={!tags}
             predefinedOptions={tags || []}
             value={draft.tags}
-            setValue={(tags) =>
-              setDraft((draft) => ({ ...draft, tags: tags || [] }))
-            }
+            setValue={(tags) => setDraft({ ...draft, tags: tags || [] })}
           />
         </label>
         <label className="text-gray-500 block mb-2">
           Text
           <textarea
             value={draft.text}
-            onChange={(e) =>
-              setDraft((draft) => ({ ...draft, text: e.target.value }))
-            }
+            onChange={(e) => setDraft({ ...draft, text: e.target.value })}
             placeholder=""
             className={cn(Input, "block w-full h-48")}
           />
@@ -292,7 +296,7 @@ export default function EntryForm({
               ? "Drag and drop"
               : attachments.map((attachment) => (
                   <AttachmentCard
-                    key={attachment.fileName}
+                    key={attachment.id || attachment.fileName}
                     className="mr-3 mb-3"
                     isLoading={!attachment.id}
                     attachment={attachment}
