@@ -92,6 +92,7 @@ export default function EntryView({ entry }: Props) {
           <EntryList
             entries={entry.followUp}
             showEntryDates
+            showFollowUps
             expandable
             selectable
             allowSpotlight

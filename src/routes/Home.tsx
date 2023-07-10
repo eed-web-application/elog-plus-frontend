@@ -62,6 +62,7 @@ export default function Home() {
               selectable
               expandable
               showDayHeaders
+              showFollowUps
               allowFollowUp
               allowSupersede
               onBottomVisible={getMoreEntries}

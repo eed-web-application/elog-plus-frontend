@@ -13,6 +13,7 @@ export interface Props {
   expandDefault?: boolean;
   showDayHeaders?: boolean;
   showEntryDates?: boolean;
+  showFollowUps?: boolean;
   allowFollowUp?: boolean;
   allowSupersede?: boolean;
   allowSpotlight?: boolean;
@@ -29,6 +30,7 @@ export default function EntryList({
   expandDefault,
   showDayHeaders,
   showEntryDates,
+  showFollowUps,
   allowFollowUp,
   allowSupersede,
   allowSpotlight,
@@ -96,7 +98,7 @@ export default function EntryList({
                 spotlight={spotlight === entry.id}
                 expandable={expandable}
                 selectable={selectable}
-                showFollowUps
+                showFollowUps={showFollowUps}
                 expandedDefault={expandDefault}
                 showDate={showEntryDates}
                 allowFollowUp={allowFollowUp}
