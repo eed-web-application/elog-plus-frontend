@@ -54,7 +54,10 @@ export default function EntryForm({
     }
     if (followingUp) {
       return [
-        state.followUps[followingUp.id] || DEFAULT_DRAFT,
+        state.followUps[followingUp.id] || {
+          ...DEFAULT_DRAFT,
+          logbook: followingUp.logbook,
+        },
         (draft: Draft) => state.updateFollowUpDraft(followingUp.id, draft),
         () => state.removeFollowUpDraft(followingUp.id),
       ];
