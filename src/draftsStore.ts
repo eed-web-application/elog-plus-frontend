@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import { Attachment, Entry, EntryForm } from "./api";
+import { Attachment, EntryForm } from "./api";
 
 export type LocalUploadedAttachment = Omit<Attachment, "previewState">;
 
@@ -12,8 +12,6 @@ interface DraftsState {
   newEntry: Draft;
   followUps: { [id: string]: Draft };
   supersedes: { [id: string]: Draft };
-  getOrCreateFollowUpDraft: (entry: Entry) => Draft;
-  getOrCreateSupersedingDraft: (entry: Entry) => Draft;
   updateNewEntryDraft: (draft: Draft) => void;
   updateFollowUpDraft: (entryId: string, draft: Draft) => void;
   updateSupersedingDraft: (entryId: string, draft: Draft) => void;
@@ -22,7 +20,7 @@ interface DraftsState {
   removeSupersedingDraft: (entryId: string) => void;
 }
 
-const DEFAULT_DRAFT: Draft = {
+export const DEFAULT_DRAFT: Draft = {
   title: "",
   text: "",
   logbook: "",
@@ -32,23 +30,12 @@ const DEFAULT_DRAFT: Draft = {
 
 export const useDraftsStore = create(
   persist<DraftsState>(
-    (set, get) => ({
+    (set) => ({
       newEntry: {
         ...DEFAULT_DRAFT,
       },
       followUps: {},
       supersedes: {},
-      getOrCreateFollowUpDraft(entry) {
-        return (
-          get().followUps[entry.id] || {
-            ...DEFAULT_DRAFT,
-            logbook: entry.logbook,
-          }
-        );
-      },
-      getOrCreateSupersedingDraft(entry) {
-        return get().supersedes[entry.id] || { ...entry };
-      },
       updateNewEntryDraft(draft) {
         set({ newEntry: draft });
       },

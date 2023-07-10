@@ -1,11 +1,4 @@
-import {
-  FormEvent,
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
+import { FormEvent, useCallback, useContext, useEffect, useState } from "react";
 import cn from "classnames";
 import { useDropzone } from "react-dropzone";
 import {
@@ -24,7 +17,12 @@ import { Button, Input, InputInvalid } from "./base";
 import EntryRow from "./EntryRow";
 import MultiSelect from "./MultiSelect";
 import AttachmentCard from "./AttachmentCard";
-import { Draft, LocalUploadedAttachment, useDraftsStore } from "../draftsStore";
+import {
+  DEFAULT_DRAFT,
+  Draft,
+  LocalUploadedAttachment,
+  useDraftsStore,
+} from "../draftsStore";
 import EntryRefreshContext from "../EntryRefreshContext";
 
 type LocalAttachment = {
@@ -40,57 +38,45 @@ export default function EntryForm({
   followingUp?: Entry;
   superseding?: Entry;
 }) {
-  const {
-    newEntry,
-    getOrCreateSupersedingDraft,
-    getOrCreateFollowUpDraft,
-    updateSupersedingDraft,
-    updateFollowUpDraft,
-    updateNewEntryDraft,
-    removeFollowUpDraft,
-    removeSupersedingDraft,
-    removeNewEntryDraft,
-  } = useDraftsStore();
   const [logbooks, setLogbooks] = useState<null | string[]>(null);
   const [tags, setTags] = useState<null | string[]>(null);
-  const refreshEntries = useContext(EntryRefreshContext);
   const [attachmentsUploading, setAttachmentsUploading] = useState<
     LocalAttachment[]
   >([]);
-
-  const draft = useMemo(() => {
+  const refreshEntries = useContext(EntryRefreshContext);
+  const [draft, setDraft, removeDraft] = useDraftsStore((state) => {
     if (superseding) {
-      return getOrCreateSupersedingDraft(superseding);
+      return [
+        state.supersedes[superseding.id] || DEFAULT_DRAFT,
+        (draft: Draft) => state.updateSupersedingDraft(superseding.id, draft),
+        () => state.removeSupersedingDraft(superseding.id),
+      ];
     }
     if (followingUp) {
-      return getOrCreateFollowUpDraft(followingUp);
+      return [
+        state.followUps[followingUp.id] || DEFAULT_DRAFT,
+        (draft: Draft) => state.updateSupersedingDraft(followingUp.id, draft),
+        () => state.removeFollowUpDraft(followingUp.id),
+      ];
     }
-    return newEntry;
-  }, [
-    superseding,
-    followingUp,
-    getOrCreateSupersedingDraft,
-    getOrCreateFollowUpDraft,
-    newEntry,
-  ]);
+    return [
+      state.newEntry,
+      state.updateNewEntryDraft,
+      state.removeNewEntryDraft,
+    ];
+  });
 
-  const setDraft = useCallback(
-    (draft: Draft) => {
+  const submitEntry = useCallback(
+    (newEntry: EntryFormType) => {
       if (superseding) {
-        updateSupersedingDraft(superseding.id, draft);
-      } else if (followingUp) {
-        updateFollowUpDraft(followingUp.id, draft);
-      } else {
-        updateNewEntryDraft(draft);
+        return supersede(superseding.id, newEntry);
       }
+      if (followingUp) {
+        return followUp(followingUp.id, newEntry);
+      }
+      return createEntry(newEntry);
     },
-    [
-      superseding,
-      followingUp,
-      updateSupersedingDraft,
-      updateFollowUpDraft,
-      updateNewEntryDraft,
-    ]
+    [superseding, followingUp]
   );
 
   useEffect(() => {
@@ -156,23 +142,16 @@ export default function EntryForm({
       ),
     };
 
-    let id;
-    if (followingUp) {
-      id = await followUp(followingUp.id, newEntry);
-      removeFollowUpDraft(followingUp.id);
-    } else if (superseding) {
-      id = await supersede(superseding.id, newEntry);
-      removeSupersedingDraft(superseding.id);
-    } else {
-      id = await createEntry(newEntry);
-      removeNewEntryDraft();
-    }
+    const id = await submitEntry(newEntry);
+    removeDraft();
 
     refreshEntries();
     onEntryCreated(id);
   }
 
-  async function startAttachmentUpload(file: File) {
+  async function startUploadingAttachment(
+    file: File
+  ): Promise<LocalUploadedAttachment | undefined> {
     if (
       attachmentsUploading.some(
         (attachment) => attachment.fileName === file.name
@@ -192,13 +171,7 @@ export default function EntryForm({
     setAttachmentsUploading((attachments) =>
       attachments.filter((attachment) => attachment.fileName !== file.name)
     );
-    setDraft({
-      ...draft,
-      attachments: [
-        ...draft.attachments,
-        { fileName: file.name, contentType: file.type, id },
-      ],
-    });
+    return { fileName: file.name, contentType: file.type, id };
   }
 
   async function removeAttachment(attachment: LocalAttachment) {
@@ -209,11 +182,22 @@ export default function EntryForm({
       });
       return;
     }
+
+    setAttachmentsUploading((attachments) =>
+      attachments.filter(({ fileName }) => fileName !== attachment.fileName)
+    );
   }
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
-    onDrop: (acceptedFiles) => {
-      acceptedFiles.forEach(startAttachmentUpload);
+    onDrop: async (acceptedFiles) => {
+      const attachments = (
+        await Promise.all(acceptedFiles.map(startUploadingAttachment))
+      ).filter((x) => x) as LocalUploadedAttachment[];
+
+      setDraft({
+        ...draft,
+        attachments: draft.attachments.concat(attachments),
+      });
     },
   });
 
