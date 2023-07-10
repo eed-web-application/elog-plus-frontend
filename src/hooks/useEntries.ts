@@ -89,7 +89,6 @@ export default function useEntries({
   }, [searchText, logbooks, tags, entries, isLoading]);
 
   useEffect(() => {
-    console.log("happened");
     refreshEntries();
   }, [refreshEntries]);
 
