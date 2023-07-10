@@ -4,7 +4,7 @@ import { Input, InputInvalid } from "./base";
 import { size, useFloating } from "@floating-ui/react";
 import Spinner from "./Spinner";
 import Tag from "./Tag";
-import useSelectCursor from "../useSelectCursor";
+import useSelectCursor from "../hooks/useSelectCursor";
 
 interface Props extends Omit<HTMLProps<HTMLInputElement>, "value"> {
   value: string[];

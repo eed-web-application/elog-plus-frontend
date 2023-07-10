@@ -2,7 +2,7 @@ import cn from "classnames";
 import { useState } from "react";
 import Spinner from "./Spinner";
 import { Input } from "./base";
-import useSelectCursor from "../useSelectCursor";
+import useSelectCursor from "../hooks/useSelectCursor";
 
 export interface Props {
   selected: string[];

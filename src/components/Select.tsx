@@ -3,7 +3,7 @@ import cn from "classnames";
 import { Input, InputInvalid } from "./base";
 import { size, useFloating } from "@floating-ui/react";
 import Spinner from "./Spinner";
-import useSelectCursor from "../useSelectCursor";
+import useSelectCursor from "../hooks/useSelectCursor";
 
 interface Props extends Omit<HTMLProps<HTMLInputElement>, "value"> {
   value: string | null;
