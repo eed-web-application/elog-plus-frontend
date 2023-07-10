@@ -47,7 +47,7 @@ export default function EntryForm({
   const [draft, setDraft, removeDraft] = useDraftsStore((state) => {
     if (superseding) {
       return [
-        state.supersedes[superseding.id] || DEFAULT_DRAFT,
+        state.supersedes[superseding.id] || { ...superseding },
         (draft: Draft) => state.updateSupersedingDraft(superseding.id, draft),
         () => state.removeSupersedingDraft(superseding.id),
       ];
