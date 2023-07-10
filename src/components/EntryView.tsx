@@ -49,7 +49,7 @@ export default function EntryView({ entry }: Props) {
         {attachments.length > 0 && (
           <>
             <div className="mt-1 mb-1 text-gray-500">Attachments</div>
-            <div className="w-full overflow-hidden flex flex-wrap m-auto border-b pb-1">
+            <div className="w-full overflow-hidden flex flex-wrap m-auto border-b pb-1 gap-3">
               {attachments.map((attachment) => (
                 <AttachmentCard
                   key={attachment.id}
