@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { fetchLogbooks, fetchTags } from "../api.ts";
+import { fetchLogbooks, fetchTags } from "../api";
 import Filter from "./Filter.tsx";
 import FilterSelect from "./FilterSelect.tsx";
 import { Input } from "./base.ts";
