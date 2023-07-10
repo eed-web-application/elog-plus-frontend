@@ -5,7 +5,6 @@ let memoizedTags: string[] | undefined;
 export async function createTag(tag: string) {
   await fetch("tags", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
     body: { name: tag },
   });
 }
