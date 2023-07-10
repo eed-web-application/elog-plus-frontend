@@ -93,7 +93,7 @@ export default function EntryRow({
         className={cn(
           "flex items-center",
           selectable && "cursor-pointer relative hover:bg-gray-50",
-          spotlight && "bg-yellow-100",
+          spotlight && "bg-yellow-100 hover:bg-yellow-200",
           className
         )}
       >
