@@ -1,7 +1,7 @@
 import cn from "classnames";
 import { PropsWithChildren, useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { IconButton } from "./base";
+import { BackDrop, IconButton } from "./base";
 import IsPaneFullscreenContext from "../IsPaneFullscreenContext";
 import {
   FloatingFocusManager,
@@ -167,7 +167,7 @@ export default function Pane({
   return (
     <IsPaneFullscreenContext.Provider value={fullscreen}>
       {fullscreen ? (
-        <FloatingOverlay lockScroll className="z-10 bg-gray-500 bg-opacity-50">
+        <FloatingOverlay lockScroll className={cn("z-10", BackDrop)}>
           <FloatingFocusManager context={context}>{inner}</FloatingFocusManager>
         </FloatingOverlay>
       ) : (
