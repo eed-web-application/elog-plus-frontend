@@ -272,6 +272,7 @@ export default function EntryRow({
                 selectable
                 expandable
                 showEntryDates
+                showFollowUps={showFollowUps}
                 allowFollowUp={allowFollowUp}
                 allowSupersede={allowSupersede}
               />
