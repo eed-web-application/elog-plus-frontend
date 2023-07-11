@@ -1,49 +1,61 @@
 import cn from "classnames";
-import { PropsWithChildren, useState } from "react";
-import { IconButton } from "./base";
+import { PropsWithChildren, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { IconButton } from "./base";
+import IsPaneFullscreenContext from "../IsPaneFullscreenContext";
 
 type Props = {
   header: string;
   fullscreenByDefault?: boolean;
 };
 
+const SM = 640;
+const query = `(min-width: ${SM}px)`;
+
 export default function Pane({
   children,
   header,
-  fullscreenByDefault,
+  fullscreenByDefault = false,
 }: PropsWithChildren<Props>) {
-  const [fullscreen, setFullscreen] = useState(fullscreenByDefault);
+  const [explicitFullscreen, setExplicitFullscreen] =
+    useState(fullscreenByDefault);
+  const [mobile, setMobile] = useState(!window.matchMedia(query).matches);
+
+  useEffect(() => {
+    function handler(e: MediaQueryListEvent) {
+      setMobile(!e.matches);
+    }
+
+    window.matchMedia(query).addEventListener("change", handler);
+    return () => {
+      window.matchMedia(query).removeEventListener("change", handler);
+    };
+  }, []);
+
+  const fullscreen = explicitFullscreen || mobile;
 
   return (
-    <>
+    <IsPaneFullscreenContext.Provider value={fullscreen}>
       <div
         className={cn(
-          "overflow-y-auto mx-auto container absolute left-0 right-0 top-0 bottom-0 z-30 bg-white mt-6 rounded-lg",
-          fullscreen ||
-            "sm:w-1/2 sm:relative sm:rounded-none sm:mt-0 sm:bg-transparent sm:z-auto"
+          "overflow-y-auto mx-auto container w-1/2",
+          fullscreen &&
+            "absolute left-0 right-0 top-0 bottom-0 z-30 bg-white mt-6 rounded-lg w-auto"
         )}
       >
         <div className="flex items-center px-1 pt-1">
           {fullscreen ? (
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={1.5}
-              stroke="currentColor"
-              className={IconButton}
-              tabIndex={0}
-              onClick={() => setFullscreen(false)}
+            <Link
+              to="/"
+              onClick={
+                mobile
+                  ? undefined
+                  : (e) => {
+                      e.preventDefault();
+                      setExplicitFullscreen(false);
+                    }
+              }
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M6 18L18 6M6 6l12 12"
-              />
-            </svg>
-          ) : (
-            <Link to="/">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
@@ -56,14 +68,32 @@ export default function Pane({
                   strokeLinecap="round"
                   strokeLinejoin="round"
                   d="M6 18L18 6M6 6l12 12"
-                  className="block sm:hidden"
                 />
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M8.25 4.5l7.5 7.5-7.5 7.5"
-                  className="hidden sm:block"
-                />
+              </svg>
+            </Link>
+          ) : (
+            <Link to="/">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={1.5}
+                stroke="currentColor"
+                className={IconButton}
+              >
+                {fullscreen ? (
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                ) : (
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M8.25 4.5l7.5 7.5-7.5 7.5"
+                  />
+                )}
               </svg>
             </Link>
           )}
@@ -79,9 +109,9 @@ export default function Pane({
               viewBox="0 0 24 24"
               strokeWidth={1.5}
               stroke="currentColor"
-              className={cn(IconButton, "sm:block hidden")}
+              className={IconButton}
               tabIndex={0}
-              onClick={() => setFullscreen(true)}
+              onClick={() => setExplicitFullscreen(true)}
             >
               <path
                 strokeLinecap="round"
@@ -93,12 +123,9 @@ export default function Pane({
         </div>
         {children}
       </div>
-      <div
-        className={cn(
-          "absolute left-0 right-0 bottom-0 top-0 bg-gray-500 bg-opacity-50 z-20",
-          fullscreen || "sm:hidden"
-        )}
-      />
-    </>
+      {fullscreen && (
+        <div className="absolute left-0 right-0 bottom-0 top-0 bg-gray-500 bg-opacity-50 z-20" />
+      )}
+    </IsPaneFullscreenContext.Provider>
   );
 }

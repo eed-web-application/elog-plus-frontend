@@ -1,5 +1,5 @@
 import cn from "classnames";
-import { PropsWithChildren, useCallback, useState } from "react";
+import { PropsWithChildren, useCallback, useContext, useState } from "react";
 import { Link } from "react-router-dom";
 import {
   useDismiss,
@@ -15,6 +15,7 @@ import { Entry, EntrySummary } from "../api";
 import EntryList from "./EntryList";
 import Tag from "./Tag";
 import EntryBody from "./EntryBody";
+import IsPaneFullscreen from "../IsPaneFullscreenContext";
 
 export interface Props {
   entry: EntrySummary;
@@ -85,6 +86,8 @@ export default function EntryRow({
     },
     [spotlight]
   );
+
+  const isPaneFullscreen = useContext(IsPaneFullscreen);
 
   return (
     <>
@@ -164,7 +167,9 @@ export default function EntryRow({
         <div className="flex">
           {allowSpotlight && (
             <Link
-              to={`#${entry.id}`}
+              // If the pane is fullscreen, then we want to close it
+              // which can be done by redirecting to the root: `/`.
+              to={isPaneFullscreen ? `/#${entry.id}` : `#${entry.id}`}
               className={cn(IconButton, "p-1 mr-2 z-0")}
               onClick={(e) => e.stopPropagation()}
             >
