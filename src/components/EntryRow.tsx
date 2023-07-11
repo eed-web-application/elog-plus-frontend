@@ -77,7 +77,7 @@ export default function EntryRow({
     (elem: HTMLDivElement) => {
       if (elem && spotlight) {
         elem.scrollIntoView({
-          behavior: "auto",
+          behavior: "smooth",
           block: "center",
           inline: "center",
         });
