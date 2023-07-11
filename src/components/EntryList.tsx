@@ -17,6 +17,7 @@ export interface Props {
   allowFollowUp?: boolean;
   allowSupersede?: boolean;
   allowSpotlight?: boolean;
+  allowSpotlightForFollowUps?: boolean;
   onBottomVisible?: () => void;
 }
 
@@ -34,6 +35,7 @@ export default function EntryList({
   allowFollowUp,
   allowSupersede,
   allowSpotlight,
+  allowSpotlightForFollowUps,
   onBottomVisible,
 }: Props) {
   let currentDate: string | undefined;
@@ -104,6 +106,7 @@ export default function EntryList({
                 allowFollowUp={allowFollowUp}
                 allowSupersede={allowSupersede}
                 allowSpotlight={allowSpotlight}
+                allowSpotlightForFollowUps={allowSpotlightForFollowUps}
               />
             </div>
           </Fragment>

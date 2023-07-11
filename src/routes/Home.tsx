@@ -66,6 +66,7 @@ export default function Home() {
               showFollowUps
               allowFollowUp
               allowSupersede
+              allowSpotlightForFollowUps
               onBottomVisible={reachedBottom ? undefined : getMoreEntries}
               spotlight={hash?.slice(1) || undefined}
             />

@@ -29,6 +29,7 @@ export interface Props {
   allowFollowUp?: boolean;
   allowSupersede?: boolean;
   allowSpotlight?: boolean;
+  allowSpotlightForFollowUps?: boolean;
 }
 
 export default function EntryRow({
@@ -43,6 +44,7 @@ export default function EntryRow({
   allowFollowUp,
   allowSupersede,
   allowSpotlight,
+  allowSpotlightForFollowUps,
 }: PropsWithChildren<Props>) {
   const [expanded, setExpanded] = useState(Boolean(expandedDefault));
   const [fullEntry, setFullEntry] = useState<Entry | null>(null);
@@ -275,6 +277,7 @@ export default function EntryRow({
                 showFollowUps={showFollowUps}
                 allowFollowUp={allowFollowUp}
                 allowSupersede={allowSupersede}
+                allowSpotlight={allowSpotlightForFollowUps}
               />
             </div>
           )}
