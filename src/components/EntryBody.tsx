@@ -107,7 +107,12 @@ export default function EntryBody({
           {entry.text ? undefined : "No entry text"}
         </div>
       )}
-      <div className={cn("flex gap-3 pb-1", borderBottom && "border-b")}>
+      <div
+        className={cn(
+          "flex gap-3 pb-1",
+          borderBottom && figures.length > 0 && "border-b"
+        )}
+      >
         <div className="flex flex-col">
           {figures
             .filter((_, index) => index % 2 === 0)
