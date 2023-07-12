@@ -18,7 +18,7 @@ export default function EntryView({ entry }: Props) {
 
   return (
     <>
-      <div className="p-3 pt-2">
+      <div className="px-3 pt-1 pb-2">
         <div className="text-gray-500">Logged by </div>
         <div className="border-b pb-1 mb-1">{entry.author}</div>
         <div className="text-gray-500">Logged at</div>
@@ -76,28 +76,40 @@ export default function EntryView({ entry }: Props) {
         </div>
       </div>
       {entry.history && entry.history.length > 0 && (
-        <div className="p-3 border-t">
-          <div className="text-gray-500">History</div>
-          <EntryList
-            entries={entry.history}
-            showEntryDates
-            expandable
-            selectable
-          />
-        </div>
+        <>
+          <div className="flex items-center">
+            <div className="flex-grow border-t"></div>
+            <span className="flex-shrink mx-4 text-gray-500">History</span>
+            <div className="flex-grow border-t"></div>
+          </div>
+          <div className="px-3 pb-3">
+            <EntryList
+              entries={entry.history}
+              showEntryDates
+              expandable
+              selectable
+            />
+          </div>
+        </>
       )}
       {entry.followUp.length > 0 && (
-        <div className="p-3 border-t">
-          <div className="text-gray-500">Follow ups</div>
-          <EntryList
-            entries={entry.followUp}
-            showEntryDates
-            showFollowUps
-            expandable
-            selectable
-            allowSpotlight
-          />
-        </div>
+        <>
+          <div className="flex items-center">
+            <div className="flex-grow border-t"></div>
+            <span className="flex-shrink mx-4 text-gray-500">Follow Ups</span>
+            <div className="flex-grow border-t"></div>
+          </div>
+          <div className="px-3 pb-3">
+            <EntryList
+              entries={entry.followUp}
+              showEntryDates
+              showFollowUps
+              expandable
+              selectable
+              allowSpotlight
+            />
+          </div>
+        </>
       )}
     </>
   );
