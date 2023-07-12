@@ -1,5 +1,6 @@
-import { useState } from "react";
-import { Outlet, useLocation } from "react-router-dom";
+import { useCallback, useRef, useState } from "react";
+import { useLocation, useOutlet } from "react-router-dom";
+import cn from "classnames";
 import Filters, { Filters as FiltersObject } from "../components/Filters";
 import Navbar from "../components/Navbar";
 import EntryList from "../components/EntryList";
@@ -12,9 +13,13 @@ const DEFAULT_FILTERS = {
   date: "",
 };
 
+const MIN_PANE_WIDTH = 384;
+
 export default function Home() {
   const [filters, setFilters] = useState<FiltersObject>(DEFAULT_FILTERS);
   const [searchText, setSearchText] = useState("");
+  const bodyRef = useRef<HTMLDivElement>(null);
+  const gutterRef = useRef<HTMLDivElement>(null);
 
   function resetSearch() {
     setSearchText("");
@@ -41,6 +46,26 @@ export default function Home() {
     setSearchText(search);
   }
 
+  const outlet = useOutlet();
+
+  const mouseMoveHandler = useCallback((e: MouseEvent) => {
+    if (bodyRef.current && gutterRef.current) {
+      const gutterRect = gutterRef.current.getBoundingClientRect();
+      bodyRef.current.style.flexBasis =
+        Math.max(e.clientX - gutterRect.width / 2, MIN_PANE_WIDTH) + "px";
+    }
+  }, []);
+
+  const endDrag = useCallback(() => {
+    document.removeEventListener("mousemove", mouseMoveHandler);
+    document.removeEventListener("mouseup", endDrag);
+  }, [mouseMoveHandler]);
+
+  const startDrag = useCallback(() => {
+    document.addEventListener("mousemove", mouseMoveHandler);
+    document.addEventListener("mouseup", endDrag);
+  }, [mouseMoveHandler, endDrag]);
+
   return (
     <EntryRefreshContext.Provider value={refreshEntries}>
       <div className="h-screen flex flex-col">
@@ -54,8 +79,15 @@ export default function Home() {
             <Filters filters={filters} setFilters={onFiltersChange} />
           </div>
         </div>
+
         <div className="flex-1 flex overflow-hidden">
-          <div className={"border-r px-3 overflow-y-auto flex-1"}>
+          <div
+            className={cn(
+              "px-3 overflow-y-auto w-1/2",
+              !outlet && "flex-1 pr-3"
+            )}
+            ref={bodyRef}
+          >
             <EntryList
               entries={entries || []}
               emptyLabel="No entries found"
@@ -71,7 +103,23 @@ export default function Home() {
               spotlight={hash?.slice(1) || undefined}
             />
           </div>
-          <Outlet />
+          {outlet && (
+            <>
+              <div
+                className="relative border-r cursor-col-resize select-none"
+                onMouseDown={startDrag}
+                ref={gutterRef}
+              >
+                <div className="absolute -left-3 w-6 h-full" />
+              </div>
+              <div
+                className="flex-1 flex-shrink"
+                style={{ minWidth: MIN_PANE_WIDTH }}
+              >
+                {outlet}
+              </div>
+            </>
+          )}
         </div>
       </div>
     </EntryRefreshContext.Provider>

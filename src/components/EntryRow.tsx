@@ -172,7 +172,11 @@ export default function EntryRow({
               // If the pane is fullscreen, then we want to close it
               // which can be done by redirecting to the root: `/`.
               to={isPaneFullscreen ? `/#${entry.id}` : `#${entry.id}`}
-              className={cn(IconButton, "p-1 mr-2 z-0")}
+              className={cn(
+                IconButton,
+                "p-1 mr-2 z-0",
+                spotlight && "hover:bg-yellow-300"
+              )}
               onClick={(e) => e.stopPropagation()}
             >
               <svg
@@ -195,7 +199,11 @@ export default function EntryRow({
           {allowSupersede && (
             <Link
               to={`/${entry.id}/supersede`}
-              className={cn(IconButton, "rounded-full mr-2 z-0")}
+              className={cn(
+                IconButton,
+                "rounded-full mr-2 z-0",
+                spotlight && "hover:bg-yellow-300"
+              )}
               tabIndex={0}
               onClick={(e) => e.stopPropagation()}
             >
@@ -219,7 +227,11 @@ export default function EntryRow({
           {allowFollowUp && (
             <Link
               to={`/${entry.id}/follow-up`}
-              className={cn(IconButton, "p-1 mr-2 rotate-180 z-0")}
+              className={cn(
+                IconButton,
+                "p-1 mr-2 rotate-180 z-0",
+                spotlight && "hover:bg-yellow-300"
+              )}
               onClick={(e) => e.stopPropagation()}
             >
               <svg
@@ -245,7 +257,12 @@ export default function EntryRow({
               strokeWidth={1.5}
               stroke="currentColor"
               tabIndex={0}
-              className={cn(IconButton, "z-0", { "rotate-180": expanded })}
+              className={cn(
+                IconButton,
+                "z-0",
+                { "rotate-180": expanded },
+                spotlight && "hover:bg-yellow-300"
+              )}
               onClick={toggleExpand}
             >
               <path
