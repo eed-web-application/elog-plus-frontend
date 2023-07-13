@@ -96,9 +96,9 @@ export default function EntryBody({
       {(showEmptyLabel || entry.text) && (
         <div
           className={cn(
-            entry.text || "text-gray-500",
+            !entry.text && "text-gray-500",
             (borderBottom || figures.length > 0) && "border-b",
-            "pb-1"
+            "pb-1 prose overflow-x-auto"
           )}
           dangerouslySetInnerHTML={
             entry.text ? { __html: entry.text } : undefined

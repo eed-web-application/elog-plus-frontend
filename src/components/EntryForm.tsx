@@ -1,4 +1,11 @@
-import { FormEvent, useCallback, useContext, useEffect, useState } from "react";
+import {
+  FormEvent,
+  useCallback,
+  useContext,
+  useEffect,
+  useId,
+  useState,
+} from "react";
 import cn from "classnames";
 import { useDropzone } from "react-dropzone";
 import {
@@ -24,6 +31,7 @@ import {
   useDraftsStore,
 } from "../draftsStore";
 import EntryRefreshContext from "../EntryRefreshContext";
+import EntryTextEditor from "./EntryTextEditor";
 
 type LocalAttachment = {
   id?: string;
@@ -259,15 +267,15 @@ export default function EntryForm({
             setValue={(tags) => setDraft({ ...draft, tags: tags || [] })}
           />
         </label>
-        <label className="text-gray-500 block mb-2">
+        {/* Not using a label here, because there are some weird */}
+        {/* interactions with having multiple inputs under the same label */}
+        <div className="text-gray-500 block mb-2">
           Text
-          <textarea
+          <EntryTextEditor
             value={draft.text}
-            onChange={(e) => setDraft({ ...draft, text: e.target.value })}
-            placeholder=""
-            className={cn(Input, "block w-full h-48")}
+            onChange={(text) => setDraft({ ...draft, text })}
           />
-        </label>
+        </div>
         <label className="text-gray-500 block mb-2">
           Attachments
           <div
