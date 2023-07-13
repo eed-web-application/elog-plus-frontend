@@ -8,10 +8,11 @@ import useSelectCursor from "../hooks/useSelectCursor";
 interface Props extends Omit<HTMLProps<HTMLInputElement>, "value"> {
   value: string | null;
   setValue: (selected: string | null) => void;
-  options: string[];
+  options: Readonly<string[]>;
   isLoading?: boolean;
-  containerClassName: string;
+  containerClassName?: string;
   invalid?: boolean;
+  nonsearchable?: boolean;
 }
 
 export default function Select({
@@ -23,6 +24,7 @@ export default function Select({
   containerClassName,
   placeholder,
   invalid,
+  nonsearchable,
   onBlur,
   ...rest
 }: Props) {
@@ -73,10 +75,11 @@ export default function Select({
   }
 
   return (
-    <div className={cn(containerClassName, "relative")}>
+    // Flex is to fix weird layout issues when the input is a button
+    <div className={cn(containerClassName, "relative flex")}>
       <input
         {...rest}
-        type="text"
+        type={nonsearchable ? "button" : "text"}
         className={cn(Input, invalid && InputInvalid, className)}
         placeholder={value && !placeholder ? "" : placeholder}
         value={search}
@@ -120,7 +123,7 @@ export default function Select({
         <div
           ref={refs.setFloating}
           style={floatingStyles}
-          className="max-h-64 overflow-y-auto rounded-lg shadow mt-2 text-black bg-white"
+          className="max-h-64 overflow-y-auto rounded-lg shadow mt-2 text-black bg-white z-10"
         >
           {filteredOptions.length === 0 || isLoading ? (
             <div className="text-gray-500 text-center w-full py-3">
