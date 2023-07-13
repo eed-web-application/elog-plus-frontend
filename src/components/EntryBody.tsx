@@ -152,7 +152,7 @@ export default function EntryBody({
                 />
               </svg>
               <img
-                className="max-h-full"
+                className="max-h-screen"
                 src={getAttachmentPreviewURL(viewingFigure)}
               />
             </div>
