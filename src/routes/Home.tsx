@@ -113,7 +113,7 @@ export default function Home() {
                 <div className="absolute -left-3 w-6 h-full" />
               </div>
               <div
-                className="flex-1 flex-shrink"
+                className="flex-1 flex-shrink overflow-y-auto pb-3"
                 style={{ minWidth: MIN_PANE_WIDTH }}
               >
                 {outlet}
