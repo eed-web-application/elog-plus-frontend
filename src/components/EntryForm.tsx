@@ -1,11 +1,4 @@
-import {
-  FormEvent,
-  useCallback,
-  useContext,
-  useEffect,
-  useId,
-  useState,
-} from "react";
+import { FormEvent, useCallback, useContext, useEffect, useState } from "react";
 import cn from "classnames";
 import { useDropzone } from "react-dropzone";
 import {
