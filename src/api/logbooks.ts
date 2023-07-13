@@ -1,5 +1,10 @@
 import { fetch } from ".";
 
+export interface Logbook {
+  id: string;
+  name: string;
+}
+
 let memoizedLogbooks: string[] | undefined;
 
 export async function fetchLogbooks(): Promise<string[]> {
@@ -9,6 +14,7 @@ export async function fetchLogbooks(): Promise<string[]> {
   }
 
   const data = await fetch("logbooks");
-  memoizedLogbooks = data.logbook;
-  return data.logbook;
+  const logbookNames = data.map((logbook: Logbook) => logbook.name);
+  memoizedLogbooks = logbookNames;
+  return logbookNames;
 }
