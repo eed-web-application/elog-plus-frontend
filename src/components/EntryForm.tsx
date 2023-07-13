@@ -214,7 +214,13 @@ export default function EntryForm({
     <div className="px-3">
       {entryPreview && (
         <div className="border-b pb-2">
-          <EntryRow entry={entryPreview} showDate expandable showFollowUps />
+          <EntryRow
+            entry={entryPreview}
+            showDate
+            expandable
+            showFollowUps
+            allowSpotlight
+          />
         </div>
       )}
       <form noValidate onSubmit={submit} className="mt-3">
