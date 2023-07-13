@@ -6,6 +6,7 @@ import EntryList from "./EntryList";
 import EntryBody from "./EntryBody";
 import Tag from "./Tag";
 import AttachmentCard from "./AttachmentCard";
+import EntryRow from "./EntryRow";
 
 export interface Props {
   entry: Entry;
@@ -18,6 +19,18 @@ export default function EntryView({ entry }: Props) {
 
   return (
     <>
+      {entry.followingUp && (
+        <div className="px-3 pt-1 pb-2 border-b">
+          <div className="text-lg">Follows up</div>
+          <EntryRow
+            entry={entry.followingUp}
+            showDate
+            expandable
+            selectable
+            allowSpotlight
+          />
+        </div>
+      )}
       <div className="px-3 pt-1 pb-2">
         <div className="text-gray-500">Logged by </div>
         <div className="border-b pb-1 mb-1">{entry.author}</div>
