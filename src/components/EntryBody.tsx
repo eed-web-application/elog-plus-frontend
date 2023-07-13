@@ -1,13 +1,6 @@
 import { useState } from "react";
 import cn from "classnames";
 import {
-  Attachment,
-  Entry,
-  getAttachmentDownloadURL,
-  getAttachmentPreviewURL,
-} from "../api";
-import { BackDrop, IconButton } from "./base";
-import {
   FloatingFocusManager,
   FloatingOverlay,
   useClick,
@@ -16,6 +9,14 @@ import {
   useInteractions,
   useRole,
 } from "@floating-ui/react";
+import DOMPurify from "dompurify";
+import {
+  Attachment,
+  Entry,
+  getAttachmentDownloadURL,
+  getAttachmentPreviewURL,
+} from "../api";
+import { BackDrop, IconButton } from "./base";
 
 interface Props {
   entry: Entry;
@@ -101,7 +102,7 @@ export default function EntryBody({
             "pb-1 prose overflow-x-auto"
           )}
           dangerouslySetInnerHTML={
-            entry.text ? { __html: entry.text } : undefined
+            entry.text ? { __html: DOMPurify.sanitize(entry.text) } : undefined
           }
         >
           {entry.text ? undefined : "No entry text"}
