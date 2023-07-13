@@ -17,9 +17,11 @@ export default function useSelectCursor(options: number) {
     if (e.code === "ArrowUp" && cursor > 0) {
       setCursor((cursor) => cursor - 1);
       ensureSelectedInView(cursor - 1);
+      e.preventDefault();
     } else if (e.code === "ArrowDown" && cursor < options - 1) {
       setCursor((cursor) => cursor + 1);
       ensureSelectedInView(cursor + 1);
+      e.preventDefault();
     }
   }
 
