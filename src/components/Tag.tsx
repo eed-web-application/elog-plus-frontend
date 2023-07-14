@@ -21,6 +21,7 @@ const Tag = forwardRef<HTMLDivElement, Props>(function Tag(
       <div
         className={cn(base, "px-1.5 py-0.5 leading-none", className)}
         ref={ref}
+        tabIndex={clickable ? 0 : undefined}
         {...rest}
       >
         {children}
