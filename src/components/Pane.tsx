@@ -1,5 +1,5 @@
 import cn from "classnames";
-import { PropsWithChildren, useEffect, useState } from "react";
+import { PropsWithChildren, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { BackDrop, IconButton } from "./base";
 import IsPaneFullscreenContext from "../IsPaneFullscreenContext";
@@ -12,14 +12,12 @@ import {
   useInteractions,
   useRole,
 } from "@floating-ui/react";
+import useIsSmallScreen from "../useIsSmallScreen";
 
 type Props = {
   header: string;
   fullscreenByDefault?: boolean;
 };
-
-const SM = 640;
-const query = `(min-width: ${SM}px)`;
 
 export default function Pane({
   children,
@@ -28,21 +26,10 @@ export default function Pane({
 }: PropsWithChildren<Props>) {
   const [explicitFullscreen, setExplicitFullscreen] =
     useState(fullscreenByDefault);
-  const [mobile, setMobile] = useState(!window.matchMedia(query).matches);
+  const isSmallScreen = useIsSmallScreen();
   const navigate = useNavigate();
 
-  useEffect(() => {
-    function handler(e: MediaQueryListEvent) {
-      setMobile(!e.matches);
-    }
-
-    window.matchMedia(query).addEventListener("change", handler);
-    return () => {
-      window.matchMedia(query).removeEventListener("change", handler);
-    };
-  }, []);
-
-  const fullscreen = explicitFullscreen || mobile;
+  const fullscreen = explicitFullscreen || isSmallScreen;
 
   const { refs, context } = useFloating({
     open: fullscreen,
@@ -52,7 +39,7 @@ export default function Pane({
         return;
       }
 
-      if (mobile) {
+      if (isSmallScreen) {
         navigate("/");
       } else {
         setExplicitFullscreen(false);
@@ -86,7 +73,7 @@ export default function Pane({
           <Link
             to="/"
             onClick={
-              mobile
+              isSmallScreen
                 ? undefined
                 : (e) => {
                     e.preventDefault();

@@ -6,6 +6,7 @@ import Navbar from "../components/Navbar";
 import EntryList from "../components/EntryList";
 import EntryRefreshContext from "../EntryRefreshContext";
 import useEntries from "../hooks/useEntries";
+import useIsSmallScreen from "../useIsSmallScreen";
 
 const DEFAULT_FILTERS = {
   logbooks: [],
@@ -18,6 +19,7 @@ const MIN_PANE_WIDTH = 384;
 export default function Home() {
   const [filters, setFilters] = useState<FiltersObject>(DEFAULT_FILTERS);
   const [searchText, setSearchText] = useState("");
+  const isSmallScreen = useIsSmallScreen();
   const bodyRef = useRef<HTMLDivElement>(null);
   const gutterRef = useRef<HTMLDivElement>(null);
 
@@ -84,7 +86,7 @@ export default function Home() {
           <div
             className={cn(
               "px-3 overflow-y-auto w-1/2",
-              !outlet && "flex-1 pr-3"
+              (!outlet || isSmallScreen) && "flex-1 pr-3"
             )}
             ref={bodyRef}
           >
@@ -105,16 +107,21 @@ export default function Home() {
           </div>
           {outlet && (
             <>
+              {!isSmallScreen && (
+                <div
+                  className="relative border-r cursor-col-resize select-none"
+                  onMouseDown={startDrag}
+                  ref={gutterRef}
+                >
+                  <div className="absolute -left-3 w-6 h-full" />
+                </div>
+              )}
               <div
-                className="relative border-r cursor-col-resize select-none"
-                onMouseDown={startDrag}
-                ref={gutterRef}
-              >
-                <div className="absolute -left-3 w-6 h-full" />
-              </div>
-              <div
-                className="flex-1 flex-shrink overflow-y-auto pb-3"
-                style={{ minWidth: MIN_PANE_WIDTH }}
+                className={cn(
+                  "overflow-y-auto pb-3",
+                  !isSmallScreen && "flex-1 flex-shrink"
+                )}
+                style={{ minWidth: isSmallScreen ? "auto" : MIN_PANE_WIDTH }}
               >
                 {outlet}
               </div>
