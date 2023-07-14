@@ -9,12 +9,10 @@ export default {
         return {
           DEFAULT: {
             css: {
-              "code::before": {
-                content: "none",
-              },
-              "code::after": {
-                content: "none",
-              },
+              "blockquote p:first-of-type::before": { content: "none" },
+              "blockquote p:first-of-type::after": { content: "none" },
+              "code::before": { content: "none" },
+              "code::after": { content: "none" },
               code: {
                 color: theme("colors.gray.500"),
                 backgroundColor: theme("colors.gray.100"),
