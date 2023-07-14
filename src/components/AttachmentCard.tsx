@@ -2,6 +2,7 @@ import React, { HTMLProps } from "react";
 import cn from "classnames";
 import AttachmentIcon from "./AttachmentIcon";
 import { Attachment, getAttachmentDownloadURL } from "../api";
+import Tooltip from "./Tooltip";
 
 export type Props = (
   | { attachment: Omit<Attachment, "previewState">; downloadable: true }
@@ -80,8 +81,9 @@ export default function AttachmentCard({
           </>
         )}
       </div>
-      {/* TODO: Add tooltip */}
-      <div className="text-sm truncate">{attachment.fileName}</div>
+      <Tooltip label={attachment.fileName} placement="bottom">
+        <div className="text-sm truncate">{attachment.fileName}</div>
+      </Tooltip>
       {onRemove && (
         <svg
           xmlns="http://www.w3.org/2000/svg"

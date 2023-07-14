@@ -1,7 +1,8 @@
 import cn from "classnames";
 import { PropsWithChildren, useCallback, useContext, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, LinkProps } from "react-router-dom";
 import {
+  FloatingDelayGroup,
   useDismiss,
   useFloating,
   useFocus,
@@ -16,6 +17,37 @@ import EntryList from "./EntryList";
 import Tag from "./Tag";
 import EntryBody from "./EntryBody";
 import IsPaneFullscreen from "../IsPaneFullscreenContext";
+import Tooltip from "./Tooltip";
+
+function RowButton({
+  children,
+  to,
+  tooltip,
+  highlighted,
+}: PropsWithChildren<
+  LinkProps & {
+    tooltip: string;
+    active?: boolean;
+    highlighted?: boolean;
+  }
+>) {
+  return (
+    <Tooltip label={tooltip}>
+      <Link
+        to={to}
+        className={cn(
+          IconButton,
+          "rounded-full z-0",
+          highlighted && "hover:bg-yellow-300"
+        )}
+        tabIndex={0}
+        onClick={(e) => e.stopPropagation()}
+      >
+        {children}
+      </Link>
+    </Tooltip>
+  );
+}
 
 export interface Props {
   entry: EntrySummary;
@@ -166,112 +198,101 @@ export default function EntryRow({
             )}
           </div>
         </div>
-        <div className="flex">
-          {allowSpotlight && (
-            <Link
-              // If the pane is fullscreen, then we want to close it
-              // which can be done by redirecting to the root: `/`.
-              to={isPaneFullscreen ? `/#${entry.id}` : `#${entry.id}`}
-              className={cn(
-                IconButton,
-                "p-1 mr-2 z-0",
-                spotlight && "hover:bg-yellow-300"
-              )}
-              onClick={(e) => e.stopPropagation()}
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth={1.5}
-                stroke="currentColor"
-                className="w-6 h-6"
+        <div className="flex gap-2">
+          <FloatingDelayGroup delay={200}>
+            {allowSpotlight && (
+              <RowButton
+                tooltip="Spotlight"
+                // If the pane is fullscreen, then we want to close it
+                // which can be done by redirecting to the root: `/`.
+                to={isPaneFullscreen ? `/#${entry.id}` : `#${entry.id}`}
+                highlighted={spotlight}
               >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"
-                />
-              </svg>
-            </Link>
-          )}
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth={1.5}
+                  stroke="currentColor"
+                  className="w-6 h-6"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"
+                  />
+                </svg>
+              </RowButton>
+            )}
 
-          {allowSupersede && (
-            <Link
-              to={`/${entry.id}/supersede`}
-              className={cn(
-                IconButton,
-                "rounded-full mr-2 z-0",
-                spotlight && "hover:bg-yellow-300"
-              )}
-              tabIndex={0}
-              onClick={(e) => e.stopPropagation()}
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth={1.5}
-                stroke="currentColor"
+            {allowSupersede && (
+              <RowButton
+                tooltip="Supersede"
+                to={`/${entry.id}/supersede`}
+                highlighted={spotlight}
               >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L6.832 19.82a4.5 4.5 0 01-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 011.13-1.897L16.863 4.487zm0 0L19.5 7.125"
-                  className="absolute "
-                />
-              </svg>
-            </Link>
-          )}
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth={1.5}
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L6.832 19.82a4.5 4.5 0 01-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 011.13-1.897L16.863 4.487zm0 0L19.5 7.125"
+                    className="absolute "
+                  />
+                </svg>
+              </RowButton>
+            )}
 
-          {allowFollowUp && (
-            <Link
-              to={`/${entry.id}/follow-up`}
-              className={cn(
-                IconButton,
-                "p-1 mr-2 rotate-180 z-0",
-                spotlight && "hover:bg-yellow-300"
-              )}
-              onClick={(e) => e.stopPropagation()}
-            >
+            {allowFollowUp && (
+              <RowButton
+                tooltip="Follow up"
+                to={`/${entry.id}/follow-up`}
+                highlighted={spotlight}
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth={1.5}
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M15 15l6-6m0 0l-6-6m6 6H9a6 6 0 000 12h3"
+                  />
+                </svg>
+              </RowButton>
+            )}
+            {expandable && (
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
                 viewBox="0 0 24 24"
                 strokeWidth={1.5}
                 stroke="currentColor"
+                tabIndex={0}
+                className={cn(
+                  IconButton,
+                  "z-0",
+                  { "rotate-180": expanded },
+                  spotlight && "hover:bg-yellow-300"
+                )}
+                onClick={toggleExpand}
               >
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
-                  d="M15 15l6-6m0 0l-6-6m6 6H9a6 6 0 000 12h3"
+                  d="M19.5 8.25l-7.5 7.5-7.5-7.5"
                 />
               </svg>
-            </Link>
-          )}
-          {expandable && (
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={1.5}
-              stroke="currentColor"
-              tabIndex={0}
-              className={cn(
-                IconButton,
-                "z-0",
-                { "rotate-180": expanded },
-                spotlight && "hover:bg-yellow-300"
-              )}
-              onClick={toggleExpand}
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M19.5 8.25l-7.5 7.5-7.5-7.5"
-              />
-            </svg>
-          )}
+            )}
+          </FloatingDelayGroup>
         </div>
       </div>
       {expanded && fullEntry && (
