@@ -219,6 +219,7 @@ export default function EntryForm({
             showDate
             expandable
             showFollowUps
+            selectable
             allowSpotlight
           />
         </div>
