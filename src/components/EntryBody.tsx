@@ -99,7 +99,7 @@ export default function EntryBody({
           className={cn(
             !entry.text && "text-gray-500",
             (borderBottom || figures.length > 0) && "border-b",
-            "pb-1 prose overflow-x-auto"
+            "pb-1 prose max-w-none overflow-x-auto"
           )}
           dangerouslySetInnerHTML={
             entry.text ? { __html: DOMPurify.sanitize(entry.text) } : undefined
