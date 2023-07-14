@@ -20,6 +20,7 @@ import React, { useId, useRef, useState } from "react";
 
 const ARROW_HEIGHT = 7;
 const GAP = 2;
+const DEFAULT_DELAY = 200;
 
 export default function Tooltip({
   children,
@@ -50,11 +51,16 @@ export default function Tooltip({
 
   const { delay } = useDelayGroupContext();
 
-  const hover = useHover(context, { move: false, delay });
+  const id = useId();
+  const hover = useHover(context, {
+    move: false,
+    // Even when not in a delay group, delay will be zero, so we use || instead
+    // of ??.
+    delay: delay || DEFAULT_DELAY,
+  });
   const focus = useFocus(context);
   const dismiss = useDismiss(context);
   const role = useRole(context, { role: "tooltip" });
-  const id = useId();
   useDelayGroup(context, { id });
 
   const child = React.Children.only(children);
