@@ -20,10 +20,15 @@ export default function EntryView({ entry }: Props) {
   return (
     <>
       {entry.followingUp && (
-        <div className="px-3 pt-1 pb-2 border-b">
-          <div className="text-lg">Follows up</div>
+        <div className="pb-2 border-b">
+          <div className="flex items-center">
+            <div className="flex-grow border-t"></div>
+            <span className="flex-shrink mx-4 text-gray-500">Follows up</span>
+            <div className="flex-grow border-t"></div>
+          </div>
           <EntryRow
             entry={entry.followingUp}
+            className="mx-2"
             showDate
             expandable
             selectable
