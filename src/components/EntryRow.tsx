@@ -1,13 +1,22 @@
 import cn from "classnames";
-import { PropsWithChildren, useCallback, useContext, useState } from "react";
+import {
+  PropsWithChildren,
+  useCallback,
+  useContext,
+  useState,
+  useRef,
+  useEffect,
+} from "react";
 import { Link, LinkProps } from "react-router-dom";
 import {
   FloatingDelayGroup,
+  FloatingPortal,
   useDismiss,
   useFloating,
   useFocus,
   useHover,
   useInteractions,
+  useMergeRefs,
   useRole,
 } from "@floating-ui/react";
 import { IconButton } from "./base";
@@ -49,6 +58,136 @@ function RowButton({
   );
 }
 
+function TagList({ tags }: { tags: string[] }) {
+  const [isTagsOpen, setIsTagsOpen] = useState(false);
+  const [stoppingPoint, setStoppingPoint] = useState<number | null>(null);
+  const [ellipsisOffset, setEllipsisOffset] = useState<number | null>(null);
+  const tagRefs = useRef<(HTMLDivElement | null)[]>(new Array(tags.length));
+  const containerRef = useRef<HTMLDivElement | null>(null);
+  const ellipsisRef = useRef<HTMLDivElement | null>(null);
+
+  const { refs, floatingStyles, context } = useFloating({
+    open: isTagsOpen,
+    onOpenChange: setIsTagsOpen,
+  });
+
+  const mergedEllipsisRef = useMergeRefs([refs.setReference, ellipsisRef]);
+
+  const hover = useHover(context, { move: false });
+  const focus = useFocus(context);
+  const dismiss = useDismiss(context);
+  const role = useRole(context, { role: "tooltip" });
+
+  const { getReferenceProps, getFloatingProps } = useInteractions([
+    hover,
+    focus,
+    dismiss,
+    role,
+  ]);
+
+  const truncate = useCallback(() => {
+    if (!containerRef.current || !ellipsisRef.current) {
+      return;
+    }
+    const containerRect = containerRef.current.getBoundingClientRect();
+    const ellipsisRect = ellipsisRef.current.getBoundingClientRect();
+    let offset = 0;
+
+    for (let i = 0; i < tagRefs.current.length; i++) {
+      const el = tagRefs.current[i];
+      if (!el) {
+        continue;
+      }
+
+      const rect = el.getBoundingClientRect();
+      const styles = window.getComputedStyle(el);
+
+      const margin =
+        parseFloat(styles.marginRight) + parseFloat(styles.marginLeft);
+
+      if (
+        rect.right >
+        containerRect.right -
+          (stoppingPoint === null ? 0 : ellipsisRect.width + margin)
+      ) {
+        setStoppingPoint(i);
+        setEllipsisOffset(offset);
+        return;
+      }
+
+      offset += rect.width + margin;
+    }
+
+    setStoppingPoint(null);
+  }, [stoppingPoint]);
+
+  useEffect(() => {
+    if (!containerRef.current) {
+      return;
+    }
+
+    const containerElem = containerRef.current;
+
+    const observer = new ResizeObserver(() => {
+      truncate();
+    });
+    observer.observe(containerElem);
+
+    return () => {
+      observer.unobserve(containerElem);
+      observer.disconnect();
+    };
+  }, [truncate]);
+
+  return (
+    <div
+      className="flex overflow-hidden relative w-full"
+      ref={(el) => (containerRef.current = el)}
+    >
+      {tags.map((tag, index) => (
+        <Tag
+          key={tag}
+          className={cn(
+            "ml-1.5",
+            stoppingPoint !== null && index >= stoppingPoint && "invisible"
+          )}
+          ref={(el) => (tagRefs.current[index] = el)}
+        >
+          {tag}
+        </Tag>
+      ))}
+      <Tag
+        ref={mergedEllipsisRef}
+        {...getReferenceProps()}
+        className={cn(
+          "ml-1.5 z-0 absolute",
+          stoppingPoint === null && "invisible"
+        )}
+        style={{ left: `${ellipsisOffset}px` }}
+        clickable
+      >
+        ...
+      </Tag>
+      {isTagsOpen && stoppingPoint !== null && (
+        <FloatingPortal>
+          <div
+            className="shadow rounded-lg bg-white p-1.5 pb-0 mt-1 z-10"
+            style={floatingStyles}
+            ref={refs.setFloating}
+            {...getFloatingProps()}
+          >
+            {tags.slice(stoppingPoint).map((tag) => (
+              <Tag key={tag} className="mb-1.5">
+                {tag}
+              </Tag>
+            ))}
+          </div>
+        </FloatingPortal>
+      )}
+    </div>
+  );
+}
+
 export interface Props {
   entry: EntrySummary;
   className?: string;
@@ -80,7 +219,6 @@ export default function EntryRow({
 }: PropsWithChildren<Props>) {
   const [expanded, setExpanded] = useState(Boolean(expandedDefault));
   const [fullEntry, setFullEntry] = useState<Entry | null>(null);
-  const [isTagsOpen, setIsTagsOpen] = useState(false);
 
   const getOrFetch = useEntriesStore((state) => state.getOrFetch);
 
@@ -90,23 +228,6 @@ export default function EntryRow({
     setFullEntry(await getOrFetch(entry.id));
     setExpanded((expanded) => !expanded);
   }
-
-  const { refs, floatingStyles, context } = useFloating({
-    open: isTagsOpen,
-    onOpenChange: setIsTagsOpen,
-  });
-
-  const hover = useHover(context, { move: false });
-  const focus = useFocus(context);
-  const dismiss = useDismiss(context);
-  const role = useRole(context, { role: "tooltip" });
-
-  const { getReferenceProps, getFloatingProps } = useInteractions([
-    hover,
-    focus,
-    dismiss,
-    role,
-  ]);
 
   const rootRef = useCallback(
     (elem: HTMLDivElement) => {
@@ -164,41 +285,13 @@ export default function EntryRow({
             <div className="truncate leading-[1.2]">{entry.title}</div>
           )}
           <div className="flex items-center h-5">
-            <div className="text-sm text-gray-500 leading-none truncate flex-shrink">
+            <div className="text-sm text-gray-500 leading-none whitespace-nowrap">
               {entry.author}
             </div>
-            {entry.tags.slice(0, 2).map((tag) => (
-              <Tag key={tag} className="ml-1.5">
-                {tag}
-              </Tag>
-            ))}
-            {entry.tags.length > 2 && (
-              <Tag
-                ref={refs.setReference}
-                {...getReferenceProps()}
-                className="ml-1.5 z-0"
-                clickable
-              >
-                ...
-              </Tag>
-            )}
-            {isTagsOpen && (
-              <div
-                className="shadow rounded-lg bg-white p-1.5 pb-0 mt-1 z-10"
-                style={floatingStyles}
-                ref={refs.setFloating}
-                {...getFloatingProps()}
-              >
-                {entry.tags.slice(2).map((tag) => (
-                  <Tag key={tag} className="mb-1.5">
-                    {tag}
-                  </Tag>
-                ))}
-              </div>
-            )}
+            <TagList tags={entry.tags} />
           </div>
         </div>
-        <div className="flex gap-2">
+        <div className="flex gap-2 pl-3">
           <FloatingDelayGroup delay={200}>
             {allowSpotlight && (
               <RowButton
