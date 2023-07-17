@@ -72,6 +72,7 @@ export default function MultiSelect({
   }
 
   function toggleSelection(option: string) {
+    setSearch("");
     if (value.includes(option)) {
       setValue(value.filter((otherOption) => otherOption !== option));
     } else {
