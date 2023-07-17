@@ -141,7 +141,7 @@ function TagList({ tags }: { tags: string[] }) {
 
   return (
     <div
-      className="flex overflow-hidden relative w-full"
+      className="flex overflow-hidden relative w-full pointer-events-none"
       ref={(el) => (containerRef.current = el)}
     >
       {tags.map((tag, index) => (
@@ -160,7 +160,7 @@ function TagList({ tags }: { tags: string[] }) {
         ref={mergedEllipsisRef}
         {...getReferenceProps()}
         className={cn(
-          "ml-1.5 z-0 absolute",
+          "ml-1.5 absolute pointer-events-auto",
           stoppingPoint === null && "invisible"
         )}
         style={{ left: `${ellipsisOffset}px` }}
@@ -277,7 +277,7 @@ export default function EntryRow({
             <Link
               to={`/${entry.id}`}
               // see https://inclusive-components.design/cards/
-              className="truncate leading-[1.2] after:absolute after:left-0 after:right-0 after:bottom-0 after:top-0 after:z-10"
+              className="truncate leading-[1.2] after:absolute after:left-0 after:right-0 after:bottom-0 after:top-0"
             >
               {entry.title}
             </Link>
