@@ -61,8 +61,8 @@ export default function Pane({
 
   const inner = (
     <div
-      ref={refs.setFloating}
-      {...getFloatingProps()}
+      {...(fullscreen ? getFloatingProps() : {})}
+      ref={fullscreen ? refs.setFloating : undefined}
       className={cn(
         "overflow-y-auto mx-auto container flex-1",
         fullscreen && "bg-white mt-6 rounded-lg w-auto"
