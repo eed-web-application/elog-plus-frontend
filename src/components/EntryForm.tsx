@@ -211,7 +211,7 @@ export default function EntryForm({
   );
 
   return (
-    <div className="px-3">
+    <div className="px-3 pb-2">
       {entryPreview && (
         <div className="border-b pb-2">
           <EntryRow
