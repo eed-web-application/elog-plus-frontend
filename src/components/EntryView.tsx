@@ -26,14 +26,15 @@ export default function EntryView({ entry }: Props) {
             <span className="flex-shrink mx-4 text-gray-500">Follows up</span>
             <div className="flex-grow border-t"></div>
           </div>
-          <EntryRow
-            entry={entry.followingUp}
-            className="mx-2"
-            showDate
-            expandable
-            selectable
-            allowSpotlight
-          />
+          <div className="px-2">
+            <EntryRow
+              entry={entry.followingUp}
+              showDate
+              expandable
+              selectable
+              allowSpotlight
+            />
+          </div>
         </div>
       )}
       <div className="px-3 pt-1 pb-2">
