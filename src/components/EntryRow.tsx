@@ -277,7 +277,7 @@ export default function EntryRow({
             <Link
               to={`/${entry.id}`}
               // see https://inclusive-components.design/cards/
-              className="truncate leading-[1.2] after:absolute after:left-0 after:right-0 after:bottom-0 after:top-0"
+              className="truncate leading-[1.2] after:absolute after:left-0 after:right-0 after:bottom-0 after:top-0 after:z-10"
             >
               {entry.title}
             </Link>
