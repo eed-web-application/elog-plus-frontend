@@ -56,7 +56,7 @@ export const useDraftsStore = create(
         set((state) => {
           // eslint-disable-next-line @typescript-eslint/no-unused-vars
           const { [entryId]: _removed, ...rest } = state.followUps;
-          return { supersedes: rest };
+          return { followUps: rest };
         });
       },
       removeSupersedingDraft(entryId) {
