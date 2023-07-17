@@ -3,8 +3,8 @@ export default {
   content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
   darkMode: "class",
   theme: {
-    // If customizing sm, one should also update `useIsSmallScreen.ts` as that
-    // file hardcodes sm's width
+    // If customizing md, one should also update `useIsSmallScreen.ts` as that
+    // file hardcodes md's width
     extend: {
       // https://futurestud.io/tutorials/tailwind-css-remove-backticks-around-inline-code
       typography(theme) {

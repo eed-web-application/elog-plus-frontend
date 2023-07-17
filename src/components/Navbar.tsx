@@ -23,11 +23,11 @@ export default function Navbar({
 
   return (
     <div className={cn("flex flex-wrap", className)} {...rest}>
-      <Link to="/" className="text-center mb-3 w-full sm:mb-0 sm:w-auto">
+      <Link to="/" className="text-center mb-3 w-full md:mb-0 md:w-auto">
         <img src={elogLogo} className="inline" alt="SLAC E-LOG logo" />
       </Link>
       <form
-        className="flex-1 mr-2 sm:mx-2"
+        className="flex-1 mr-2 md:mx-2"
         onSubmit={(e) => {
           e.preventDefault();
           onSearchChange(stagedSearch);
