@@ -15,7 +15,9 @@ export default function ErrorBoundary() {
   return (
     <div className="h-screen w-screen flex flex-col items-center justify-center">
       <div className="text-4xl">{is404 ? "404" : "Uh oh 😕"}</div>
-      <div className="text-xl">Page not found</div>
+      <div className="text-xl">
+        {is404 ? "Page not found" : "Something went wrong"}
+      </div>
       {!is404 && (
         <div className="text-lg mt-3 text-center text-gray-500 max-w-sm">
           Oops! It seems like there was an error. Please try refreshing the
