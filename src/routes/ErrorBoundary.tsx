@@ -6,7 +6,7 @@ import { Link as LinkStyle } from "../components/base";
 export default function ErrorBoundary() {
   const error = useRouteError();
 
-  let is404 = true;
+  let is404 = false;
 
   if (error instanceof NotFoundError) {
     is404 = true;
