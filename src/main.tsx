@@ -7,6 +7,7 @@ import FollowUp from "./routes/FollowUp.tsx";
 import NewEntry from "./routes/NewEntry.tsx";
 import { useEntriesStore } from "./entriesStore.ts";
 import ViewEntry from "./routes/ViewEntry.tsx";
+import ErrorBoundary from "./routes/ErrorBoundary";
 import "./index.css";
 
 function entryLoader({ params }: { params: Params }) {
@@ -20,6 +21,7 @@ const router = createBrowserRouter([
   {
     path: "/",
     element: <Home />,
+    errorElement: <ErrorBoundary />,
     children: [
       {
         path: ":entryId/supersede",

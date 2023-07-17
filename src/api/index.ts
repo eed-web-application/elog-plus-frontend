@@ -1,5 +1,12 @@
 export const ENDPOINT = "/api/v1";
 
+export class NotFoundError extends Error {
+  constructor() {
+    super("Could not find resource");
+    this.name = "NotFoundError";
+  }
+}
+
 interface FetchOptions extends Omit<RequestInit, "body" | "headers"> {
   body?: object;
   formData?: FormData;
@@ -37,8 +44,15 @@ export async function fetch(
   );
 
   if (!res.ok) {
+    if (res.status === 404) {
+      throw new NotFoundError();
+    }
+
     // TODO: Provide better error handling
-    throw new Error("Network response was not ok");
+    const errorText = await res.text();
+    throw new Error(
+      `Network response was not as expected: ${res.status} ${errorText}`
+    );
   }
 
   const responseData = await res.json();
