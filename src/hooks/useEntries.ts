@@ -55,7 +55,6 @@ export default function useEntries({
   }, [fetchSurroundingSpotlight, spotlight, entries, onSpotlightFetched]);
 
   const refreshEntries = useCallback(async () => {
-    console.log("test");
     setIsLoading(true);
 
     let dateDayEnd;
