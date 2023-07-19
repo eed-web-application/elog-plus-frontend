@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useMemo, useRef } from "react";
 import { useLocation, useOutlet, useSearchParams } from "react-router-dom";
 import cn from "classnames";
 import Filters, { Filters as FiltersObject } from "../components/Filters";
