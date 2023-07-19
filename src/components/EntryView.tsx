@@ -21,13 +21,9 @@ export default function EntryView({ entry }: Props) {
 
   return (
     <>
-      <div
-        className={cn(
-          "text-lg px-3 flex justify-between items-center",
-          !entry.followingUp && "pb-2"
-        )}
-      >
-        {entry.title}
+      <div className={cn("px-3", !entry.followingUp && "pb-2")}>
+        <div className="text-lg leading-4">{entry.title}</div>
+        <div className="text-sm text-gray-500">{entry.logbook}</div>
       </div>
       {entry.followingUp && (
         <div className="pb-2">

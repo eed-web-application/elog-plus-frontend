@@ -294,6 +294,9 @@ export default function EntryRow({
           )}
           <div className="flex items-center h-5">
             <div className="text-sm text-gray-500 leading-none whitespace-nowrap">
+              {entry.logbook}
+            </div>
+            <div className="text-sm text-gray-500 leading-none whitespace-nowrap before:content-['•'] before:mx-1">
               {entry.author}
             </div>
             <TagList tags={entry.tags} />
