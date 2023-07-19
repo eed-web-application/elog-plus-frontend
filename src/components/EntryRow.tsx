@@ -7,7 +7,7 @@ import {
   useRef,
   useEffect,
 } from "react";
-import { Link, LinkProps } from "react-router-dom";
+import { Link, LinkProps, useLocation } from "react-router-dom";
 import {
   FloatingDelayGroup,
   FloatingPortal,
@@ -220,6 +220,7 @@ export default function EntryRow({
 }: PropsWithChildren<Props>) {
   const [expanded, setExpanded] = useState(Boolean(expandedDefault));
   const [fullEntry, setFullEntry] = useState<Entry | null>(null);
+  const pathname = useLocation().pathname.slice(1);
 
   const getOrFetch = useEntriesStore((state) => state.getOrFetch);
 
@@ -253,6 +254,7 @@ export default function EntryRow({
           "flex items-center",
           selectable && "cursor-pointer relative hover:bg-gray-50",
           spotlight && "bg-yellow-100 hover:bg-yellow-200",
+          pathname === entry.id && "bg-blue-50 hover:bg-blue-100",
           className
         )}
       >
