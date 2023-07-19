@@ -15,7 +15,7 @@ import {
 import useIsSmallScreen from "../useIsSmallScreen";
 
 type Props = {
-  header: string;
+  header?: string;
   fullscreenByDefault?: boolean;
 };
 
@@ -68,7 +68,7 @@ export default function Pane({
         fullscreen && "bg-white mt-6 rounded-lg w-auto"
       )}
     >
-      <div className="flex items-center px-1 pt-1">
+      <div className="flex items-center px-1 py-1">
         {fullscreen ? (
           <Link
             // We close the pane by redirecting to the root: "/"

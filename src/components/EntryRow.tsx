@@ -27,6 +27,7 @@ import Tag from "./Tag";
 import EntryBody from "./EntryBody";
 import IsPaneFullscreen from "../IsPaneFullscreenContext";
 import Tooltip from "./Tooltip";
+import EntryFigureList from "./EntryFigureList";
 
 function RowButton({
   children,
@@ -406,7 +407,8 @@ export default function EntryRow({
               fullEntry.text || "text-gray-500"
             )}
           >
-            <EntryBody entry={fullEntry} showEmptyLabel />
+            <EntryBody body={fullEntry.text} showEmptyLabel />
+            <EntryFigureList attachments={fullEntry.attachments} />
           </div>
           {showFollowUps && (
             <div className="ml-12 border-l">

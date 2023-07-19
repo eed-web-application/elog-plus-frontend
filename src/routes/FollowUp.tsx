@@ -9,7 +9,7 @@ export default function FollowUp() {
   const entry = useLoaderData() as Entry;
 
   return (
-    <Pane header="Follow Up">
+    <Pane>
       <EntryForm
         followingUp={entry}
         onEntryCreated={(entryId) =>

@@ -7,7 +7,7 @@ export default function ViewEntry() {
   const entry = useLoaderData() as Entry;
 
   return (
-    <Pane header={entry.title}>
+    <Pane>
       <EntryView entry={entry} />
     </Pane>
   );

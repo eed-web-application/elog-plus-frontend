@@ -9,7 +9,7 @@ export default function Supersede() {
   const entry = useLoaderData() as Entry;
 
   return (
-    <Pane header="Supersede">
+    <Pane>
       <EntryForm
         superseding={entry}
         onEntryCreated={(entryId) =>

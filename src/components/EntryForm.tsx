@@ -25,6 +25,7 @@ import {
 } from "../draftsStore";
 import EntryRefreshContext from "../EntryRefreshContext";
 import EntryTextEditor from "./EntryTextEditor";
+import TextDivider from "./TextDivider";
 
 type LocalAttachment = {
   id?: string;
@@ -211,20 +212,25 @@ export default function EntryForm({
   );
 
   return (
-    <div className="px-3 pb-2">
+    <div className="pb-2">
       {entryPreview && (
-        <div className="border-b pb-2">
-          <EntryRow
-            entry={entryPreview}
-            showDate
-            expandable
-            showFollowUps
-            selectable
-            allowSpotlight
-          />
-        </div>
+        <>
+          <TextDivider>
+            {followingUp ? "Following up" : "Superseding"}
+          </TextDivider>
+          <div className="border-b pb-2 px-3 mb-3">
+            <EntryRow
+              entry={entryPreview}
+              showDate
+              expandable
+              showFollowUps
+              selectable
+              allowSpotlight
+            />
+          </div>
+        </>
       )}
-      <form noValidate onSubmit={submit} className="mt-3">
+      <form noValidate onSubmit={submit} className="px-3">
         <label className="text-gray-500 block mb-2">
           Title
           <input
@@ -307,7 +313,7 @@ export default function EntryForm({
         <input
           type="submit"
           className={cn(Button, "block ml-auto mt-2")}
-          value="Create"
+          value={followingUp ? "Follow up" : superseding ? "Supersede" : "Save"}
         />
       </form>
     </div>
