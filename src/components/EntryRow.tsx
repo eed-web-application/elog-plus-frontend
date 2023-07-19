@@ -33,14 +33,20 @@ function RowButton({
   children,
   to,
   tooltip,
-  highlighted,
+  entrySelected,
+  entryHighlighted,
 }: PropsWithChildren<
   LinkProps & {
     tooltip: string;
     active?: boolean;
-    highlighted?: boolean;
+    entrySelected?: boolean;
+    entryHighlighted?: boolean;
   }
 >) {
+  if (entrySelected) {
+    console.log("test");
+  }
+
   return (
     <Tooltip label={tooltip}>
       <Link
@@ -48,7 +54,8 @@ function RowButton({
         className={cn(
           IconButton,
           "rounded-full z-0",
-          highlighted && "hover:bg-yellow-300"
+          entrySelected && "hover:!bg-blue-200",
+          entryHighlighted && "hover:bg-yellow-300"
         )}
         tabIndex={0}
         onClick={(e) => e.stopPropagation()}
@@ -252,9 +259,11 @@ export default function EntryRow({
         ref={rootRef}
         className={cn(
           "flex items-center",
-          selectable && "cursor-pointer relative hover:bg-gray-50",
+          selectable && "cursor-pointer relative",
+          pathname === entry.id
+            ? "bg-blue-50 hover:bg-blue-100"
+            : "hover:bg-gray-50",
           spotlight && "bg-yellow-100 hover:bg-yellow-200",
-          pathname === entry.id && "bg-blue-50 hover:bg-blue-100",
           className
         )}
       >
@@ -306,7 +315,8 @@ export default function EntryRow({
                   hash: entry.id,
                   search: window.location.search,
                 }}
-                highlighted={spotlight}
+                entrySelected={pathname === entry.id}
+                entryHighlighted={spotlight}
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -332,7 +342,8 @@ export default function EntryRow({
                   pathname: `/${entry.id}/supersede`,
                   search: window.location.search,
                 }}
-                highlighted={spotlight}
+                entrySelected={pathname === entry.id}
+                entryHighlighted={spotlight}
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -358,7 +369,8 @@ export default function EntryRow({
                   pathname: `/${entry.id}/follow-up`,
                   search: window.location.search,
                 }}
-                highlighted={spotlight}
+                entrySelected={pathname === entry.id}
+                entryHighlighted={spotlight}
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
