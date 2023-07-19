@@ -299,7 +299,7 @@ export default function EntryRow({
                 // If the pane is fullscreen, then we want to close it
                 // which can be done by redirecting to the root: `/`.
                 to={{
-                  pathname: isPaneFullscreen ? "/" : "",
+                  pathname: isPaneFullscreen ? "/" : undefined,
                   hash: entry.id,
                   search: window.location.search,
                 }}
