@@ -43,10 +43,6 @@ function RowButton({
     entryHighlighted?: boolean;
   }
 >) {
-  if (entrySelected) {
-    console.log("test");
-  }
-
   return (
     <Tooltip label={tooltip}>
       <Link
