@@ -26,13 +26,6 @@ export interface EntryForm {
   attachments: string[];
 }
 
-export interface EntryQuery {
-  search: string;
-  logbooks: string[];
-  tags: string[];
-  date: string;
-}
-
 // Java is weird and doesn't add the Z at the end of its dates, so this is
 // what we gotta do
 function normalizeEntry(entry: EntrySummary) {
