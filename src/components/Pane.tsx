@@ -71,7 +71,8 @@ export default function Pane({
       <div className="flex items-center px-1 pt-1">
         {fullscreen ? (
           <Link
-            to="/"
+            // We close the pane by redirecting to the root: "/"
+            to={{ pathname: "/", search: window.location.search }}
             onClick={
               isSmallScreen
                 ? undefined
@@ -97,7 +98,7 @@ export default function Pane({
             </svg>
           </Link>
         ) : (
-          <Link to="/">
+          <Link to={{ pathname: "/", search: window.location.search }}>
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"

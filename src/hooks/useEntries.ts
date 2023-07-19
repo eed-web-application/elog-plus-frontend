@@ -1,19 +1,24 @@
 import { useCallback, useEffect, useState } from "react";
 import { EntrySummary, fetchEntries } from "../api";
 import { useEntriesStore } from "../entriesStore";
-import { Filters } from "../components/Filters";
 
 const ENTRIES_PER_FETCH = 25;
 
-export interface Params extends Partial<Filters> {
-  searchText?: string;
+export interface EntryQuery {
+  search: string;
+  logbooks: string[];
+  tags: string[];
+  date: string;
+}
+
+export interface Params extends Partial<EntryQuery> {
   spotlight?: string;
   onSpotlightFetched?: () => void;
 }
 
 export default function useEntries({
   spotlight,
-  searchText,
+  search,
   logbooks,
   tags,
   date,
@@ -50,6 +55,7 @@ export default function useEntries({
   }, [fetchSurroundingSpotlight, spotlight, entries, onSpotlightFetched]);
 
   const refreshEntries = useCallback(async () => {
+    console.log("test");
     setIsLoading(true);
 
     let dateDayEnd;
@@ -63,7 +69,7 @@ export default function useEntries({
     }
 
     const newEntries = await fetchEntries({
-      search: searchText,
+      search,
       logbooks,
       tags,
       anchorDate: dateDayEnd,
@@ -76,7 +82,7 @@ export default function useEntries({
     if (newEntries.length !== ENTRIES_PER_FETCH) {
       setReachedBottom(true);
     }
-  }, [searchText, logbooks, tags, date, setIsLoading, setEntries]);
+  }, [search, logbooks, tags, date, setIsLoading, setEntries]);
 
   const getMoreEntries = useCallback(async () => {
     if (entries.length > 0 && !isLoading) {
@@ -85,7 +91,7 @@ export default function useEntries({
       const newEntries = await fetchEntries({
         logbooks,
         tags,
-        search: searchText,
+        search,
         anchorDate: entries[entries.length - 1].logDate,
         numberAfterAnchor: ENTRIES_PER_FETCH,
       });
@@ -97,7 +103,7 @@ export default function useEntries({
       setIsLoading(false);
       setEntries((entries) => entries.concat(newEntries));
     }
-  }, [searchText, logbooks, tags, entries, isLoading]);
+  }, [search, logbooks, tags, entries, isLoading]);
 
   useEffect(() => {
     refreshEntries();

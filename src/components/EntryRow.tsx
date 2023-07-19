@@ -275,7 +275,7 @@ export default function EntryRow({
         <div className="flex-1 flex flex-col py-1 overflow-hidden">
           {selectable ? (
             <Link
-              to={`/${entry.id}`}
+              to={{ pathname: `/${entry.id}`, search: window.location.search }}
               // see https://inclusive-components.design/cards/
               className="truncate leading-[1.2] after:absolute after:left-0 after:right-0 after:bottom-0 after:top-0"
             >
@@ -298,7 +298,11 @@ export default function EntryRow({
                 tooltip="Spotlight"
                 // If the pane is fullscreen, then we want to close it
                 // which can be done by redirecting to the root: `/`.
-                to={isPaneFullscreen ? `/#${entry.id}` : `#${entry.id}`}
+                to={{
+                  pathname: isPaneFullscreen ? "/" : "",
+                  hash: entry.id,
+                  search: window.location.search,
+                }}
                 highlighted={spotlight}
               >
                 <svg
@@ -321,7 +325,10 @@ export default function EntryRow({
             {allowSupersede && (
               <RowButton
                 tooltip="Supersede"
-                to={`/${entry.id}/supersede`}
+                to={{
+                  pathname: `/${entry.id}/supersede`,
+                  search: window.location.search,
+                }}
                 highlighted={spotlight}
               >
                 <svg
@@ -344,7 +351,10 @@ export default function EntryRow({
             {allowFollowUp && (
               <RowButton
                 tooltip="Follow up"
-                to={`/${entry.id}/follow-up`}
+                to={{
+                  pathname: `/${entry.id}/follow-up`,
+                  search: window.location.search,
+                }}
                 highlighted={spotlight}
               >
                 <svg

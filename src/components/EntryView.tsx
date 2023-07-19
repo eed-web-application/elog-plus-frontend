@@ -81,13 +81,19 @@ export default function EntryView({ entry }: Props) {
         )}
         <div className="text-right mt-1 pt-1">
           <Link
-            to={`/${entry.id}/supersede`}
+            to={{
+              pathname: `/${entry.id}/supersede`,
+              search: window.location.search,
+            }}
             className={cn(Button, "mr-3 inline-block ml-auto w-fit")}
           >
             Supersede
           </Link>
           <Link
-            to={`/${entry.id}/follow-up`}
+            to={{
+              pathname: `/${entry.id}/follow-up`,
+              search: window.location.search,
+            }}
             className={cn(Button, "inline-block ml-auto w-fit")}
           >
             Follow up

@@ -12,7 +12,9 @@ export default function Supersede() {
     <Pane header="Supersede">
       <EntryForm
         superseding={entry}
-        onEntryCreated={(entryId) => navigate(`/${entryId}`)}
+        onEntryCreated={(entryId) =>
+          navigate({ pathname: `/${entryId}`, search: window.location.search })
+        }
       />
     </Pane>
   );

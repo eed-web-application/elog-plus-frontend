@@ -63,7 +63,10 @@ export default function Navbar({
           </button>
         </div>
       </form>
-      <Link to="/new-entry" className={cn(Button)}>
+      <Link
+        to={{ pathname: "/new-entry", search: window.location.search }}
+        className={Button}
+      >
         New Entry
       </Link>
     </div>

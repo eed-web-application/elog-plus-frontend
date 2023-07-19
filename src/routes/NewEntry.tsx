@@ -7,7 +7,11 @@ export default function NewEntry() {
 
   return (
     <Pane header="New Entry">
-      <EntryForm onEntryCreated={(entryId) => navigate(`/${entryId}`)} />
+      <EntryForm
+        onEntryCreated={(entryId) =>
+          navigate({ pathname: `/${entryId}`, search: window.location.search })
+        }
+      />
     </Pane>
   );
 }

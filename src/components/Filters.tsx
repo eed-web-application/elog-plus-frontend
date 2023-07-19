@@ -1,15 +1,12 @@
 import { useEffect, useState } from "react";
 import { fetchLogbooks, fetchTags } from "../api";
+import { EntryQuery } from "../hooks/useEntries";
 import Filter from "./Filter.tsx";
 import FilterSelect from "./FilterSelect.tsx";
 import { Input } from "./base.ts";
 import Tag from "./Tag.tsx";
 
-export interface Filters {
-  logbooks: string[];
-  tags: string[];
-  date: string;
-}
+export type Filters = Pick<EntryQuery, "logbooks" | "tags" | "date">;
 
 export interface Props {
   filters: Filters;

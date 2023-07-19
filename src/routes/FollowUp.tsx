@@ -12,7 +12,9 @@ export default function FollowUp() {
     <Pane header="Follow Up">
       <EntryForm
         followingUp={entry}
-        onEntryCreated={(entryId) => navigate(`/${entryId}`)}
+        onEntryCreated={(entryId) =>
+          navigate({ pathname: `/${entryId}`, search: window.location.search })
+        }
       />
     </Pane>
   );
