@@ -314,6 +314,8 @@ export default function EntryRow({
                   hash: entry.id,
                   search: window.location.search,
                 }}
+                // See https://stackoverflow.com/a/71210781
+                reloadDocument={!isPaneFullscreen}
                 entrySelected={pathname === entry.id}
                 entryHighlighted={spotlight}
               >

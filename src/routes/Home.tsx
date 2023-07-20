@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useRef } from "react";
-import { useLocation, useOutlet, useSearchParams } from "react-router-dom";
+import { useOutlet, useSearchParams } from "react-router-dom";
 import cn from "classnames";
 import Filters, { Filters as FiltersObject } from "../components/Filters";
 import Navbar from "../components/Navbar";
@@ -9,6 +9,7 @@ import useEntries from "../hooks/useEntries";
 import useIsSmallScreen from "../useIsSmallScreen";
 import { EntryQuery } from "../hooks/useEntries";
 import { URLSearchParamsInit } from "react-router-dom";
+import useHash from "../hooks/useHash";
 
 const DEFAULT_QUERY: EntryQuery = {
   logbooks: [],
@@ -57,7 +58,7 @@ export default function Home() {
     setQuery(DEFAULT_QUERY);
   }
 
-  const { hash } = useLocation();
+  const hash = useHash();
   const spotlight = hash?.slice(1);
   const { refreshEntries, isLoading, entries, getMoreEntries, reachedBottom } =
     useEntries({
@@ -130,7 +131,7 @@ export default function Home() {
               allowSupersede
               allowSpotlightForFollowUps
               onBottomVisible={reachedBottom ? undefined : getMoreEntries}
-              spotlight={hash?.slice(1) || undefined}
+              spotlight={spotlight}
             />
           </div>
           {outlet && (
