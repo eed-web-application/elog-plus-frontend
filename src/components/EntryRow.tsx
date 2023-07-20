@@ -112,7 +112,9 @@ function TagList({ tags }: { tags: string[] }) {
       if (
         rect.right >
         containerRect.right -
-          (stoppingPoint === null ? 0 : ellipsisRect.width + margin)
+          (stoppingPoint === null || i === tags.length - 1
+            ? 0
+            : ellipsisRect.width + margin)
       ) {
         setStoppingPoint(i);
         setEllipsisOffset(offset);
