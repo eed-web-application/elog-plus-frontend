@@ -17,6 +17,10 @@ function entryLoader({ params }: { params: Params }) {
   return null;
 }
 
+function shouldRevalidate({ currentParams, nextParams }) {
+  return currentParams.entryId !== nextParams.entryId;
+}
+
 const router = createBrowserRouter([
   {
     path: "/",
@@ -26,16 +30,19 @@ const router = createBrowserRouter([
       {
         path: ":entryId/supersede",
         loader: entryLoader,
+        shouldRevalidate,
         element: <Supersede />,
       },
       {
         path: ":entryId/follow-up",
         loader: entryLoader,
+        shouldRevalidate,
         element: <FollowUp />,
       },
       {
         path: ":entryId",
         loader: entryLoader,
+        shouldRevalidate,
         element: <ViewEntry />,
       },
       {
