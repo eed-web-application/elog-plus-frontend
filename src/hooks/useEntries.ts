@@ -36,10 +36,10 @@ export default function useEntries({
 
     const spotlightEntry = await getOrFetch(spotlight as string);
 
-    const startDate = spotlightEntry.loggedAt;
+    const endDate = spotlightEntry.loggedAt;
 
     const newEntries = await fetchEntries({
-      startDate,
+      startDate: startDate ? new Date(startDate).toISOString() : undefined,
       endDate,
       contextSize: ENTRIES_PER_FETCH,
       limit: ENTRIES_PER_FETCH,
@@ -47,7 +47,7 @@ export default function useEntries({
 
     setIsLoading(false);
     setEntries(newEntries);
-  }, [spotlight, getOrFetch, endDate]);
+  }, [spotlight, getOrFetch, startDate]);
 
   useEffect(() => {
     if (spotlight && entries.every((entry) => entry.id !== spotlight)) {
@@ -73,7 +73,7 @@ export default function useEntries({
       search,
       logbooks,
       tags,
-      startDate,
+      startDate: startDate ? new Date(startDate).toISOString() : undefined,
       endDate: dateDayEnd,
       limit: ENTRIES_PER_FETCH,
     });
