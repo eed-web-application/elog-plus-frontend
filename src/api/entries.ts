@@ -8,6 +8,7 @@ export interface EntrySummary {
   loggedBy: string;
   loggedAt: string;
   eventAt: string;
+  shift: string;
 }
 
 export interface Entry extends EntrySummary {
@@ -32,6 +33,15 @@ export interface EntryForm {
 function normalizeEntry(entry: EntrySummary) {
   entry.loggedAt = entry.loggedAt + "Z";
   entry.eventAt = entry.eventAt + "Z";
+
+  if (
+    new Date(entry.loggedAt).getTime() <
+    new Date("2023-07-20T21:55:38.205Z").getTime()
+  ) {
+    entry.shift = "Morning shift";
+  } else {
+    entry.shift = "Day shift";
+  }
   return entry;
 }
 
