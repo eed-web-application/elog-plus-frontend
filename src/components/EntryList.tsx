@@ -7,11 +7,11 @@ export interface Props {
   entries: EntrySummary[];
   emptyLabel?: string;
   spotlight?: string;
+  headerKind?: "shift" | "logbookShift" | "day" | "none";
   isLoading?: boolean;
   expandable?: boolean;
   selectable?: boolean;
   expandDefault?: boolean;
-  showDayHeaders?: boolean;
   showEntryDates?: boolean;
   showFollowUps?: boolean;
   allowFollowUp?: boolean;
@@ -25,11 +25,11 @@ export default function EntryList({
   entries,
   emptyLabel,
   spotlight,
+  headerKind = "logbookShift",
   isLoading,
   expandable,
   selectable,
   expandDefault,
-  showDayHeaders,
   showEntryDates,
   showFollowUps,
   allowFollowUp,
@@ -38,7 +38,7 @@ export default function EntryList({
   allowSpotlightForFollowUps,
   onBottomVisible,
 }: Props) {
-  let currentDate: string | undefined;
+  let currentHeader: string | undefined;
 
   const observer = useMemo(
     () =>
@@ -63,6 +63,27 @@ export default function EntryList({
     return () => observer.disconnect();
   }, [observer]);
 
+  const renderHeader = useCallback(
+    (entry: EntrySummary) => {
+      const date = new Date(entry.loggedAt).toLocaleDateString("en-us", {
+        weekday: "long",
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+      });
+      if (headerKind === "day") {
+        return date;
+      }
+      if (headerKind === "shift") {
+        return `${entry.shift} • ${date}`;
+      }
+      if (headerKind === "logbookShift") {
+        return `${entry.logbook} • ${entry.shift} • ${date}`;
+      }
+    },
+    [headerKind]
+  );
+
   if (entries.length === 0 && !isLoading && emptyLabel) {
     return <div className="text-gray-500 text-center pt-3">{emptyLabel}</div>;
   }
@@ -70,27 +91,17 @@ export default function EntryList({
   return (
     <>
       {entries.map((entry, index) => {
-        let dateHeader;
+        const headerText = renderHeader(entry);
+        let header;
 
-        const entryDate = entry.loggedAt.substring(0, 10);
-        if (showDayHeaders && entryDate !== currentDate) {
-          dateHeader = (
-            <h3 key={entry.loggedAt} className="text-lg mt-2 pb-1 border-b">
-              {new Date(entry.loggedAt).toLocaleDateString("en-us", {
-                weekday: "long",
-                year: "numeric",
-                month: "short",
-                day: "numeric",
-              })}
-            </h3>
-          );
-
-          currentDate = entryDate;
+        if (headerKind !== "none" && headerText !== currentHeader) {
+          currentHeader = headerText;
+          header = <h3 className="text-lg mt-2 pb-1 border-b">{headerText}</h3>;
         }
 
         return (
           <Fragment key={entry.id}>
-            {dateHeader}
+            {header}
             <div
               className={index === entries.length - 1 ? "" : "border-b"}
               ref={index === entries.length - 1 ? observe : undefined}

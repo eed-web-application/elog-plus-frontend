@@ -3,7 +3,7 @@ import { useOutlet, useSearchParams } from "react-router-dom";
 import cn from "classnames";
 import Filters, { Filters as FiltersObject } from "../components/Filters";
 import Navbar from "../components/Navbar";
-import EntryList from "../components/EntryList";
+import EntryList, { Props as EntryListProps } from "../components/EntryList";
 import EntryRefreshContext from "../EntryRefreshContext";
 import useEntries from "../hooks/useEntries";
 import useIsSmallScreen from "../useIsSmallScreen";
@@ -98,6 +98,15 @@ export default function Home() {
     document.addEventListener("mouseup", endDrag);
   }, [mouseMoveHandler, endDrag]);
 
+  let headerKind: EntryListProps["headerKind"];
+  if (query.logbooks.length === 0) {
+    headerKind = "day";
+  } else if (query.logbooks.length === 1) {
+    headerKind = "shift";
+  } else {
+    headerKind = "logbookShift";
+  }
+
   return (
     <EntryRefreshContext.Provider value={refreshEntries}>
       <div className="h-screen flex flex-col">
@@ -126,7 +135,7 @@ export default function Home() {
               isLoading={isLoading}
               selectable
               expandable
-              showDayHeaders
+              headerKind={headerKind}
               showFollowUps
               allowFollowUp
               allowSupersede
