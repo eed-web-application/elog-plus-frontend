@@ -25,7 +25,7 @@ export default function EntryList({
   entries,
   emptyLabel,
   spotlight,
-  headerKind = "logbookShift",
+  headerKind = "none",
   isLoading,
   expandable,
   selectable,
