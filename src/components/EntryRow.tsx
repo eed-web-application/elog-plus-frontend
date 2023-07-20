@@ -297,7 +297,7 @@ export default function EntryRow({
               {entry.logbook}
             </div>
             <div className="text-sm text-gray-500 leading-none whitespace-nowrap before:content-['•'] before:mx-1">
-              {entry.loggedAt}
+              {entry.loggedBy}
             </div>
             <TagList tags={entry.tags} />
           </div>
