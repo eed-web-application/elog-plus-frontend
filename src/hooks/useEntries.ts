@@ -60,8 +60,8 @@ export default function useEntries({
     setIsLoading(true);
 
     let dateDayEnd;
-    if (startDate) {
-      dateDayEnd = new Date(startDate);
+    if (endDate) {
+      dateDayEnd = new Date(endDate);
       // Since we want to include all the entries in the same day of the date
       // and the backend only returns entries before the date, we make sure the
       // date is at the end of the day
@@ -73,7 +73,8 @@ export default function useEntries({
       search,
       logbooks,
       tags,
-      startDate: dateDayEnd,
+      startDate,
+      endDate: dateDayEnd,
       limit: ENTRIES_PER_FETCH,
     });
 
@@ -83,7 +84,7 @@ export default function useEntries({
     if (newEntries.length !== ENTRIES_PER_FETCH) {
       setReachedBottom(true);
     }
-  }, [search, logbooks, tags, startDate, setIsLoading, setEntries]);
+  }, [search, logbooks, tags, startDate, endDate, setIsLoading, setEntries]);
 
   const getMoreEntries = useCallback(async () => {
     if (entries.length > 0 && !isLoading) {
@@ -93,7 +94,7 @@ export default function useEntries({
         logbooks,
         tags,
         search,
-        startDate: entries[entries.length - 1].loggedAt,
+        endDate: entries[entries.length - 1].loggedAt,
         limit: ENTRIES_PER_FETCH,
       });
 
