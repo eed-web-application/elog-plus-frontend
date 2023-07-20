@@ -1,6 +1,11 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import { createBrowserRouter, Params, RouterProvider } from "react-router-dom";
+import {
+  createBrowserRouter,
+  Params,
+  RouterProvider,
+  ShouldRevalidateFunction,
+} from "react-router-dom";
 import Home from "./routes/Home.tsx";
 import Supersede from "./routes/Supersede.tsx";
 import FollowUp from "./routes/FollowUp.tsx";
@@ -17,7 +22,10 @@ function entryLoader({ params }: { params: Params }) {
   return null;
 }
 
-function shouldRevalidate({ currentParams, nextParams }) {
+function shouldRevalidate({
+  currentParams,
+  nextParams,
+}: Parameters<ShouldRevalidateFunction>[0]) {
   return currentParams.entryId !== nextParams.entryId;
 }
 
