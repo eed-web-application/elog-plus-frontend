@@ -5,8 +5,9 @@ export interface EntrySummary {
   logbook: string;
   tags: string[];
   title: string;
-  author: string;
-  logDate: string;
+  loggedBy: string;
+  loggedAt: string;
+  eventAt: string;
 }
 
 export interface Entry extends EntrySummary {
@@ -29,48 +30,56 @@ export interface EntryForm {
 // Java is weird and doesn't add the Z at the end of its dates, so this is
 // what we gotta do
 function normalizeEntry(entry: EntrySummary) {
-  entry.logDate = entry.logDate + "Z";
+  entry.loggedAt = entry.loggedAt + "Z";
+  entry.eventAt = entry.eventAt + "Z";
   return entry;
 }
 
 export async function fetchEntries({
-  logbooks = [],
-  anchorDate,
-  numberBeforeAnchor,
-  numberAfterAnchor,
+  startDate,
+  endDate,
+  limit,
+  contextSize,
   search,
+  logbooks = [],
   tags = [],
 }: {
-  logbooks?: string[];
-  anchorDate?: string;
-  numberBeforeAnchor?: number;
-  numberAfterAnchor: number;
+  startDate?: string;
+  endDate?: string;
+  limit?: number;
+  contextSize?: number;
   search?: string;
+  logbooks?: string[];
   tags?: string[];
 }): Promise<EntrySummary[]> {
   const params: Record<string, string> = {
-    logbook: logbooks.join(","),
-    logsAfter: numberAfterAnchor.toString(),
+    logbooks: logbooks.join(","),
     tags: tags.join(","),
   };
 
-  if (anchorDate) {
+  if (startDate) {
     // Now, we have to remove the z added by normalizeEntry
-    params.anchorDate = anchorDate.split("Z")[0];
+    params.startDate = startDate.split("Z")[0];
   }
-  if (numberBeforeAnchor) {
-    params.logsBefore = numberBeforeAnchor.toString();
+  if (endDate) {
+    params.endDate = endDate.split("Z")[0];
+  }
+  if (limit) {
+    params.limit = limit.toString();
+  }
+  if (contextSize) {
+    params.contextSize = contextSize.toString();
   }
   if (search) {
     params.textFilter = search;
   }
 
-  const data = await fetch(`logs`, { params });
+  const data = await fetch("entries", { params });
   return data.map(normalizeEntry);
 }
 
 export async function fetchEntry(id: string): Promise<Entry> {
-  const data = await fetch(`logs/${id}`, {
+  const data = await fetch(`entries/${id}`, {
     params: {
       includeFollowUps: "true",
       includeHistory: "true",
@@ -83,7 +92,7 @@ export async function fetchEntry(id: string): Promise<Entry> {
 }
 
 export function createEntry(entry: EntryForm): Promise<string> {
-  return fetch("logs", {
+  return fetch("entries", {
     method: "POST",
     body: entry,
   });
@@ -93,7 +102,7 @@ export function followUp(
   followingUp: string,
   entry: EntryForm
 ): Promise<string> {
-  return fetch(`logs/${followingUp}/follow-up`, {
+  return fetch(`entries/${followingUp}/follow-ups`, {
     method: "POST",
     body: entry,
   });
@@ -103,7 +112,7 @@ export function supersede(
   superseding: string,
   entry: EntryForm
 ): Promise<string> {
-  return fetch(`logs/${superseding}/supersede`, {
+  return fetch(`entries/${superseding}/supersede`, {
     method: "POST",
     body: entry,
   });

@@ -6,7 +6,10 @@ import FilterSelect from "./FilterSelect.tsx";
 import { Input } from "./base.ts";
 import Tag from "./Tag.tsx";
 
-export type Filters = Pick<EntryQuery, "logbooks" | "tags" | "date">;
+export type Filters = Pick<
+  EntryQuery,
+  "logbooks" | "tags" | "startDate" | "endDate"
+>;
 
 export interface Props {
   filters: Filters;
@@ -114,25 +117,51 @@ export default function Filters({ filters, setFilters }: Props) {
       <Filter
         className="mr-3 mt-2"
         label={
-          filters.date
-            ? new Date(filters.date).toLocaleDateString("en-us", {
+          filters.startDate
+            ? new Date(filters.startDate).toLocaleDateString("en-us", {
                 timeZone: "UTC",
                 year: "numeric",
                 month: "long",
                 day: "numeric",
               })
-            : "Date"
+            : "From"
         }
-        enabled={Boolean(filters.date)}
-        onDisable={() => setFilters({ ...filters, date: "" })}
+        enabled={Boolean(filters.startDate)}
+        onDisable={() => setFilters({ ...filters, startDate: "" })}
         inline
       >
         <input
           className={Input}
           type="date"
           autoFocus
-          value={filters.date}
-          onChange={(e) => setFilters({ ...filters, date: e.target.value })}
+          value={filters.startDate}
+          onChange={(e) =>
+            setFilters({ ...filters, startDate: e.target.value })
+          }
+        />
+      </Filter>
+      <Filter
+        className="mr-3 mt-2"
+        label={
+          filters.endDate
+            ? new Date(filters.endDate).toLocaleDateString("en-us", {
+                timeZone: "UTC",
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+              })
+            : "To"
+        }
+        enabled={Boolean(filters.endDate)}
+        onDisable={() => setFilters({ ...filters, endDate: "" })}
+        inline
+      >
+        <input
+          className={Input}
+          type="date"
+          autoFocus
+          value={filters.endDate}
+          onChange={(e) => setFilters({ ...filters, endDate: e.target.value })}
         />
       </Filter>
     </div>

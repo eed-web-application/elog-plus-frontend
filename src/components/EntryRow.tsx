@@ -266,14 +266,14 @@ export default function EntryRow({
         <div className="px-2 flex flex-col justify-center items-center w-16">
           {showDate && (
             <div className="text-sm">
-              {new Date(entry.logDate).toLocaleDateString("en-us", {
+              {new Date(entry.loggedAt).toLocaleDateString("en-us", {
                 month: "short",
                 day: "numeric",
               })}
             </div>
           )}
           <div className="leading-none">
-            {new Date(entry.logDate).toLocaleString("en-us", {
+            {new Date(entry.loggedAt).toLocaleString("en-us", {
               hour: "numeric",
               minute: "numeric",
               hour12: false,
@@ -297,7 +297,7 @@ export default function EntryRow({
               {entry.logbook}
             </div>
             <div className="text-sm text-gray-500 leading-none whitespace-nowrap before:content-['•'] before:mx-1">
-              {entry.author}
+              {entry.loggedAt}
             </div>
             <TagList tags={entry.tags} />
           </div>

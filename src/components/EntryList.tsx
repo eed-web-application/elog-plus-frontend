@@ -72,11 +72,11 @@ export default function EntryList({
       {entries.map((entry, index) => {
         let dateHeader;
 
-        const entryDate = entry.logDate.substring(0, 10);
+        const entryDate = entry.loggedAt.substring(0, 10);
         if (showDayHeaders && entryDate !== currentDate) {
           dateHeader = (
-            <h3 key={entry.logDate} className="text-lg mt-2 pb-1 border-b">
-              {new Date(entry.logDate).toLocaleDateString("en-us", {
+            <h3 key={entry.loggedAt} className="text-lg mt-2 pb-1 border-b">
+              {new Date(entry.loggedAt).toLocaleDateString("en-us", {
                 weekday: "long",
                 year: "numeric",
                 month: "short",

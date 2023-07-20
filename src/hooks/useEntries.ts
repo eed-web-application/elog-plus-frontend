@@ -8,7 +8,8 @@ export interface EntryQuery {
   search: string;
   logbooks: string[];
   tags: string[];
-  date: string;
+  startDate: string;
+  endDate: string;
 }
 
 export interface Params extends Partial<EntryQuery> {
@@ -21,7 +22,8 @@ export default function useEntries({
   search,
   logbooks,
   tags,
-  date,
+  startDate,
+  endDate,
   onSpotlightFetched,
 }: Params) {
   const [entries, setEntries] = useState<EntrySummary[]>([]);
@@ -34,18 +36,18 @@ export default function useEntries({
 
     const spotlightEntry = await getOrFetch(spotlight as string);
 
-    const anchorDate = spotlightEntry.logDate;
-    const numberBeforeAnchor = ENTRIES_PER_FETCH;
+    const startDate = spotlightEntry.loggedAt;
 
     const newEntries = await fetchEntries({
-      anchorDate,
-      numberBeforeAnchor,
-      numberAfterAnchor: ENTRIES_PER_FETCH,
+      startDate,
+      endDate,
+      contextSize: ENTRIES_PER_FETCH,
+      limit: ENTRIES_PER_FETCH,
     });
 
     setIsLoading(false);
     setEntries(newEntries);
-  }, [spotlight, getOrFetch]);
+  }, [spotlight, getOrFetch, endDate]);
 
   useEffect(() => {
     if (spotlight && entries.every((entry) => entry.id !== spotlight)) {
@@ -58,8 +60,8 @@ export default function useEntries({
     setIsLoading(true);
 
     let dateDayEnd;
-    if (date) {
-      dateDayEnd = new Date(date);
+    if (startDate) {
+      dateDayEnd = new Date(startDate);
       // Since we want to include all the entries in the same day of the date
       // and the backend only returns entries before the date, we make sure the
       // date is at the end of the day
@@ -71,8 +73,8 @@ export default function useEntries({
       search,
       logbooks,
       tags,
-      anchorDate: dateDayEnd,
-      numberAfterAnchor: ENTRIES_PER_FETCH,
+      startDate: dateDayEnd,
+      limit: ENTRIES_PER_FETCH,
     });
 
     setIsLoading(false);
@@ -81,7 +83,7 @@ export default function useEntries({
     if (newEntries.length !== ENTRIES_PER_FETCH) {
       setReachedBottom(true);
     }
-  }, [search, logbooks, tags, date, setIsLoading, setEntries]);
+  }, [search, logbooks, tags, startDate, setIsLoading, setEntries]);
 
   const getMoreEntries = useCallback(async () => {
     if (entries.length > 0 && !isLoading) {
@@ -91,8 +93,8 @@ export default function useEntries({
         logbooks,
         tags,
         search,
-        anchorDate: entries[entries.length - 1].logDate,
-        numberAfterAnchor: ENTRIES_PER_FETCH,
+        startDate: entries[entries.length - 1].loggedAt,
+        limit: ENTRIES_PER_FETCH,
       });
 
       if (newEntries.length !== ENTRIES_PER_FETCH) {

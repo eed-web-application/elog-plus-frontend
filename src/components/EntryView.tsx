@@ -42,11 +42,11 @@ export default function EntryView({ entry }: Props) {
       <div className="flex flex-col gap-1 px-3 py-2 border-t">
         <div>
           <div className="text-gray-500">Logged by </div>
-          {entry.author}
+          {entry.loggedAt}
         </div>
         <div>
           <div className="text-gray-500">Logged at </div>
-          {new Date(entry.logDate).toLocaleString("en-us", {
+          {new Date(entry.loggedAt).toLocaleString("en-us", {
             year: "numeric",
             month: "short",
             day: "numeric",

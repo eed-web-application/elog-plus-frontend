@@ -14,7 +14,8 @@ import useHash from "../hooks/useHash";
 const DEFAULT_QUERY: EntryQuery = {
   logbooks: [],
   tags: [],
-  date: "",
+  startDate: "",
+  endDate: "",
   search: "",
 };
 
