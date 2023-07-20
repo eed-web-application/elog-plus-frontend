@@ -399,8 +399,9 @@ export default function EntryRow({
                 className={cn(
                   IconButton,
                   "z-0",
-                  { "rotate-180": expanded },
-                  spotlight && "hover:bg-yellow-300"
+                  expanded && "rotate-180",
+                  spotlight && "hover:bg-yellow-300",
+                  pathname === entry.id && "hover:!bg-blue-200"
                 )}
                 onClick={toggleExpand}
               >
