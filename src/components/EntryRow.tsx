@@ -116,7 +116,7 @@ function TagList({ tags }: { tags: string[] }) {
       if (
         rect.right >
         containerRect.right -
-          (stoppingPoint === null || i === tags.length - 1
+          (stoppingPoint === null || i === tagRefs.current.length - 1
             ? 0
             : ellipsisRect.width + margin)
       ) {
