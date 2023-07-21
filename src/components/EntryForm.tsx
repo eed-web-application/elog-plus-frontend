@@ -219,8 +219,6 @@ export default function EntryForm({
     attachmentsUploading
   );
 
-  console.log(draft.eventAt);
-
   return (
     <div className="pb-2">
       {entryPreview && (

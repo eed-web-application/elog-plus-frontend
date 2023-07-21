@@ -52,6 +52,7 @@ export async function fetchEntries({
   limit,
   contextSize,
   search,
+  sortBy = "eventAt",
   logbooks = [],
   tags = [],
 }: {
@@ -60,6 +61,7 @@ export async function fetchEntries({
   limit?: number;
   contextSize?: number;
   search?: string;
+  sortBy?: "eventAt" | "loggedAt";
   logbooks?: string[];
   tags?: string[];
 }): Promise<EntrySummary[]> {
@@ -83,6 +85,9 @@ export async function fetchEntries({
   }
   if (search) {
     params.textFilter = search;
+  }
+  if (sortBy) {
+    params.sortBy = sortBy;
   }
 
   const data = await fetch("entries", { params });

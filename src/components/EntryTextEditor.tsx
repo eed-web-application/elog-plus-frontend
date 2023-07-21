@@ -70,7 +70,6 @@ function getFormat(editor: Editor): (typeof allOptions)[number] {
 }
 
 function setFormat(editor: Editor, format: (typeof allOptions)[number]) {
-  console.log(format);
   if (format[0] === "H") {
     const level = parseInt(format[1]) as 1 | 2 | 3 | 4 | 5 | 6;
     editor.chain().focus().setHeading({ level }).run();

@@ -16,24 +16,20 @@ const DEFAULT_QUERY: EntryQuery = {
   startDate: "",
   endDate: "",
   search: "",
+  sortByLogDate: false,
 };
 
 const MIN_PANE_WIDTH = 384;
 
 function deserializeQuery(params: URLSearchParams): EntryQuery {
-  const query: EntryQuery = { ...DEFAULT_QUERY };
-
-  for (const [key, value] of params.entries()) {
-    // Typescript is being typescript and making things hard even though
-    // I know they work... so please excuse all the weird types here.
-    if (Array.isArray(DEFAULT_QUERY[key as keyof EntryQuery])) {
-      query[key as keyof EntryQuery] = value.split(",") as string & string[];
-    } else if (value) {
-      query[key as keyof EntryQuery] = value as string & string[];
-    }
-  }
-
-  return query;
+  return {
+    logbooks: params.get("logbooks")?.split(",") ?? DEFAULT_QUERY.logbooks,
+    tags: params.get("tags")?.split(",") ?? DEFAULT_QUERY.tags,
+    startDate: params.get("startDate") ?? DEFAULT_QUERY.startDate,
+    endDate: params.get("endDate") ?? DEFAULT_QUERY.endDate,
+    search: params.get("search") ?? DEFAULT_QUERY.search,
+    sortByLogDate: params.has("sortByLogDate"),
+  };
 }
 
 function serializeQuery(query: EntryQuery): URLSearchParamsInit {

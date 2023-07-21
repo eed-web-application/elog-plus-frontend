@@ -5,10 +5,11 @@ import Filter from "./Filter.tsx";
 import FilterSelect from "./FilterSelect.tsx";
 import { Input } from "./base.ts";
 import Tag from "./Tag.tsx";
+import FilterDropdown from "./FilterDropdown.tsx";
 
 export type Filters = Pick<
   EntryQuery,
-  "logbooks" | "tags" | "startDate" | "endDate"
+  "logbooks" | "tags" | "startDate" | "endDate" | "sortByLogDate"
 >;
 
 export interface Props {
@@ -86,7 +87,7 @@ export default function Filters({ filters, setFilters }: Props) {
 
   return (
     <div className="flex flex-wrap">
-      <Filter
+      <FilterDropdown
         className="mr-3 mt-2"
         label={logbookFilterLabel()}
         enabled={filters.logbooks.length !== 0}
@@ -100,8 +101,8 @@ export default function Filters({ filters, setFilters }: Props) {
           isLoading={logbooks === null}
           options={logbooks || []}
         />
-      </Filter>
-      <Filter
+      </FilterDropdown>
+      <FilterDropdown
         className="mr-3 mt-2"
         label={tagFilterLabel()}
         enabled={filters.tags.length !== 0}
@@ -113,8 +114,8 @@ export default function Filters({ filters, setFilters }: Props) {
           isLoading={tags === null}
           options={tags || []}
         />
-      </Filter>
-      <Filter
+      </FilterDropdown>
+      <FilterDropdown
         className="mr-3 mt-2"
         label={
           filters.startDate
@@ -139,8 +140,8 @@ export default function Filters({ filters, setFilters }: Props) {
             setFilters({ ...filters, startDate: e.target.value })
           }
         />
-      </Filter>
-      <Filter
+      </FilterDropdown>
+      <FilterDropdown
         className="mr-3 mt-2"
         label={
           filters.endDate
@@ -163,7 +164,16 @@ export default function Filters({ filters, setFilters }: Props) {
           value={filters.endDate}
           onChange={(e) => setFilters({ ...filters, endDate: e.target.value })}
         />
-      </Filter>
+      </FilterDropdown>
+      <Filter
+        className="mr-3 mt-2"
+        label="Sort by log date"
+        enabled={filters.sortByLogDate}
+        showCheck
+        onClick={() =>
+          setFilters({ ...filters, sortByLogDate: !filters.sortByLogDate })
+        }
+      />
     </div>
   );
 }

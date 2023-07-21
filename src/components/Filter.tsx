@@ -1,91 +1,65 @@
 import cn from "classnames";
-import { PropsWithChildren, ReactNode, useState } from "react";
 import {
-  useFloating,
-  useDismiss,
-  useInteractions,
-  shift,
-  offset,
-  autoUpdate,
-} from "@floating-ui/react";
+  HTMLAttributes,
+  PropsWithChildren,
+  ReactNode,
+  forwardRef,
+} from "react";
 import { MouseEvent } from "react";
 
-export interface Props {
-  enabled: boolean;
+export interface Props
+  extends Omit<HTMLAttributes<HTMLButtonElement>, "label"> {
   label: ReactNode;
-  onClose?: () => void;
-  onDisable?: () => void;
+  enabled?: boolean;
+  showCheck?: boolean;
+  showDownArrow?: boolean;
+  onDisable?: (e: MouseEvent<SVGSVGElement>) => void;
   className?: string;
-  inline?: boolean;
 }
 
-export default function Filter({
-  enabled,
-  children,
-  label,
-  onClose,
-  onDisable,
-  className,
-  inline,
-}: PropsWithChildren<Props>) {
-  const [isOpen, setIsOpen] = useState(false);
-
-  const { refs, floatingStyles, context } = useFloating({
-    open: isOpen,
-    onOpenChange: (isOpen) => {
-      if (!isOpen) {
-        onClose?.();
-      }
-      setIsOpen(isOpen);
-    },
-    placement: inline ? "bottom-start" : "bottom-start",
-
-    middleware: [
-      inline
-        ? offset(({ rects }) => {
-            return -rects.reference.height / 2 - rects.floating.height / 2;
-          })
-        : shift(),
-    ],
-    whileElementsMounted: autoUpdate,
-  });
-
-  function onClick() {
-    if (!isOpen) {
-      onClose?.();
+const Filter = forwardRef<HTMLButtonElement, PropsWithChildren<Props>>(
+  (
+    { label, enabled, showCheck, showDownArrow, onDisable, className, ...rest },
+    ref
+  ) => {
+    function disable(e: MouseEvent<SVGSVGElement>) {
+      e.stopPropagation();
+      onDisable?.(e);
     }
-    setIsOpen((isOpen) => !isOpen);
-  }
 
-  function disable(e: MouseEvent<SVGSVGElement>) {
-    e.stopPropagation();
-    onDisable?.();
-    setIsOpen(false);
-  }
-
-  const dismiss = useDismiss(context);
-
-  const { getReferenceProps, getFloatingProps } = useInteractions([dismiss]);
-
-  return (
-    <>
+    return (
       <button
+        ref={ref}
+        type="button"
         className={cn(
-          "flex items-center text-gray-500 border rounded-2xl pl-3 pr-2",
-          // It looks weird to have an inline element on top of the button
-          // and see the button creep through the side, so we make it invisible.
-          inline && isOpen && "invisible",
+          "flex items-center text-gray-500 border rounded-2xl px-3",
+          showCheck && enabled && "pl-2",
+          ((onDisable && !enabled) || (showDownArrow && enabled)) && "pr-2",
           enabled
             ? "bg-blue-100 border-blue-100 hover:bg-blue-200 hover:border-blue-200"
             : "bg-gray-50 border-gray-300 hover:bg-gray-200 hover:border-gray-400",
           className
         )}
-        onClick={onClick}
-        ref={refs.setReference}
-        {...getReferenceProps()}
+        {...rest}
       >
+        {showCheck && enabled && (
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            strokeWidth={1.5}
+            stroke="currentColor"
+            className="w-6 h-6 mr-1"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M4.5 12.75l6 6 9-13.5"
+            />
+          </svg>
+        )}
         <div className="py-1.5 whitespace-nowrap">{label}</div>
-        {enabled ? (
+        {onDisable && enabled && (
           <svg
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
@@ -101,7 +75,8 @@ export default function Filter({
               d="M6 18L18 6M6 6l12 12"
             />
           </svg>
-        ) : (
+        )}
+        {showDownArrow && !enabled && (
           <svg
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
@@ -118,16 +93,8 @@ export default function Filter({
           </svg>
         )}
       </button>
-      {isOpen && (
-        <div
-          ref={refs.setFloating}
-          style={floatingStyles}
-          className={cn(inline || "my-1", "shadow bg-white rounded-lg")}
-          {...getFloatingProps()}
-        >
-          {children}
-        </div>
-      )}
-    </>
-  );
-}
+    );
+  }
+);
+
+export default Filter;

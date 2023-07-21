@@ -10,6 +10,7 @@ export interface EntryQuery {
   tags: string[];
   startDate: string;
   endDate: string;
+  sortByLogDate: boolean;
 }
 
 export interface Params extends Partial<EntryQuery> {
@@ -24,6 +25,7 @@ export default function useEntries({
   tags,
   startDate,
   endDate,
+  sortByLogDate,
   onSpotlightFetched,
 }: Params) {
   const [entries, setEntries] = useState<EntrySummary[]>([]);
@@ -44,11 +46,12 @@ export default function useEntries({
       endDate,
       contextSize: ENTRIES_PER_FETCH,
       limit: ENTRIES_PER_FETCH,
+      sortBy: sortByLogDate ? "loggedAt" : undefined,
     });
 
     setIsLoading(false);
     setEntries(newEntries);
-  }, [spotlight, getOrFetch, startDate]);
+  }, [spotlight, getOrFetch, startDate, sortByLogDate]);
 
   useEffect(() => {
     if (
@@ -88,6 +91,7 @@ export default function useEntries({
       startDate: startDate ? new Date(startDate).toISOString() : undefined,
       endDate: dateDayEnd,
       limit: ENTRIES_PER_FETCH,
+      sortBy: sortByLogDate ? "loggedAt" : undefined,
     });
 
     setIsLoading(false);
@@ -96,7 +100,16 @@ export default function useEntries({
     if (newEntries.length !== ENTRIES_PER_FETCH) {
       setReachedBottom(true);
     }
-  }, [search, logbooks, tags, startDate, endDate, setIsLoading, setEntries]);
+  }, [
+    search,
+    logbooks,
+    tags,
+    startDate,
+    endDate,
+    sortByLogDate,
+    setIsLoading,
+    setEntries,
+  ]);
 
   const getMoreEntries = useCallback(async () => {
     if (entries.length > 0 && !isLoading) {
@@ -108,6 +121,7 @@ export default function useEntries({
         search,
         endDate: entries[entries.length - 1].loggedAt,
         limit: ENTRIES_PER_FETCH,
+        sortBy: sortByLogDate ? "loggedAt" : undefined,
       });
 
       if (newEntries.length !== ENTRIES_PER_FETCH) {
@@ -117,7 +131,7 @@ export default function useEntries({
       setIsLoading(false);
       setEntries((entries) => entries.concat(newEntries));
     }
-  }, [search, logbooks, tags, entries, isLoading]);
+  }, [search, logbooks, tags, sortByLogDate, entries, isLoading]);
 
   useEffect(() => {
     refreshEntries();
