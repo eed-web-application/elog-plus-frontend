@@ -1,4 +1,4 @@
-import { HTMLProps, useState } from "react";
+import { ComponentProps, useState } from "react";
 import cn from "classnames";
 import {
   FloatingFocusManager,
@@ -16,7 +16,7 @@ import {
 } from "../api";
 import { BackDrop, IconButton } from "./base";
 
-export interface Props extends HTMLProps<HTMLDivElement> {
+export interface Props extends ComponentProps<"div"> {
   attachments: Attachment[];
 }
 

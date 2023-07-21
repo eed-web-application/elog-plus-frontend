@@ -8,7 +8,7 @@ import {
 } from "@tiptap/react";
 import cn from "classnames";
 import { Input } from "./base";
-import { HTMLProps, PropsWithChildren, useEffect } from "react";
+import { ComponentProps, PropsWithChildren, useEffect } from "react";
 import Underline from "@tiptap/extension-underline";
 import Select from "./Select";
 
@@ -18,7 +18,7 @@ function MenuButton({
   disabled,
   active,
   ...rest
-}: Omit<HTMLProps<HTMLButtonElement>, "type"> & {
+}: Omit<ComponentProps<"button">, "type"> & {
   disabled?: boolean;
   active?: boolean;
 }) {
@@ -102,7 +102,7 @@ function MenuButtonGroup({
   children,
   className,
   ...rest
-}: PropsWithChildren<HTMLProps<HTMLDivElement>>) {
+}: PropsWithChildren<ComponentProps<"div">>) {
   return (
     <div className={cn("flex gap-1 px-2 items-center", className)} {...rest}>
       {children}

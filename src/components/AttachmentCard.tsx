@@ -1,4 +1,4 @@
-import React, { HTMLProps } from "react";
+import React, { ComponentProps } from "react";
 import cn from "classnames";
 import AttachmentIcon from "./AttachmentIcon";
 import { Attachment, getAttachmentDownloadURL } from "../api";
@@ -11,7 +11,7 @@ export type Props = (
       downloadable?: false;
     }
 ) &
-  HTMLProps<HTMLDivElement> & {
+  ComponentProps<"div"> & {
     isLoading?: boolean;
     onRemove?: () => void;
   };

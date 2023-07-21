@@ -2,9 +2,9 @@ import cn from "classnames";
 import { Link } from "react-router-dom";
 import elogLogo from "../assets/temp_elog_logo.png";
 import { Button, Input } from "./base";
-import { HTMLProps, useEffect, useState } from "react";
+import { ComponentProps, useEffect, useState } from "react";
 
-interface Props extends HTMLProps<HTMLDivElement> {
+interface Props extends ComponentProps<"div"> {
   search: string;
   onSearchChange: (search: string) => void;
 }

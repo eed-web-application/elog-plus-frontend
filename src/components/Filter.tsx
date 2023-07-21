@@ -1,14 +1,13 @@
 import cn from "classnames";
 import {
-  HTMLAttributes,
+  ComponentPropsWithRef,
   PropsWithChildren,
   ReactNode,
   forwardRef,
 } from "react";
 import { MouseEvent } from "react";
 
-export interface Props
-  extends Omit<HTMLAttributes<HTMLButtonElement>, "label"> {
+export interface Props extends Omit<ComponentPropsWithRef<"button">, "label"> {
   label: ReactNode;
   enabled?: boolean;
   showCheck?: boolean;

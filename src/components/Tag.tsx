@@ -1,7 +1,7 @@
-import React, { HTMLProps, forwardRef } from "react";
+import React, { ComponentPropsWithRef, forwardRef } from "react";
 import cn from "classnames";
 
-export interface Props extends HTMLProps<HTMLDivElement> {
+export interface Props extends ComponentPropsWithRef<"div"> {
   delectable?: boolean;
   clickable?: boolean;
   onDelete?: (event: React.MouseEvent<SVGSVGElement, MouseEvent>) => void;

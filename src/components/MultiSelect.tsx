@@ -1,4 +1,4 @@
-import { HTMLProps, useState } from "react";
+import { ComponentProps, useState } from "react";
 import cn from "classnames";
 import { Input, InputInvalid } from "./base";
 import { size, useFloating } from "@floating-ui/react";
@@ -6,7 +6,7 @@ import Spinner from "./Spinner";
 import Tag from "./Tag";
 import useSelectCursor from "../hooks/useSelectCursor";
 
-interface Props extends Omit<HTMLProps<HTMLInputElement>, "value"> {
+interface Props extends Omit<ComponentProps<"input">, "value"> {
   value: string[];
   setValue: (value: string[]) => void;
   predefinedOptions: string[];

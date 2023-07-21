@@ -1,8 +1,8 @@
 import cn from "classnames";
 import DOMPurify from "dompurify";
-import { HTMLProps } from "react";
+import { ComponentProps } from "react";
 
-interface Props extends HTMLProps<HTMLDivElement> {
+interface Props extends ComponentProps<"div"> {
   body: string;
   showEmptyLabel?: boolean;
 }

@@ -1,9 +1,9 @@
-import { HTMLProps, PropsWithChildren } from "react";
+import { ComponentProps, PropsWithChildren } from "react";
 
 export default function TextDivider({
   children,
   ...rest
-}: PropsWithChildren<HTMLProps<HTMLDivElement>>) {
+}: PropsWithChildren<ComponentProps<"div">>) {
   return (
     <div className="flex items-center" {...rest}>
       <div className="flex-grow border-t"></div>
