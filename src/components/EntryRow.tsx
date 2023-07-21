@@ -31,10 +31,11 @@ import EntryFigureList from "./EntryFigureList";
 
 function RowButton({
   children,
-  to,
   tooltip,
   entrySelected,
   entryHighlighted,
+  onClick,
+  ...rest
 }: PropsWithChildren<
   LinkProps & {
     tooltip: string;
@@ -46,7 +47,6 @@ function RowButton({
   return (
     <Tooltip label={tooltip}>
       <Link
-        to={to}
         className={cn(
           IconButton,
           "rounded-full z-0",
@@ -54,7 +54,11 @@ function RowButton({
           entryHighlighted && "hover:bg-yellow-300"
         )}
         tabIndex={0}
-        onClick={(e) => e.stopPropagation()}
+        onClick={(e) => {
+          e.stopPropagation();
+          onClick?.(e);
+        }}
+        {...rest}
       >
         {children}
       </Link>
@@ -313,11 +317,10 @@ export default function EntryRow({
                 // which can be done by redirecting to the root: `/`.
                 to={{
                   pathname: isPaneFullscreen ? "/" : undefined,
-                  hash: entry.id,
                   search: window.location.search,
                 }}
-                // See https://stackoverflow.com/a/71210781
-                reloadDocument={!isPaneFullscreen}
+                replace={!isPaneFullscreen}
+                state={{ spotlight: entry.id }}
                 entrySelected={pathname === entry.id}
                 entryHighlighted={spotlight}
               >

@@ -33,6 +33,7 @@ export default function useEntries({
 
   const fetchSurroundingSpotlight = useCallback(async () => {
     setIsLoading(true);
+    setEntries([]);
 
     const spotlightEntry = await getOrFetch(spotlight as string);
 
@@ -50,14 +51,25 @@ export default function useEntries({
   }, [spotlight, getOrFetch, startDate]);
 
   useEffect(() => {
-    if (spotlight && entries.every((entry) => entry.id !== spotlight)) {
+    if (
+      spotlight &&
+      !isLoading &&
+      entries.every((entry) => entry.id !== spotlight)
+    ) {
       fetchSurroundingSpotlight();
       onSpotlightFetched?.();
     }
-  }, [fetchSurroundingSpotlight, spotlight, entries, onSpotlightFetched]);
+  }, [
+    fetchSurroundingSpotlight,
+    isLoading,
+    spotlight,
+    entries,
+    onSpotlightFetched,
+  ]);
 
   const refreshEntries = useCallback(async () => {
     setIsLoading(true);
+    setEntries([]);
 
     let dateDayEnd;
     if (endDate) {

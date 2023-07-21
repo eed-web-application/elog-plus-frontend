@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useRef } from "react";
-import { useOutlet, useSearchParams } from "react-router-dom";
+import { useLocation, useOutlet, useSearchParams } from "react-router-dom";
 import cn from "classnames";
 import Filters, { Filters as FiltersObject } from "../components/Filters";
 import Navbar from "../components/Navbar";
@@ -50,17 +50,20 @@ export default function Home() {
   const gutterRef = useRef<HTMLDivElement>(null);
   const [searchParams, setSearchParams] = useSearchParams();
   const query = useMemo(() => deserializeQuery(searchParams), [searchParams]);
+  const location = useLocation();
 
-  function setQuery(query: EntryQuery) {
-    setSearchParams(serializeQuery(query));
+  function setQuery(query: EntryQuery, preserveState = false) {
+    setSearchParams(serializeQuery(query), {
+      replace: true,
+      state: preserveState ? location.state : undefined,
+    });
   }
 
   function resetQuery() {
-    setQuery(DEFAULT_QUERY);
+    setQuery(DEFAULT_QUERY, true);
   }
 
-  const hash = useHash();
-  const spotlight = hash?.slice(1);
+  const spotlight = location.state?.spotlight;
   const { refreshEntries, isLoading, entries, getMoreEntries, reachedBottom } =
     useEntries({
       ...query,
@@ -69,12 +72,10 @@ export default function Home() {
     });
 
   function onFiltersChange(filters: FiltersObject) {
-    window.location.hash = "";
     setQuery({ ...query, ...filters });
   }
 
   function onSearchChange(search: string) {
-    window.location.hash = "";
     setQuery({ ...query, search });
   }
 
