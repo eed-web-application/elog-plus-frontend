@@ -64,7 +64,11 @@ export default function EntryView({ entry }: Props) {
           {entry.loggedBy}
         </div>
         <div>
-          <div className="text-gray-500">Logged at </div>
+          <div className="text-gray-500">
+            {entry.loggedAt === entry.eventAt
+              ? "Event occurrend and logged at"
+              : "Logged at "}
+          </div>
           {new Date(entry.loggedAt).toLocaleString("en-us", {
             year: "numeric",
             month: "short",
@@ -75,7 +79,7 @@ export default function EntryView({ entry }: Props) {
             hour12: false,
           })}
         </div>
-        {entry.eventAt && (
+        {entry.eventAt && entry.eventAt !== entry.loggedAt && (
           <div>
             <div className="text-gray-500">Event occurrend at</div>
             {new Date(entry.eventAt).toLocaleString("en-us", {
