@@ -21,7 +21,7 @@ export default function EntryView({ entry }: Props) {
 
   return (
     <>
-      <div className={cn("px-3", !entry.followingUp && "pb-2")}>
+      <div className={cn("px-3 pt-2", !entry.followingUp && "pb-2")}>
         <div className="text-lg -mb-1">{entry.title}</div>
         <div className="text-sm text-gray-500">{entry.logbook}</div>
       </div>
