@@ -1,5 +1,5 @@
 export const Input =
-  "pl-2.5 p-2 text-gray-900 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500";
+  "pl-2.5 p-2 text-gray-900 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 disabled:text-gray-500 disabled:border-gray-200";
 
 export const InputInvalid =
   "border-red-500 focus-1 ring-red-500 focus:ring-1 focus:ring-red-500 focus:border-red-500";
@@ -14,3 +14,5 @@ export const BackDrop = "bg-gray-800 bg-opacity-60";
 
 export const Link =
   "font-medium text-blue-600 dark:text-blue-500 hover:underline";
+
+export const Checkbox = "w-5 h-5 accent-blue-500";

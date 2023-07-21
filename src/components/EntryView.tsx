@@ -56,6 +56,20 @@ export default function EntryView({ entry }: Props) {
             hour12: false,
           })}
         </div>
+        {entry.eventAt && (
+          <div>
+            <div className="text-gray-500">Event occurrend at</div>
+            {new Date(entry.eventAt).toLocaleString("en-us", {
+              year: "numeric",
+              month: "short",
+              day: "numeric",
+              hour: "numeric",
+              minute: "numeric",
+              second: "numeric",
+              hour12: false,
+            })}
+          </div>
+        )}
         {entry.tags.length > 0 && (
           <div>
             <div className="text-gray-500">Tags</div>

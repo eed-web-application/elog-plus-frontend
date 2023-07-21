@@ -26,6 +26,7 @@ export interface EntryForm {
   logbook: string;
   tags: string[];
   attachments: string[];
+  eventAt?: string;
 }
 
 // Java is weird and doesn't add the Z at the end of its dates, so this is

@@ -13,7 +13,7 @@ import {
   uploadAttachment,
 } from "../api";
 import Select from "./Select";
-import { Button, Input, InputInvalid } from "./base";
+import { Button, Checkbox, Input, InputInvalid } from "./base";
 import EntryRow from "./EntryRow";
 import MultiSelect from "./MultiSelect";
 import AttachmentCard from "./AttachmentCard";
@@ -99,6 +99,9 @@ export default function EntryForm({
   const validators = {
     title: () => Boolean(draft.title),
     logbook: () => Boolean(draft.logbook),
+    // It can either be undefined (meaning off) or a valid time, but it can't
+    // be an empty string which signifies on with no time selected.
+    eventAt: () => Boolean(draft.eventAt !== ""),
     // Ensure all attachments are downloaded
     attachments: () => attachmentsUploading.length === 0,
   };
@@ -140,12 +143,17 @@ export default function EntryForm({
 
     const newEntry: EntryFormType = {
       ...draft,
+      // Zero seconds
       attachments: draft.attachments.map(
         // We have already verified that all the ids are non null in the
         // attachment validator, so this is fine
         (attachment) => attachment.id as string
       ),
     };
+
+    if (draft.eventAt) {
+      newEntry.eventAt = draft.eventAt + ".000";
+    }
 
     const id = await submitEntry(newEntry);
     removeDraft();
@@ -211,6 +219,8 @@ export default function EntryForm({
     attachmentsUploading
   );
 
+  console.log(draft.eventAt);
+
   return (
     <div className="pb-2">
       {entryPreview && (
@@ -264,6 +274,34 @@ export default function EntryForm({
             />
           </label>
         )}
+        <label className="text-gray-500 mb-2 flex items-center">
+          <input
+            type="checkbox"
+            className={cn(Checkbox, "mr-2")}
+            checked={draft.eventAt !== undefined}
+            onChange={() =>
+              setDraft({
+                ...draft,
+                eventAt: draft.eventAt === undefined ? "" : undefined,
+              })
+            }
+          />
+          Explicit event time
+        </label>
+        <input
+          type="datetime-local"
+          disabled={draft.eventAt === undefined}
+          step="1"
+          onChange={(e) =>
+            setDraft({ ...draft, eventAt: e.currentTarget.value })
+          }
+          className={cn(
+            Input,
+            invalid.includes("eventAt") && InputInvalid,
+            "block w-full"
+          )}
+        />
+
         <label className="text-gray-500 block mb-2">
           Tags
           <MultiSelect
