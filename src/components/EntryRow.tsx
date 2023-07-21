@@ -2,7 +2,6 @@ import cn from "classnames";
 import {
   PropsWithChildren,
   useCallback,
-  useContext,
   useState,
   useRef,
   useEffect,
@@ -25,9 +24,9 @@ import { Entry, EntrySummary } from "../api";
 import EntryList from "./EntryList";
 import Tag from "./Tag";
 import EntryBody from "./EntryBody";
-import IsPaneFullscreen from "../IsPaneFullscreenContext";
 import Tooltip from "./Tooltip";
 import EntryFigureList from "./EntryFigureList";
+import useSpotlightProps from "../hooks/useSpotlightProps";
 
 function RowButton({
   children,
@@ -253,7 +252,7 @@ export default function EntryRow({
     [spotlight]
   );
 
-  const isPaneFullscreen = useContext(IsPaneFullscreen);
+  const spotlightProps = useSpotlightProps(entry.id);
 
   return (
     <>
@@ -313,16 +312,9 @@ export default function EntryRow({
             {allowSpotlight && (
               <RowButton
                 tooltip="Spotlight"
-                // If the pane is fullscreen, then we want to close it
-                // which can be done by redirecting to the root: `/`.
-                to={{
-                  pathname: isPaneFullscreen ? "/" : undefined,
-                  search: window.location.search,
-                }}
-                replace={!isPaneFullscreen}
-                state={{ spotlight: entry.id }}
                 entrySelected={pathname === entry.id}
                 entryHighlighted={spotlight}
+                {...spotlightProps}
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"

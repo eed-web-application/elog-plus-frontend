@@ -1,7 +1,7 @@
 import cn from "classnames";
 import { Entry } from "../api";
 import { Link } from "react-router-dom";
-import { Button } from "./base";
+import { Button, IconButton } from "./base";
 import EntryList from "./EntryList";
 import EntryBody from "./EntryBody";
 import Tag from "./Tag";
@@ -9,6 +9,7 @@ import AttachmentCard from "./AttachmentCard";
 import EntryRow from "./EntryRow";
 import EntryFigureList from "./EntryFigureList";
 import TextDivider from "./TextDivider";
+import useSpotlightProps from "../hooks/useSpotlightProps";
 
 export interface Props {
   entry: Entry;
@@ -19,8 +20,26 @@ export default function EntryView({ entry }: Props) {
     (attachment) => attachment.previewState !== "Completed"
   );
 
+  const spotlightProps = useSpotlightProps(entry.id);
+
   return (
     <>
+      <Link {...spotlightProps} className={cn(IconButton, "my-1 float-right")}>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          strokeWidth={1.5}
+          stroke="currentColor"
+          className="w-6 h-6"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"
+          />
+        </svg>
+      </Link>
       <div className={cn("px-3 pt-2", !entry.followingUp && "pb-2")}>
         <div className="text-lg -mb-1">{entry.title}</div>
         <div className="text-sm text-gray-500">{entry.logbook}</div>
