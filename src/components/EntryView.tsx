@@ -42,7 +42,7 @@ export default function EntryView({ entry }: Props) {
       <div className="flex flex-col gap-1 px-3 py-2 border-t">
         <div>
           <div className="text-gray-500">Logged by </div>
-          {entry.loggedAt}
+          {entry.loggedBy}
         </div>
         <div>
           <div className="text-gray-500">Logged at </div>
