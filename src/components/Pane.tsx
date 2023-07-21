@@ -40,7 +40,7 @@ export default function Pane({
       }
 
       if (isSmallScreen) {
-        navigate("/");
+        navigate({ pathname: "/", search: window.location.search });
       } else {
         setExplicitFullscreen(false);
       }
