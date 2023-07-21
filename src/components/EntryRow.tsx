@@ -49,7 +49,7 @@ function RowButton({
         className={cn(
           IconButton,
           "rounded-full z-0",
-          entrySelected && "hover:!bg-blue-200",
+          entrySelected && !entryHighlighted && "hover:!bg-blue-200",
           entryHighlighted && "hover:bg-yellow-300"
         )}
         tabIndex={0}
@@ -398,7 +398,7 @@ export default function EntryRow({
                   "z-0",
                   expanded && "rotate-180",
                   spotlight && "hover:bg-yellow-300",
-                  pathname === entry.id && "hover:!bg-blue-200"
+                  pathname === entry.id && !spotlight && "hover:!bg-blue-200"
                 )}
                 onClick={toggleExpand}
               >
