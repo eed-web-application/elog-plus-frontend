@@ -204,6 +204,7 @@ export interface Props {
   selectable?: boolean;
   expandable?: boolean;
   showFollowUps?: boolean;
+  hideSelection?: boolean;
   expandedDefault?: boolean;
   showDate?: boolean;
   allowFollowUp?: boolean;
@@ -219,6 +220,7 @@ export default function EntryRow({
   selectable,
   expandable,
   showFollowUps,
+  hideSelection,
   expandedDefault,
   showDate,
   allowFollowUp,
@@ -228,7 +230,10 @@ export default function EntryRow({
 }: PropsWithChildren<Props>) {
   const [expanded, setExpanded] = useState(Boolean(expandedDefault));
   const [fullEntry, setFullEntry] = useState<Entry | null>(null);
-  const pathname = useLocation().pathname.slice(1);
+  const { pathname } = useLocation();
+  const selectedEntryId = hideSelection
+    ? null
+    : pathname.slice(1).split("/")[0];
 
   const getOrFetch = useEntriesStore((state) => state.getOrFetch);
 
@@ -261,7 +266,7 @@ export default function EntryRow({
         className={cn(
           "flex items-center",
           selectable && "cursor-pointer relative",
-          pathname === entry.id
+          selectedEntryId === entry.id
             ? "bg-blue-50 hover:bg-blue-100"
             : "hover:bg-gray-50",
           spotlight && "bg-yellow-100 hover:bg-yellow-200",
@@ -312,7 +317,7 @@ export default function EntryRow({
             {allowSpotlight && (
               <RowButton
                 tooltip="Spotlight"
-                entrySelected={pathname === entry.id}
+                entrySelected={selectedEntryId === entry.id}
                 entryHighlighted={spotlight}
                 {...spotlightProps}
               >
@@ -340,7 +345,7 @@ export default function EntryRow({
                   pathname: `/${entry.id}/supersede`,
                   search: window.location.search,
                 }}
-                entrySelected={pathname === entry.id}
+                entrySelected={selectedEntryId === entry.id}
                 entryHighlighted={spotlight}
               >
                 <svg
@@ -367,7 +372,7 @@ export default function EntryRow({
                   pathname: `/${entry.id}/follow-up`,
                   search: window.location.search,
                 }}
-                entrySelected={pathname === entry.id}
+                entrySelected={selectedEntryId === entry.id}
                 entryHighlighted={spotlight}
               >
                 <svg
@@ -398,7 +403,9 @@ export default function EntryRow({
                   "z-0",
                   expanded && "rotate-180",
                   spotlight && "hover:bg-yellow-300",
-                  pathname === entry.id && !spotlight && "hover:!bg-blue-200"
+                  selectedEntryId === entry.id &&
+                    !spotlight &&
+                    "hover:!bg-blue-200"
                 )}
                 onClick={toggleExpand}
               >

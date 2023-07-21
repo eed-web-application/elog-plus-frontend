@@ -227,6 +227,7 @@ export default function EntryForm({
               entry={entryPreview}
               showDate
               expandable
+              hideSelection
               showFollowUps
               selectable
               allowSpotlight
