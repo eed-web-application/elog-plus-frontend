@@ -110,7 +110,9 @@ export async function fetchEntry(id: string): Promise<Entry> {
 export function createEntry(entry: EntryForm): Promise<string> {
   return fetch("entries", {
     method: "POST",
-    body: entry,
+    body: entry.eventAt
+      ? { ...entry, eventAt: new Date(entry.eventAt).toISOString() }
+      : entry,
   });
 }
 

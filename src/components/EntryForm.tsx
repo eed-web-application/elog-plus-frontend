@@ -151,10 +151,6 @@ export default function EntryForm({
       ),
     };
 
-    if (draft.eventAt) {
-      newEntry.eventAt = draft.eventAt + ".000";
-    }
-
     const id = await submitEntry(newEntry);
     removeDraft();
 
