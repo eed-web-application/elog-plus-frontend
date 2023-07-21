@@ -9,7 +9,6 @@ import useEntries from "../hooks/useEntries";
 import useIsSmallScreen from "../useIsSmallScreen";
 import { EntryQuery } from "../hooks/useEntries";
 import { URLSearchParamsInit } from "react-router-dom";
-import useHash from "../hooks/useHash";
 
 const DEFAULT_QUERY: EntryQuery = {
   logbooks: [],
