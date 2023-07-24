@@ -11,7 +11,7 @@ export default function FollowUp() {
   return (
     <Pane>
       <EntryForm
-        followingUp={entry}
+        kind={["followingUp", entry]}
         onEntryCreated={(entryId) =>
           navigate({ pathname: `/${entryId}`, search: window.location.search })
         }

@@ -11,7 +11,7 @@ export default function Supersede() {
   return (
     <Pane>
       <EntryForm
-        superseding={entry}
+        kind={["superseding", entry]}
         onEntryCreated={(entryId) =>
           navigate({ pathname: `/${entryId}`, search: window.location.search })
         }

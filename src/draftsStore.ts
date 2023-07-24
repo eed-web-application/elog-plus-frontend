@@ -20,7 +20,7 @@ interface DraftsState {
   startDrafting: (
     factory: DraftFactory
   ) => [Draft, (draft: Draft) => void, () => void];
-  upsertDraft: (draftId: DraftId, draft: Draft) => void;
+  upsertDraft: (draftId: DraftId, draft: Partial<Draft>) => void;
   removeDraft: (draftId: DraftId) => void;
 }
 
@@ -49,7 +49,7 @@ export const useDraftsStore = create(
 
           defaultDraft = factory[1];
         } else {
-          draftId = `followUp/${factory[1]}`;
+          draftId = `followUp/${factory[1].id}`;
 
           defaultDraft = {
             ...DEFAULT_DRAFT,
@@ -67,8 +67,11 @@ export const useDraftsStore = create(
         ];
       },
       upsertDraft(draftId, draft) {
-        set((state) => ({
-          drafts: { ...state.drafts, [draftId]: draft },
+        set(({ drafts }) => ({
+          drafts: {
+            ...drafts,
+            [draftId]: { ...(drafts[draftId] || DEFAULT_DRAFT), ...draft },
+          },
         }));
       },
       removeDraft(draftId) {

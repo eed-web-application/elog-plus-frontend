@@ -31,10 +31,7 @@ import useAttachmentUploader, {
 
 export interface Props {
   onEntryCreated: (id: string) => void;
-  newEntryKind: [];
   kind?: DraftFactory;
-  followingUp?: Entry;
-  superseding?: Entry;
 }
 
 export default function EntryForm({
