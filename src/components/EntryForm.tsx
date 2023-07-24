@@ -10,7 +10,6 @@ import {
   fetchTags,
   followUp,
   supersede,
-  uploadAttachment,
 } from "../api";
 import Select from "./Select";
 import { Button, Checkbox, Input, InputInvalid } from "./base";
@@ -18,8 +17,7 @@ import EntryRow from "./EntryRow";
 import MultiSelect from "./MultiSelect";
 import AttachmentCard from "./AttachmentCard";
 import {
-  DEFAULT_DRAFT,
-  Draft,
+  DraftFactory,
   LocalUploadedAttachment,
   useDraftsStore,
 } from "../draftsStore";
@@ -27,65 +25,46 @@ import EntryRefreshContext from "../EntryRefreshContext";
 import EntryTextEditor from "./EntryTextEditor";
 import TextDivider from "./TextDivider";
 import dateToDateString from "../utils/dateToDateString";
-
-type LocalAttachment = {
-  id?: string;
-} & Omit<LocalUploadedAttachment, "id">;
+import useAttachmentUploader, {
+  LocalAttachment,
+} from "../hooks/useAttachmentUploader";
 
 export interface Props {
   onEntryCreated: (id: string) => void;
+  newEntryKind: [];
+  kind?: DraftFactory;
   followingUp?: Entry;
   superseding?: Entry;
 }
 
 export default function EntryForm({
   onEntryCreated,
-  followingUp,
-  superseding,
+  kind = "newEntry",
 }: Props) {
   const [logbooks, setLogbooks] = useState<null | string[]>(null);
   const [tags, setTags] = useState<null | string[]>(null);
   const [shifts, setShifts] = useState<null | string[]>(null);
-  const [attachmentsUploading, setAttachmentsUploading] = useState<
-    LocalAttachment[]
-  >([]);
   const refreshEntries = useContext(EntryRefreshContext);
-  const [draft, setDraft, removeDraft] = useDraftsStore((state) => {
-    if (superseding) {
-      return [
-        state.supersedes[superseding.id] || { ...superseding },
-        (draft: Draft) => state.updateSupersedingDraft(superseding.id, draft),
-        () => state.removeSupersedingDraft(superseding.id),
-      ];
-    }
-    if (followingUp) {
-      return [
-        state.followUps[followingUp.id] || {
-          ...DEFAULT_DRAFT,
-          logbook: followingUp.logbook,
-        },
-        (draft: Draft) => state.updateFollowUpDraft(followingUp.id, draft),
-        () => state.removeFollowUpDraft(followingUp.id),
-      ];
-    }
-    return [
-      state.newEntry,
-      state.updateNewEntryDraft,
-      state.removeNewEntryDraft,
-    ];
-  });
+  const [draft, updateDraft, removeDraft] = useDraftsStore((state) =>
+    state.startDrafting(kind)
+  );
+  const {
+    uploading: attachmentsUploading,
+    upload: uploadAttachment,
+    cancel: cancelUploadingAttachment,
+  } = useAttachmentUploader();
 
   const submitEntry = useCallback(
     (newEntry: EntryFormType) => {
-      if (superseding) {
-        return supersede(superseding.id, newEntry);
+      if (kind === "newEntry") {
+        return createEntry(newEntry);
       }
-      if (followingUp) {
-        return followUp(followingUp.id, newEntry);
+      if (kind[0] === "superseding") {
+        return supersede(kind[1].id, newEntry);
       }
-      return createEntry(newEntry);
+      return followUp(kind[1].id, newEntry);
     },
-    [superseding, followingUp]
+    [kind]
   );
 
   useEffect(() => {
@@ -171,73 +150,45 @@ export default function EntryForm({
     onEntryCreated(id);
   }
 
-  async function startUploadingAttachment(
-    file: File
-  ): Promise<LocalUploadedAttachment | undefined> {
-    if (
-      attachmentsUploading.some(
-        (attachment) => attachment.fileName === file.name
-      )
-    ) {
-      alert("Can't upload two files with the same name at the same time");
-      return;
-    }
-
-    setAttachmentsUploading((attachments) => [
-      ...attachments,
-      { fileName: file.name, contentType: file.type },
-    ]);
-
-    const id = await uploadAttachment(file);
-
-    setAttachmentsUploading((attachments) =>
-      attachments.filter((attachment) => attachment.fileName !== file.name)
-    );
-    return { fileName: file.name, contentType: file.type, id };
-  }
-
   async function removeAttachment(attachment: LocalAttachment) {
     if (attachment.id) {
-      setDraft({
+      updateDraft({
         ...draft,
         attachments: draft.attachments.filter(({ id }) => id !== attachment.id),
       });
       return;
     }
 
-    setAttachmentsUploading((attachments) =>
-      attachments.filter(({ fileName }) => fileName !== attachment.fileName)
-    );
+    cancelUploadingAttachment(attachment.fileName);
   }
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop: async (acceptedFiles) => {
       const attachments = (
-        await Promise.all(acceptedFiles.map(startUploadingAttachment))
+        await Promise.all(acceptedFiles.map(uploadAttachment))
       ).filter((x) => x) as LocalUploadedAttachment[];
 
-      setDraft({
+      updateDraft({
         ...draft,
         attachments: draft.attachments.concat(attachments),
       });
     },
   });
 
-  const entryPreview = followingUp || superseding;
   const attachments = (draft.attachments as LocalAttachment[]).concat(
     attachmentsUploading
   );
 
   return (
     <div className="pb-2">
-      {entryPreview && (
+      {kind !== "newEntry" && (
         <>
           <TextDivider>
-            {followingUp ? "Following up" : "Superseding"}
+            {kind[0] === "followingUp" ? "Following up" : "Superseding"}
           </TextDivider>
           <div className="border-b pb-2 px-3 mb-3">
             <EntryRow
-              entry={entryPreview}
+              entry={kind[1]}
               showDate
               expandable
               hideSelection
@@ -260,11 +211,11 @@ export default function EntryForm({
               "block w-full"
             )}
             value={draft.title}
-            onChange={(e) => setDraft({ ...draft, title: e.target.value })}
+            onChange={(e) => updateDraft({ ...draft, title: e.target.value })}
             onBlur={() => validate("title")}
           />
         </label>
-        {!followingUp && !superseding && (
+        {kind === "newEntry" && (
           <label className="text-gray-500 block mb-2">
             Logbook
             <Select
@@ -275,7 +226,7 @@ export default function EntryForm({
               isLoading={!logbooks}
               value={draft.logbook}
               setValue={(logbook) =>
-                setDraft({ ...draft, logbook: logbook || "" })
+                updateDraft({ ...draft, logbook: logbook || "" })
               }
               invalid={invalid.includes("logbook")}
               onBlur={() => validate("logbook")}
@@ -288,7 +239,7 @@ export default function EntryForm({
             className={cn(Checkbox, "mr-2")}
             checked={draft.eventAt !== undefined}
             onChange={() =>
-              setDraft({
+              updateDraft({
                 ...draft,
                 eventAt: draft.eventAt === undefined ? "" : undefined,
               })
@@ -301,7 +252,7 @@ export default function EntryForm({
           disabled={draft.eventAt === undefined}
           step="1"
           onChange={(e) =>
-            setDraft({ ...draft, eventAt: e.currentTarget.value })
+            updateDraft({ ...draft, eventAt: e.currentTarget.value })
           }
           className={cn(
             Input,
@@ -315,7 +266,7 @@ export default function EntryForm({
             className={cn(Checkbox, "mr-2")}
             checked={draft.summarize !== undefined}
             onChange={() =>
-              setDraft({
+              updateDraft({
                 ...draft,
                 summarize: draft.summarize
                   ? undefined
@@ -335,7 +286,7 @@ export default function EntryForm({
             isLoading={!shifts}
             value={draft.summarize?.shift || null}
             setValue={(shift) =>
-              setDraft({
+              updateDraft({
                 ...draft,
                 summarize: draft.summarize && {
                   ...draft.summarize,
@@ -351,7 +302,7 @@ export default function EntryForm({
             type="date"
             value={draft.summarize?.date || ""}
             onChange={(e) =>
-              setDraft({
+              updateDraft({
                 ...draft,
                 summarize: draft.summarize && {
                   ...draft.summarize,
@@ -375,7 +326,7 @@ export default function EntryForm({
             isLoading={!tags}
             predefinedOptions={tags || []}
             value={draft.tags}
-            setValue={(tags) => setDraft({ ...draft, tags: tags || [] })}
+            setValue={(tags) => updateDraft({ ...draft, tags: tags || [] })}
           />
         </label>
         {/* Not using a label here, because there are some weird */}
@@ -384,7 +335,7 @@ export default function EntryForm({
           Text
           <EntryTextEditor
             value={draft.text}
-            onChange={(text) => setDraft({ ...draft, text })}
+            onChange={(text) => updateDraft({ ...draft, text })}
           />
         </div>
         <label className="text-gray-500 block mb-2">
@@ -418,7 +369,13 @@ export default function EntryForm({
         <input
           type="submit"
           className={cn(Button, "block ml-auto mt-2")}
-          value={followingUp ? "Follow up" : superseding ? "Supersede" : "Save"}
+          value={
+            kind === "newEntry"
+              ? "Save"
+              : kind[0] === "followingUp"
+              ? "Follow up"
+              : "Supersede"
+          }
         />
       </form>
     </div>

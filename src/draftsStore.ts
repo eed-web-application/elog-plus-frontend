@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import { Attachment, EntryForm } from "./api";
+import { Attachment, Entry, EntryForm } from "./api";
 
 export type LocalUploadedAttachment = Omit<Attachment, "previewState">;
 
@@ -8,16 +8,20 @@ export type Draft = Omit<EntryForm, "attachments"> & {
   attachments: LocalUploadedAttachment[];
 };
 
+export type DraftId = "newEntry" | `supersede/${string}` | `followUp/${string}`;
+
+export type DraftFactory =
+  | "newEntry"
+  | ["followingUp", Entry]
+  | ["superseding", Entry];
+
 interface DraftsState {
-  newEntry: Draft;
-  followUps: { [id: string]: Draft };
-  supersedes: { [id: string]: Draft };
-  updateNewEntryDraft: (draft: Draft) => void;
-  updateFollowUpDraft: (entryId: string, draft: Draft) => void;
-  updateSupersedingDraft: (entryId: string, draft: Draft) => void;
-  removeNewEntryDraft: () => void;
-  removeFollowUpDraft: (entryId: string) => void;
-  removeSupersedingDraft: (entryId: string) => void;
+  drafts: Partial<Record<DraftId, Draft>>;
+  startDrafting: (
+    factory: DraftFactory
+  ) => [Draft, (draft: Draft) => void, () => void];
+  upsertDraft: (draftId: DraftId, draft: Draft) => void;
+  removeDraft: (draftId: DraftId) => void;
 }
 
 export const DEFAULT_DRAFT: Draft = {
@@ -30,40 +34,48 @@ export const DEFAULT_DRAFT: Draft = {
 
 export const useDraftsStore = create(
   persist<DraftsState>(
-    (set) => ({
-      newEntry: {
-        ...DEFAULT_DRAFT,
+    (set, get) => ({
+      drafts: {},
+      startDrafting(factory) {
+        let draftId: DraftId;
+        let defaultDraft: Draft;
+
+        if (factory === "newEntry") {
+          draftId = "newEntry";
+
+          defaultDraft = DEFAULT_DRAFT;
+        } else if (factory[0] === "superseding") {
+          draftId = `supersede/${factory[1].id}`;
+
+          defaultDraft = factory[1];
+        } else {
+          draftId = `followUp/${factory[1]}`;
+
+          defaultDraft = {
+            ...DEFAULT_DRAFT,
+            logbook: factory[1].logbook,
+          };
+        }
+
+        const state = get();
+        const draft = state.drafts[draftId] || defaultDraft;
+
+        return [
+          draft,
+          (draft: Draft) => state.upsertDraft(draftId, draft),
+          () => state.removeDraft(draftId),
+        ];
       },
-      followUps: {},
-      supersedes: {},
-      updateNewEntryDraft(draft) {
-        set({ newEntry: draft });
-      },
-      updateFollowUpDraft(entryId, draft) {
+      upsertDraft(draftId, draft) {
         set((state) => ({
-          followUps: { ...state.followUps, [entryId]: draft },
+          drafts: { ...state.drafts, [draftId]: draft },
         }));
       },
-      updateSupersedingDraft(entryId, draft) {
-        set((state) => ({
-          supersedes: { ...state.supersedes, [entryId]: draft },
-        }));
-      },
-      removeNewEntryDraft() {
-        set({ newEntry: { ...DEFAULT_DRAFT } });
-      },
-      removeFollowUpDraft(entryId) {
+      removeDraft(draftId) {
         set((state) => {
           // eslint-disable-next-line @typescript-eslint/no-unused-vars
-          const { [entryId]: _removed, ...rest } = state.followUps;
-          return { followUps: rest };
-        });
-      },
-      removeSupersedingDraft(entryId) {
-        set((state) => {
-          // eslint-disable-next-line @typescript-eslint/no-unused-vars
-          const { [entryId]: _removed, ...rest } = state.supersedes;
-          return { supersedes: rest };
+          const { [draftId]: _removed, ...rest } = state.drafts;
+          return { drafts: rest };
         });
       },
     }),
