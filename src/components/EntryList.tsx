@@ -2,6 +2,8 @@ import { Fragment, useCallback, useEffect, useMemo } from "react";
 import { EntrySummary } from "../api";
 import EntryRow from "./EntryRow";
 import Spinner from "./Spinner";
+import { Link } from "react-router-dom";
+import dateToDateString from "../utils/dateToDateString";
 
 export interface Props {
   entries: EntrySummary[];
@@ -18,6 +20,7 @@ export interface Props {
   allowSupersede?: boolean;
   allowSpotlight?: boolean;
   allowSpotlightForFollowUps?: boolean;
+  allowSummarize?: boolean;
   onBottomVisible?: () => void;
 }
 
@@ -36,6 +39,7 @@ export default function EntryList({
   allowSupersede,
   allowSpotlight,
   allowSpotlightForFollowUps,
+  allowSummarize,
   onBottomVisible,
 }: Props) {
   let currentHeader: string | undefined;
@@ -96,12 +100,34 @@ export default function EntryList({
 
         if (headerKind !== "none" && headerText !== currentHeader) {
           currentHeader = headerText;
-          header = <h3 className="text-lg mt-2 pb-1 border-b">{headerText}</h3>;
+          header = <h3 className="text-lg">{headerText}</h3>;
         }
 
         return (
           <Fragment key={entry.id}>
-            {header}
+            {header && (
+              <div className="flex justify-between items-center mt-2 pb-2 border-b pr-1 truncate gap-3">
+                {header}
+                {allowSummarize && (
+                  <Link
+                    to={{
+                      pathname: "/new-entry",
+                      search: window.location.search,
+                    }}
+                    state={{
+                      logbook: entry.logbook,
+                      summarize: {
+                        shift: entry.shift,
+                        date: dateToDateString(new Date(entry.eventAt)),
+                      },
+                    }}
+                    className="font-medium text-gray-700 hover:underline text-right"
+                  >
+                    Summarize shift
+                  </Link>
+                )}
+              </div>
+            )}
             <div
               className={index === entries.length - 1 ? "" : "border-b"}
               ref={index === entries.length - 1 ? observe : undefined}

@@ -27,6 +27,10 @@ export interface EntryForm {
   tags: string[];
   attachments: string[];
   eventAt?: string;
+  summarize?: {
+    shift: string;
+    date: string;
+  };
 }
 
 // Java is weird and doesn't add the Z at the end of its dates, so this is

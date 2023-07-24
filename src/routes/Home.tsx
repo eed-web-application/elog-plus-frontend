@@ -136,6 +136,7 @@ export default function Home() {
               allowFollowUp
               allowSupersede
               allowSpotlightForFollowUps
+              allowSummarize
               onBottomVisible={reachedBottom ? undefined : getMoreEntries}
               spotlight={spotlight}
             />

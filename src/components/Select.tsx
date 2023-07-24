@@ -1,6 +1,6 @@
 import { ComponentProps, useEffect, useState } from "react";
 import cn from "classnames";
-import { Input, InputInvalid } from "./base";
+import { Input, InputDisabled, InputInvalid } from "./base";
 import { size, useFloating } from "@floating-ui/react";
 import Spinner from "./Spinner";
 import useSelectCursor from "../hooks/useSelectCursor";
@@ -26,6 +26,7 @@ export default function Select({
   invalid,
   nonsearchable,
   onBlur,
+  disabled,
   ...rest
 }: Props) {
   const [search, setSearch] = useState("");
@@ -81,7 +82,7 @@ export default function Select({
         {...rest}
         type={nonsearchable ? "button" : "text"}
         className={cn(Input, invalid && InputInvalid, className)}
-        placeholder={value && !placeholder ? "" : placeholder}
+        placeholder={value || !placeholder ? "" : placeholder}
         value={search}
         onChange={(e) => setSearch(e.target.value)}
         ref={refs.setReference}
@@ -91,12 +92,14 @@ export default function Select({
           setIsOpen(false);
         }}
         onKeyDown={onInputKeyDown}
+        disabled={disabled}
       />
       {
         <div
           className={cn(
             // Using styles from Input to ensure padding is correct
             Input,
+            disabled && InputDisabled,
             className,
             "absolute flex left-0 right-0 bottom-0 top-0 bg-transparent border-transparent pointer-events-none"
           )}

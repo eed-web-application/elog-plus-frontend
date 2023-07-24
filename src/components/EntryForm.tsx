@@ -26,22 +26,26 @@ import {
 import EntryRefreshContext from "../EntryRefreshContext";
 import EntryTextEditor from "./EntryTextEditor";
 import TextDivider from "./TextDivider";
+import dateToDateString from "../utils/dateToDateString";
 
 type LocalAttachment = {
   id?: string;
 } & Omit<LocalUploadedAttachment, "id">;
 
+export interface Props {
+  onEntryCreated: (id: string) => void;
+  followingUp?: Entry;
+  superseding?: Entry;
+}
+
 export default function EntryForm({
   onEntryCreated,
   followingUp,
   superseding,
-}: {
-  onEntryCreated: (id: string) => void;
-  followingUp?: Entry;
-  superseding?: Entry;
-}) {
+}: Props) {
   const [logbooks, setLogbooks] = useState<null | string[]>(null);
   const [tags, setTags] = useState<null | string[]>(null);
+  const [shifts, setShifts] = useState<null | string[]>(null);
   const [attachmentsUploading, setAttachmentsUploading] = useState<
     LocalAttachment[]
   >([]);
@@ -96,12 +100,21 @@ export default function EntryForm({
     }
   }, [tags]);
 
+  useEffect(() => {
+    if (!shifts) {
+      // TODO: fetch shifts
+      setShifts(["Day shift", "Night shift"]);
+    }
+  }, [shifts]);
+
   const validators = {
     title: () => Boolean(draft.title),
     logbook: () => Boolean(draft.logbook),
     // It can either be undefined (meaning off) or a valid time, but it can't
     // be an empty string which signifies on with no time selected.
     eventAt: () => Boolean(draft.eventAt !== ""),
+    shiftName: () => !draft.summarize || Boolean(draft.summarize.shift),
+    shiftDate: () => !draft.summarize || Boolean(draft.summarize.date),
     // Ensure all attachments are downloaded
     attachments: () => attachmentsUploading.length === 0,
   };
@@ -269,7 +282,7 @@ export default function EntryForm({
             />
           </label>
         )}
-        <label className="text-gray-500 mb-2 flex items-center">
+        <label className="text-gray-500 mb-1 flex items-center">
           <input
             type="checkbox"
             className={cn(Checkbox, "mr-2")}
@@ -293,9 +306,68 @@ export default function EntryForm({
           className={cn(
             Input,
             invalid.includes("eventAt") && InputInvalid,
-            "block w-full"
+            "block w-full mb-2"
           )}
         />
+        <label className="text-gray-500 mb-1 flex items-center">
+          <input
+            type="checkbox"
+            className={cn(Checkbox, "mr-2")}
+            checked={draft.summarize !== undefined}
+            onChange={() =>
+              setDraft({
+                ...draft,
+                summarize: draft.summarize
+                  ? undefined
+                  : { shift: "", date: dateToDateString(new Date()) },
+              })
+            }
+          />
+          Shift summary
+        </label>
+        <div className="flex gap-3 mb-2">
+          <Select
+            placeholder="Shift"
+            required
+            containerClassName="block w-full"
+            className="w-full"
+            options={shifts || []}
+            isLoading={!shifts}
+            value={draft.summarize?.shift || null}
+            setValue={(shift) =>
+              setDraft({
+                ...draft,
+                summarize: draft.summarize && {
+                  ...draft.summarize,
+                  shift: shift || "",
+                },
+              })
+            }
+            invalid={invalid.includes("shiftName")}
+            onBlur={() => validate("shiftName")}
+            disabled={!draft.summarize}
+          />
+          <input
+            type="date"
+            value={draft.summarize?.date || ""}
+            onChange={(e) =>
+              setDraft({
+                ...draft,
+                summarize: draft.summarize && {
+                  ...draft.summarize,
+                  date: e.currentTarget.value,
+                },
+              })
+            }
+            className={cn(
+              Input,
+              invalid.includes("shiftDate") && InputInvalid,
+              "block w-full"
+            )}
+            onBlur={() => validate("shiftDate")}
+            disabled={!draft.summarize}
+          />
+        </div>
 
         <label className="text-gray-500 block mb-2">
           Tags
