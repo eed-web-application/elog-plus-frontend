@@ -113,24 +113,25 @@ export default function EntryList({
             {header && (
               <div className="flex justify-between items-center mt-2 pb-2 border-b pr-1 truncate gap-3">
                 {header}
-                {allowSummarize && (
-                  <Link
-                    to={{
-                      pathname: "/new-entry",
-                      search: window.location.search,
-                    }}
-                    state={{
-                      logbook: entry.logbook,
-                      summarize: {
-                        shift: entry.shift,
-                        date: dateToDateString(new Date(entry.eventAt)),
-                      },
-                    }}
-                    className="font-medium text-gray-700 hover:underline text-right"
-                  >
-                    Summarize shift
-                  </Link>
-                )}
+                {(headerKind === "shift" || headerKind === "logbookShift") &&
+                  allowSummarize && (
+                    <Link
+                      to={{
+                        pathname: "/new-entry",
+                        search: window.location.search,
+                      }}
+                      state={{
+                        logbook: entry.logbook,
+                        summarize: {
+                          shift: entry.shift,
+                          date: dateToDateString(new Date(entry.eventAt)),
+                        },
+                      }}
+                      className="font-medium text-gray-700 hover:underline text-right"
+                    >
+                      Summarize shift
+                    </Link>
+                  )}
               </div>
             )}
             <div
