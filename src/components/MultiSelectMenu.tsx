@@ -47,7 +47,9 @@ export default function MultiSelectMenu({
     if (e.code === "Enter") {
       e.preventDefault();
 
-      selectOption(filteredOptions[cursor]);
+      if (filteredOptions[cursor]) {
+        selectOption(filteredOptions[cursor]);
+      }
     }
   }
 
