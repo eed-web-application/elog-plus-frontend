@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { fetchLogbooks, fetchTags } from "../api";
 import { EntryQuery } from "../hooks/useEntries";
 import FilterChip from "./FilterChip.tsx";
@@ -19,7 +19,9 @@ export interface Props {
 
 export default function Filters({ filters, setFilters }: Props) {
   const [logbooks, setLogbooks] = useState<string[] | null>(null);
-  const [tags, setTags] = useState<string[] | null>(null);
+  const [tagsLoaded, setTagsLoaded] = useState<Record<string, string[]>>({});
+  const logbooksAsKey = filters.logbooks.join(",");
+  const tags = tagsLoaded[logbooksAsKey];
 
   useEffect(() => {
     if (!logbooks) {
@@ -27,13 +29,18 @@ export default function Filters({ filters, setFilters }: Props) {
     }
   }, [logbooks]);
 
-  useEffect(() => {
+  const loadTags = useCallback(() => {
     if (!tags) {
-      fetchTags().then((tags) => setTags(tags));
+      fetchTags({ logbooks: filters.logbooks }).then((tags) =>
+        setTagsLoaded((tagsLoaded) => ({
+          ...tagsLoaded,
+          [logbooksAsKey]: tags,
+        }))
+      );
     }
-  }, [tags]);
+  }, [logbooksAsKey, filters.logbooks, tags]);
 
-  function logbookFilterLabel() {
+  const logbookFilterLabel = useCallback(() => {
     if (filters.logbooks.length === 0) {
       return "Logbook";
     }
@@ -47,9 +54,9 @@ export default function Filters({ filters, setFilters }: Props) {
     }
 
     return out;
-  }
+  }, [filters.logbooks]);
 
-  function tagFilterLabel() {
+  const tagFilterLabel = useCallback(() => {
     if (filters.tags.length === 0) {
       return "Tags";
     }
@@ -83,7 +90,7 @@ export default function Filters({ filters, setFilters }: Props) {
         </div>
       </>
     );
-  }
+  }, [filters.tags]);
 
   return (
     <div className="flex flex-wrap">
@@ -106,6 +113,7 @@ export default function Filters({ filters, setFilters }: Props) {
         className="mr-3 mt-2"
         label={tagFilterLabel()}
         enabled={filters.tags.length !== 0}
+        onOpen={loadTags}
         onDisable={() => setFilters({ ...filters, tags: [] })}
       >
         <MultiSelectMenu

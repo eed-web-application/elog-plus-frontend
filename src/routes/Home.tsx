@@ -67,6 +67,9 @@ export default function Home() {
     });
 
   function onFiltersChange(filters: FiltersObject) {
+    if (query.logbooks.join(",") !== filters.logbooks.join(",")) {
+      filters.tags = [];
+    }
     setQuery({ ...query, ...filters });
   }
 

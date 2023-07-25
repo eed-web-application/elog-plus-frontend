@@ -129,10 +129,6 @@ export default function EntryForm({
       return;
     }
 
-    await Promise.all(
-      draft.tags.filter((tag) => !tags?.includes(tag)).map(createTag)
-    );
-
     const newEntry: EntryFormType = {
       ...draft,
       // Zero seconds

@@ -13,6 +13,7 @@ import FilterChip, { Props as FilterChipProps } from "./FilterChip";
 
 export interface Props extends FilterChipProps {
   onClose?: () => void;
+  onOpen?: () => void;
   onDisable?: () => void;
   className?: string;
   /**
@@ -30,6 +31,7 @@ export interface Props extends FilterChipProps {
 export default function FilterChipWithMenu({
   children,
   onClose,
+  onOpen,
   onDisable,
   className,
   inline,
@@ -40,7 +42,9 @@ export default function FilterChipWithMenu({
   const { refs, floatingStyles, context } = useFloating({
     open: isOpen,
     onOpenChange: (isOpen) => {
-      if (!isOpen) {
+      if (isOpen) {
+        onOpen?.();
+      } else {
         onClose?.();
       }
       setIsOpen(isOpen);
@@ -58,8 +62,10 @@ export default function FilterChipWithMenu({
   });
 
   function onClick() {
-    if (!isOpen) {
+    if (isOpen) {
       onClose?.();
+    } else {
+      onOpen?.();
     }
     setIsOpen((isOpen) => !isOpen);
   }
