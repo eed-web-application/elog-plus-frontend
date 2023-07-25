@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
 import { fetchLogbooks, fetchTags } from "../api";
 import { EntryQuery } from "../hooks/useEntries";
-import Filter from "./Filter.tsx";
-import FilterSelect from "./FilterSelect.tsx";
+import FilterChip from "./FilterChip.tsx";
+import MultiSelectMenu from "./MultiSelectMenu.tsx";
 import { Input } from "./base.ts";
-import Tag from "./Tag.tsx";
-import FilterDropdown from "./FilterDropdown.tsx";
+import Chip from "./Chip.tsx";
+import FilterChipWithMenu from "./FilterChipWithMenu.tsx";
 
 export type Filters = Pick<
   EntryQuery,
@@ -67,7 +67,7 @@ export default function Filters({ filters, setFilters }: Props) {
       <>
         <div className="flex items-center">
           {filters.tags?.slice(0, 2).map((tag, index) => (
-            <Tag
+            <Chip
               key={tag}
               className={
                 (index !== 1 && index !== filters.tags.length - 1) ||
@@ -77,7 +77,7 @@ export default function Filters({ filters, setFilters }: Props) {
               }
             >
               {tag}
-            </Tag>
+            </Chip>
           ))}
           {andOtherText}
         </div>
@@ -87,13 +87,13 @@ export default function Filters({ filters, setFilters }: Props) {
 
   return (
     <div className="flex flex-wrap">
-      <FilterDropdown
+      <FilterChipWithMenu
         className="mr-3 mt-2"
         label={logbookFilterLabel()}
         enabled={filters.logbooks.length !== 0}
         onDisable={() => setFilters({ ...filters, logbooks: [] })}
       >
-        <FilterSelect
+        <MultiSelectMenu
           selected={filters.logbooks}
           setSelected={(selected) =>
             setFilters({ ...filters, logbooks: selected })
@@ -101,21 +101,21 @@ export default function Filters({ filters, setFilters }: Props) {
           isLoading={logbooks === null}
           options={logbooks || []}
         />
-      </FilterDropdown>
-      <FilterDropdown
+      </FilterChipWithMenu>
+      <FilterChipWithMenu
         className="mr-3 mt-2"
         label={tagFilterLabel()}
         enabled={filters.tags.length !== 0}
         onDisable={() => setFilters({ ...filters, tags: [] })}
       >
-        <FilterSelect
+        <MultiSelectMenu
           selected={filters.tags}
           setSelected={(selected) => setFilters({ ...filters, tags: selected })}
           isLoading={tags === null}
           options={tags || []}
         />
-      </FilterDropdown>
-      <FilterDropdown
+      </FilterChipWithMenu>
+      <FilterChipWithMenu
         className="mr-3 mt-2"
         label={
           filters.startDate
@@ -140,8 +140,8 @@ export default function Filters({ filters, setFilters }: Props) {
             setFilters({ ...filters, startDate: e.target.value })
           }
         />
-      </FilterDropdown>
-      <FilterDropdown
+      </FilterChipWithMenu>
+      <FilterChipWithMenu
         className="mr-3 mt-2"
         label={
           filters.endDate
@@ -164,8 +164,8 @@ export default function Filters({ filters, setFilters }: Props) {
           value={filters.endDate}
           onChange={(e) => setFilters({ ...filters, endDate: e.target.value })}
         />
-      </FilterDropdown>
-      <Filter
+      </FilterChipWithMenu>
+      <FilterChip
         className="mr-3 mt-2"
         label="Sort by log date"
         enabled={filters.sortByLogDate}

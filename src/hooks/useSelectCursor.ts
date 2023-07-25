@@ -1,5 +1,8 @@
 import React, { useRef, useState } from "react";
 
+/**
+ * Logic for implmenting an options cursor for a select component
+ */
 export default function useSelectCursor(options: number) {
   const [cursor, setCursor] = useState(0);
   const optionRefs = useRef<(HTMLElement | null)[]>(new Array(options));

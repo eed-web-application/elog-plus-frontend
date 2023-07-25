@@ -3,8 +3,8 @@ import { Entry } from "../api";
 import { Link } from "react-router-dom";
 import { Button, IconButton } from "./base";
 import EntryList from "./EntryList";
-import EntryBody from "./EntryBody";
-import Tag from "./Tag";
+import EntryBodyText from "./EntryBodyText";
+import Chip from "./Chip";
 import AttachmentCard from "./AttachmentCard";
 import EntryRow from "./EntryRow";
 import EntryFigureList from "./EntryFigureList";
@@ -15,6 +15,7 @@ export interface Props {
   entry: Entry;
 }
 
+// Detailed view of an entry with acitons such as supersede and follow up.
 export default function EntryView({ entry }: Props) {
   const attachments = entry.attachments.filter(
     (attachment) => attachment.previewState !== "Completed"
@@ -98,9 +99,9 @@ export default function EntryView({ entry }: Props) {
             <div className="text-gray-500">Tags</div>
             <div className="flex flex-wrap">
               {entry.tags.map((tag) => (
-                <Tag key={tag} className="mr-1.5 mt-0.5">
+                <Chip key={tag} className="mr-1.5 mt-0.5">
                   {tag}
-                </Tag>
+                </Chip>
               ))}
             </div>
           </div>
@@ -108,7 +109,7 @@ export default function EntryView({ entry }: Props) {
       </div>
       {(entry.text || entry.attachments.length > 0) && (
         <div className="px-3 py-2 border-t">
-          <EntryBody body={entry.text} />
+          <EntryBodyText body={entry.text} />
           <EntryFigureList attachments={entry.attachments} />
           {attachments.length > 0 && (
             <>

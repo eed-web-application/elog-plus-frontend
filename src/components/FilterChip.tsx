@@ -16,7 +16,11 @@ export interface Props extends Omit<ComponentPropsWithRef<"button">, "label"> {
   className?: string;
 }
 
-const Filter = forwardRef<HTMLButtonElement, PropsWithChildren<Props>>(
+/**
+ * Generic filter chip.
+ * See https://m3.material.io/components/chips/overview.
+ */
+const FilterChip = forwardRef<HTMLButtonElement, PropsWithChildren<Props>>(
   (
     { label, enabled, showCheck, showDownArrow, onDisable, className, ...rest },
     ref
@@ -96,4 +100,4 @@ const Filter = forwardRef<HTMLButtonElement, PropsWithChildren<Props>>(
   }
 );
 
-export default Filter;
+export default FilterChip;

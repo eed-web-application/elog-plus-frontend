@@ -24,6 +24,9 @@ export interface Props {
   onBottomVisible?: () => void;
 }
 
+/**
+ * Customizable entry list supporting intermediate headers
+ */
 export default function EntryList({
   entries,
   emptyLabel,
@@ -138,7 +141,7 @@ export default function EntryList({
                 expandable={expandable}
                 selectable={selectable}
                 showFollowUps={showFollowUps}
-                expandedDefault={expandDefault}
+                expandedByDefault={expandDefault}
                 showDate={showEntryDates}
                 allowFollowUp={allowFollowUp}
                 allowSupersede={allowSupersede}

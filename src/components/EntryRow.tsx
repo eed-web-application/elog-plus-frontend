@@ -22,8 +22,8 @@ import { IconButton } from "./base";
 import { useEntriesStore } from "../entriesStore";
 import { Entry, EntrySummary } from "../api";
 import EntryList from "./EntryList";
-import Tag from "./Tag";
-import EntryBody from "./EntryBody";
+import Chip from "./Chip";
+import EntryBodyText from "./EntryBodyText";
 import Tooltip from "./Tooltip";
 import EntryFigureList from "./EntryFigureList";
 import useSpotlightProps from "../hooks/useSpotlightProps";
@@ -65,20 +65,25 @@ function RowButton({
   );
 }
 
+/**
+ * Single line tag list supporting truncation based on available width and
+ * an overflow drawer (an ellipsis that when hovered, displays the rest of the
+ * tags with floating element)
+ */
 function TagList({ tags }: { tags: string[] }) {
-  const [isTagsOpen, setIsTagsOpen] = useState(false);
-  const [stoppingPoint, setStoppingPoint] = useState<number | null>(null);
-  const [ellipsisOffset, setEllipsisOffset] = useState<number | null>(null);
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [overflowIndex, setOverflowIndex] = useState<number | null>(null);
+  const [drawerOffset, setDrawerOffset] = useState<number | null>(null);
   const tagRefs = useRef<(HTMLDivElement | null)[]>(new Array(tags.length));
   const containerRef = useRef<HTMLDivElement | null>(null);
-  const ellipsisRef = useRef<HTMLDivElement | null>(null);
+  const drawerRef = useRef<HTMLDivElement | null>(null);
 
   const { refs, floatingStyles, context } = useFloating({
-    open: isTagsOpen,
-    onOpenChange: setIsTagsOpen,
+    open: isDrawerOpen,
+    onOpenChange: setIsDrawerOpen,
   });
 
-  const mergedEllipsisRef = useMergeRefs([refs.setReference, ellipsisRef]);
+  const mergedDrawerRef = useMergeRefs([refs.setReference, drawerRef]);
 
   const hover = useHover(context, { move: false });
   const focus = useFocus(context);
@@ -92,12 +97,17 @@ function TagList({ tags }: { tags: string[] }) {
     role,
   ]);
 
-  const truncate = useCallback(() => {
-    if (!containerRef.current || !ellipsisRef.current) {
+  // Iterates through each tag checking if it is outside the bounds of its
+  // parent. If one is found, then overflow index is set to its index, and
+  // it and all tags after it are hidden. To position the drawer correctly, we
+  // sum up width (and margin) of each visable tag and then position the drawer
+  // with that offset.
+  const updateTruncation = useCallback(() => {
+    if (!containerRef.current || !drawerRef.current) {
       return;
     }
     const containerRect = containerRef.current.getBoundingClientRect();
-    const ellipsisRect = ellipsisRef.current.getBoundingClientRect();
+    const drawerRect = drawerRef.current.getBoundingClientRect();
     let offset = 0;
 
     for (let i = 0; i < tagRefs.current.length; i++) {
@@ -115,20 +125,20 @@ function TagList({ tags }: { tags: string[] }) {
       if (
         rect.right >
         containerRect.right -
-          (stoppingPoint === null || i === tagRefs.current.length - 1
+          (overflowIndex === null || i === tagRefs.current.length - 1
             ? 0
-            : ellipsisRect.width + margin)
+            : drawerRect.width + margin)
       ) {
-        setStoppingPoint(i);
-        setEllipsisOffset(offset);
+        setOverflowIndex(i);
+        setDrawerOffset(offset);
         return;
       }
 
       offset += rect.width + margin;
     }
 
-    setStoppingPoint(null);
-  }, [stoppingPoint]);
+    setOverflowIndex(null);
+  }, [overflowIndex]);
 
   useEffect(() => {
     if (!containerRef.current) {
@@ -138,7 +148,7 @@ function TagList({ tags }: { tags: string[] }) {
     const containerElem = containerRef.current;
 
     const observer = new ResizeObserver(() => {
-      truncate();
+      updateTruncation();
     });
     observer.observe(containerElem);
 
@@ -146,7 +156,7 @@ function TagList({ tags }: { tags: string[] }) {
       observer.unobserve(containerElem);
       observer.disconnect();
     };
-  }, [truncate]);
+  }, [updateTruncation]);
 
   return (
     <div
@@ -154,30 +164,30 @@ function TagList({ tags }: { tags: string[] }) {
       ref={(el) => (containerRef.current = el)}
     >
       {tags.map((tag, index) => (
-        <Tag
+        <Chip
           key={tag}
           className={cn(
             "ml-1.5",
-            stoppingPoint !== null && index >= stoppingPoint && "invisible"
+            overflowIndex !== null && index >= overflowIndex && "invisible"
           )}
           ref={(el) => (tagRefs.current[index] = el)}
         >
           {tag}
-        </Tag>
+        </Chip>
       ))}
-      <Tag
-        ref={mergedEllipsisRef}
+      <Chip
+        ref={mergedDrawerRef}
         {...getReferenceProps()}
         className={cn(
           "ml-1.5 absolute pointer-events-auto",
-          stoppingPoint === null && "invisible"
+          overflowIndex === null && "invisible"
         )}
-        style={{ left: `${ellipsisOffset}px` }}
+        style={{ left: `${drawerOffset}px` }}
         clickable
       >
         ...
-      </Tag>
-      {isTagsOpen && stoppingPoint !== null && (
+      </Chip>
+      {isDrawerOpen && overflowIndex !== null && (
         <FloatingPortal>
           <div
             className="shadow rounded-lg bg-white p-1.5 pb-0 mt-1 z-10"
@@ -185,10 +195,10 @@ function TagList({ tags }: { tags: string[] }) {
             ref={refs.setFloating}
             {...getFloatingProps()}
           >
-            {tags.slice(stoppingPoint).map((tag) => (
-              <Tag key={tag} className="mb-1.5">
+            {tags.slice(overflowIndex).map((tag) => (
+              <Chip key={tag} className="mb-1.5">
                 {tag}
-              </Tag>
+              </Chip>
             ))}
           </div>
         </FloatingPortal>
@@ -205,7 +215,7 @@ export interface Props {
   expandable?: boolean;
   showFollowUps?: boolean;
   hideSelection?: boolean;
-  expandedDefault?: boolean;
+  expandedByDefault?: boolean;
   showDate?: boolean;
   allowFollowUp?: boolean;
   allowSupersede?: boolean;
@@ -213,6 +223,10 @@ export interface Props {
   allowSpotlightForFollowUps?: boolean;
 }
 
+/**
+ * Horizontal summary of an entry supporting actions (such as follow up or
+ * spotlight) and expanding to see the body content and follows ups.
+ */
 export default function EntryRow({
   entry,
   className,
@@ -221,16 +235,17 @@ export default function EntryRow({
   expandable,
   showFollowUps,
   hideSelection,
-  expandedDefault,
+  expandedByDefault,
   showDate,
   allowFollowUp,
   allowSupersede,
   allowSpotlight,
   allowSpotlightForFollowUps,
 }: PropsWithChildren<Props>) {
-  const [expanded, setExpanded] = useState(Boolean(expandedDefault));
+  const [expanded, setExpanded] = useState(Boolean(expandedByDefault));
   const [fullEntry, setFullEntry] = useState<Entry | null>(null);
   const { pathname } = useLocation();
+  // Although this implementation is easy, it really should be done by Home
   const selectedEntryId = hideSelection
     ? null
     : pathname.slice(1).split("/")[0];
@@ -427,7 +442,7 @@ export default function EntryRow({
               fullEntry.text || "text-gray-500"
             )}
           >
-            <EntryBody body={fullEntry.text} showEmptyLabel />
+            <EntryBodyText body={fullEntry.text} showEmptyLabel />
             <EntryFigureList attachments={fullEntry.attachments} />
           </div>
           {showFollowUps && (

@@ -18,6 +18,10 @@ export interface Params extends Partial<EntryQuery> {
   onSpotlightFetched?: () => void;
 }
 
+/**
+ * Manages fetching entries with filtering and spotlighting supporting
+ * infnite scroll
+ */
 export default function useEntries({
   spotlight,
   search,

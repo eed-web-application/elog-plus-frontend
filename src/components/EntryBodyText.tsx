@@ -7,7 +7,10 @@ interface Props extends ComponentProps<"div"> {
   showEmptyLabel?: boolean;
 }
 
-export default function EntryBody({
+/**
+ * Renders an entry's body text with sanitization and prose styling
+ */
+export default function EntryBodyText({
   body,
   className,
   showEmptyLabel,

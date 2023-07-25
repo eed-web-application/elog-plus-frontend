@@ -6,7 +6,7 @@ import Navbar from "../components/Navbar";
 import EntryList, { Props as EntryListProps } from "../components/EntryList";
 import EntryRefreshContext from "../EntryRefreshContext";
 import useEntries from "../hooks/useEntries";
-import useIsSmallScreen from "../useIsSmallScreen";
+import useIsSmallScreen from "../hooks/useIsSmallScreen";
 import { EntryQuery } from "../hooks/useEntries";
 import { URLSearchParamsInit } from "react-router-dom";
 

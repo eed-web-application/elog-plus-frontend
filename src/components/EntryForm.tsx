@@ -2,7 +2,6 @@ import { FormEvent, useCallback, useContext, useEffect, useState } from "react";
 import cn from "classnames";
 import { useDropzone } from "react-dropzone";
 import {
-  Entry,
   EntryForm as EntryFormType,
   createEntry,
   createTag,
@@ -22,7 +21,7 @@ import {
   useDraftsStore,
 } from "../draftsStore";
 import EntryRefreshContext from "../EntryRefreshContext";
-import EntryTextEditor from "./EntryTextEditor";
+import EntryBodyTextEditor from "./EntryBodyTextEditor";
 import TextDivider from "./TextDivider";
 import dateToDateString from "../utils/dateToDateString";
 import useAttachmentUploader, {
@@ -34,6 +33,10 @@ export interface Props {
   kind?: DraftFactory;
 }
 
+/**
+ * A form to either create a new entry, supersede an existing entry, or follow
+ * up an entry
+ */
 export default function EntryForm({
   onEntryCreated,
   kind = "newEntry",
@@ -330,7 +333,7 @@ export default function EntryForm({
         {/* interactions with having multiple inputs under the same label */}
         <div className="text-gray-500 block mb-2">
           Text
-          <EntryTextEditor
+          <EntryBodyTextEditor
             value={draft.text}
             onChange={(text) => updateDraft({ ...draft, text })}
           />

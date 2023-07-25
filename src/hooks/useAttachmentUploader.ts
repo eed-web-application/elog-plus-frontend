@@ -2,6 +2,9 @@ import { useCallback, useState } from "react";
 import { LocalUploadedAttachment } from "../draftsStore";
 import { uploadAttachment } from "../api";
 
+/**
+ * Attachment that hasn't been uploaded to the server yet (basically a file)
+ */
 export type LocalAttachment = {
   id?: string;
 } & Omit<LocalUploadedAttachment, "id">;
@@ -12,6 +15,7 @@ export default function useAttachmentUploader() {
   const upload = useCallback(
     async (file: File): Promise<LocalUploadedAttachment | undefined> => {
       if (uploading.some((attachment) => attachment.fileName === file.name)) {
+        // TODO: Don't use alert
         alert("Can't upload two files with the same name at the same time");
         return;
       }

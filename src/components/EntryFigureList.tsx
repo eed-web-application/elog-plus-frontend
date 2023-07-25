@@ -20,6 +20,9 @@ export interface Props extends ComponentProps<"div"> {
   attachments: Attachment[];
 }
 
+/**
+ * Two column masonry figure list with download buttons and a image preview modal
+ */
 export default function EntryFigureList({
   attachments,
   className,

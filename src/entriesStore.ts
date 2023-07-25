@@ -1,6 +1,9 @@
 import { create } from "zustand";
 import { Entry, fetchEntry } from "./api";
 
+/**
+ * Simple cache for specifically full entries (i.e., not EntrySummary)
+ */
 interface EntriesState {
   entries: { [id: string]: Entry };
   getOrFetch: (id: string) => Promise<Entry>;

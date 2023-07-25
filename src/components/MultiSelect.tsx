@@ -3,7 +3,7 @@ import cn from "classnames";
 import { Input, InputInvalid } from "./base";
 import { size, useFloating } from "@floating-ui/react";
 import Spinner from "./Spinner";
-import Tag from "./Tag";
+import Chip from "./Chip";
 import useSelectCursor from "../hooks/useSelectCursor";
 
 interface Props extends Omit<ComponentProps<"input">, "value"> {
@@ -109,7 +109,7 @@ export default function MultiSelect({
     >
       <div className="flex flex-wrap flex-1 items-center">
         {value.map((option) => (
-          <Tag
+          <Chip
             delectable
             className="mr-2 my-1"
             key={option}
@@ -121,7 +121,7 @@ export default function MultiSelect({
             }
           >
             {option}
-          </Tag>
+          </Chip>
         ))}
         <input
           {...rest}

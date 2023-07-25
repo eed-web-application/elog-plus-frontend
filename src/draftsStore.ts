@@ -2,14 +2,24 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { Attachment, Entry, EntryForm } from "./api";
 
+/**
+ * Attachment that has been uploaded to the server, but we don't have all its
+ * properties (mostly because it was just uploaded).
+ */
 export type LocalUploadedAttachment = Omit<Attachment, "previewState">;
 
+/**
+ * An entry that hasn't been submitted to the server
+ */
 export type Draft = Omit<EntryForm, "attachments"> & {
   attachments: LocalUploadedAttachment[];
 };
 
 export type DraftId = "newEntry" | `supersede/${string}` | `followUp/${string}`;
 
+/**
+ * Information needed to start a draft
+ */
 export type DraftFactory =
   | "newEntry"
   | ["followingUp", Entry]
@@ -32,6 +42,10 @@ export const DEFAULT_DRAFT: Draft = {
   tags: [],
 };
 
+/**
+ * Manages and saves drafts (i.e., entries that haven't been submited to the
+ * server yet).
+ */
 export const useDraftsStore = create(
   persist<DraftsState>(
     (set, get) => ({

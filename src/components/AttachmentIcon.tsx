@@ -45,6 +45,9 @@ export interface Props extends Omit<FaIconProps, "icon"> {
   mimeType: string;
 }
 
+/**
+ * Given a mimeType, renders an icon representing that mimeType.
+ */
 export default function AttachmentIcon({ mimeType, ...rest }: Props) {
   const candidate = Object.entries(iconClasses).find(([k]) =>
     mimeType.startsWith(k)

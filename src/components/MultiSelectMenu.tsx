@@ -11,7 +11,10 @@ export interface Props {
   isLoading: boolean;
 }
 
-export default function FilterSelect({
+/**
+ * Multiselect with search input directly above options and no floating elements
+ */
+export default function MultiSelectMenu({
   selected,
   setSelected,
   options,

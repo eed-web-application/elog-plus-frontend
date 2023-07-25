@@ -9,16 +9,25 @@ import {
   autoUpdate,
 } from "@floating-ui/react";
 import { MouseEvent } from "react";
-import Filter, { Props as FilterProps } from "./Filter";
+import FilterChip, { Props as FilterChipProps } from "./FilterChip";
 
-export interface Props extends FilterProps {
+export interface Props extends FilterChipProps {
   onClose?: () => void;
   onDisable?: () => void;
   className?: string;
+  /**
+   * If the menu should be displayed below the filter (not inlined) or over
+   * the filter (inlined)
+   */
   inline?: boolean;
 }
 
-export default function FilterDropdown({
+/**
+ * Filter chip with a custom floating menu (supplied by `children`) which is
+ * once clicked. The enabled and menu opened states are not the same state
+ * (e.g., the menu may be open but the filter disabled).
+ */
+export default function FilterChipWithMenu({
   children,
   onClose,
   onDisable,
@@ -67,7 +76,7 @@ export default function FilterDropdown({
 
   return (
     <>
-      <Filter
+      <FilterChip
         ref={refs.setReference}
         enabled={isOpen}
         onClick={onClick}

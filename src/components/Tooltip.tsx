@@ -22,6 +22,9 @@ const ARROW_HEIGHT = 7;
 const GAP = 2;
 const DEFAULT_DELAY = 200;
 
+/**
+ * Shows tooltip when child is hovered. Only one child allowed.
+ */
 export default function Tooltip({
   children,
   label,

@@ -304,7 +304,10 @@ function MenuBar({ editor }: { editor: Editor | null }) {
   );
 }
 
-export default function EntryTextEditor({
+/**
+ * WYSIWYG editor that renders to HTML
+ */
+export default function EntryBodyTextEditor({
   value,
   onChange,
   ...rest

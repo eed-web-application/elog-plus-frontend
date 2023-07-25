@@ -4,17 +4,16 @@ import AttachmentIcon from "./AttachmentIcon";
 import { Attachment, getAttachmentDownloadURL } from "../api";
 import Tooltip from "./Tooltip";
 
-export type Props = (
-  | { attachment: Omit<Attachment, "previewState">; downloadable: true }
-  | {
-      attachment: Omit<Attachment, "id" | "previewState">;
-      downloadable?: false;
-    }
-) &
-  ComponentProps<"div"> & {
-    isLoading?: boolean;
-    onRemove?: () => void;
-  };
+export type Props = ComponentProps<"div"> & {
+  isLoading?: boolean;
+  onRemove?: () => void;
+} & (
+    | { attachment: Omit<Attachment, "previewState">; downloadable: true }
+    | {
+        attachment: Omit<Attachment, "id" | "previewState">;
+        downloadable?: false;
+      }
+  );
 
 export default function AttachmentCard({
   isLoading,

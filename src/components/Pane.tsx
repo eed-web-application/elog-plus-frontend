@@ -12,13 +12,17 @@ import {
   useInteractions,
   useRole,
 } from "@floating-ui/react";
-import useIsSmallScreen from "../useIsSmallScreen";
+import useIsSmallScreen from "../hooks/useIsSmallScreen";
 
 type Props = {
   fullscreenByDefault?: boolean;
   explicitHeader?: boolean;
 };
 
+/**
+ * Both a side sheet and a modal in one. Switches to fullscreen automatically
+ * if the screen size is small.
+ */
 export default function Pane({
   children,
   fullscreenByDefault = false,
