@@ -35,7 +35,7 @@ export interface EntryForm {
 
 // Java is weird and doesn't add the Z at the end of its dates, so this is
 // what we gotta do
-function normalizeEntry(entry: EntrySummary) {
+function normalizeEntry<E extends EntrySummary>(entry: E): E {
   entry.loggedAt = entry.loggedAt + "Z";
   entry.eventAt = entry.eventAt + "Z";
 
@@ -107,8 +107,9 @@ export async function fetchEntry(id: string): Promise<Entry> {
     },
   });
 
-  data.followUp = data.followUp.map(normalizeEntry);
-  return data;
+  const entry = normalizeEntry(data);
+  entry.followUp = entry.followUp.map(normalizeEntry);
+  return entry;
 }
 
 export function createEntry(entry: EntryForm): Promise<string> {
