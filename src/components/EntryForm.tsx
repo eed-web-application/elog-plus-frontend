@@ -51,7 +51,7 @@ export default function EntryForm({
   kind = "newEntry",
 }: Props) {
   const [logbooks, setLogbooks] = useState<null | string[]>(null);
-  const [tags, setTags] = useState<null | string[]>(null);
+  const [tagsLoaded, setTagsLoaded] = useState<Record<string, string[]>>({});
   const [shifts, setShifts] = useState<null | string[]>(null);
   const refreshEntries = useContext(EntryRefreshContext);
   const [draft, updateDraft, removeDraft] = useDraftsStore((state) =>
@@ -62,6 +62,11 @@ export default function EntryForm({
     upload: uploadAttachment,
     cancel: cancelUploadingAttachment,
   } = useAttachmentUploader();
+
+  let tags: string[] | undefined;
+  if (draft.logbook) {
+    tags = tagsLoaded[draft.logbook];
+  }
 
   const submitEntry = useCallback(
     (newEntry: EntryFormType) => {
@@ -84,9 +89,14 @@ export default function EntryForm({
 
   useEffect(() => {
     if (!tags) {
-      fetchTags().then(setTags);
+      fetchTags({ logbooks: [draft.logbook] }).then((tags) =>
+        setTagsLoaded((tagsLoaded) => ({
+          ...tagsLoaded,
+          [draft.logbook]: tags,
+        }))
+      );
     }
-  }, [tags]);
+  }, [tags, draft.logbook]);
 
   useEffect(() => {
     if (!shifts) {
@@ -239,6 +249,16 @@ export default function EntryForm({
               />
             </label>
           )}
+          <label className="text-gray-500 block mb-2">
+            Tags
+            <MultiSelect
+              disabled={!tags}
+              isLoading={!tags}
+              predefinedOptions={tags || []}
+              value={draft.tags}
+              setValue={(tags) => updateDraft({ ...draft, tags: tags || [] })}
+            />
+          </label>
           <label className="text-gray-500 mb-1 flex items-center">
             <input
               type="checkbox"
@@ -326,15 +346,6 @@ export default function EntryForm({
             />
           </div>
 
-          <label className="text-gray-500 block mb-2">
-            Tags
-            <MultiSelect
-              isLoading={!tags}
-              predefinedOptions={tags || []}
-              value={draft.tags}
-              setValue={(tags) => updateDraft({ ...draft, tags: tags || [] })}
-            />
-          </label>
           {/* Not using a label here, because there are some weird */}
           {/* interactions with having multiple inputs under the same label */}
           <div className="text-gray-500 block mb-2">

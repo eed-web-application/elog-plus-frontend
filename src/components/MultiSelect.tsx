@@ -1,6 +1,6 @@
 import { ComponentProps, useState } from "react";
 import cn from "classnames";
-import { Input, InputInvalid } from "./base";
+import { Input, InputDisabled, InputInvalid } from "./base";
 import { size, useFloating } from "@floating-ui/react";
 import Spinner from "./Spinner";
 import Chip from "./Chip";
@@ -12,6 +12,7 @@ interface Props extends Omit<ComponentProps<"input">, "value"> {
   predefinedOptions: string[];
   isLoading?: boolean;
   invalid?: boolean;
+  disabled?: boolean;
 }
 
 export default function MultiSelect({
@@ -22,6 +23,7 @@ export default function MultiSelect({
   className,
   placeholder,
   invalid,
+  disabled,
   onBlur,
   onFocus,
   ...rest
@@ -101,6 +103,7 @@ export default function MultiSelect({
       className={cn(
         Input,
         invalid && InputInvalid,
+        disabled && InputDisabled,
         focused && "outline-none ring-1 ring-blue-500 border-blue-500",
         className,
         "flex pb-1 pt-1"
@@ -140,6 +143,7 @@ export default function MultiSelect({
           }}
           onKeyDown={onInputKeyDown}
           size={search.length + 1}
+          disabled={disabled}
         />
       </div>
 
