@@ -92,7 +92,9 @@ export default function EntryList({
   );
 
   if (entries.length === 0 && !isLoading && emptyLabel) {
-    return <div className="text-gray-500 text-center pt-3">{emptyLabel}</div>;
+    return (
+      <div className="text-gray-500 text-center pt-6 text-lg">{emptyLabel}</div>
+    );
   }
 
   return (
