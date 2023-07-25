@@ -65,13 +65,20 @@ export default function Select({
   } = useSelectCursor(filteredOptions.length);
 
   function onInputKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
-    inputKeyDownCursorHandler(e);
+    if (isOpen) {
+      inputKeyDownCursorHandler(e);
+    } else if (e.code === "ArrowDown" || e.code === "ArrowUp") {
+      setIsOpen(true);
+    }
 
     if (e.code === "Enter") {
       e.preventDefault();
 
-      setValue(filteredOptions[cursor]);
-      setSearch("");
+      if (isOpen) {
+        setValue(filteredOptions[cursor]);
+        setSearch("");
+        setIsOpen(false);
+      }
     }
   }
 
@@ -84,7 +91,12 @@ export default function Select({
         className={cn(Input, invalid && InputInvalid, className)}
         placeholder={value || !placeholder ? "" : placeholder}
         value={search}
-        onChange={(e) => setSearch(e.target.value)}
+        onChange={(e) => {
+          setSearch(e.target.value);
+          if (!isOpen) {
+            setIsOpen(true);
+          }
+        }}
         ref={refs.setReference}
         onFocus={() => setIsOpen(true)}
         onBlur={(e) => {
