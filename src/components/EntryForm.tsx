@@ -1,10 +1,17 @@
-import { FormEvent, useCallback, useContext, useEffect, useState } from "react";
+import {
+  FormEvent,
+  Suspense,
+  lazy,
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
 import cn from "classnames";
 import { useDropzone } from "react-dropzone";
 import {
   EntryForm as EntryFormType,
   createEntry,
-  createTag,
   fetchLogbooks,
   fetchTags,
   followUp,
@@ -21,12 +28,14 @@ import {
   useDraftsStore,
 } from "../draftsStore";
 import EntryRefreshContext from "../EntryRefreshContext";
-import EntryBodyTextEditor from "./EntryBodyTextEditor";
 import TextDivider from "./TextDivider";
 import dateToDateString from "../utils/dateToDateString";
 import useAttachmentUploader, {
   LocalAttachment,
 } from "../hooks/useAttachmentUploader";
+import Spinner from "./Spinner";
+
+const EntryBodyTextEditor = lazy(() => import("./EntryBodyTextEditor"));
 
 export interface Props {
   onEntryCreated: (id: string) => void;
@@ -177,203 +186,205 @@ export default function EntryForm({
 
   return (
     <div className="pb-2">
-      {kind !== "newEntry" && (
-        <>
-          <TextDivider>
-            {kind[0] === "followingUp" ? "Following up" : "Superseding"}
-          </TextDivider>
-          <div className="border-b pb-2 px-3 mb-3">
-            <EntryRow
-              entry={kind[1]}
-              showDate
-              expandable
-              hideSelection
-              showFollowUps
-              selectable
-              allowSpotlight
+      <Suspense fallback={<Spinner className="m-auto" />}>
+        {kind !== "newEntry" && (
+          <>
+            <TextDivider>
+              {kind[0] === "followingUp" ? "Following up" : "Superseding"}
+            </TextDivider>
+            <div className="border-b pb-2 px-3 mb-3">
+              <EntryRow
+                entry={kind[1]}
+                showDate
+                expandable
+                hideSelection
+                showFollowUps
+                selectable
+                allowSpotlight
+              />
+            </div>
+          </>
+        )}
+        <form noValidate onSubmit={submit} className="px-3">
+          <label className="text-gray-500 block mb-2">
+            Title
+            <input
+              required
+              type="text"
+              className={cn(
+                Input,
+                invalid.includes("title") && InputInvalid,
+                "block w-full"
+              )}
+              value={draft.title}
+              onChange={(e) => updateDraft({ ...draft, title: e.target.value })}
+              onBlur={() => validate("title")}
             />
-          </div>
-        </>
-      )}
-      <form noValidate onSubmit={submit} className="px-3">
-        <label className="text-gray-500 block mb-2">
-          Title
+          </label>
+          {kind === "newEntry" && (
+            <label className="text-gray-500 block mb-2">
+              Logbook
+              <Select
+                required
+                containerClassName="block w-full"
+                className="w-full"
+                options={logbooks || []}
+                isLoading={!logbooks}
+                value={draft.logbook}
+                setValue={(logbook) =>
+                  updateDraft({ ...draft, logbook: logbook || "" })
+                }
+                invalid={invalid.includes("logbook")}
+                onBlur={() => validate("logbook")}
+              />
+            </label>
+          )}
+          <label className="text-gray-500 mb-1 flex items-center">
+            <input
+              type="checkbox"
+              className={cn(Checkbox, "mr-2")}
+              checked={draft.eventAt !== undefined}
+              onChange={() =>
+                updateDraft({
+                  ...draft,
+                  eventAt: draft.eventAt === undefined ? "" : undefined,
+                })
+              }
+            />
+            Explicit event time
+          </label>
           <input
-            required
-            type="text"
+            type="datetime-local"
+            disabled={draft.eventAt === undefined}
+            step="1"
+            onChange={(e) =>
+              updateDraft({ ...draft, eventAt: e.currentTarget.value })
+            }
             className={cn(
               Input,
-              invalid.includes("title") && InputInvalid,
-              "block w-full"
+              invalid.includes("eventAt") && InputInvalid,
+              "block w-full mb-2"
             )}
-            value={draft.title}
-            onChange={(e) => updateDraft({ ...draft, title: e.target.value })}
-            onBlur={() => validate("title")}
           />
-        </label>
-        {kind === "newEntry" && (
-          <label className="text-gray-500 block mb-2">
-            Logbook
+          <label className="text-gray-500 mb-1 flex items-center">
+            <input
+              type="checkbox"
+              className={cn(Checkbox, "mr-2")}
+              checked={draft.summarize !== undefined}
+              onChange={() =>
+                updateDraft({
+                  ...draft,
+                  summarize: draft.summarize
+                    ? undefined
+                    : { shift: "", date: dateToDateString(new Date()) },
+                })
+              }
+            />
+            Shift summary
+          </label>
+          <div className="flex gap-3 mb-2">
             <Select
+              placeholder="Shift"
               required
               containerClassName="block w-full"
               className="w-full"
-              options={logbooks || []}
-              isLoading={!logbooks}
-              value={draft.logbook}
-              setValue={(logbook) =>
-                updateDraft({ ...draft, logbook: logbook || "" })
+              options={shifts || []}
+              isLoading={!shifts}
+              value={draft.summarize?.shift || null}
+              setValue={(shift) =>
+                updateDraft({
+                  ...draft,
+                  summarize: draft.summarize && {
+                    ...draft.summarize,
+                    shift: shift || "",
+                  },
+                })
               }
-              invalid={invalid.includes("logbook")}
-              onBlur={() => validate("logbook")}
+              invalid={invalid.includes("shiftName")}
+              onBlur={() => validate("shiftName")}
+              disabled={!draft.summarize}
+            />
+            <input
+              type="date"
+              value={draft.summarize?.date || ""}
+              onChange={(e) =>
+                updateDraft({
+                  ...draft,
+                  summarize: draft.summarize && {
+                    ...draft.summarize,
+                    date: e.currentTarget.value,
+                  },
+                })
+              }
+              className={cn(
+                Input,
+                invalid.includes("shiftDate") && InputInvalid,
+                "block w-full"
+              )}
+              onBlur={() => validate("shiftDate")}
+              disabled={!draft.summarize}
+            />
+          </div>
+
+          <label className="text-gray-500 block mb-2">
+            Tags
+            <MultiSelect
+              isLoading={!tags}
+              predefinedOptions={tags || []}
+              value={draft.tags}
+              setValue={(tags) => updateDraft({ ...draft, tags: tags || [] })}
             />
           </label>
-        )}
-        <label className="text-gray-500 mb-1 flex items-center">
-          <input
-            type="checkbox"
-            className={cn(Checkbox, "mr-2")}
-            checked={draft.eventAt !== undefined}
-            onChange={() =>
-              updateDraft({
-                ...draft,
-                eventAt: draft.eventAt === undefined ? "" : undefined,
-              })
-            }
-          />
-          Explicit event time
-        </label>
-        <input
-          type="datetime-local"
-          disabled={draft.eventAt === undefined}
-          step="1"
-          onChange={(e) =>
-            updateDraft({ ...draft, eventAt: e.currentTarget.value })
-          }
-          className={cn(
-            Input,
-            invalid.includes("eventAt") && InputInvalid,
-            "block w-full mb-2"
-          )}
-        />
-        <label className="text-gray-500 mb-1 flex items-center">
-          <input
-            type="checkbox"
-            className={cn(Checkbox, "mr-2")}
-            checked={draft.summarize !== undefined}
-            onChange={() =>
-              updateDraft({
-                ...draft,
-                summarize: draft.summarize
-                  ? undefined
-                  : { shift: "", date: dateToDateString(new Date()) },
-              })
-            }
-          />
-          Shift summary
-        </label>
-        <div className="flex gap-3 mb-2">
-          <Select
-            placeholder="Shift"
-            required
-            containerClassName="block w-full"
-            className="w-full"
-            options={shifts || []}
-            isLoading={!shifts}
-            value={draft.summarize?.shift || null}
-            setValue={(shift) =>
-              updateDraft({
-                ...draft,
-                summarize: draft.summarize && {
-                  ...draft.summarize,
-                  shift: shift || "",
-                },
-              })
-            }
-            invalid={invalid.includes("shiftName")}
-            onBlur={() => validate("shiftName")}
-            disabled={!draft.summarize}
-          />
-          <input
-            type="date"
-            value={draft.summarize?.date || ""}
-            onChange={(e) =>
-              updateDraft({
-                ...draft,
-                summarize: draft.summarize && {
-                  ...draft.summarize,
-                  date: e.currentTarget.value,
-                },
-              })
-            }
-            className={cn(
-              Input,
-              invalid.includes("shiftDate") && InputInvalid,
-              "block w-full"
-            )}
-            onBlur={() => validate("shiftDate")}
-            disabled={!draft.summarize}
-          />
-        </div>
-
-        <label className="text-gray-500 block mb-2">
-          Tags
-          <MultiSelect
-            isLoading={!tags}
-            predefinedOptions={tags || []}
-            value={draft.tags}
-            setValue={(tags) => updateDraft({ ...draft, tags: tags || [] })}
-          />
-        </label>
-        {/* Not using a label here, because there are some weird */}
-        {/* interactions with having multiple inputs under the same label */}
-        <div className="text-gray-500 block mb-2">
-          Text
-          <EntryBodyTextEditor
-            value={draft.text}
-            onChange={(text) => updateDraft({ ...draft, text })}
-          />
-        </div>
-        <label className="text-gray-500 block mb-2">
-          Attachments
-          <div
-            className={cn(
-              "relative cursor-pointer border rounded-lg bg-gray-50 w-full overflow-hidden flex flex-wrap m-auto",
-              attachments.length === 0
-                ? "items-center justify-center text-xl h-24"
-                : "px-3 pt-3"
-            )}
-            {...getRootProps()}
-          >
-            {attachments.length === 0
-              ? "Drag and drop"
-              : attachments.map((attachment) => (
-                  <AttachmentCard
-                    key={attachment.id || attachment.fileName}
-                    className="mr-3 mb-3"
-                    isLoading={!attachment.id}
-                    attachment={attachment}
-                    onRemove={() => removeAttachment(attachment)}
-                  />
-                ))}
-            {isDragActive && (
-              <div className="absolute left-0 right-0 top-0 bottom-0 bg-opacity-20 bg-gray-500" />
-            )}
+          {/* Not using a label here, because there are some weird */}
+          {/* interactions with having multiple inputs under the same label */}
+          <div className="text-gray-500 block mb-2">
+            Text
+            <EntryBodyTextEditor
+              value={draft.text}
+              onChange={(text) => updateDraft({ ...draft, text })}
+            />
           </div>
-          <input {...getInputProps()} />
-        </label>
-        <input
-          type="submit"
-          className={cn(Button, "block ml-auto mt-2")}
-          value={
-            kind === "newEntry"
-              ? "Save"
-              : kind[0] === "followingUp"
-              ? "Follow up"
-              : "Supersede"
-          }
-        />
-      </form>
+          <label className="text-gray-500 block mb-2">
+            Attachments
+            <div
+              className={cn(
+                "relative cursor-pointer border rounded-lg bg-gray-50 w-full overflow-hidden flex flex-wrap m-auto",
+                attachments.length === 0
+                  ? "items-center justify-center text-xl h-24"
+                  : "px-3 pt-3"
+              )}
+              {...getRootProps()}
+            >
+              {attachments.length === 0
+                ? "Drag and drop"
+                : attachments.map((attachment) => (
+                    <AttachmentCard
+                      key={attachment.id || attachment.fileName}
+                      className="mr-3 mb-3"
+                      isLoading={!attachment.id}
+                      attachment={attachment}
+                      onRemove={() => removeAttachment(attachment)}
+                    />
+                  ))}
+              {isDragActive && (
+                <div className="absolute left-0 right-0 top-0 bottom-0 bg-opacity-20 bg-gray-500" />
+              )}
+            </div>
+            <input {...getInputProps()} />
+          </label>
+          <input
+            type="submit"
+            className={cn(Button, "block ml-auto mt-2")}
+            value={
+              kind === "newEntry"
+                ? "Save"
+                : kind[0] === "followingUp"
+                ? "Follow up"
+                : "Supersede"
+            }
+          />
+        </form>
+      </Suspense>
     </div>
   );
 }
