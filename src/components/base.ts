@@ -16,7 +16,6 @@ export const IconButton =
 
 export const BackDrop = "bg-gray-800 bg-opacity-60";
 
-export const Link =
-  "font-medium text-blue-600 dark:text-blue-500 hover:underline";
+export const Link = "font-medium text-blue-600 hover:underline";
 
 export const Checkbox = "w-5 h-5 accent-blue-500";
