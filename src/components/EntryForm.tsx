@@ -83,7 +83,9 @@ export default function EntryForm({
 
   useEffect(() => {
     if (!logbooks) {
-      fetchLogbooks().then(setLogbooks);
+      fetchLogbooks().then((logbooks) =>
+        setLogbooks(logbooks.map(({ name }) => name))
+      );
     }
   }, [logbooks]);
 

@@ -14,6 +14,7 @@ import { useEntriesStore } from "./entriesStore.ts";
 import ViewEntry from "./routes/ViewEntry.tsx";
 import ErrorBoundary from "./routes/ErrorBoundary";
 import "./index.css";
+import Admin from "./routes/Admin.tsx";
 
 function entryLoader({ params }: { params: Params }) {
   if (params.entryId) {
@@ -30,6 +31,11 @@ function shouldRevalidate({
 }
 
 const router = createBrowserRouter([
+  {
+    path: "/admin",
+    errorElement: <ErrorBoundary />,
+    element: <Admin />,
+  },
   {
     path: "/",
     element: <Home />,

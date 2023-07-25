@@ -25,7 +25,9 @@ export default function Filters({ filters, setFilters }: Props) {
 
   useEffect(() => {
     if (!logbooks) {
-      fetchLogbooks().then((logbooks) => setLogbooks(logbooks));
+      fetchLogbooks().then((logbooks) =>
+        setLogbooks(logbooks.map(({ name }) => name))
+      );
     }
   }, [logbooks]);
 
