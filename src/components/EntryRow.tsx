@@ -6,7 +6,7 @@ import {
   useRef,
   useEffect,
 } from "react";
-import { Link, LinkProps, useLocation } from "react-router-dom";
+import { Link, LinkProps } from "react-router-dom";
 import {
   FloatingDelayGroup,
   FloatingPortal,
@@ -211,6 +211,7 @@ export interface Props {
   entry: EntrySummary;
   className?: string;
   spotlight?: boolean;
+  selected?: boolean;
   selectable?: boolean;
   expandable?: boolean;
   showFollowUps?: boolean;
@@ -231,10 +232,10 @@ export default function EntryRow({
   entry,
   className,
   spotlight,
+  selected,
   selectable,
   expandable,
   showFollowUps,
-  hideSelection,
   expandedByDefault,
   showDate,
   allowFollowUp,
@@ -244,11 +245,6 @@ export default function EntryRow({
 }: PropsWithChildren<Props>) {
   const [expanded, setExpanded] = useState(Boolean(expandedByDefault));
   const [fullEntry, setFullEntry] = useState<Entry | null>(null);
-  const { pathname } = useLocation();
-  // Although this implementation is easy, it really should be done by Home
-  const selectedEntryId = hideSelection
-    ? null
-    : pathname.slice(1).split("/")[0];
 
   const getOrFetch = useEntriesStore((state) => state.getOrFetch);
 
@@ -281,9 +277,7 @@ export default function EntryRow({
         className={cn(
           "flex items-center",
           selectable && "cursor-pointer relative",
-          selectedEntryId === entry.id
-            ? "bg-blue-50 hover:bg-blue-100"
-            : "hover:bg-gray-50",
+          selected ? "bg-blue-50 hover:bg-blue-100" : "hover:bg-gray-50",
           spotlight && "bg-yellow-100 hover:bg-yellow-200",
           className
         )}
@@ -332,7 +326,7 @@ export default function EntryRow({
             {allowSpotlight && (
               <RowButton
                 tooltip="Spotlight"
-                entrySelected={selectedEntryId === entry.id}
+                entrySelected={selected}
                 entryHighlighted={spotlight}
                 {...spotlightProps}
               >
@@ -360,7 +354,7 @@ export default function EntryRow({
                   pathname: `/${entry.id}/supersede`,
                   search: window.location.search,
                 }}
-                entrySelected={selectedEntryId === entry.id}
+                entrySelected={selected}
                 entryHighlighted={spotlight}
               >
                 <svg
@@ -387,7 +381,7 @@ export default function EntryRow({
                   pathname: `/${entry.id}/follow-up`,
                   search: window.location.search,
                 }}
-                entrySelected={selectedEntryId === entry.id}
+                entrySelected={selected}
                 entryHighlighted={spotlight}
               >
                 <svg
@@ -418,9 +412,7 @@ export default function EntryRow({
                   "z-0",
                   expanded && "rotate-180",
                   spotlight && "hover:bg-yellow-300",
-                  selectedEntryId === entry.id &&
-                    !spotlight &&
-                    "hover:!bg-blue-200"
+                  selected && !spotlight && "hover:!bg-blue-200"
                 )}
                 onClick={toggleExpand}
               >

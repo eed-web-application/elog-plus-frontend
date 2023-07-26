@@ -9,6 +9,7 @@ export interface Props {
   entries: EntrySummary[];
   emptyLabel?: string;
   spotlight?: string;
+  selected?: string;
   headerKind?: "shift" | "logbookShift" | "day" | "none";
   isLoading?: boolean;
   expandable?: boolean;
@@ -31,6 +32,7 @@ export default function EntryList({
   entries,
   emptyLabel,
   spotlight,
+  selected,
   headerKind = "none",
   isLoading,
   expandable,
@@ -150,6 +152,7 @@ export default function EntryList({
                 allowSupersede={allowSupersede}
                 allowSpotlight={allowSpotlight}
                 allowSpotlightForFollowUps={allowSpotlightForFollowUps}
+                selected={entry.id === selected}
               />
             </div>
           </Fragment>

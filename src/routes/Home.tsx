@@ -131,6 +131,7 @@ export default function Home() {
             <EntryList
               entries={entries || []}
               emptyLabel="No entries found"
+              selected={location.pathname.split("/")[1]}
               isLoading={isLoading}
               selectable
               expandable
