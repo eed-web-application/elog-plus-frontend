@@ -1,9 +1,12 @@
 import cn from "classnames";
 
-export const Input = cn(
-  "pl-2.5 p-2 text-gray-900 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 disabled:text-gray-500 disabled:border-gray-200"
-);
+export const InputBase =
+  "text-gray-900 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 disabled:text-gray-500 disabled:border-gray-200";
 export const InputDisabled = "!bg-gray-100 !text-gray-500 !border-gray-200";
+
+export const Input = cn(InputBase, "pl-2.5 p-2");
+
+export const InputSmall = cn(InputBase, "px-2 py-1");
 
 export const InputInvalid =
   "border-red-500 focus-1 ring-red-500 focus:ring-1 focus:ring-red-500 focus:border-red-500";
