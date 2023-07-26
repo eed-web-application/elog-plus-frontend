@@ -11,7 +11,7 @@ interface Props {
 let idCounter = 0;
 
 export default function LogbookForm({ logbook }: Props) {
-  const [form, setForm] = useLogbookFormsStore((state) =>
+  const [form, setForm, removeForm] = useLogbookFormsStore((state) =>
     state.startEditing(logbook)
   );
 

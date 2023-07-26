@@ -5,12 +5,16 @@ import Spinner from "../components/Spinner";
 import useIsSmallScreen from "../hooks/useIsSmallScreen";
 import cn from "classnames";
 import LogbookForm from "../components/LogbookForm";
+import { useLogbookFormsStore } from "../logbookFormsStore";
 
 const MIN_PANE_WIDTH = 384;
 
 export default function Admin() {
   const [logbooks, setLogbooks] = useState<Logbook[] | null>(null);
   const [selectedLogbook, setSelectedLogbook] = useState<Logbook | null>(null);
+  const logbooksEdited = useLogbookFormsStore((state) =>
+    Object.keys(state.forms)
+  );
 
   const isSmallScreen = useIsSmallScreen();
   const bodyRef = useRef<HTMLDivElement>(null);
@@ -64,6 +68,9 @@ export default function Admin() {
               onClick={() => setSelectedLogbook(logbook)}
             >
               {logbook.name}
+              <span className="text-gray-500">
+                {logbooksEdited.includes(logbook.id) && "*"}
+              </span>
             </div>
           ))
         ) : (

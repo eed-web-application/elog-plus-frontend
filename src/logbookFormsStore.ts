@@ -20,7 +20,21 @@ export const useLogbookFormsStore = create<LogbookFormsState>((set, get) => ({
     const state = get();
     const form = state.forms[logbook.id] || logbook;
 
-    return [form, state.upsertForm];
+    return [
+      form,
+      (newValue: LogbookForm) => {
+        if (JSON.stringify(newValue) === JSON.stringify(logbook)) {
+          set(({ forms }) => {
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            const { [logbook.id]: _removed, ...rest } = forms;
+
+            return { forms: rest };
+          });
+        } else {
+          state.upsertForm(newValue);
+        }
+      },
+    ];
   },
   upsertForm(newValue: LogbookForm) {
     set(({ forms }) => ({
