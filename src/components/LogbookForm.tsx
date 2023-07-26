@@ -1,27 +1,22 @@
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, useState } from "react";
 import cn from "classnames";
-import { Logbook, Shift, Tag } from "../api";
+import { Logbook } from "../api";
 import { Button, IconButton, Input, InputInvalid, InputSmall } from "./base";
+import { useLogbookFormsStore } from "../logbookFormsStore";
 
 interface Props {
   logbook: Logbook;
 }
 
-interface LogbookForm extends Omit<Logbook, "tags" | "shifts"> {
-  tags: (Omit<Tag, "id"> & { id?: string })[];
-  shifts: (Partial<Shift> & { id: string; name: string })[];
-}
-
 let idCounter = 0;
 
 export default function LogbookForm({ logbook }: Props) {
-  const [form, setForm] = useState<LogbookForm>(logbook);
+  const [form, setForm] = useLogbookFormsStore((state) =>
+    state.startEditing(logbook)
+  );
+
   const [newTag, setNewTag] = useState<string>("");
   const [newShift, setNewShift] = useState<string>("");
-
-  useEffect(() => {
-    setForm(logbook);
-  }, [logbook]);
 
   const validators = {
     name: () => Boolean(form.name),
@@ -91,7 +86,7 @@ export default function LogbookForm({ logbook }: Props) {
     e.preventDefault();
 
     setNewTag("");
-    setForm((form) => ({ ...form, tags: [...form.tags, { name: newTag }] }));
+    setForm({ ...form, tags: [...form.tags, { name: newTag }] });
   }
 
   function createShift(e: FormEvent<HTMLFormElement>) {
@@ -100,37 +95,33 @@ export default function LogbookForm({ logbook }: Props) {
     idCounter += 1;
 
     setNewShift("");
-    setForm((form) => ({
+    setForm({
       ...form,
       shifts: [...form.shifts, { id: idCounter.toString(), name: newShift }],
-    }));
+    });
   }
 
   function removeTag(index: number) {
-    setForm((form) => {
-      const newTags = [...form.tags];
-      newTags.splice(index, 1);
-      return { ...form, tags: newTags };
-    });
+    const newTags = [...form.tags];
+    newTags.splice(index, 1);
+
+    setForm({ ...form, tags: newTags });
   }
 
   function removeShift(index: number) {
-    setForm((form) => {
-      const newShifts = [...form.shifts];
-      newShifts.splice(index, 1);
-      return { ...form, shifts: newShifts };
-    });
+    const newShifts = [...form.shifts];
+    newShifts.splice(index, 1);
+
+    setForm({ ...form, shifts: newShifts });
   }
 
   function changeShiftName(index: number, name: string) {
-    setForm((form) => {
-      const updatedShifts = [...form.shifts];
-      updatedShifts[index] = { ...updatedShifts[index], name };
+    const updatedShifts = [...form.shifts];
+    updatedShifts[index] = { ...updatedShifts[index], name };
 
-      return {
-        ...form,
-        shifts: updatedShifts,
-      };
+    setForm({
+      ...form,
+      shifts: updatedShifts,
     });
   }
 
@@ -149,9 +140,7 @@ export default function LogbookForm({ logbook }: Props) {
             "block w-full"
           )}
           value={form.name}
-          onChange={(e) =>
-            setForm((form) => ({ ...form, name: e.target.value }))
-          }
+          onChange={(e) => setForm({ ...form, name: e.target.value })}
           onBlur={() => onValidate(validators.name(), "name")}
         />
       </label>
@@ -239,14 +228,14 @@ export default function LogbookForm({ logbook }: Props) {
               {form.shifts.map((shift, index) => (
                 <div
                   key={shift.id}
-                  className="flex justify-between px-2 py-1 items-center gap-1"
+                  className="flex justify-between py-2 items-center gap-1"
                 >
                   <input
                     type="text"
                     className={cn(
                       InputSmall,
                       invalid.includes(`shiftName/${shift.id}`) && InputInvalid,
-                      "flex-1"
+                      "flex-1 min-w-0"
                     )}
                     value={shift.name}
                     onChange={(e) =>
