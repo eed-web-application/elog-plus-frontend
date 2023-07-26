@@ -215,7 +215,6 @@ export interface Props {
   selectable?: boolean;
   expandable?: boolean;
   showFollowUps?: boolean;
-  hideSelection?: boolean;
   expandedByDefault?: boolean;
   showDate?: boolean;
   allowFollowUp?: boolean;

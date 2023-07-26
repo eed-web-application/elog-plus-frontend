@@ -209,7 +209,6 @@ export default function EntryForm({
                 entry={kind[1]}
                 showDate
                 expandable
-                hideSelection
                 showFollowUps
                 selectable
                 allowSpotlight
