@@ -166,12 +166,12 @@ export default function EntryView({ entry }: Props) {
           </div>
         </>
       )}
-      {entry.followUp.length > 0 && (
+      {entry.followUps.length > 0 && (
         <>
           <TextDivider>Follow Ups</TextDivider>
           <div className="px-3 pb-3">
             <EntryList
-              entries={entry.followUp}
+              entries={entry.followUps}
               showEntryDates
               showFollowUps
               expandable

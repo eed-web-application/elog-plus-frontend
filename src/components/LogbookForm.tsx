@@ -1,6 +1,6 @@
 import { FormEvent, useState } from "react";
 import cn from "classnames";
-import { Logbook } from "../api";
+import { Logbook, Shift, updateLogbookShifts } from "../api";
 import { Button, IconButton, Input, InputInvalid, InputSmall } from "./base";
 import { useLogbookFormsStore } from "../logbookFormsStore";
 
@@ -55,7 +55,7 @@ export default function LogbookForm({ logbook }: Props) {
     let invalid = false;
     for (const field in validators) {
       if (
-        onValidate(
+        !onValidate(
           validators[field as keyof typeof validators](),
           field as Ident
         )
@@ -66,7 +66,7 @@ export default function LogbookForm({ logbook }: Props) {
     for (const shift of form.shifts) {
       for (const field in shiftValidators) {
         if (
-          onValidate(
+          !onValidate(
             shiftValidators[field as keyof typeof shiftValidators](shift.id),
             `${field}/${shift.id}` as Ident
           )
@@ -79,7 +79,15 @@ export default function LogbookForm({ logbook }: Props) {
       return;
     }
 
-    // TODO
+    if (JSON.stringify(form.shifts) !== JSON.stringify(logbook.shifts)) {
+      updateLogbookShifts(
+        logbook.id,
+        form.shifts.map(({ id, ...shift }) => ({
+          ...(shift as Shift),
+          id: id.startsWith("_") ? undefined : id,
+        }))
+      );
+    }
   }
 
   function createTag(e: FormEvent<HTMLFormElement>) {
@@ -97,7 +105,10 @@ export default function LogbookForm({ logbook }: Props) {
     setNewShift("");
     setForm({
       ...form,
-      shifts: [...form.shifts, { id: idCounter.toString(), name: newShift }],
+      shifts: [
+        ...form.shifts,
+        { id: `_${idCounter.toString()}`, name: newShift },
+      ],
     });
   }
 
@@ -257,6 +268,15 @@ export default function LogbookForm({ logbook }: Props) {
                         "w-32"
                       )}
                       type="time"
+                      value={form.shifts[index].from}
+                      onChange={(e) => {
+                        const updatedShifts = [...form.shifts];
+                        updatedShifts[index] = {
+                          ...updatedShifts[index],
+                          from: e.currentTarget.value,
+                        };
+                        setForm({ ...form, shifts: updatedShifts });
+                      }}
                       onBlur={() =>
                         onValidate(
                           shiftValidators.shiftFrom(shift.id),
@@ -272,6 +292,15 @@ export default function LogbookForm({ logbook }: Props) {
                         "w-32"
                       )}
                       type="time"
+                      value={form.shifts[index].to}
+                      onChange={(e) => {
+                        const updatedShifts = [...form.shifts];
+                        updatedShifts[index] = {
+                          ...updatedShifts[index],
+                          to: e.currentTarget.value,
+                        };
+                        setForm({ ...form, shifts: updatedShifts });
+                      }}
                       onBlur={() =>
                         onValidate(
                           shiftValidators.shiftTo(shift.id),

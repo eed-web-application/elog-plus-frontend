@@ -18,3 +18,16 @@ export interface Logbook {
 export async function fetchLogbooks(): Promise<Logbook[]> {
   return await fetch("logbooks");
 }
+
+export async function updateLogbookShifts(
+  logbookId: string,
+  shifts: (
+    | Omit<Shift, "id">
+    | (Partial<Omit<Shift, "id">> & Pick<Shift, "id">)
+  )[]
+): Promise<void> {
+  return await fetch(`logbooks/${logbookId}/shifts`, {
+    method: "PUT",
+    body: shifts,
+  });
+}

@@ -1,9 +1,18 @@
 import { create } from "zustand";
 import { Logbook, Shift, Tag } from "./api";
 
+/**
+ * Shift that has not been uploaded to the server yet. `id`s starting with an
+ * underscore are not uploaded yet.
+ */
+interface LocalShift extends Omit<Partial<Shift>, "id"> {
+  id: string | `_${string}`;
+  name: string;
+}
+
 interface LogbookForm extends Omit<Logbook, "tags" | "shifts"> {
   tags: (Omit<Tag, "id"> & { id?: string })[];
-  shifts: (Partial<Shift> & { id: string; name: string })[];
+  shifts: LocalShift[];
 }
 
 interface LogbookFormsState {

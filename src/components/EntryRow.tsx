@@ -439,7 +439,7 @@ export default function EntryRow({
           {showFollowUps && (
             <div className="ml-12 border-l">
               <EntryList
-                entries={fullEntry.followUp}
+                entries={fullEntry.followUps}
                 selectable
                 expandable
                 showEntryDates

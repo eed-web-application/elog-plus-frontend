@@ -12,6 +12,8 @@ export default function ErrorBoundary() {
     is404 = true;
   }
 
+  console.error(error);
+
   return (
     <div className="h-screen w-screen flex flex-col items-center justify-center">
       <div className="text-4xl">{is404 ? "404" : "Uh oh 😕"}</div>

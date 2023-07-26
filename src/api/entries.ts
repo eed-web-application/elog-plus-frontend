@@ -15,7 +15,7 @@ export interface Entry extends EntrySummary {
   supersedeBy: string;
   text: string;
   attachments: Attachment[];
-  followUp: EntrySummary[];
+  followUps: EntrySummary[];
   history?: EntrySummary[];
   followingUp?: EntrySummary;
 }
@@ -39,17 +39,8 @@ function normalizeEntry<E extends Entry | EntrySummary>(entry: E): E {
   entry.loggedAt = entry.loggedAt + "Z";
   entry.eventAt = entry.eventAt + "Z";
 
-  if (
-    new Date(entry.loggedAt).getTime() <
-    new Date("2023-07-20T21:55:38.205Z").getTime()
-  ) {
-    entry.shift = "Morning shift";
-  } else {
-    entry.shift = "Day shift";
-  }
-
   if ("text" in entry) {
-    entry.followUp = entry.followUp.map(normalizeEntry);
+    entry.followUps = entry.followUps.map(normalizeEntry);
     entry.history = entry.history
       ? entry.history.map(normalizeEntry)
       : undefined;
