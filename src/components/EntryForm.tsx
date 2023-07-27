@@ -10,7 +10,7 @@ import {
 import cn from "classnames";
 import { useDropzone } from "react-dropzone";
 import {
-  EntryForm as EntryFormType,
+  EntryNew,
   createEntry,
   fetchLogbooks,
   fetchTags,
@@ -70,7 +70,7 @@ export default function EntryForm({
   }
 
   const submitEntry = useCallback(
-    (newEntry: EntryFormType) => {
+    (newEntry: EntryNew) => {
       if (kind === "newEntry") {
         return createEntry(newEntry);
       }
@@ -149,15 +149,16 @@ export default function EntryForm({
       return;
     }
 
-    const newEntry: EntryFormType = {
+    const newEntry = {
       ...draft,
-      // Zero seconds
       attachments: draft.attachments.map(
         // We have already verified that all the ids are non null in the
         // attachment validator, so this is fine
         (attachment) => attachment.id as string
       ),
-    };
+      // This should be fine as the validators should ensure that this Draft
+      // is indeed a EntryNew
+    } as EntryNew;
 
     const id = await submitEntry(newEntry);
     removeDraft();

@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import { Attachment, Entry, EntryForm } from "./api";
+import { Attachment, Entry, EntryNew } from "./api";
 
 /**
  * Attachment that has been uploaded to the server, but we don't have all its
@@ -11,7 +11,11 @@ export type LocalUploadedAttachment = Omit<Attachment, "previewState">;
 /**
  * An entry that hasn't been submitted to the server
  */
-export type Draft = Omit<EntryForm, "attachments"> & {
+export type Draft = Omit<EntryNew, "attachments" | "eventAt"> & {
+  /**
+   * `null` meaning checked but no date
+   */
+  eventAt?: Date | null;
   attachments: LocalUploadedAttachment[];
 };
 

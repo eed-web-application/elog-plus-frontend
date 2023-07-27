@@ -20,16 +20,13 @@ export interface Entry extends EntrySummary {
   followingUp?: EntrySummary;
 }
 
-export interface EntryForm {
+export interface EntryNew {
   title: string;
   text: string;
   logbook: string;
   tags: string[];
   attachments: string[];
-  /**
-   * `null` meaning checked but no date
-   */
-  eventAt?: Date | null;
+  eventAt?: Date;
   summarize?: {
     shift: string;
     date: string;
@@ -117,7 +114,7 @@ export async function fetchEntry(id: string): Promise<Entry> {
   return entry;
 }
 
-export function createEntry(entry: EntryForm): Promise<string> {
+export function createEntry(entry: EntryNew): Promise<string> {
   return fetch("entries", {
     method: "POST",
     body: entry.eventAt
@@ -128,7 +125,7 @@ export function createEntry(entry: EntryForm): Promise<string> {
 
 export function followUp(
   followingUp: string,
-  entry: EntryForm
+  entry: EntryNew
 ): Promise<string> {
   return fetch(`entries/${followingUp}/follow-ups`, {
     method: "POST",
@@ -138,7 +135,7 @@ export function followUp(
 
 export function supersede(
   superseding: string,
-  entry: EntryForm
+  entry: EntryNew
 ): Promise<string> {
   return fetch(`entries/${superseding}/supersede`, {
     method: "POST",
