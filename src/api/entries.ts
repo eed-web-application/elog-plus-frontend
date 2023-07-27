@@ -40,7 +40,9 @@ function normalizeEntry<E extends Entry | EntrySummary>(entry: E): E {
   entry.eventAt = entry.eventAt + "Z";
 
   if ("text" in entry) {
-    entry.followUps = entry.followUps.map(normalizeEntry);
+    if (entry.followUps) {
+      entry.followUps = entry.followUps.map(normalizeEntry);
+    }
     entry.history = entry.history
       ? entry.history.map(normalizeEntry)
       : undefined;
