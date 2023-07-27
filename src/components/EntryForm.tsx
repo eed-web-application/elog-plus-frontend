@@ -278,6 +278,7 @@ export default function EntryForm({
             type="datetime-local"
             disabled={draft.eventAt === undefined}
             step="1"
+            value={draft.eventAt || ""}
             onChange={(e) =>
               updateDraft({ ...draft, eventAt: e.currentTarget.value })
             }
