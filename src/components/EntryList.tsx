@@ -5,6 +5,23 @@ import Spinner from "./Spinner";
 import { Link } from "react-router-dom";
 import dateToDateString from "../utils/dateToDateString";
 
+function groupBy<K, V>(
+  list: Array<V>,
+  keyGetter: (input: V) => K
+): Map<K, Array<V>> {
+  const map = new Map();
+  list.forEach((item) => {
+    const key = keyGetter(item);
+    const collection = map.get(key);
+    if (!collection) {
+      map.set(key, [item]);
+    } else {
+      collection.push(item);
+    }
+  });
+  return map;
+}
+
 export interface Props {
   entries: EntrySummary[];
   emptyLabel?: string;
@@ -84,10 +101,10 @@ export default function EntryList({
         return date;
       }
       if (headerKind === "shift") {
-        return `${entry.shift} • ${date}`;
+        return `${entry.shift || "No shift"} • ${date}`;
       }
       if (headerKind === "logbookShift") {
-        return `${entry.logbook} • ${entry.shift} • ${date}`;
+        return `${entry.logbook} • ${entry.shift || "No shift"} • ${date}`;
       }
     },
     [headerKind]
@@ -99,10 +116,11 @@ export default function EntryList({
     );
   }
 
+  const entryGroups = groupBy(entries, renderHeader);
+
   return (
     <>
-      {entries.map((entry, index) => {
-        const headerText = renderHeader(entry);
+      {Array.from(entryGroups, ([headerText, entries], groupIndex) => {
         let header;
 
         if (headerKind !== "none" && headerText !== currentHeader) {
@@ -111,9 +129,12 @@ export default function EntryList({
         }
 
         return (
-          <Fragment key={entry.id}>
+          <div
+            key={headerText || "only key because headerKind == 'none'"}
+            className="rounded-lg border mb-2 overflow-hidden"
+          >
             {header && (
-              <div className="flex justify-between items-center mt-2 pb-2 border-b pr-1 truncate gap-3">
+              <div className="flex justify-between items-center border-b truncate gap-3 px-3 pt-1.5 pb-1 bg-gray-100">
                 {header}
                 {(headerKind === "shift" || headerKind === "logbookShift") &&
                   allowSummarize && (
@@ -123,10 +144,10 @@ export default function EntryList({
                         search: window.location.search,
                       }}
                       state={{
-                        logbook: entry.logbook,
+                        logbook: entries[0].logbook,
                         summarize: {
-                          shift: entry.shift,
-                          date: dateToDateString(new Date(entry.eventAt)),
+                          shift: entries[0].shift,
+                          date: dateToDateString(new Date(entries[0].eventAt)),
                         },
                       }}
                       className="font-medium text-gray-700 hover:underline text-right"
@@ -136,26 +157,36 @@ export default function EntryList({
                   )}
               </div>
             )}
-            <div
-              className={index === entries.length - 1 ? "" : "border-b"}
-              ref={index === entries.length - 1 ? observe : undefined}
-            >
-              <EntryRow
-                entry={entry}
-                spotlight={spotlight === entry.id}
-                expandable={expandable}
-                selectable={selectable}
-                showFollowUps={showFollowUps}
-                expandedByDefault={expandDefault}
-                showDate={showEntryDates}
-                allowFollowUp={allowFollowUp}
-                allowSupersede={allowSupersede}
-                allowSpotlight={allowSpotlight}
-                allowSpotlightForFollowUps={allowSpotlightForFollowUps}
-                selected={entry.id === selected}
-              />
-            </div>
-          </Fragment>
+            {entries.map((entry, entryIndex) => {
+              const lastEntry =
+                entryIndex === entries.length - 1 &&
+                groupIndex === entryGroups.size - 1;
+              return (
+                <div
+                  key={entry.id}
+                  className={
+                    entryIndex === entries.length - 1 ? "" : "border-b"
+                  }
+                  ref={lastEntry ? observe : undefined}
+                >
+                  <EntryRow
+                    entry={entry}
+                    spotlight={spotlight === entry.id}
+                    expandable={expandable}
+                    selectable={selectable}
+                    showFollowUps={showFollowUps}
+                    expandedByDefault={expandDefault}
+                    showDate={showEntryDates}
+                    allowFollowUp={allowFollowUp}
+                    allowSupersede={allowSupersede}
+                    allowSpotlight={allowSpotlight}
+                    allowSpotlightForFollowUps={allowSpotlightForFollowUps}
+                    selected={entry.id === selected}
+                  />
+                </div>
+              );
+            })}
+          </div>
         );
       })}
 

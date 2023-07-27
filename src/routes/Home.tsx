@@ -123,7 +123,7 @@ export default function Home() {
         <div className="flex-1 flex overflow-hidden">
           <div
             className={cn(
-              "px-3 overflow-y-auto w-1/2",
+              "px-3 pt-3 overflow-y-auto w-1/2",
               (!outlet || isSmallScreen) && "flex-1 pr-3"
             )}
             ref={bodyRef}

@@ -437,7 +437,7 @@ export default function EntryRow({
             <EntryFigureList attachments={fullEntry.attachments} />
           </div>
           {showFollowUps && (
-            <div className="ml-12 border-l">
+            <div className="ml-6 pt-2 pr-2">
               <EntryList
                 entries={fullEntry.followUps}
                 selectable
