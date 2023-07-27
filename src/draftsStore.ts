@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { persist } from "zustand/middleware";
+import { createJSONStorage, persist } from "zustand/middleware";
 import { Attachment, Entry, EntryNew } from "./api";
 
 /**
@@ -102,6 +102,18 @@ export const useDraftsStore = create(
     }),
     {
       name: "draft-store",
+      storage: createJSONStorage(() => localStorage, {
+        replacer: (key, value) => {
+          if (key !== "drafts") {
+            return;
+          }
+
+          return (value as Draft[]).map(({ eventAt, ...draft }) => ({
+            ...draft,
+            eventAt: eventAt ? new Date(eventAt) : undefined,
+          }));
+        },
+      }),
     }
   )
 );
