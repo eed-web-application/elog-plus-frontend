@@ -125,7 +125,7 @@ export default function EntryList({
 
         if (headerKind !== "none" && headerText !== currentHeader) {
           currentHeader = headerText;
-          header = <h3 className="text-lg">{headerText}</h3>;
+          header = <h3 className="text-lg truncate">{headerText}</h3>;
         }
 
         return (
@@ -134,7 +134,7 @@ export default function EntryList({
             className="rounded-lg border mb-2 overflow-hidden"
           >
             {header && (
-              <div className="flex justify-between items-center border-b truncate gap-3 px-3 pt-1.5 pb-1 bg-gray-100">
+              <div className="flex justify-between items-center border-b gap-3 px-3 pt-1.5 pb-1 bg-gray-100 whitespace-nowrap">
                 {header}
                 {(headerKind === "shift" || headerKind === "logbookShift") &&
                   allowSummarize && (
