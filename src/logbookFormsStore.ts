@@ -19,7 +19,8 @@ interface LogbookFormsState {
   forms: Record<string, LogbookForm>;
   startEditing: (
     logbook: Logbook
-  ) => [LogbookForm, (newValue: LogbookForm) => void];
+  ) => [LogbookForm, (newValue: LogbookForm) => void, () => void];
+  removeForm: (logbookId: string) => void;
   upsertForm: (newValue: LogbookForm) => void;
 }
 
@@ -33,16 +34,12 @@ export const useLogbookFormsStore = create<LogbookFormsState>((set, get) => ({
       form,
       (newValue: LogbookForm) => {
         if (JSON.stringify(newValue) === JSON.stringify(logbook)) {
-          set(({ forms }) => {
-            // eslint-disable-next-line @typescript-eslint/no-unused-vars
-            const { [logbook.id]: _removed, ...rest } = forms;
-
-            return { forms: rest };
-          });
+          state.removeForm(logbook.id);
         } else {
           state.upsertForm(newValue);
         }
       },
+      () => state.removeForm(logbook.id),
     ];
   },
   upsertForm(newValue: LogbookForm) {
@@ -52,5 +49,13 @@ export const useLogbookFormsStore = create<LogbookFormsState>((set, get) => ({
         [newValue.id]: newValue,
       },
     }));
+  },
+  removeForm(logbookId: string) {
+    set(({ forms }) => {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { [logbookId]: _removed, ...rest } = forms;
+
+      return { forms: rest };
+    });
   },
 }));

@@ -1,17 +1,18 @@
 import { FormEvent, useState } from "react";
 import cn from "classnames";
-import { Logbook, Shift, updateLogbookShifts } from "../api";
+import { Logbook, LogbookUpdation, Shift, updateLogbook } from "../api";
 import { Button, IconButton, Input, InputInvalid, InputSmall } from "./base";
 import { useLogbookFormsStore } from "../logbookFormsStore";
 
 interface Props {
   logbook: Logbook;
+  onSave: () => void;
 }
 
 let idCounter = 0;
 
-export default function LogbookForm({ logbook }: Props) {
-  const [form, setForm] = useLogbookFormsStore((state) =>
+export default function LogbookForm({ logbook, onSave }: Props) {
+  const [form, setForm, removeForm] = useLogbookFormsStore((state) =>
     state.startEditing(logbook)
   );
 
@@ -51,7 +52,7 @@ export default function LogbookForm({ logbook }: Props) {
     return false;
   }
 
-  function save() {
+  async function save() {
     let invalid = false;
     for (const field in validators) {
       if (
@@ -79,15 +80,18 @@ export default function LogbookForm({ logbook }: Props) {
       return;
     }
 
-    if (JSON.stringify(form.shifts) !== JSON.stringify(logbook.shifts)) {
-      updateLogbookShifts(
-        logbook.id,
-        form.shifts.map(({ id, ...shift }) => ({
-          ...(shift as Shift),
-          id: id.startsWith("_") ? undefined : id,
-        }))
-      );
-    }
+    // Remove temp ids
+    const logbookUpdation: LogbookUpdation = {
+      ...form,
+      shifts: form.shifts.map(({ id, ...shift }) => ({
+        ...(shift as Shift),
+        id: id.startsWith("_") ? undefined : id,
+      })),
+    };
+
+    await updateLogbook(logbookUpdation);
+    removeForm();
+    onSave();
   }
 
   function createTag(e: FormEvent<HTMLFormElement>) {

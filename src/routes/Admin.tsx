@@ -11,7 +11,10 @@ const MIN_PANE_WIDTH = 384;
 
 export default function Admin() {
   const [logbooks, setLogbooks] = useState<Logbook[] | null>(null);
-  const [selectedLogbook, setSelectedLogbook] = useState<Logbook | null>(null);
+  const [selectedLogbookId, setSelectedLogbookId] = useState<string | null>(
+    null
+  );
+  const selectedLogbook = logbooks?.find(({ id }) => id === selectedLogbookId);
   const logbooksEdited = useLogbookFormsStore((state) =>
     Object.keys(state.forms)
   );
@@ -20,11 +23,15 @@ export default function Admin() {
   const bodyRef = useRef<HTMLDivElement>(null);
   const gutterRef = useRef<HTMLDivElement>(null);
 
+  const refresh = useCallback(() => {
+    fetchLogbooks().then(setLogbooks);
+  }, [setLogbooks]);
+
   useEffect(() => {
     if (!logbooks) {
-      fetchLogbooks().then(setLogbooks);
+      refresh();
     }
-  }, [logbooks]);
+  }, [logbooks, refresh]);
 
   const mouseMoveHandler = useCallback((e: MouseEvent) => {
     if (bodyRef.current && gutterRef.current) {
@@ -65,7 +72,7 @@ export default function Admin() {
                 selectedLogbook?.id === logbook.id &&
                   "bg-blue-100 hover:!bg-blue-200"
               )}
-              onClick={() => setSelectedLogbook(logbook)}
+              onClick={() => setSelectedLogbookId(logbook.id)}
             >
               {logbook.name}
               <span className="text-gray-500">
@@ -89,7 +96,9 @@ export default function Admin() {
         style={{ minWidth: isSmallScreen ? "auto" : MIN_PANE_WIDTH }}
       >
         <Pane>
-          {selectedLogbook && <LogbookForm logbook={selectedLogbook} />}
+          {selectedLogbook && (
+            <LogbookForm logbook={selectedLogbook} onSave={refresh} />
+          )}
         </Pane>
       </div>
     </div>
