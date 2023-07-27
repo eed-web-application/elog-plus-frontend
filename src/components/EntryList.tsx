@@ -1,4 +1,4 @@
-import { Fragment, useCallback, useEffect, useMemo } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 import { EntrySummary } from "../api";
 import EntryRow from "./EntryRow";
 import Spinner from "./Spinner";
@@ -91,7 +91,7 @@ export default function EntryList({
 
   const renderHeader = useCallback(
     (entry: EntrySummary) => {
-      const date = new Date(entry.loggedAt).toLocaleDateString("en-us", {
+      const date = entry.loggedAt.toLocaleDateString("en-us", {
         weekday: "long",
         year: "numeric",
         month: "short",
@@ -147,7 +147,7 @@ export default function EntryList({
                         logbook: entries[0].logbook,
                         summarize: {
                           shift: entries[0].shift,
-                          date: dateToDateString(new Date(entries[0].eventAt)),
+                          date: dateToDateString(entries[0].eventAt),
                         },
                       }}
                       className="font-medium text-gray-700 hover:underline text-right"

@@ -13,8 +13,8 @@ import { URLSearchParamsInit } from "react-router-dom";
 const DEFAULT_QUERY: EntryQuery = {
   logbooks: [],
   tags: [],
-  startDate: "",
-  endDate: "",
+  startDate: null,
+  endDate: null,
   search: "",
   sortByLogDate: false,
 };
@@ -22,11 +22,14 @@ const DEFAULT_QUERY: EntryQuery = {
 const MIN_PANE_WIDTH = 384;
 
 function deserializeQuery(params: URLSearchParams): EntryQuery {
+  const startDate = params.get("startDate");
+  const endDate = params.get("endDate");
+
   return {
     logbooks: params.get("logbooks")?.split(",") ?? DEFAULT_QUERY.logbooks,
     tags: params.get("tags")?.split(",") ?? DEFAULT_QUERY.tags,
-    startDate: params.get("startDate") ?? DEFAULT_QUERY.startDate,
-    endDate: params.get("endDate") ?? DEFAULT_QUERY.endDate,
+    startDate: startDate ? new Date(startDate) : DEFAULT_QUERY.startDate,
+    endDate: endDate ? new Date(endDate) : DEFAULT_QUERY.endDate,
     search: params.get("search") ?? DEFAULT_QUERY.search,
     sortByLogDate: params.has("sortByLogDate"),
   };

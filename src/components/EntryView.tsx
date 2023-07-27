@@ -66,11 +66,11 @@ export default function EntryView({ entry }: Props) {
         </div>
         <div>
           <div className="text-gray-500">
-            {entry.loggedAt === entry.eventAt
+            {entry.loggedAt.getTime() === entry.eventAt.getTime()
               ? "Event occurrend and logged at"
               : "Logged at "}
           </div>
-          {new Date(entry.loggedAt).toLocaleString("en-us", {
+          {entry.loggedAt.toLocaleString("en-us", {
             year: "numeric",
             month: "short",
             day: "numeric",
@@ -80,20 +80,21 @@ export default function EntryView({ entry }: Props) {
             hour12: false,
           })}
         </div>
-        {entry.eventAt && entry.eventAt !== entry.loggedAt && (
-          <div>
-            <div className="text-gray-500">Event occurrend at</div>
-            {new Date(entry.eventAt).toLocaleString("en-us", {
-              year: "numeric",
-              month: "short",
-              day: "numeric",
-              hour: "numeric",
-              minute: "numeric",
-              second: "numeric",
-              hour12: false,
-            })}
-          </div>
-        )}
+        {entry.eventAt &&
+          entry.eventAt.getTime() !== entry.loggedAt.getTime() && (
+            <div>
+              <div className="text-gray-500">Event occurrend at</div>
+              {entry.eventAt.toLocaleString("en-us", {
+                year: "numeric",
+                month: "short",
+                day: "numeric",
+                hour: "numeric",
+                minute: "numeric",
+                second: "numeric",
+                hour12: false,
+              })}
+            </div>
+          )}
         {entry.shift && (
           <div>
             <div className="text-gray-500">During</div>

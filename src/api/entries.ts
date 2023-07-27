@@ -6,8 +6,8 @@ export interface EntrySummary {
   tags: string[];
   title: string;
   loggedBy: string;
-  loggedAt: string;
-  eventAt: string;
+  loggedAt: Date;
+  eventAt: Date;
   shift: string;
 }
 
@@ -26,18 +26,21 @@ export interface EntryForm {
   logbook: string;
   tags: string[];
   attachments: string[];
-  eventAt?: string;
+  /**
+   * `null` meaning checked but no date
+   */
+  eventAt?: Date | null;
   summarize?: {
     shift: string;
     date: string;
   };
 }
 
-// Java is weird and doesn't add the Z at the end of its dates, so this is
-// what we gotta do
 function normalizeEntry<E extends Entry | EntrySummary>(entry: E): E {
-  entry.loggedAt = entry.loggedAt + "Z";
-  entry.eventAt = entry.eventAt + "Z";
+  // Java is weird and doesn't add the Z at the end of its dates, so this is
+  // what we gotta do
+  entry.loggedAt = new Date(entry.loggedAt + "Z");
+  entry.eventAt = new Date(entry.eventAt + "Z");
 
   if ("text" in entry) {
     if (entry.followUps) {
@@ -64,8 +67,8 @@ export async function fetchEntries({
   logbooks = [],
   tags = [],
 }: {
-  startDate?: string;
-  endDate?: string;
+  startDate?: Date;
+  endDate?: Date;
   limit?: number;
   contextSize?: number;
   search?: string;
@@ -79,11 +82,10 @@ export async function fetchEntries({
   };
 
   if (startDate) {
-    // Now, we have to remove the z added by normalizeEntry
-    params.startDate = startDate.split("Z")[0];
+    params.startDate = startDate.toISOString();
   }
   if (endDate) {
-    params.endDate = endDate.split("Z")[0];
+    params.endDate = endDate.toISOString();
   }
   if (limit) {
     params.limit = limit.toString();
@@ -119,7 +121,7 @@ export function createEntry(entry: EntryForm): Promise<string> {
   return fetch("entries", {
     method: "POST",
     body: entry.eventAt
-      ? { ...entry, eventAt: new Date(entry.eventAt).toISOString() }
+      ? { ...entry, eventAt: entry.eventAt.toISOString() }
       : entry,
   });
 }

@@ -34,6 +34,7 @@ import useAttachmentUploader, {
   LocalAttachment,
 } from "../hooks/useAttachmentUploader";
 import Spinner from "./Spinner";
+import dateToDatetimeString from "../utils/dateToDatetimeString";
 
 const EntryBodyTextEditor = lazy(() => import("./EntryBodyTextEditor"));
 
@@ -110,9 +111,7 @@ export default function EntryForm({
   const validators = {
     title: () => Boolean(draft.title),
     logbook: () => Boolean(draft.logbook),
-    // It can either be undefined (meaning off) or a valid time, but it can't
-    // be an empty string which signifies on with no time selected.
-    eventAt: () => Boolean(draft.eventAt !== ""),
+    eventAt: () => draft.eventAt !== null,
     shiftName: () => !draft.summarize || Boolean(draft.summarize.shift),
     shiftDate: () => !draft.summarize || Boolean(draft.summarize.date),
     // Ensure all attachments are downloaded
@@ -268,7 +267,7 @@ export default function EntryForm({
               onChange={() =>
                 updateDraft({
                   ...draft,
-                  eventAt: draft.eventAt === undefined ? "" : undefined,
+                  eventAt: draft.eventAt === undefined ? null : undefined,
                 })
               }
             />
@@ -278,9 +277,12 @@ export default function EntryForm({
             type="datetime-local"
             disabled={draft.eventAt === undefined}
             step="1"
-            value={draft.eventAt || ""}
+            value={draft.eventAt ? dateToDatetimeString(draft.eventAt) : ""}
             onChange={(e) =>
-              updateDraft({ ...draft, eventAt: e.currentTarget.value })
+              updateDraft({
+                ...draft,
+                eventAt: new Date(e.currentTarget.value),
+              })
             }
             className={cn(
               Input,

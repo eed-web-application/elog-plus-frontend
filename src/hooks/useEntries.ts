@@ -5,11 +5,12 @@ import { useEntriesStore } from "../entriesStore";
 const ENTRIES_PER_FETCH = 25;
 
 export interface EntryQuery {
+  // TODO: Instead of using sentinel values, use null
   search: string;
   logbooks: string[];
   tags: string[];
-  startDate: string;
-  endDate: string;
+  startDate: Date | null;
+  endDate: Date | null;
   sortByLogDate: boolean;
 }
 
@@ -46,7 +47,7 @@ export default function useEntries({
     const endDate = spotlightEntry.loggedAt;
 
     const newEntries = await fetchEntries({
-      startDate: startDate ? new Date(startDate).toISOString() : undefined,
+      startDate: startDate || undefined,
       endDate,
       contextSize: ENTRIES_PER_FETCH,
       limit: ENTRIES_PER_FETCH,
@@ -85,14 +86,13 @@ export default function useEntries({
       // and the backend only returns entries before the date, we make sure the
       // date is at the end of the day
       dateDayEnd.setUTCHours(23, 59, 59, 999);
-      dateDayEnd = dateDayEnd.toISOString();
     }
 
     const newEntries = await fetchEntries({
       search,
       logbooks,
       tags,
-      startDate: startDate ? new Date(startDate).toISOString() : undefined,
+      startDate: startDate || undefined,
       endDate: dateDayEnd,
       limit: ENTRIES_PER_FETCH,
       sortBy: sortByLogDate ? "loggedAt" : undefined,

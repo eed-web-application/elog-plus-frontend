@@ -284,14 +284,14 @@ export default function EntryRow({
         <div className="px-2 flex flex-col justify-center items-center w-16">
           {showDate && (
             <div className="text-sm">
-              {new Date(entry.loggedAt).toLocaleDateString("en-us", {
+              {entry.loggedAt.toLocaleDateString("en-us", {
                 month: "short",
                 day: "numeric",
               })}
             </div>
           )}
           <div className="leading-none">
-            {new Date(entry.loggedAt).toLocaleString("en-us", {
+            {entry.loggedAt.toLocaleString("en-us", {
               hour: "numeric",
               minute: "numeric",
               hour12: false,

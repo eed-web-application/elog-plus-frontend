@@ -6,6 +6,7 @@ import MultiSelectMenu from "./MultiSelectMenu.tsx";
 import { Input } from "./base.ts";
 import Chip from "./Chip.tsx";
 import FilterChipWithMenu from "./FilterChipWithMenu.tsx";
+import dateToDateString from "../utils/dateToDateString.ts";
 
 export type Filters = Pick<
   EntryQuery,
@@ -138,16 +139,16 @@ export default function Filters({ filters, setFilters }: Props) {
             : "From"
         }
         enabled={Boolean(filters.startDate)}
-        onDisable={() => setFilters({ ...filters, startDate: "" })}
+        onDisable={() => setFilters({ ...filters, startDate: null })}
         inline
       >
         <input
           className={Input}
           type="date"
           autoFocus
-          value={filters.startDate}
+          value={filters.startDate ? dateToDateString(filters.startDate) : ""}
           onChange={(e) =>
-            setFilters({ ...filters, startDate: e.target.value })
+            setFilters({ ...filters, startDate: new Date(e.target.value) })
           }
         />
       </FilterChipWithMenu>
@@ -155,7 +156,7 @@ export default function Filters({ filters, setFilters }: Props) {
         className="mr-3 mt-2"
         label={
           filters.endDate
-            ? new Date(filters.endDate).toLocaleDateString("en-us", {
+            ? filters.endDate.toLocaleDateString("en-us", {
                 timeZone: "UTC",
                 year: "numeric",
                 month: "long",
@@ -164,15 +165,17 @@ export default function Filters({ filters, setFilters }: Props) {
             : "To"
         }
         enabled={Boolean(filters.endDate)}
-        onDisable={() => setFilters({ ...filters, endDate: "" })}
+        onDisable={() => setFilters({ ...filters, endDate: null })}
         inline
       >
         <input
           className={Input}
           type="date"
           autoFocus
-          value={filters.endDate}
-          onChange={(e) => setFilters({ ...filters, endDate: e.target.value })}
+          value={filters.endDate ? dateToDateString(filters.endDate) : ""}
+          onChange={(e) =>
+            setFilters({ ...filters, endDate: new Date(e.target.value) })
+          }
         />
       </FilterChipWithMenu>
       <FilterChip
