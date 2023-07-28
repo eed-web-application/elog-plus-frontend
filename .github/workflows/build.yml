@@ -1,0 +1,71 @@
+name: Build docker image
+on: 
+  workflow_call:
+      secrets:
+          token:
+              required: false
+              
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+  
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout source code
+      uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+    - name: Install GitVersion
+      uses: gittools/actions/gitversion/setup@v0
+      with:
+        versionSpec: '5.x'
+    - name: Determine Version
+      id: gitversion
+      uses: gittools/actions/gitversion/execute@v0
+      with:
+        useConfigFile: true
+    - name: Manage Version
+      run: |
+        echo "Modify package.gradle with version number \"$GitVersion_Major.$GitVersion_Minor.$GitVersion_Patch\""
+        sed -i sed -i 's/"version": ".*"/"version": "$GitVersion_Major.$GitVersion_Minor.$GitVersion_Patch"/g' package.json
+        cat package.gradle
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v2
+    - name: Log in to the Container registry
+      uses: docker/login-action@v2
+      with:
+        registry: ${{ env.REGISTRY }}
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+    - name: Docker Metadata
+      id: meta
+      uses: docker/metadata-action@v4
+      with:
+        # list of Docker images to use as base name for tags
+        images: ${{env.REGISTRY }}/${{ env.IMAGE_NAME }}
+        # generate Docker tags based on the following events/attributes
+        tags: |
+          type=sha
+        labels: |
+          maintainer=boogie@slac.stanford.edu
+    - name: Build and push Docker image
+      uses: docker/build-push-action@v4
+      id: build_and_push
+      with:
+        context: .
+        file: ./Dockerfile
+        platforms: |
+          linux/amd64
+          linux/arm64/v8
+        provenance: false
+        push: true
+        tags: ${{ steps.meta.outputs.tags }}
+        labels: ${{ steps.meta.outputs.labels }}
+
