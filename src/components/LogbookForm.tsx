@@ -273,12 +273,18 @@ export default function LogbookForm({ logbook, onSave }: Props) {
                         "w-32"
                       )}
                       type="time"
-                      value={utcToLocal(form.shifts[index].from)}
+                      value={
+                        form.shifts[index].from
+                          ? utcToLocal(form.shifts[index].from)
+                          : ""
+                      }
                       onChange={(e) => {
                         const updatedShifts = [...form.shifts];
                         updatedShifts[index] = {
                           ...updatedShifts[index],
-                          from: localToUtc(e.currentTarget.value),
+                          from: e.currentTarget.value
+                            ? localToUtc(e.currentTarget.value)
+                            : "",
                         };
                         setForm({ ...form, shifts: updatedShifts });
                       }}
@@ -297,12 +303,18 @@ export default function LogbookForm({ logbook, onSave }: Props) {
                         "w-32"
                       )}
                       type="time"
-                      value={utcToLocal(form.shifts[index].to)}
+                      value={
+                        form.shifts[index].to
+                          ? utcToLocal(form.shifts[index].to)
+                          : ""
+                      }
                       onChange={(e) => {
                         const updatedShifts = [...form.shifts];
                         updatedShifts[index] = {
                           ...updatedShifts[index],
-                          to: localToUtc(e.currentTarget.value),
+                          to: e.currentTarget.value
+                            ? localToUtc(e.currentTarget.value)
+                            : "",
                         };
                         setForm({ ...form, shifts: updatedShifts });
                       }}
