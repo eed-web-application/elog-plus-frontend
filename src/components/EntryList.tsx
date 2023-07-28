@@ -137,7 +137,8 @@ export default function EntryList({
               <div className="flex justify-between items-center border-b gap-3 px-3 pt-1.5 pb-1 bg-gray-100 whitespace-nowrap">
                 {header}
                 {(headerKind === "shift" || headerKind === "logbookShift") &&
-                  allowSummarize && (
+                  allowSummarize &&
+                  entries[0].shift && (
                     <Link
                       to={{
                         pathname: "/new-entry",
