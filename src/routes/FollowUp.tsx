@@ -15,7 +15,7 @@ export default function FollowUp() {
       <EntryForm
         kind={["followingUp", entry]}
         onEntryCreated={(entryId) => {
-          invalidateEntry(entryId);
+          invalidateEntry(entry.id);
           navigate({ pathname: `/${entryId}`, search: window.location.search });
         }}
       />
