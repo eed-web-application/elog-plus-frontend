@@ -3,6 +3,7 @@ import cn from "classnames";
 import { Logbook, LogbookUpdation, Shift, updateLogbook } from "../api";
 import { Button, IconButton, Input, InputInvalid, InputSmall } from "./base";
 import { useLogbookFormsStore } from "../logbookFormsStore";
+import { localToUtc, utcToLocal } from "../utils/utcTimeConversion";
 
 interface Props {
   logbook: Logbook;
@@ -111,7 +112,7 @@ export default function LogbookForm({ logbook, onSave }: Props) {
       ...form,
       shifts: [
         ...form.shifts,
-        { id: `_${idCounter.toString()}`, name: newShift },
+        { id: `_${idCounter.toString()}`, name: newShift, from: "", to: "" },
       ],
     });
   }
@@ -272,12 +273,12 @@ export default function LogbookForm({ logbook, onSave }: Props) {
                         "w-32"
                       )}
                       type="time"
-                      value={form.shifts[index].from}
+                      value={utcToLocal(form.shifts[index].from)}
                       onChange={(e) => {
                         const updatedShifts = [...form.shifts];
                         updatedShifts[index] = {
                           ...updatedShifts[index],
-                          from: e.currentTarget.value,
+                          from: localToUtc(e.currentTarget.value),
                         };
                         setForm({ ...form, shifts: updatedShifts });
                       }}
@@ -296,12 +297,12 @@ export default function LogbookForm({ logbook, onSave }: Props) {
                         "w-32"
                       )}
                       type="time"
-                      value={form.shifts[index].to}
+                      value={utcToLocal(form.shifts[index].to)}
                       onChange={(e) => {
                         const updatedShifts = [...form.shifts];
                         updatedShifts[index] = {
                           ...updatedShifts[index],
-                          to: e.currentTarget.value,
+                          to: localToUtc(e.currentTarget.value),
                         };
                         setForm({ ...form, shifts: updatedShifts });
                       }}

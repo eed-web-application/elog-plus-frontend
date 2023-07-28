@@ -5,7 +5,7 @@ import { Logbook, Shift, Tag } from "./api";
  * Shift that has not been uploaded to the server yet. `id`s starting with an
  * underscore are not uploaded yet.
  */
-interface LocalShift extends Omit<Partial<Shift>, "id"> {
+interface LocalShift extends Omit<Shift, "id"> {
   id: string | `_${string}`;
   name: string;
 }
