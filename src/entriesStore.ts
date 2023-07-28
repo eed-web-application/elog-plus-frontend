@@ -8,6 +8,7 @@ interface EntriesState {
   entries: { [id: string]: Entry };
   getOrFetch: (id: string) => Promise<Entry>;
   fetch: (id: string) => Promise<Entry>;
+  invalidate: (id: string) => void;
 }
 
 export const useEntriesStore = create<EntriesState>((set, get) => ({
@@ -26,5 +27,12 @@ export const useEntriesStore = create<EntriesState>((set, get) => ({
     const entry = await fetchEntry(id);
     set((state) => ({ ...state, entries: { ...state.entries, [id]: entry } }));
     return entry;
+  },
+  invalidate: (id: string) => {
+    set(({ entries }) => {
+      const { [id]: _removed, ...rest } = entries;
+
+      return { entries: rest };
+    });
   },
 }));
