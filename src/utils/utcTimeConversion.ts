@@ -5,15 +5,20 @@ export function utcToLocal(utcTime: string) {
   now.setUTCHours(hour);
   now.setUTCMinutes(minute);
 
-  return now.toLocaleTimeString("en-US", {
+  const date = now.toLocaleTimeString("en-US", {
     hour: "2-digit",
     minute: "2-digit",
     hour12: false,
   });
+
+  if (date.split(":")[0] === "24") {
+    return `00:${date.split(":")[1]}`;
+  }
+  return date;
 }
 
 export function localToUtc(localTime: string) {
-  return new Date(`${new Date().toISOString().split("T")[0]}T${localTime}Z`)
+  return new Date(`${new Date().toISOString().split("T")[0]}T${localTime}`)
     .toISOString()
     .split("T")[1]
     .slice(0, 5);
