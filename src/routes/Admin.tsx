@@ -6,14 +6,13 @@ import useIsSmallScreen from "../hooks/useIsSmallScreen";
 import cn from "classnames";
 import LogbookForm from "../components/LogbookForm";
 import { useLogbookFormsStore } from "../logbookFormsStore";
+import { Link, useParams } from "react-router-dom";
 
 const MIN_PANE_WIDTH = 384;
 
 export default function Admin() {
   const [logbooks, setLogbooks] = useState<Logbook[] | null>(null);
-  const [selectedLogbookId, setSelectedLogbookId] = useState<string | null>(
-    null
-  );
+  const { logbookId: selectedLogbookId } = useParams();
   const selectedLogbook = logbooks?.find(({ id }) => id === selectedLogbookId);
   const logbooksEdited = useLogbookFormsStore((state) =>
     Object.keys(state.forms)
@@ -64,21 +63,21 @@ export default function Admin() {
         <div className="text-xl mb-2 font-normal text-gray-500">Logbooks</div>
         {logbooks ? (
           logbooks.map((logbook) => (
-            <div
+            <Link
               key={logbook.id}
+              to={`/admin/${logbook.id}`}
               tabIndex={0}
               className={cn(
                 "p-2 hover:bg-gray-100 cursor-pointer",
                 selectedLogbook?.id === logbook.id &&
                   "bg-blue-100 hover:!bg-blue-200"
               )}
-              onClick={() => setSelectedLogbookId(logbook.id)}
             >
               {logbook.name}
               <span className="text-gray-500">
                 {logbooksEdited.includes(logbook.id) && "*"}
               </span>
-            </div>
+            </Link>
           ))
         ) : (
           <Spinner className="self-center" />
@@ -95,7 +94,7 @@ export default function Admin() {
         className={cn("pb-3", !isSmallScreen && "flex-1 flex-shrink")}
         style={{ minWidth: isSmallScreen ? "auto" : MIN_PANE_WIDTH }}
       >
-        <Pane>
+        <Pane home="/admin">
           {selectedLogbook && (
             <LogbookForm logbook={selectedLogbook} onSave={refresh} />
           )}

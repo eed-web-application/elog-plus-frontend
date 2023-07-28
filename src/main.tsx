@@ -13,8 +13,8 @@ import NewEntry from "./routes/NewEntry.tsx";
 import { useEntriesStore } from "./entriesStore.ts";
 import ViewEntry from "./routes/ViewEntry.tsx";
 import ErrorBoundary from "./routes/ErrorBoundary";
-import "./index.css";
 import Admin from "./routes/Admin.tsx";
+import "./index.css";
 
 function entryLoader({ params }: { params: Params }) {
   if (params.entryId) {
@@ -32,36 +32,44 @@ function shouldRevalidate({
 
 const router = createBrowserRouter([
   {
-    path: "/admin",
-    errorElement: <ErrorBoundary />,
-    element: <Admin />,
-  },
-  {
-    path: "/",
-    element: <Home />,
     errorElement: <ErrorBoundary />,
     children: [
       {
-        path: ":entryId/supersede",
-        loader: entryLoader,
-        shouldRevalidate,
-        element: <Supersede />,
+        path: "/admin",
+        element: <Admin />,
       },
       {
-        path: ":entryId/follow-up",
-        loader: entryLoader,
-        shouldRevalidate,
-        element: <FollowUp />,
+        path: "/admin/:logbookId",
+        element: <Admin />,
       },
       {
-        path: ":entryId",
-        loader: entryLoader,
-        shouldRevalidate,
-        element: <ViewEntry />,
-      },
-      {
-        path: "new-entry",
-        element: <NewEntry />,
+        path: "/",
+        element: <Home />,
+        errorElement: <ErrorBoundary />,
+        children: [
+          {
+            path: ":entryId/supersede",
+            loader: entryLoader,
+            shouldRevalidate,
+            element: <Supersede />,
+          },
+          {
+            path: ":entryId/follow-up",
+            loader: entryLoader,
+            shouldRevalidate,
+            element: <FollowUp />,
+          },
+          {
+            path: ":entryId",
+            loader: entryLoader,
+            shouldRevalidate,
+            element: <ViewEntry />,
+          },
+          {
+            path: "new-entry",
+            element: <NewEntry />,
+          },
+        ],
       },
     ],
   },

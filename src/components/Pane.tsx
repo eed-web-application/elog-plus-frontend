@@ -1,6 +1,6 @@
 import cn from "classnames";
 import { PropsWithChildren, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, To, useNavigate } from "react-router-dom";
 import { BackDrop, IconButton } from "./base";
 import IsPaneFullscreenContext from "../IsPaneFullscreenContext";
 import {
@@ -17,6 +17,7 @@ import useIsSmallScreen from "../hooks/useIsSmallScreen";
 type Props = {
   fullscreenByDefault?: boolean;
   explicitHeader?: boolean;
+  home?: To;
 };
 
 /**
@@ -27,6 +28,7 @@ export default function Pane({
   children,
   fullscreenByDefault = false,
   explicitHeader = true,
+  home = { pathname: "/", search: window.location.search },
 }: PropsWithChildren<Props>) {
   const [explicitFullscreen, setExplicitFullscreen] =
     useState(fullscreenByDefault);
@@ -44,7 +46,7 @@ export default function Pane({
       }
 
       if (isSmallScreen) {
-        navigate({ pathname: "/", search: window.location.search });
+        navigate(home);
       } else {
         setExplicitFullscreen(false);
       }
@@ -99,8 +101,7 @@ export default function Pane({
         )}
         {fullscreen ? (
           <Link
-            // We close the pane by redirecting to the root: "/"
-            to={{ pathname: "/", search: window.location.search }}
+            to={home}
             onClick={
               isSmallScreen
                 ? undefined
@@ -126,7 +127,7 @@ export default function Pane({
             </svg>
           </Link>
         ) : (
-          <Link to={{ pathname: "/", search: window.location.search }}>
+          <Link to={home}>
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
