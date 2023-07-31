@@ -104,7 +104,7 @@ export const useDraftsStore = create(
       name: "draft-store",
       version: 0,
       storage: createJSONStorage(() => localStorage, {
-        replacer: (key, value) => {
+        reviver: (key, value) => {
           if (key !== "drafts") {
             return value;
           }
