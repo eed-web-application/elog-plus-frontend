@@ -91,7 +91,7 @@ export async function fetchEntries({
     params.contextSize = contextSize.toString();
   }
   if (search) {
-    params.textFilter = search;
+    params.search = search;
   }
   if (sortBy) {
     params.sortBy = sortBy;
