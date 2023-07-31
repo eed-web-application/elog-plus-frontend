@@ -27,6 +27,7 @@ import EntryBodyText from "./EntryBodyText";
 import Tooltip from "./Tooltip";
 import EntryFigureList from "./EntryFigureList";
 import useSpotlightProps from "../hooks/useSpotlightProps";
+import { useDraftsStore } from "../draftsStore";
 
 function RowButton({
   children,
@@ -34,6 +35,7 @@ function RowButton({
   entrySelected,
   entryHighlighted,
   onClick,
+  marked = false,
   ...rest
 }: PropsWithChildren<
   LinkProps & {
@@ -41,6 +43,7 @@ function RowButton({
     active?: boolean;
     entrySelected?: boolean;
     entryHighlighted?: boolean;
+    marked?: boolean;
   }
 >) {
   return (
@@ -48,7 +51,7 @@ function RowButton({
       <Link
         className={cn(
           IconButton,
-          "rounded-full z-0",
+          "rounded-full z-0 relative",
           entrySelected && !entryHighlighted && "hover:!bg-blue-200",
           entryHighlighted && "hover:bg-yellow-300"
         )}
@@ -60,6 +63,11 @@ function RowButton({
         {...rest}
       >
         {children}
+        {marked && (
+          <div className="absolute top-0.5 right-0.5 text-sm text-gray-500">
+            *
+          </div>
+        )}
       </Link>
     </Tooltip>
   );
@@ -247,6 +255,13 @@ export default function EntryRow({
 
   const getOrFetch = useEntriesStore((state) => state.getOrFetch);
 
+  const [hasFollowUpDraft, hasSupersedingDraft] = useDraftsStore(
+    ({ drafts }) => [
+      Boolean(drafts[`followUp/${entry.id}`]),
+      Boolean(drafts[`supersede/${entry.id}`]),
+    ]
+  );
+
   async function toggleExpand(e: React.MouseEvent<SVGSVGElement, MouseEvent>) {
     e.stopPropagation();
 
@@ -355,6 +370,7 @@ export default function EntryRow({
                 }}
                 entrySelected={selected}
                 entryHighlighted={spotlight}
+                marked={hasSupersedingDraft}
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -382,6 +398,7 @@ export default function EntryRow({
                 }}
                 entrySelected={selected}
                 entryHighlighted={spotlight}
+                marked={hasFollowUpDraft}
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"

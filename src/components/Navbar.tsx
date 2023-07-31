@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import elogLogo from "../assets/temp_elog_logo.png";
 import { Button, Input } from "./base";
 import { ComponentProps, useEffect, useState } from "react";
+import { useDraftsStore } from "../draftsStore";
 
 interface Props extends ComponentProps<"div"> {
   search: string;
@@ -16,6 +17,9 @@ export default function Navbar({
   ...rest
 }: Props) {
   const [stagedSearch, setStagedSearch] = useState(search);
+  const hasNewEntryDraft = useDraftsStore(({ drafts }) =>
+    Boolean(drafts["newEntry"])
+  );
 
   useEffect(() => {
     setStagedSearch(search);
@@ -65,9 +69,12 @@ export default function Navbar({
       </form>
       <Link
         to={{ pathname: "/new-entry", search: window.location.search }}
-        className={Button}
+        className={cn(Button, "relative")}
       >
         New Entry
+        {hasNewEntryDraft && (
+          <div className="w-4 h-4 translate-x-1.5 -translate-y-1.5 p-[3px] shadow-xl bg-gray-200 rounded-full absolute top-0 right-0 text-black"></div>
+        )}
       </Link>
     </div>
   );

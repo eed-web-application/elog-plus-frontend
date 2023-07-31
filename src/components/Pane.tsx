@@ -16,7 +16,6 @@ import useIsSmallScreen from "../hooks/useIsSmallScreen";
 
 type Props = {
   fullscreenByDefault?: boolean;
-  explicitHeader?: boolean;
   home?: To;
 };
 
@@ -27,7 +26,6 @@ type Props = {
 export default function Pane({
   children,
   fullscreenByDefault = false,
-  explicitHeader = true,
   home = { pathname: "/", search: window.location.search },
 }: PropsWithChildren<Props>) {
   const [explicitFullscreen, setExplicitFullscreen] =
@@ -74,12 +72,7 @@ export default function Pane({
         fullscreen && "bg-white mt-6 rounded-lg w-auto"
       )}
     >
-      <div
-        className={cn(
-          "flex items-center px-1 py-1",
-          explicitHeader ? "justify-end" : "float-right"
-        )}
-      >
+      <div className="flex items-center pr-1 py-1 float-right">
         {fullscreen || (
           <svg
             xmlns="http://www.w3.org/2000/svg"
