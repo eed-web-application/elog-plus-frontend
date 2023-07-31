@@ -79,10 +79,10 @@ export async function fetchEntries({
   };
 
   if (startDate) {
-    params.startDate = startDate.toISOString();
+    params.startDate = startDate.toISOString().slice(0, -1);
   }
   if (endDate) {
-    params.endDate = endDate.toISOString();
+    params.endDate = endDate.toISOString().slice(0, -1);
   }
   if (limit) {
     params.limit = limit.toString();
