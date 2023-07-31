@@ -2,12 +2,27 @@ import cn from "classnames";
 import { Link } from "react-router-dom";
 import elogLogo from "../assets/temp_elog_logo.png";
 import { Button, Input } from "./base";
-import { ComponentProps, useEffect, useState } from "react";
+import { ComponentProps, useEffect, useMemo, useState } from "react";
 import { useDraftsStore } from "../draftsStore";
 
 interface Props extends ComponentProps<"div"> {
   search: string;
   onSearchChange: (search: string) => void;
+}
+
+function debounce<A extends unknown[]>(
+  func: (...args: A) => void,
+  timeout: number
+): (...args: A) => void {
+  let timer: number;
+
+  return (...args: A) => {
+    clearTimeout(timer);
+    timer = setTimeout(() => {
+      func(...args);
+    }, timeout);
+    console.log(timer);
+  };
 }
 
 export default function Navbar({
@@ -20,6 +35,16 @@ export default function Navbar({
   const hasNewEntryDraft = useDraftsStore(({ drafts }) =>
     Boolean(drafts["newEntry"])
   );
+
+  const debouncedOnSearchChange = useMemo(
+    () => debounce(onSearchChange, 500),
+    [onSearchChange]
+  );
+
+  function searchFor(value: string) {
+    setStagedSearch(value);
+    debouncedOnSearchChange(value);
+  }
 
   useEffect(() => {
     setStagedSearch(search);
@@ -43,7 +68,7 @@ export default function Navbar({
             className={cn("block w-full", Input)}
             placeholder="Search..."
             value={stagedSearch}
-            onChange={(e) => setStagedSearch(e.target.value)}
+            onChange={(e) => searchFor(e.target.value)}
           />
           <button
             type="submit"
