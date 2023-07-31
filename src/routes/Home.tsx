@@ -9,6 +9,7 @@ import useEntries from "../hooks/useEntries";
 import useIsSmallScreen from "../hooks/useIsSmallScreen";
 import { EntryQuery } from "../hooks/useEntries";
 import { URLSearchParamsInit } from "react-router-dom";
+import dateToDateString from "../utils/dateToDateString";
 
 const DEFAULT_QUERY: EntryQuery = {
   logbooks: [],
@@ -37,9 +38,14 @@ function deserializeQuery(params: URLSearchParams): EntryQuery {
 
 function serializeQuery(query: EntryQuery): URLSearchParamsInit {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  return Object.entries(query).filter(([_, value]) =>
-    Array.isArray(value) ? value.length > 0 : Boolean(value)
-  );
+  return Object.entries(query)
+    .filter(([_, value]) =>
+      Array.isArray(value) ? value.length > 0 : Boolean(value)
+    )
+    .map(([key, value]) => [
+      key,
+      value instanceof Date ? value.toISOString().split("T")[0] : value,
+    ]);
 }
 
 export default function Home() {
