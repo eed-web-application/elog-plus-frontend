@@ -66,6 +66,13 @@ export const useDraftsStore = create(
           draftId = `supersede/${factory[1].id}`;
 
           defaultDraft = factory[1];
+
+          // If eventAt is the same as loggedAt, then we consider
+          // it as there being no explicit event time and and thus we ensure
+          // eventAt is undefined or deleted
+          if (factory[1].eventAt.getTime() === factory[1].loggedAt.getTime()) {
+            defaultDraft = { ...defaultDraft, eventAt: undefined };
+          }
         } else {
           draftId = `followUp/${factory[1].id}`;
 
