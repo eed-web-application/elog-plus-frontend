@@ -30,8 +30,10 @@ export default function MultiSelect({
   onFocus,
   ...rest
 }: Props) {
-  const [search, setSearch] = useState("");
+  const [untrimedSearch, setSearch] = useState("");
   const [focused, setFocused] = useState(false);
+
+  const search = untrimedSearch.trim();
 
   const filteredOptions = predefinedOptions.filter(
     (option) =>
@@ -134,7 +136,7 @@ export default function MultiSelect({
           {...rest}
           type="text"
           placeholder={value && !placeholder ? "" : placeholder}
-          value={search}
+          value={untrimedSearch}
           className="flex-1 outline-none bg-transparent w-fit my-1"
           onChange={(e) => setSearch(e.target.value)}
           onFocus={(e) => {
@@ -146,7 +148,7 @@ export default function MultiSelect({
             setFocused(false);
           }}
           onKeyDown={onInputKeyDown}
-          size={search.length + 1}
+          size={untrimedSearch.length + 1}
           disabled={disabled}
         />
       </div>
