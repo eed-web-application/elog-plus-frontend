@@ -6,6 +6,7 @@ import useSelectCursor from "../hooks/useSelectCursor";
 
 export interface Props {
   selected: string[];
+  onOptionSelected?: (option: string) => void;
   setSelected: (options: string[]) => void;
   options: string[];
   isLoading: boolean;
@@ -17,6 +18,7 @@ export interface Props {
 export default function MultiSelectMenu({
   selected,
   setSelected,
+  onOptionSelected,
   options,
   isLoading,
 }: Props) {
@@ -30,6 +32,7 @@ export default function MultiSelectMenu({
     if (selected.includes(option)) {
       setSelected(selected.filter((x) => x !== option));
     } else {
+      onOptionSelected?.(option);
       setSelected([...selected, option]);
     }
   }

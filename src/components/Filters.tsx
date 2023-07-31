@@ -7,6 +7,7 @@ import { Input } from "./base.ts";
 import Chip from "./Chip.tsx";
 import FilterChipWithMenu from "./FilterChipWithMenu.tsx";
 import dateToDateString from "../utils/dateToDateString.ts";
+import { useTagUsageStore } from "../tagUsageStore.ts";
 
 export type Filters = Pick<
   EntryQuery,
@@ -22,7 +23,11 @@ export default function Filters({ filters, setFilters }: Props) {
   const [logbooks, setLogbooks] = useState<string[] | null>(null);
   const [tagsLoaded, setTagsLoaded] = useState<Record<string, string[]>>({});
   const logbooksAsKey = filters.logbooks.join(",");
-  const tags = tagsLoaded[logbooksAsKey];
+  const tags = [...new Set(tagsLoaded[logbooksAsKey])];
+  const [bumpTag, sortTagsByMostRecent] = useTagUsageStore((state) => [
+    state.bump,
+    state.sortByMostRecent,
+  ]);
 
   useEffect(() => {
     if (!logbooks) {
@@ -32,8 +37,9 @@ export default function Filters({ filters, setFilters }: Props) {
     }
   }, [logbooks]);
 
+  const hasTagsLoaded = logbooksAsKey in tagsLoaded;
   const loadTags = useCallback(() => {
-    if (!tags) {
+    if (!hasTagsLoaded) {
       fetchTags({ logbooks: filters.logbooks }).then((tags) =>
         setTagsLoaded((tagsLoaded) => ({
           ...tagsLoaded,
@@ -41,7 +47,7 @@ export default function Filters({ filters, setFilters }: Props) {
         }))
       );
     }
-  }, [logbooksAsKey, filters.logbooks, tags]);
+  }, [logbooksAsKey, filters.logbooks, hasTagsLoaded]);
 
   const logbookFilterLabel = useCallback(() => {
     if (filters.logbooks.length === 0) {
@@ -122,8 +128,9 @@ export default function Filters({ filters, setFilters }: Props) {
         <MultiSelectMenu
           selected={filters.tags}
           setSelected={(selected) => setFilters({ ...filters, tags: selected })}
+          onOptionSelected={bumpTag}
           isLoading={tags === null}
-          options={tags || []}
+          options={sortTagsByMostRecent(tags || [])}
         />
       </FilterChipWithMenu>
       <FilterChipWithMenu
