@@ -157,7 +157,7 @@ export default function EntryView({ entry }: Props) {
       {entry.history && entry.history.length > 0 && (
         <>
           <TextDivider>History</TextDivider>
-          <div className="px-3 pb-3">
+          <div className="mt-3 px-3 pb-3">
             <EntryList
               entries={entry.history}
               showEntryDates
@@ -170,7 +170,7 @@ export default function EntryView({ entry }: Props) {
       {entry.followUps.length > 0 && (
         <>
           <TextDivider>Follow Ups</TextDivider>
-          <div className="px-3 pb-3">
+          <div className="mt-3 px-3 pb-3">
             <EntryList
               entries={entry.followUps}
               showEntryDates
