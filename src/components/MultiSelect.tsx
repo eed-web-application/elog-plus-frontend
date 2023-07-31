@@ -41,9 +41,9 @@ export default function MultiSelect({
       !value.includes(option)
   );
 
-  const exactMatch = predefinedOptions.find(
-    (option) => option.toLowerCase() === search.toLowerCase()
-  );
+  const exactMatch = predefinedOptions
+    .concat(value)
+    .find((option) => option.toLowerCase() === search.toLowerCase());
 
   const showCreateButton = search && !exactMatch;
 
