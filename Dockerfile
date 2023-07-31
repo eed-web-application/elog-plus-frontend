@@ -1,7 +1,11 @@
 FROM node:16-alpine as builder
 
+ARG API_ENDPOINT
+ENV API_ENDPOINT $API_ENDPOINT
+
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
+
 RUN corepack enable
 
 COPY . ./app
