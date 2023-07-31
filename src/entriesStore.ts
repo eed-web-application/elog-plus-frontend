@@ -30,6 +30,7 @@ export const useEntriesStore = create<EntriesState>((set, get) => ({
   },
   invalidate: (id: string) => {
     set(({ entries }) => {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { [id]: _removed, ...rest } = entries;
 
       return { entries: rest };
