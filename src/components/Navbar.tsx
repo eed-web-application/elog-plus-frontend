@@ -21,7 +21,6 @@ function debounce<A extends unknown[]>(
     timer = setTimeout(() => {
       func(...args);
     }, timeout);
-    console.log(timer);
   };
 }
 
