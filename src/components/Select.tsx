@@ -1,7 +1,7 @@
 import { ComponentProps, useEffect, useState } from "react";
 import cn from "classnames";
 import { Input, InputDisabled, InputInvalid } from "./base";
-import { size, useFloating } from "@floating-ui/react";
+import { autoUpdate, size, useFloating } from "@floating-ui/react";
 import Spinner from "./Spinner";
 import useSelectCursor from "../hooks/useSelectCursor";
 
@@ -49,6 +49,7 @@ export default function Select({
         },
       }),
     ],
+    whileElementsMounted: autoUpdate,
   });
 
   useEffect(() => {

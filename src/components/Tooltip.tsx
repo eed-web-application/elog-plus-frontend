@@ -91,7 +91,7 @@ export default function Tooltip({
       {isOpen && (
         <FloatingPortal>
           <div
-            className="px-3 py-2 text-sm font-medium text-white transition-opacity duration-300 bg-gray-900 rounded-lg shadow-sm"
+            className="px-3 py-2 text-sm font-medium text-white transition-opacity duration-300 bg-gray-900 rounded-lg shadow-sm z-10"
             ref={refs.setFloating}
             style={floatingStyles}
             id={id}
