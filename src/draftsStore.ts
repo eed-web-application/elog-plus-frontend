@@ -102,16 +102,27 @@ export const useDraftsStore = create(
     }),
     {
       name: "draft-store",
+      version: 0,
       storage: createJSONStorage(() => localStorage, {
         replacer: (key, value) => {
           if (key !== "drafts") {
-            return;
+            return value;
           }
 
-          return (value as Draft[]).map(({ eventAt, ...draft }) => ({
-            ...draft,
-            eventAt: eventAt ? new Date(eventAt) : undefined,
-          }));
+          for (const draft of Object.values(
+            value as Record<
+              string,
+              Omit<Draft, "eventAt"> & {
+                eventAt?: string | null | Date;
+              }
+            >
+          )) {
+            draft.eventAt = draft.eventAt
+              ? new Date(draft.eventAt)
+              : draft.eventAt;
+          }
+
+          return value;
         },
       }),
     }
