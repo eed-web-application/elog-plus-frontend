@@ -2,30 +2,11 @@ import { Link, useRouteError } from "react-router-dom";
 import cn from "classnames";
 import { NotFoundError } from "../api";
 import { Link as LinkStyle } from "../components/base";
-import { useCallback, useEffect, useState } from "react";
 
 export default function ErrorBoundary() {
-  console.log("Test");
-  const [asyncError, setAsyncError] = useState(null);
   const routeError = useRouteError();
 
-  const error = routeError || asyncError;
-
-  console.log("test");
-  const promiseRejectionHandler = useCallback(
-    (event: PromiseRejectionEvent) => {
-      setAsyncError(event.reason);
-    },
-    []
-  );
-
-  useEffect(() => {
-    window.addEventListener("unhandledrejection", promiseRejectionHandler);
-
-    return () => {
-      window.removeEventListener("unhandledrejection", promiseRejectionHandler);
-    };
-  }, []);
+  const error = routeError;
 
   let is404 = false;
 
