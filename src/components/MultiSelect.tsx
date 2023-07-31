@@ -9,6 +9,7 @@ import useSelectCursor from "../hooks/useSelectCursor";
 interface Props extends Omit<ComponentProps<"input">, "value"> {
   value: string[];
   setValue: (value: string[]) => void;
+  onOptionSelected: (option: string) => void;
   predefinedOptions: string[];
   isLoading?: boolean;
   invalid?: boolean;
@@ -18,6 +19,7 @@ interface Props extends Omit<ComponentProps<"input">, "value"> {
 export default function MultiSelect({
   value,
   setValue,
+  onOptionSelected,
   predefinedOptions,
   isLoading,
   className,
@@ -71,6 +73,7 @@ export default function MultiSelect({
     }
     setSearch("");
     setValue([...value, search]);
+    onOptionSelected(search);
   }
 
   function toggleSelection(option: string) {
@@ -79,6 +82,7 @@ export default function MultiSelect({
       setValue(value.filter((otherOption) => otherOption !== option));
     } else {
       setValue([...value, option]);
+      onOptionSelected(option);
     }
   }
 

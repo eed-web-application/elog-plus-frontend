@@ -35,6 +35,7 @@ import useAttachmentUploader, {
 } from "../hooks/useAttachmentUploader";
 import Spinner from "./Spinner";
 import dateToDatetimeString from "../utils/dateToDatetimeString";
+import { useTagUsageStore } from "../tagUsageStore";
 
 const EntryBodyTextEditor = lazy(() => import("./EntryBodyTextEditor"));
 
@@ -63,6 +64,10 @@ export default function EntryForm({
     upload: uploadAttachment,
     cancel: cancelUploadingAttachment,
   } = useAttachmentUploader();
+  const [bumpTag, sortTagsByMostRecent] = useTagUsageStore((state) => [
+    state.bump,
+    state.sortByMostRecent,
+  ]);
 
   let tags: string[] | undefined;
   if (draft.logbook) {
@@ -255,7 +260,8 @@ export default function EntryForm({
             <MultiSelect
               disabled={!tags}
               isLoading={!tags}
-              predefinedOptions={tags || []}
+              predefinedOptions={tags ? sortTagsByMostRecent(tags) : []}
+              onOptionSelected={bumpTag}
               value={draft.tags}
               setValue={(tags) => updateDraft({ ...draft, tags: tags || [] })}
             />
