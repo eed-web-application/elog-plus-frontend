@@ -112,7 +112,7 @@ export default function MultiSelect({
         disabled && InputDisabled,
         focused && "outline-none ring-1 ring-blue-500 border-blue-500",
         className,
-        "flex pb-1 pt-1"
+        "flex"
       )}
       ref={refs.setReference}
     >
@@ -120,7 +120,7 @@ export default function MultiSelect({
         {value.map((option) => (
           <Chip
             delectable
-            className="mr-2 my-1"
+            className="mr-2"
             key={option}
             onMouseDown={(e) => {
               e.preventDefault();
@@ -137,7 +137,7 @@ export default function MultiSelect({
           type="text"
           placeholder={value && !placeholder ? "" : placeholder}
           value={untrimedSearch}
-          className="flex-1 outline-none bg-transparent w-fit my-1"
+          className="flex-1 outline-none bg-transparent w-fit"
           onChange={(e) => setSearch(e.target.value)}
           onFocus={(e) => {
             onFocus?.(e);

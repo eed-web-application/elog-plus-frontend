@@ -61,7 +61,7 @@ const FilterChip = forwardRef<HTMLButtonElement, PropsWithChildren<Props>>(
             />
           </svg>
         )}
-        <div className="py-1.5 whitespace-nowrap">{label}</div>
+        <div className="py-1 whitespace-nowrap">{label}</div>
         {onDisable && enabled && (
           <svg
             xmlns="http://www.w3.org/2000/svg"

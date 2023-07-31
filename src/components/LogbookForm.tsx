@@ -1,7 +1,7 @@
 import { FormEvent, useState } from "react";
 import cn from "classnames";
 import { Logbook, LogbookUpdation, Shift, updateLogbook } from "../api";
-import { Button, IconButton, Input, InputInvalid, InputSmall } from "./base";
+import { Button, IconButton, Input, InputInvalid } from "./base";
 import { useLogbookFormsStore } from "../logbookFormsStore";
 import { localToUtc, utcToLocal } from "../utils/utcTimeConversion";
 
@@ -249,7 +249,7 @@ export default function LogbookForm({ logbook, onSave }: Props) {
                   <input
                     type="text"
                     className={cn(
-                      InputSmall,
+                      Input,
                       invalid.includes(`shiftName/${shift.id}`) && InputInvalid,
                       "flex-1 min-w-0"
                     )}
@@ -267,7 +267,7 @@ export default function LogbookForm({ logbook, onSave }: Props) {
                   <div className="gap-2 self-end flex items-center">
                     <input
                       className={cn(
-                        InputSmall,
+                        Input,
                         invalid.includes(`shiftFrom/${shift.id}`) &&
                           InputInvalid,
                         "w-32"
@@ -298,7 +298,7 @@ export default function LogbookForm({ logbook, onSave }: Props) {
                     <div className="text-gray-500">to</div>
                     <input
                       className={cn(
-                        InputSmall,
+                        Input,
                         invalid.includes(`shiftTo/${shift.id}`) && InputInvalid,
                         "w-32"
                       )}
