@@ -6,6 +6,8 @@ import {
   RouterProvider,
   ShouldRevalidateFunction,
 } from "react-router-dom";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import Home from "./routes/Home.tsx";
 import Supersede from "./routes/Supersede.tsx";
 import FollowUp from "./routes/FollowUp.tsx";
@@ -78,5 +80,6 @@ const router = createBrowserRouter([
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
   <React.StrictMode>
     <RouterProvider router={router} />
+    <ToastContainer hideProgressBar={true} />
   </React.StrictMode>
 );

@@ -3,6 +3,7 @@ import EntryForm from "../components/EntryForm";
 import Pane from "../components/Pane";
 import { useDraftsStore } from "../draftsStore";
 import { useEffect } from "react";
+import { toast } from "react-toastify";
 
 export default function NewEntry() {
   const { state: customDraftProperties } = useLocation();
@@ -20,9 +21,10 @@ export default function NewEntry() {
     <Pane>
       <EntryForm
         kind="newEntry"
-        onEntryCreated={(entryId) =>
-          navigate({ pathname: `/${entryId}`, search: window.location.search })
-        }
+        onEntryCreated={(entryId) => {
+          toast.success("Created entry", { autoClose: 1000 });
+          navigate({ pathname: `/${entryId}`, search: window.location.search });
+        }}
       />
     </Pane>
   );

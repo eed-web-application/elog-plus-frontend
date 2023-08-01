@@ -3,6 +3,7 @@ import EntryForm from "../components/EntryForm";
 import Pane from "../components/Pane";
 import { Entry } from "../api";
 import { useEntriesStore } from "../entriesStore";
+import { toast } from "react-toastify";
 
 export default function FollowUp() {
   const navigate = useNavigate();
@@ -15,6 +16,7 @@ export default function FollowUp() {
       <EntryForm
         kind={["followingUp", entry]}
         onEntryCreated={(entryId) => {
+          toast.success("Followed up entry");
           invalidateEntry(entry.id);
           navigate({ pathname: `/${entryId}`, search: window.location.search });
         }}

@@ -6,6 +6,7 @@ import useIsSmallScreen from "../hooks/useIsSmallScreen";
 import cn from "classnames";
 import LogbookForm from "../components/LogbookForm";
 import { useLogbookFormsStore } from "../logbookFormsStore";
+import { toast } from "react-toastify";
 import { Link, useParams } from "react-router-dom";
 
 const MIN_PANE_WIDTH = 384;
@@ -49,6 +50,11 @@ export default function Admin() {
     document.addEventListener("mousemove", mouseMoveHandler);
     document.addEventListener("mouseup", endDrag);
   }, [mouseMoveHandler, endDrag]);
+
+  const onSave = useCallback(() => {
+    refresh();
+    toast.success("Saved logbook");
+  }, [refresh]);
 
   return (
     <div className="flex max-h-screen">
@@ -97,7 +103,7 @@ export default function Admin() {
         <Pane home="/admin">
           <br className="w-full" />
           {selectedLogbook && (
-            <LogbookForm logbook={selectedLogbook} onSave={refresh} />
+            <LogbookForm logbook={selectedLogbook} onSave={onSave} />
           )}
         </Pane>
       </div>
