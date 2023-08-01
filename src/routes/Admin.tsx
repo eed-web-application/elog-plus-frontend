@@ -95,6 +95,7 @@ export default function Admin() {
         style={{ minWidth: isSmallScreen ? "auto" : MIN_PANE_WIDTH }}
       >
         <Pane home="/admin">
+          <br className="w-full" />
           {selectedLogbook && (
             <LogbookForm logbook={selectedLogbook} onSave={refresh} />
           )}
