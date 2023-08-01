@@ -46,6 +46,7 @@ export default function useEntries({
 
     const endDate = spotlightEntry.loggedAt;
 
+    // TODO: Error handling
     const newEntries = await fetchEntries({
       startDate: startDate || undefined,
       endDate,

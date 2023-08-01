@@ -1,5 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
-import { Logbook, fetchLogbooks } from "../api";
+import { useCallback, useRef } from "react";
 import Pane from "../components/Pane";
 import Spinner from "../components/Spinner";
 import useIsSmallScreen from "../hooks/useIsSmallScreen";
@@ -8,11 +7,12 @@ import LogbookForm from "../components/LogbookForm";
 import { useLogbookFormsStore } from "../logbookFormsStore";
 import { toast } from "react-toastify";
 import { Link, useParams } from "react-router-dom";
+import useLogbooks from "../hooks/useLogbooks";
 
 const MIN_PANE_WIDTH = 384;
 
 export default function Admin() {
-  const [logbooks, setLogbooks] = useState<Logbook[] | null>(null);
+  const { logbooks, refresh } = useLogbooks();
   const { logbookId: selectedLogbookId } = useParams();
   const selectedLogbook = logbooks?.find(({ id }) => id === selectedLogbookId);
   const logbooksEdited = useLogbookFormsStore((state) =>
@@ -22,16 +22,6 @@ export default function Admin() {
   const isSmallScreen = useIsSmallScreen();
   const bodyRef = useRef<HTMLDivElement>(null);
   const gutterRef = useRef<HTMLDivElement>(null);
-
-  const refresh = useCallback(() => {
-    fetchLogbooks().then(setLogbooks);
-  }, [setLogbooks]);
-
-  useEffect(() => {
-    if (!logbooks) {
-      refresh();
-    }
-  }, [logbooks, refresh]);
 
   const mouseMoveHandler = useCallback((e: MouseEvent) => {
     if (bodyRef.current && gutterRef.current) {

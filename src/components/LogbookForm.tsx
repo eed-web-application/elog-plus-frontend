@@ -1,9 +1,16 @@
 import { FormEvent, useState } from "react";
 import cn from "classnames";
-import { Logbook, LogbookUpdation, Shift, updateLogbook } from "../api";
+import {
+  Logbook,
+  LogbookUpdation,
+  ServerError,
+  Shift,
+  updateLogbook,
+} from "../api";
 import { Button, IconButton, Input, InputInvalid } from "./base";
 import { useLogbookFormsStore } from "../logbookFormsStore";
 import { localToUtc, utcToLocal } from "../utils/utcTimeConversion";
+import reportServerError from "../reportServerError";
 
 interface Props {
   logbook: Logbook;
@@ -90,9 +97,16 @@ export default function LogbookForm({ logbook, onSave }: Props) {
       })),
     };
 
-    await updateLogbook(logbookUpdation);
-    removeForm();
-    onSave();
+    try {
+      await updateLogbook(logbookUpdation);
+      removeForm();
+      onSave();
+    } catch (e) {
+      if (!(e instanceof ServerError)) {
+        throw e;
+      }
+      reportServerError("Could not save logbook", e);
+    }
   }
 
   function createTag(e: FormEvent<HTMLFormElement>) {

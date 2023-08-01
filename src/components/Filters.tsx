@@ -1,5 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
-import { fetchLogbooks, fetchTags } from "../api";
+import { useCallback } from "react";
 import { EntryQuery } from "../hooks/useEntries";
 import FilterChip from "./FilterChip.tsx";
 import MultiSelectMenu from "./MultiSelectMenu.tsx";
@@ -7,7 +6,8 @@ import { Input } from "./base.ts";
 import Chip from "./Chip.tsx";
 import FilterChipWithMenu from "./FilterChipWithMenu.tsx";
 import dateToDateString from "../utils/dateToDateString.ts";
-import { useTagUsageStore } from "../tagUsageStore.ts";
+import useLogbooks from "../hooks/useLogbooks.ts";
+import useTags from "../hooks/useTags.ts";
 
 export type Filters = Pick<
   EntryQuery,
@@ -20,34 +20,11 @@ export interface Props {
 }
 
 export default function Filters({ filters, setFilters }: Props) {
-  const [logbooks, setLogbooks] = useState<string[] | null>(null);
-  const [tagsLoaded, setTagsLoaded] = useState<Record<string, string[]>>({});
-  const logbooksAsKey = filters.logbooks.join(",");
-  const tags = [...new Set(tagsLoaded[logbooksAsKey])];
-  const [bumpTag, sortTagsByMostRecent] = useTagUsageStore((state) => [
-    state.bump,
-    state.sortByMostRecent,
-  ]);
-
-  useEffect(() => {
-    if (!logbooks) {
-      fetchLogbooks().then((logbooks) =>
-        setLogbooks(logbooks.map(({ name }) => name))
-      );
-    }
-  }, [logbooks]);
-
-  const hasTagsLoaded = logbooksAsKey in tagsLoaded;
-  const loadTags = useCallback(() => {
-    if (!hasTagsLoaded) {
-      fetchTags({ logbooks: filters.logbooks }).then((tags) =>
-        setTagsLoaded((tagsLoaded) => ({
-          ...tagsLoaded,
-          [logbooksAsKey]: tags,
-        }))
-      );
-    }
-  }, [logbooksAsKey, filters.logbooks, hasTagsLoaded]);
+  const { logbooks } = useLogbooks();
+  const { tags, fetchTags, bumpTag } = useTags({
+    logbooks: filters.logbooks,
+    loadInitial: false,
+  });
 
   const logbookFilterLabel = useCallback(() => {
     if (filters.logbooks.length === 0) {
@@ -115,14 +92,14 @@ export default function Filters({ filters, setFilters }: Props) {
             setFilters({ ...filters, logbooks: selected })
           }
           isLoading={logbooks === null}
-          options={logbooks || []}
+          options={(logbooks || []).map(({ name }) => name)}
         />
       </FilterChipWithMenu>
       <FilterChipWithMenu
         className="mr-3 mt-2"
         label={tagFilterLabel()}
         enabled={filters.tags.length !== 0}
-        onOpen={loadTags}
+        onOpen={fetchTags}
         onDisable={() => setFilters({ ...filters, tags: [] })}
       >
         <MultiSelectMenu
@@ -130,7 +107,7 @@ export default function Filters({ filters, setFilters }: Props) {
           setSelected={(selected) => setFilters({ ...filters, tags: selected })}
           onOptionSelected={bumpTag}
           isLoading={tags === null}
-          options={sortTagsByMostRecent(tags || [])}
+          options={tags || []}
         />
       </FilterChipWithMenu>
       <FilterChipWithMenu

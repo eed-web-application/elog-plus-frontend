@@ -25,6 +25,7 @@ export default function useAttachmentUploader() {
         { fileName: file.name, contentType: file.type },
       ]);
 
+      // TODO: Error handling
       const id = await uploadAttachment(file);
 
       setUploading((attachments) =>

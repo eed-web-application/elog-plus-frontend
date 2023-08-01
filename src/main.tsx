@@ -16,7 +16,9 @@ import { useEntriesStore } from "./entriesStore.ts";
 import ViewEntry from "./routes/ViewEntry.tsx";
 import ErrorBoundary from "./routes/ErrorBoundary";
 import Admin from "./routes/Admin.tsx";
+import * as api from "./api";
 import "./index.css";
+import reportServerError from "./reportServerError.tsx";
 
 function entryLoader({ params }: { params: Params }) {
   if (params.entryId) {
@@ -76,6 +78,12 @@ const router = createBrowserRouter([
     ],
   },
 ]);
+
+window.addEventListener("unhandledrejection", (e) => {
+  if (e.reason instanceof api.ServerError) {
+    reportServerError("Unexpected error", e.reason);
+  }
+});
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
   <React.StrictMode>

@@ -24,6 +24,7 @@ export const useEntriesStore = create<EntriesState>((set, get) => ({
     return entry;
   },
   fetch: async (id: string) => {
+    // TODO: Error handling
     const entry = await fetchEntry(id);
     set((state) => ({ ...state, entries: { ...state.entries, [id]: entry } }));
     return entry;

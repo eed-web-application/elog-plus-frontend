@@ -1,8 +1,32 @@
 export const ENDPOINT = import.meta.env.API_ENDPOINT || "/api/v1";
 
-export class NotFoundError extends Error {
-  constructor() {
-    super("Could not find resource");
+interface ErrorContext {
+  errorCode: number;
+  errorDomain: string;
+}
+
+export abstract class ServerError extends Error {
+  res: Response;
+  context?: ErrorContext;
+
+  constructor(message: string, res: Response, context?: ErrorContext) {
+    super(message);
+    this.res = res;
+    this.name = "ServerError";
+    this.context = context;
+  }
+}
+
+export class InternalServerError extends ServerError {
+  constructor(res: Response, context?: ErrorContext) {
+    super("Internal server error", res, context);
+    this.name = "InternalServerError";
+  }
+}
+
+export class NotFoundError extends ServerError {
+  constructor(res: Response, context?: ErrorContext) {
+    super("Could not find resource", res, context);
     this.name = "NotFoundError";
   }
 }
@@ -43,23 +67,19 @@ export async function fetch(
     options
   );
 
-  if (!res.ok) {
-    if (res.status === 404) {
-      throw new NotFoundError();
-    }
-
-    // TODO: Provide better error handling
-    const errorText = await res.text();
-    throw new Error(
-      `Network response was not as expected: ${res.status} ${errorText}`
-    );
+  let responseData;
+  try {
+    responseData = await res.json();
+  } catch {
+    // Let responseData be undefined
   }
 
-  const responseData = await res.json();
-
-  if (responseData.errorCode !== 0) {
-    // TODO: Same here
-    throw new Error(responseData.errorMessage);
+  if (!res.ok) {
+    if (res.status === 404) {
+      throw new NotFoundError(res, responseData);
+    } else {
+      throw new InternalServerError(res, responseData);
+    }
   }
 
   return responseData.payload;

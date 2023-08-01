@@ -9,14 +9,8 @@ import {
 } from "react";
 import cn from "classnames";
 import { useDropzone } from "react-dropzone";
-import {
-  EntryNew,
-  createEntry,
-  fetchLogbooks,
-  fetchTags,
-  followUp,
-  supersede,
-} from "../api";
+import { Link } from "react-router-dom";
+import { EntryNew, createEntry, followUp, supersede } from "../api";
 import Select from "./Select";
 import { Button, Checkbox, IconButton, Input, InputInvalid } from "./base";
 import EntryRow from "./EntryRow";
@@ -35,8 +29,8 @@ import useAttachmentUploader, {
 } from "../hooks/useAttachmentUploader";
 import Spinner from "./Spinner";
 import dateToDatetimeString from "../utils/dateToDatetimeString";
-import { useTagUsageStore } from "../tagUsageStore";
-import { Link } from "react-router-dom";
+import useLogbooks from "../hooks/useLogbooks";
+import useTags from "../hooks/useTags";
 
 const EntryBodyTextEditor = lazy(() => import("./EntryBodyTextEditor"));
 
@@ -53,27 +47,21 @@ export default function EntryForm({
   onEntryCreated,
   kind = "newEntry",
 }: Props) {
-  const [logbooks, setLogbooks] = useState<null | string[]>(null);
-  const [tagsLoaded, setTagsLoaded] = useState<Record<string, string[]>>({});
+  const { logbooks } = useLogbooks();
   const [shifts, setShifts] = useState<null | string[]>(null);
   const refreshEntries = useContext(EntryRefreshContext);
   const [draft, updateDraft, removeDraft] = useDraftsStore((state) =>
     state.startDrafting(kind)
   );
+  const { tags, bumpTag } = useTags({
+    loadInitial: Boolean(draft.logbook),
+    logbooks: draft.logbook ? [draft.logbook] : [],
+  });
   const {
     uploading: attachmentsUploading,
     upload: uploadAttachment,
     cancel: cancelUploadingAttachment,
   } = useAttachmentUploader();
-  const [bumpTag, sortTagsByMostRecent] = useTagUsageStore((state) => [
-    state.bump,
-    state.sortByMostRecent,
-  ]);
-
-  let tags: string[] | undefined;
-  if (draft.logbook) {
-    tags = tagsLoaded[draft.logbook];
-  }
 
   const submitEntry = useCallback(
     (newEntry: EntryNew) => {
@@ -89,27 +77,8 @@ export default function EntryForm({
   );
 
   useEffect(() => {
-    if (!logbooks) {
-      fetchLogbooks().then((logbooks) =>
-        setLogbooks(logbooks.map(({ name }) => name))
-      );
-    }
-  }, [logbooks]);
-
-  useEffect(() => {
-    if (!tags) {
-      fetchTags({ logbooks: [draft.logbook] }).then((tags) =>
-        setTagsLoaded((tagsLoaded) => ({
-          ...tagsLoaded,
-          [draft.logbook]: tags,
-        }))
-      );
-    }
-  }, [tags, draft.logbook]);
-
-  useEffect(() => {
     if (!shifts) {
-      // TODO: fetch shifts
+      // FIXME: fetch shifts
       setShifts(["Day shift", "Night shift"]);
     }
   }, [shifts]);
@@ -267,7 +236,7 @@ export default function EntryForm({
                 required
                 containerClassName="block w-full"
                 className="w-full"
-                options={logbooks || []}
+                options={(logbooks || []).map(({ name }) => name)}
                 isLoading={!logbooks}
                 value={draft.logbook}
                 setValue={(logbook) =>
@@ -283,7 +252,7 @@ export default function EntryForm({
             <MultiSelect
               disabled={!tags}
               isLoading={!tags}
-              predefinedOptions={tags ? sortTagsByMostRecent(tags) : []}
+              predefinedOptions={tags || []}
               onOptionSelected={bumpTag}
               value={draft.tags}
               setValue={(tags) => updateDraft({ ...draft, tags: tags || [] })}
