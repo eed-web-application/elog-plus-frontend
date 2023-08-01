@@ -60,18 +60,20 @@ export async function fetchEntries({
   limit,
   contextSize,
   search,
-  sortBy = "eventAt",
+  sortByLogDate = false,
   logbooks = [],
   tags = [],
+  anchorId,
 }: {
   startDate?: Date;
   endDate?: Date;
   limit?: number;
   contextSize?: number;
   search?: string;
-  sortBy?: "eventAt" | "loggedAt";
+  sortByLogDate?: boolean;
   logbooks?: string[];
   tags?: string[];
+  anchorId?: string;
 }): Promise<EntrySummary[]> {
   const params: Record<string, string> = {
     logbooks: logbooks.join(","),
@@ -93,10 +95,12 @@ export async function fetchEntries({
   if (search) {
     params.search = search;
   }
-  if (sortBy) {
-    params.sortBy = sortBy;
+  if (sortByLogDate) {
+    params.sortByLogDate = "true";
   }
-
+  if (anchorId) {
+    params.anchorId = anchorId;
+  }
   const data = await fetch("entries", { params });
   return data.map(normalizeEntry);
 }

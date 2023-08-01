@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
 import { EntrySummary, fetchEntries } from "../api";
-import { useEntriesStore } from "../entriesStore";
 
 const ENTRIES_PER_FETCH = 25;
 
@@ -36,28 +35,30 @@ export default function useEntries({
   const [entries, setEntries] = useState<EntrySummary[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [reachedBottom, setReachedBottom] = useState<boolean>(false);
-  const getOrFetch = useEntriesStore((state) => state.getOrFetch);
+
+  // Since we want to include all the entries in the same day of the date
+  // and the backend only returns entries before the date, we make sure the
+  // date is at the end of the day
+  let endOfEndDate: Date | null = null;
+  if (endDate) {
+    endOfEndDate = new Date(endDate);
+    endOfEndDate.setUTCHours(23, 59, 59, 999);
+  }
 
   const fetchSurroundingSpotlight = useCallback(async () => {
     setIsLoading(true);
     setEntries([]);
 
-    const spotlightEntry = await getOrFetch(spotlight as string);
-
-    const endDate = spotlightEntry.loggedAt;
-
     // TODO: Error handling
     const newEntries = await fetchEntries({
-      startDate: startDate || undefined,
-      endDate,
+      anchorId: spotlight,
       contextSize: ENTRIES_PER_FETCH,
       limit: ENTRIES_PER_FETCH,
-      sortBy: sortByLogDate ? "loggedAt" : undefined,
     });
 
     setIsLoading(false);
     setEntries(newEntries);
-  }, [spotlight, getOrFetch, startDate, sortByLogDate]);
+  }, [spotlight]);
 
   useEffect(() => {
     if (
@@ -80,23 +81,14 @@ export default function useEntries({
     setIsLoading(true);
     setEntries([]);
 
-    let dateDayEnd;
-    if (endDate) {
-      dateDayEnd = new Date(endDate);
-      // Since we want to include all the entries in the same day of the date
-      // and the backend only returns entries before the date, we make sure the
-      // date is at the end of the day
-      dateDayEnd.setUTCHours(23, 59, 59, 999);
-    }
-
     const newEntries = await fetchEntries({
       search,
       logbooks,
       tags,
       startDate: startDate || undefined,
-      endDate: dateDayEnd,
+      endDate: endOfEndDate || undefined,
       limit: ENTRIES_PER_FETCH,
-      sortBy: sortByLogDate ? "loggedAt" : undefined,
+      sortByLogDate,
     });
 
     setIsLoading(false);
@@ -110,7 +102,7 @@ export default function useEntries({
     logbooks,
     tags,
     startDate,
-    endDate,
+    endOfEndDate,
     sortByLogDate,
     setIsLoading,
     setEntries,
@@ -124,9 +116,11 @@ export default function useEntries({
         logbooks,
         tags,
         search,
-        endDate: entries[entries.length - 1].loggedAt,
+        startDate: startDate || undefined,
+        endDate: endOfEndDate || undefined,
+        anchorId: entries[entries.length - 1].id,
         limit: ENTRIES_PER_FETCH,
-        sortBy: sortByLogDate ? "loggedAt" : undefined,
+        sortByLogDate,
       });
 
       if (newEntries.length !== ENTRIES_PER_FETCH) {
@@ -136,7 +130,16 @@ export default function useEntries({
       setIsLoading(false);
       setEntries((entries) => entries.concat(newEntries));
     }
-  }, [search, logbooks, tags, sortByLogDate, entries, isLoading]);
+  }, [
+    search,
+    logbooks,
+    tags,
+    sortByLogDate,
+    startDate,
+    endOfEndDate,
+    entries,
+    isLoading,
+  ]);
 
   useEffect(() => {
     refreshEntries();
