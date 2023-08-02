@@ -22,8 +22,8 @@ export default function ErrorBoundary() {
       </div>
       {!is404 && (
         <div className="text-lg mt-3 text-center text-gray-500 max-w-sm">
-          Oops! It seems like there was an error. Please try refreshing the
-          page. If the issue persists, feel free to contact{" "}
+          There was an unrecoverable error. Please try refreshing the page. If
+          the issue persists, feel free to contact{" "}
           <a href="mailto:boogie@slac.stanford.edu">boogie@slac.stanford.edu</a>
           .
         </div>
