@@ -1,16 +1,8 @@
 import cn from "classnames";
 import { Link } from "react-router-dom";
-import elogLogo from "../assets/temp_elog_logo.png";
-import { Button, IconButton, Input } from "./base";
+import { Button, Input } from "./base";
 import { ComponentProps, useEffect, useMemo, useState } from "react";
 import { useDraftsStore } from "../draftsStore";
-import {
-  useClick,
-  useDismiss,
-  useFloating,
-  useInteractions,
-  useRole,
-} from "@floating-ui/react";
 import Logo from "./Logo";
 
 interface Props extends ComponentProps<"div"> {
