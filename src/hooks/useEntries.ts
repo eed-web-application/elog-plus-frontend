@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
-import { EntrySummary, fetchEntries } from "../api";
+import { EntrySummary, ServerError, fetchEntries } from "../api";
+import reportServerError from "../reportServerError";
 
 const ENTRIES_PER_FETCH = 25;
 
@@ -49,7 +50,6 @@ export default function useEntries({
     setIsLoading(true);
     setEntries([]);
 
-    // TODO: Error handling
     const newEntries = await fetchEntries({
       anchorId: spotlight,
       contextSize: ENTRIES_PER_FETCH,
@@ -66,8 +66,19 @@ export default function useEntries({
       !isLoading &&
       entries.every((entry) => entry.id !== spotlight)
     ) {
-      fetchSurroundingSpotlight();
-      onSpotlightFetched?.();
+      fetchSurroundingSpotlight()
+        .then(onSpotlightFetched)
+        .catch((e) => {
+          if (!(e instanceof ServerError)) {
+            throw e;
+          }
+
+          reportServerError("Could not retrieve entry", e);
+
+          // Rollback
+          setIsLoading(false);
+          setEntries(entries);
+        });
     }
   }, [
     fetchSurroundingSpotlight,
