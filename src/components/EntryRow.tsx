@@ -28,6 +28,7 @@ import Tooltip from "./Tooltip";
 import EntryFigureList from "./EntryFigureList";
 import useSpotlightProps from "../hooks/useSpotlightProps";
 import { useDraftsStore } from "../draftsStore";
+import useEntry from "../hooks/useEntry";
 
 function RowButton({
   children,
@@ -251,9 +252,7 @@ export default function EntryRow({
   allowSpotlightForFollowUps,
 }: PropsWithChildren<Props>) {
   const [expanded, setExpanded] = useState(Boolean(expandedByDefault));
-  const [fullEntry, setFullEntry] = useState<Entry | null>(null);
-
-  const getOrFetch = useEntriesStore((state) => state.getOrFetch);
+  const fullEntry = useEntry(expanded ? entry.id : undefined);
 
   const [hasFollowUpDraft, hasSupersedingDraft] = useDraftsStore(
     ({ drafts }) => [
@@ -261,13 +260,6 @@ export default function EntryRow({
       Boolean(drafts[`supersede/${entry.id}`]),
     ]
   );
-
-  async function toggleExpand(e: React.MouseEvent<SVGSVGElement, MouseEvent>) {
-    e.stopPropagation();
-
-    setFullEntry(await getOrFetch(entry.id));
-    setExpanded((expanded) => !expanded);
-  }
 
   const rootRef = useCallback(
     (elem: HTMLDivElement) => {
@@ -430,7 +422,7 @@ export default function EntryRow({
                   spotlight && "hover:bg-yellow-300",
                   selected && !spotlight && "hover:!bg-blue-200"
                 )}
-                onClick={toggleExpand}
+                onClick={() => setExpanded((expanded) => !expanded)}
               >
                 <path
                   strokeLinecap="round"
