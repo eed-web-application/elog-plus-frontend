@@ -50,10 +50,10 @@ export default function InfoDialogButton({
         reportServerError("Could not retrieve server version", e);
       }
     }
-    if (!version) {
+    if (!version && viewingInfoDialog) {
       fetch();
     }
-  }, [version, setVersion]);
+  }, [version, setVersion, viewingInfoDialog]);
 
   return (
     <>
