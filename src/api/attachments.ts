@@ -17,7 +17,7 @@ export function uploadAttachment(file: File) {
 
   formData.append("uploadFile", file);
 
-  return fetch("attachment", {
+  return fetch("v1/attachment", {
     method: "POST",
     formData,
   });
