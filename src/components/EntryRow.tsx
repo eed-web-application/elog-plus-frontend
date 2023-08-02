@@ -19,8 +19,7 @@ import {
   useRole,
 } from "@floating-ui/react";
 import { IconButton } from "./base";
-import { useEntriesStore } from "../entriesStore";
-import { Entry, EntrySummary } from "../api";
+import { EntrySummary } from "../api";
 import EntryList from "./EntryList";
 import Chip from "./Chip";
 import EntryBodyText from "./EntryBodyText";
