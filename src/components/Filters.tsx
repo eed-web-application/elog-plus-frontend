@@ -87,7 +87,7 @@ export default function Filters({ filters, setFilters }: Props) {
         onDisable={() => setFilters({ ...filters, logbooks: [] })}
       >
         <MultiSelectMenu
-          selected={filters.logbooks}
+          selected={filters.logbooks.map((name) => name.toUpperCase())}
           setSelected={(selected) =>
             setFilters({
               ...filters,
