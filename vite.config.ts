@@ -1,5 +1,6 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
+import { version } from "./package.json";
 
 declare const process: { env: Record<string, string> };
 
@@ -18,9 +19,7 @@ export default defineConfig({
   },
   define: {
     "import.meta.env.API_ENDPOINT": JSON.stringify(process.env.API_ENDPOINT),
-    "import.meta.env.APP_VERSION": JSON.stringify(
-      process.env.npm_package_version
-    ),
+    "import.meta.env.APP_VERSION": JSON.stringify(version),
   },
   plugins: [react()],
 });
