@@ -11,12 +11,13 @@ export default function ErrorToast({ message, error }: Props) {
       <div>{message}</div>
       <div className="text-sm text-gray-500">
         {error.message}
-        {error.context && (
-          <div className="text-xs">
-            Code: {error.context.errorCode},{" "}
-            <code>{error.context.errorDomain}</code>
-          </div>
-        )}
+        {error.context?.errorDomain &&
+          error.context?.errorCode !== undefined && (
+            <div className="text-xs">
+              Error code: {error.context.errorCode},{" "}
+              <code>{error.context.errorDomain}</code>
+            </div>
+          )}
       </div>
     </>
   );

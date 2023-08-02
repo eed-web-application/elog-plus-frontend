@@ -1,8 +1,8 @@
 export const ENDPOINT = import.meta.env.API_ENDPOINT || "/api/v1";
 
 interface ErrorContext {
-  errorCode: number;
-  errorDomain: string;
+  errorCode?: number;
+  errorDomain?: string;
 }
 
 export abstract class ServerError extends Error {
