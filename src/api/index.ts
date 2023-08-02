@@ -36,6 +36,7 @@ interface FetchOptions extends Omit<RequestInit, "body" | "headers"> {
   formData?: FormData;
   headers?: Record<string, string>;
   params?: ConstructorParameters<typeof URLSearchParams>[0];
+  payloadKey?: string;
 }
 
 export async function fetch(
@@ -46,6 +47,7 @@ export async function fetch(
     body,
     params,
     formData,
+    payloadKey = "payload",
     ...restOptions
   }: FetchOptions = {}
 ) {
@@ -82,7 +84,16 @@ export async function fetch(
     }
   }
 
-  return responseData.payload;
+  return responseData[payloadKey];
+}
+
+export interface ServerVersion {
+  name: string;
+  version: string;
+}
+
+export async function fetchVersion(): Promise<ServerVersion | undefined> {
+  return await fetch("actuator/infoa", { payloadKey: "build" });
 }
 
 export * from "./attachments";

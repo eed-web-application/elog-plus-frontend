@@ -9,6 +9,9 @@ import useEntries from "../hooks/useEntries";
 import useIsSmallScreen from "../hooks/useIsSmallScreen";
 import { EntryQuery } from "../hooks/useEntries";
 import { URLSearchParamsInit } from "react-router-dom";
+import { useFloating } from "@floating-ui/react";
+import useInfoDialog from "../hooks/useInfoDialog";
+import InfoDialogButton from "../components/InfoDialogButton";
 
 const DEFAULT_QUERY: EntryQuery = {
   logbooks: [],
@@ -119,13 +122,21 @@ export default function Home() {
   return (
     <EntryRefreshContext.Provider value={refreshEntries}>
       <div className="h-screen flex flex-col">
-        <div className="p-3 shadow z-10">
+        <div
+          className={cn(
+            "p-3 shadow z-10 relative",
+            // Padding for the absolutely positioned info button
+            !isSmallScreen && "px-12"
+          )}
+        >
           <div className="container m-auto">
             <Navbar
               className="mb-1"
               search={query.search}
               onSearchChange={onSearchChange}
             />
+
+            <InfoDialogButton />
             <Filters filters={query} setFilters={onFiltersChange} />
           </div>
         </div>

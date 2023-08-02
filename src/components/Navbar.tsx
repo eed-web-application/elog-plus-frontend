@@ -1,9 +1,17 @@
 import cn from "classnames";
 import { Link } from "react-router-dom";
 import elogLogo from "../assets/temp_elog_logo.png";
-import { Button, Input } from "./base";
+import { Button, IconButton, Input } from "./base";
 import { ComponentProps, useEffect, useMemo, useState } from "react";
 import { useDraftsStore } from "../draftsStore";
+import {
+  useClick,
+  useDismiss,
+  useFloating,
+  useInteractions,
+  useRole,
+} from "@floating-ui/react";
+import Logo from "./Logo";
 
 interface Props extends ComponentProps<"div"> {
   search: string;
@@ -52,7 +60,7 @@ export default function Navbar({
   return (
     <div className={cn("flex flex-wrap", className)} {...rest}>
       <Link to="/" className="text-center mb-3 w-full md:mb-0 md:w-auto">
-        <img src={elogLogo} className="inline" alt="SLAC E-LOG logo" />
+        <Logo className="inline" />
       </Link>
       <form
         className="flex-1 mr-2 md:mx-2"
