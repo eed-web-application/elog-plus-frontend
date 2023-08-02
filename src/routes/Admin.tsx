@@ -53,7 +53,8 @@ export default function Admin() {
         className={cn(
           "w-1/2 flex flex-col mt-3 justify-stretch p-3 overflow-y-auto",
           // Don't want to have border when loading
-          logbooks ? "divide-y" : "justify-center w-full"
+          logbooks ? "divide-y" : "justify-center w-full",
+          !selectedLogbook && "flex-1 pr-3"
         )}
       >
         <div className="text-xl mb-2 font-normal text-gray-500">Logbooks</div>
@@ -86,17 +87,19 @@ export default function Admin() {
       >
         <div className="absolute -left-3 w-6 h-full" />
       </div>
-      <div
-        className={cn("pb-3", !isSmallScreen && "flex-1 flex-shrink")}
-        style={{ minWidth: isSmallScreen ? "auto" : MIN_PANE_WIDTH }}
-      >
-        <Pane home="/admin">
-          <br className="w-full" />
-          {selectedLogbook && (
-            <LogbookForm logbook={selectedLogbook} onSave={onSave} />
-          )}
-        </Pane>
-      </div>
+      {selectedLogbook && (
+        <div
+          className={cn("pb-3", !isSmallScreen && "flex-1 flex-shrink")}
+          style={{ minWidth: isSmallScreen ? "auto" : MIN_PANE_WIDTH }}
+        >
+          <Pane home="/admin">
+            <br className="w-full" />
+            {selectedLogbook && (
+              <LogbookForm logbook={selectedLogbook} onSave={onSave} />
+            )}
+          </Pane>
+        </div>
+      )}
     </div>
   );
 }
