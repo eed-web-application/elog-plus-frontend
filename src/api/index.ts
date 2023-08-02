@@ -93,7 +93,7 @@ export interface ServerVersion {
 }
 
 export async function fetchVersion(): Promise<ServerVersion | undefined> {
-  return await fetch("actuator/infoa", { payloadKey: "build" });
+  return await fetch("actuator/info", { payloadKey: "build" });
 }
 
 export * from "./attachments";
