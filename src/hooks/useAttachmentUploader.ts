@@ -1,6 +1,7 @@
 import { useCallback, useState } from "react";
 import { LocalUploadedAttachment } from "../draftsStore";
-import { uploadAttachment } from "../api";
+import { ServerError, uploadAttachment } from "../api";
+import reportServerError from "../reportServerError";
 
 /**
  * Attachment that hasn't been uploaded to the server yet (basically a file)
@@ -25,13 +26,23 @@ export default function useAttachmentUploader() {
         { fileName: file.name, contentType: file.type },
       ]);
 
-      // TODO: Error handling
-      const id = await uploadAttachment(file);
+      let id;
+      try {
+        id = await uploadAttachment(file);
+      } catch (e) {
+        if (!(e instanceof ServerError)) {
+          throw e;
+        }
+
+        reportServerError("Could not upload attachment", e);
+      }
 
       setUploading((attachments) =>
         attachments.filter((attachment) => attachment.fileName !== file.name)
       );
-      return { fileName: file.name, contentType: file.type, id };
+      if (id) {
+        return { fileName: file.name, contentType: file.type, id };
+      }
     },
     [uploading, setUploading]
   );

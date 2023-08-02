@@ -10,7 +10,13 @@ import {
 import cn from "classnames";
 import { useDropzone } from "react-dropzone";
 import { Link } from "react-router-dom";
-import { EntryNew, createEntry, followUp, supersede } from "../api";
+import {
+  EntryNew,
+  ServerError,
+  createEntry,
+  followUp,
+  supersede,
+} from "../api";
 import Select from "./Select";
 import { Button, Checkbox, IconButton, Input, InputInvalid } from "./base";
 import EntryRow from "./EntryRow";
@@ -31,6 +37,7 @@ import Spinner from "./Spinner";
 import dateToDatetimeString from "../utils/dateToDatetimeString";
 import useLogbooks from "../hooks/useLogbooks";
 import useTags from "../hooks/useTags";
+import reportServerError from "../reportServerError";
 
 const EntryBodyTextEditor = lazy(() => import("./EntryBodyTextEditor"));
 
@@ -63,15 +70,23 @@ export default function EntryForm({
     cancel: cancelUploadingAttachment,
   } = useAttachmentUploader();
 
-  const submitEntry = useCallback(
-    (newEntry: EntryNew) => {
-      if (kind === "newEntry") {
-        return createEntry(newEntry);
+  const saveEntry = useCallback(
+    async (newEntry: EntryNew) => {
+      try {
+        if (kind === "newEntry") {
+          return await createEntry(newEntry);
+        }
+        if (kind[0] === "superseding") {
+          return await supersede(kind[1].id, newEntry);
+        }
+        return await followUp(kind[1].id, newEntry);
+      } catch (e) {
+        if (!(e instanceof ServerError)) {
+          throw e;
+        }
+
+        reportServerError("Could not save entry", e);
       }
-      if (kind[0] === "superseding") {
-        return supersede(kind[1].id, newEntry);
-      }
-      return followUp(kind[1].id, newEntry);
     },
     [kind]
   );
@@ -135,11 +150,12 @@ export default function EntryForm({
       // is indeed a EntryNew
     } as EntryNew;
 
-    const id = await submitEntry(newEntry);
-    removeDraft();
-
-    refreshEntries();
-    onEntryCreated(id);
+    const id = await saveEntry(newEntry);
+    if (id) {
+      removeDraft();
+      refreshEntries();
+      onEntryCreated(id);
+    }
   }
 
   async function removeAttachment(attachment: LocalAttachment) {
