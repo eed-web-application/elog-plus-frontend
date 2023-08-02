@@ -9,8 +9,6 @@ import useEntries from "../hooks/useEntries";
 import useIsSmallScreen from "../hooks/useIsSmallScreen";
 import { EntryQuery } from "../hooks/useEntries";
 import { URLSearchParamsInit } from "react-router-dom";
-import { useFloating } from "@floating-ui/react";
-import useInfoDialog from "../hooks/useInfoDialog";
 import InfoDialogButton from "../components/InfoDialogButton";
 
 const DEFAULT_QUERY: EntryQuery = {
