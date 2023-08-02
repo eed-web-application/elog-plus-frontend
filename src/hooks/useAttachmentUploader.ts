@@ -11,20 +11,16 @@ export type LocalAttachment = {
 } & Omit<LocalUploadedAttachment, "id">;
 
 export default function useAttachmentUploader() {
-  const [uploading, setUploading] = useState<LocalAttachment[]>([]);
+  const [uploading, setUploading] = useState<Record<string, LocalAttachment>>(
+    {}
+  );
 
   const upload = useCallback(
     async (file: File): Promise<LocalUploadedAttachment | undefined> => {
-      if (uploading.some((attachment) => attachment.fileName === file.name)) {
-        // TODO: Don't use alert
-        alert("Can't upload two files with the same name at the same time");
-        return;
-      }
-
-      setUploading((attachments) => [
+      setUploading((attachments) => ({
         ...attachments,
-        { fileName: file.name, contentType: file.type },
-      ]);
+        [file.name]: { fileName: file.name, contentType: file.type },
+      }));
 
       let id;
       try {
@@ -37,24 +33,26 @@ export default function useAttachmentUploader() {
         reportServerError("Could not upload attachment", e);
       }
 
-      setUploading((attachments) =>
-        attachments.filter((attachment) => attachment.fileName !== file.name)
+      setUploading(
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        ({ [file.name]: _removed, ...uploading }) => uploading
       );
       if (id) {
         return { fileName: file.name, contentType: file.type, id };
       }
     },
-    [uploading, setUploading]
+    [setUploading]
   );
 
   const cancel = useCallback(
     (filename: string) => {
-      setUploading((uploading) =>
-        uploading.filter((attachment) => attachment.fileName !== filename)
+      setUploading(
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        ({ [filename]: _removed, ...uploading }) => uploading
       );
     },
     [setUploading]
   );
 
-  return { uploading, upload, cancel };
+  return { uploading: Object.values(uploading), upload, cancel };
 }
