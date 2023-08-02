@@ -4,7 +4,6 @@ import {
   lazy,
   useCallback,
   useContext,
-  useEffect,
   useState,
 } from "react";
 import cn from "classnames";
@@ -55,7 +54,6 @@ export default function EntryForm({
   kind = "newEntry",
 }: Props) {
   const { logbooks } = useLogbooks();
-  const [shifts, setShifts] = useState<null | string[]>(null);
   const refreshEntries = useContext(EntryRefreshContext);
   const [draft, updateDraft, removeDraft] = useDraftsStore((state) =>
     state.startDrafting(kind)
@@ -69,6 +67,12 @@ export default function EntryForm({
     upload: uploadAttachment,
     cancel: cancelUploadingAttachment,
   } = useAttachmentUploader();
+  let shifts: string[] | undefined;
+  if (draft.logbook) {
+    shifts = logbooks
+      ?.find(({ name }) => name === draft.logbook)
+      ?.shifts.map(({ name }) => name);
+  }
 
   const saveEntry = useCallback(
     async (newEntry: EntryNew) => {
@@ -91,19 +95,12 @@ export default function EntryForm({
     [kind]
   );
 
-  useEffect(() => {
-    if (!shifts) {
-      // FIXME: fetch shifts
-      setShifts(["Day shift", "Night shift"]);
-    }
-  }, [shifts]);
-
   const validators = {
     title: () => Boolean(draft.title),
     logbook: () => Boolean(draft.logbook),
     eventAt: () => draft.eventAt !== null,
-    shiftName: () => !draft.summarize || Boolean(draft.summarize.shift),
-    shiftDate: () => !draft.summarize || Boolean(draft.summarize.date),
+    shiftName: () => !draft.summarizes || Boolean(draft.summarizes.shift),
+    shiftDate: () => !draft.summarizes || Boolean(draft.summarizes.date),
     // Ensure all attachments are downloaded
     attachments: () => attachmentsUploading.length === 0,
   };
@@ -312,11 +309,11 @@ export default function EntryForm({
             <input
               type="checkbox"
               className={cn(Checkbox, "mr-2")}
-              checked={draft.summarize !== undefined}
+              checked={draft.summarizes !== undefined}
               onChange={() =>
                 updateDraft({
                   ...draft,
-                  summarize: draft.summarize
+                  summarizes: draft.summarizes
                     ? undefined
                     : { shift: "", date: dateToDateString(new Date()) },
                 })
@@ -330,30 +327,30 @@ export default function EntryForm({
               required
               containerClassName="block w-full"
               className="w-full"
+              noOptionsLabel={shifts ? undefined : "Select a logbook first"}
               options={shifts || []}
-              isLoading={!shifts}
-              value={draft.summarize?.shift || null}
+              value={draft.summarizes?.shift || null}
               setValue={(shift) =>
                 updateDraft({
                   ...draft,
-                  summarize: draft.summarize && {
-                    ...draft.summarize,
+                  summarizes: draft.summarizes && {
+                    ...draft.summarizes,
                     shift: shift || "",
                   },
                 })
               }
               invalid={invalid.includes("shiftName")}
               onBlur={() => validate("shiftName")}
-              disabled={!draft.summarize}
+              disabled={!draft.summarizes}
             />
             <input
               type="date"
-              value={draft.summarize?.date || ""}
+              value={draft.summarizes?.date || ""}
               onChange={(e) =>
                 updateDraft({
                   ...draft,
-                  summarize: draft.summarize && {
-                    ...draft.summarize,
+                  summarizes: draft.summarizes && {
+                    ...draft.summarizes,
                     date: e.currentTarget.value,
                   },
                 })
@@ -364,7 +361,7 @@ export default function EntryForm({
                 "block w-full"
               )}
               onBlur={() => validate("shiftDate")}
-              disabled={!draft.summarize}
+              disabled={!draft.summarizes}
             />
           </div>
 

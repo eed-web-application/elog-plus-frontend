@@ -27,7 +27,7 @@ export interface EntryNew {
   tags: string[];
   attachments: string[];
   eventAt?: Date;
-  summarize?: {
+  summarizes?: {
     shift: string;
     date: string;
   };

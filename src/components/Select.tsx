@@ -13,6 +13,7 @@ interface Props extends Omit<ComponentProps<"input">, "value"> {
   containerClassName?: string;
   invalid?: boolean;
   nonsearchable?: boolean;
+  noOptionsLabel?: string;
 }
 
 export default function Select({
@@ -25,6 +26,7 @@ export default function Select({
   placeholder,
   invalid,
   nonsearchable,
+  noOptionsLabel,
   onBlur,
   disabled,
   ...rest
@@ -143,7 +145,11 @@ export default function Select({
         >
           {filteredOptions.length === 0 || isLoading ? (
             <div className="text-gray-500 text-center w-full py-3">
-              {isLoading ? <Spinner className="m-auto" /> : "No options"}
+              {isLoading ? (
+                <Spinner className="m-auto" />
+              ) : (
+                noOptionsLabel || "No options"
+              )}
             </div>
           ) : (
             filteredOptions.map((option, index) => {
