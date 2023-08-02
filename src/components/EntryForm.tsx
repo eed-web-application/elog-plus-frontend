@@ -252,11 +252,14 @@ export default function EntryForm({
                 required
                 containerClassName="block w-full"
                 className="w-full"
-                options={(logbooks || []).map(({ name }) => name)}
+                options={(logbooks || []).map(({ name }) => name.toUpperCase())}
                 isLoading={!logbooks}
-                value={draft.logbook}
+                value={draft.logbook.toUpperCase()}
                 setValue={(logbook) =>
-                  updateDraft({ ...draft, logbook: logbook || "" })
+                  updateDraft({
+                    ...draft,
+                    logbook: (logbook || "").toLowerCase(),
+                  })
                 }
                 invalid={invalid.includes("logbook")}
                 onBlur={() => validate("logbook")}

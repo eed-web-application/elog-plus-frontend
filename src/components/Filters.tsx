@@ -31,7 +31,7 @@ export default function Filters({ filters, setFilters }: Props) {
       return "Logbook";
     }
 
-    let out = filters.logbooks[0];
+    let out = filters.logbooks[0].toUpperCase();
     if (filters.logbooks.length > 1) {
       out += ` and ${filters.logbooks.length - 1} other`;
       if (filters.logbooks.length > 2) {
@@ -89,10 +89,13 @@ export default function Filters({ filters, setFilters }: Props) {
         <MultiSelectMenu
           selected={filters.logbooks}
           setSelected={(selected) =>
-            setFilters({ ...filters, logbooks: selected })
+            setFilters({
+              ...filters,
+              logbooks: selected.map((name) => name.toLowerCase()),
+            })
           }
           isLoading={logbooks === null}
-          options={(logbooks || []).map(({ name }) => name)}
+          options={(logbooks || []).map(({ name }) => name.toUpperCase())}
         />
       </FilterChipWithMenu>
       <FilterChipWithMenu

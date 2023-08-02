@@ -65,7 +65,7 @@ export default function Admin() {
               to={`/admin/${logbook.id}`}
               tabIndex={0}
               className={cn(
-                "p-2 hover:bg-gray-100 cursor-pointer",
+                "p-2 hover:bg-gray-100 cursor-pointer uppercase",
                 selectedLogbook?.id === logbook.id &&
                   "bg-blue-100 hover:!bg-blue-200"
               )}

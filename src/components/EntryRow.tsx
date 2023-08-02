@@ -317,7 +317,7 @@ export default function EntryRow({
             <div className="truncate leading-[1.2]">{entry.title}</div>
           )}
           <div className="flex items-center h-5">
-            <div className="text-sm text-gray-500 leading-none whitespace-nowrap">
+            <div className="text-sm text-gray-500 leading-none whitespace-nowrap uppercase">
               {entry.logbook}
             </div>
             <div className="text-sm text-gray-500 leading-none whitespace-nowrap before:content-['•'] before:mx-1">
