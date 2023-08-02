@@ -101,12 +101,12 @@ export async function fetchEntries({
   if (anchorId) {
     params.anchorId = anchorId;
   }
-  const data = await fetch("entries", { params });
+  const data = await fetch("v1/entries", { params });
   return data.map(normalizeEntry);
 }
 
 export async function fetchEntry(id: string): Promise<Entry> {
-  const data = await fetch(`entries/${id}`, {
+  const data = await fetch(`v1/entries/${id}`, {
     params: {
       includeFollowUps: "true",
       includeHistory: "true",
@@ -119,7 +119,7 @@ export async function fetchEntry(id: string): Promise<Entry> {
 }
 
 export function createEntry(entry: EntryNew): Promise<string> {
-  return fetch("entries", {
+  return fetch("v1/entries", {
     method: "POST",
     body: entry.eventAt
       ? { ...entry, eventAt: entry.eventAt.toISOString() }
@@ -131,7 +131,7 @@ export function followUp(
   followingUp: string,
   entry: EntryNew
 ): Promise<string> {
-  return fetch(`entries/${followingUp}/follow-ups`, {
+  return fetch(`v1/entries/${followingUp}/follow-ups`, {
     method: "POST",
     body: entry,
   });
@@ -141,7 +141,7 @@ export function supersede(
   superseding: string,
   entry: EntryNew
 ): Promise<string> {
-  return fetch(`entries/${superseding}/supersede`, {
+  return fetch(`v1/entries/${superseding}/supersede`, {
     method: "POST",
     body: entry,
   });

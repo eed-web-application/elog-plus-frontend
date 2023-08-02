@@ -1,4 +1,4 @@
-export const ENDPOINT = import.meta.env.API_ENDPOINT || "/api/v1";
+export const ENDPOINT = import.meta.env.API_ENDPOINT || "/api";
 
 interface ErrorContext {
   errorCode?: number;

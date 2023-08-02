@@ -24,9 +24,9 @@ export function uploadAttachment(file: File) {
 }
 
 export function getAttachmentPreviewURL(id: string) {
-  return `${ENDPOINT}/attachment/${id}/preview.jpg`;
+  return `${ENDPOINT}/v1/attachment/${id}/preview.jpg`;
 }
 
 export function getAttachmentDownloadURL(id: string) {
-  return `${ENDPOINT}/attachment/${id}/download`;
+  return `${ENDPOINT}/v1/attachment/${id}/download`;
 }

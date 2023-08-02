@@ -12,7 +12,7 @@ export async function fetchTags(
     logbooks: string[];
   } = { logbooks: [] }
 ): Promise<string[]> {
-  const data = await fetch("tags", {
+  const data = await fetch("v1/tags", {
     params: {
       logbooks: logbooks.join(","),
     },

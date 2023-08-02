@@ -21,11 +21,11 @@ export interface LogbookUpdation extends Omit<Logbook, "tags" | "shifts"> {
 }
 
 export async function fetchLogbooks(): Promise<Logbook[]> {
-  return await fetch("logbooks");
+  return await fetch("v1/logbooks");
 }
 
 export async function updateLogbook(logbook: LogbookUpdation) {
-  return await fetch(`logbooks/${logbook.id}`, {
+  return await fetch(`v1/logbooks/${logbook.id}`, {
     method: "PUT",
     body: logbook,
   });
