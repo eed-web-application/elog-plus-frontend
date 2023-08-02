@@ -92,6 +92,12 @@ export default function Navbar({
         </div>
       </form>
       <Link
+        to={{ pathname: "/admin" }}
+        className={cn(Button, "mr-2 text-sm flex items-center")}
+      >
+        Admin Dashboard
+      </Link>
+      <Link
         to={{ pathname: "/new-entry", search: window.location.search }}
         className={cn(Button, "relative")}
       >
