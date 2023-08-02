@@ -47,7 +47,6 @@ export default function MultiSelect({
 
   const showCreateButton = search && !exactMatch;
 
-  // TODO: Update on resize
   const { refs, floatingStyles } = useFloating({
     open: focused,
     placement: "bottom-start",
