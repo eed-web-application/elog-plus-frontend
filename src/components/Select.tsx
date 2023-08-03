@@ -5,10 +5,13 @@ import { autoUpdate, size, useFloating } from "@floating-ui/react";
 import Spinner from "./Spinner";
 import useSelectCursor from "../hooks/useSelectCursor";
 
-interface Props extends Omit<ComponentProps<"input">, "value"> {
+export type Option = string | { value: string; label: string };
+
+interface Props<O extends Option>
+  extends Omit<ComponentProps<"input">, "value"> {
   value: string | null;
   setValue: (selected: string | null) => void;
-  options: Readonly<string[]>;
+  options: Readonly<O[]>;
   isLoading?: boolean;
   containerClassName?: string;
   invalid?: boolean;
@@ -16,7 +19,7 @@ interface Props extends Omit<ComponentProps<"input">, "value"> {
   noOptionsLabel?: string;
 }
 
-export default function Select({
+export default function Select<O extends Option>({
   value,
   setValue,
   options,
@@ -30,13 +33,25 @@ export default function Select({
   onBlur,
   disabled,
   ...rest
-}: Props) {
+}: Props<O>) {
   const [search, setSearch] = useState("");
   const [isOpen, setIsOpen] = useState(false);
 
   const filteredOptions = search
-    ? options.filter((option) => option.toLowerCase().includes(search))
+    ? options.filter((option) =>
+        (typeof option === "string" ? option : option.label)
+          .toLowerCase()
+          .includes(search)
+      )
     : options;
+
+  let valuesLabel: string | undefined;
+  if (value) {
+    const option = options.find(
+      (option) => (typeof option === "string" ? option : option.value) === value
+    );
+    valuesLabel = typeof option === "string" ? option : option?.label;
+  }
 
   const { refs, floatingStyles } = useFloating({
     open: isOpen,
@@ -78,7 +93,8 @@ export default function Select({
       e.preventDefault();
 
       if (isOpen) {
-        setValue(filteredOptions[cursor]);
+        const option = filteredOptions[cursor];
+        setValue(typeof option == "string" ? option : option.value);
         setSearch("");
         setIsOpen(false);
       }
@@ -119,7 +135,7 @@ export default function Select({
             "absolute flex left-0 right-0 bottom-0 top-0 bg-transparent border-transparent pointer-events-none"
           )}
         >
-          {value && !search ? value : ""}
+          {value && !search ? valuesLabel : ""}
 
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -153,13 +169,14 @@ export default function Select({
             </div>
           ) : (
             filteredOptions.map((option, index) => {
-              const selected = value === option;
+              const selected =
+                value === (typeof option === "string" ? option : option.value);
               const focused = cursor === index;
 
               return (
                 <div
                   tabIndex={0}
-                  key={option}
+                  key={typeof option === "string" ? option : option.value}
                   ref={(el) => (optionRefs.current[index] = el)}
                   className={cn("px-2 p-1  cursor-pointer", {
                     "bg-blue-200": selected && focused,
@@ -168,13 +185,15 @@ export default function Select({
                     "hover:bg-gray-100": !selected && !focused,
                   })}
                   onMouseDown={() => {
-                    setValue(option);
+                    setValue(
+                      typeof option === "string" ? option : option.value
+                    );
                   }}
                   onMouseEnter={() => {
                     setCursor(index);
                   }}
                 >
-                  {option}
+                  {typeof option === "string" ? option : option.label}
                 </div>
               );
             })

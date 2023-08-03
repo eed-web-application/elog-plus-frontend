@@ -12,6 +12,7 @@ import { Link } from "react-router-dom";
 import {
   EntryNew,
   ServerError,
+  Shift,
   createEntry,
   followUp,
   supersede,
@@ -67,11 +68,9 @@ export default function EntryForm({
     upload: uploadAttachment,
     cancel: cancelUploadingAttachment,
   } = useAttachmentUploader();
-  let shifts: string[] | undefined;
+  let shifts: Shift[] | undefined;
   if (draft.logbook) {
-    shifts = logbooks
-      ?.find(({ name }) => name === draft.logbook)
-      ?.shifts.map(({ name }) => name);
+    shifts = logbooks?.find(({ name }) => name === draft.logbook)?.shifts;
   }
 
   const saveEntry = useCallback(
@@ -99,7 +98,7 @@ export default function EntryForm({
     title: () => Boolean(draft.title),
     logbook: () => Boolean(draft.logbook),
     eventAt: () => draft.eventAt !== null,
-    shiftName: () => !draft.summarizes || Boolean(draft.summarizes.shift),
+    shiftName: () => !draft.summarizes || Boolean(draft.summarizes.shiftId),
     shiftDate: () => !draft.summarizes || Boolean(draft.summarizes.date),
     // Ensure all attachments are downloaded
     attachments: () => attachmentsUploading.length === 0,
@@ -315,7 +314,10 @@ export default function EntryForm({
                   ...draft,
                   summarizes: draft.summarizes
                     ? undefined
-                    : { shift: "", date: dateToDateString(new Date()) },
+                    : {
+                        shiftId: "",
+                        date: dateToDateString(new Date()),
+                      },
                 })
               }
             />
@@ -328,14 +330,17 @@ export default function EntryForm({
               containerClassName="block w-full"
               className="w-full"
               noOptionsLabel={shifts ? undefined : "Select a logbook first"}
-              options={shifts || []}
-              value={draft.summarizes?.shift || null}
+              options={(shifts || []).map(({ name, id }) => ({
+                label: name,
+                value: id,
+              }))}
+              value={draft.summarizes?.shiftId || null}
               setValue={(shift) =>
                 updateDraft({
                   ...draft,
                   summarizes: draft.summarizes && {
                     ...draft.summarizes,
-                    shift: shift || "",
+                    shiftId: shift || "",
                   },
                 })
               }

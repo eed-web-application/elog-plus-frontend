@@ -28,7 +28,7 @@ export interface EntryNew {
   attachments: string[];
   eventAt?: Date;
   summarizes?: {
-    shift: string;
+    shiftId: string;
     date: string;
   };
 }
