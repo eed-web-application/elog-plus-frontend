@@ -200,8 +200,8 @@ export default function EntryList({
                 }}
                 state={{
                   logbook: entries[0].logbook,
-                  summarize: {
-                    shift: entries[0].shift,
+                  summarizes: {
+                    shiftId: entries[0].shift?.id,
                     date: dateToDateString(entries[0].eventAt),
                   },
                 }}
