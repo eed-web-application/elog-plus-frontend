@@ -10,8 +10,6 @@ export default function useTags({
   logbooks?: string[];
   loadInitial?: boolean;
 }) {
-  // TODO: Memoize each logbook individually then combile with the ability
-  // to invalidate the cache
   const [tagsLoaded, setTagsLoaded] = useState<Record<string, string[]>>({});
   const [bumpTag, sortTagsByMostRecent] = useTagUsageStore((state) => [
     state.bump,
