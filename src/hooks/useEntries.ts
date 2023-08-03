@@ -5,7 +5,6 @@ import reportServerError from "../reportServerError";
 const ENTRIES_PER_FETCH = 25;
 
 export interface EntryQuery {
-  // TODO: Instead of using sentinel values, use null
   search: string;
   logbooks: string[];
   tags: string[];
