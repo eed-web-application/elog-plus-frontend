@@ -1,4 +1,4 @@
-import { Attachment, fetch } from ".";
+import { Attachment, NotFoundError, Shift, fetch } from ".";
 
 export interface EntrySummary {
   id: string;
@@ -8,7 +8,7 @@ export interface EntrySummary {
   loggedBy: string;
   loggedAt: Date;
   eventAt: Date;
-  shift: string;
+  shift?: Shift;
 }
 
 export interface Entry extends EntrySummary {
@@ -64,6 +64,7 @@ export async function fetchEntries({
   logbooks = [],
   tags = [],
   anchorId,
+  hideSummaries,
 }: {
   startDate?: Date;
   endDate?: Date;
@@ -74,6 +75,7 @@ export async function fetchEntries({
   logbooks?: string[];
   tags?: string[];
   anchorId?: string;
+  hideSummaries?: boolean;
 }): Promise<EntrySummary[]> {
   const params: Record<string, string> = {
     logbooks: logbooks.join(","),
@@ -101,6 +103,9 @@ export async function fetchEntries({
   if (anchorId) {
     params.anchorId = anchorId;
   }
+  if (hideSummaries) {
+    params.hideSummaries = "true";
+  }
   const data = await fetch("v1/entries", { params });
   return data.map(normalizeEntry);
 }
@@ -116,6 +121,18 @@ export async function fetchEntry(id: string): Promise<Entry> {
 
   const entry: Entry = normalizeEntry(data);
   return entry;
+}
+
+export function fetchShiftSummary(
+  shiftId: string,
+  date: string
+): Promise<string | undefined> {
+  return fetch(`v1/entries/${shiftId}/summaries/${date}`).catch((e) => {
+    if (e instanceof NotFoundError) {
+      return;
+    }
+    throw e;
+  });
 }
 
 export function createEntry(entry: EntryNew): Promise<string> {

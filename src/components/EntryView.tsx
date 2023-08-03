@@ -98,7 +98,7 @@ export default function EntryView({ entry }: Props) {
         {entry.shift && (
           <div>
             <div className="text-gray-500">During</div>
-            {entry.shift}
+            {entry.shift.name}
           </div>
         )}
         {entry.tags.length > 0 && (

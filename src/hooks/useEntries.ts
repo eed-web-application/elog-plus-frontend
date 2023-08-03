@@ -16,6 +16,7 @@ export interface EntryQuery {
 export interface Params extends Partial<EntryQuery> {
   spotlight?: string;
   onSpotlightFetched?: () => void;
+  hideSummaries?: boolean;
 }
 
 /**
@@ -31,6 +32,7 @@ export default function useEntries({
   endDate,
   sortByLogDate,
   onSpotlightFetched,
+  hideSummaries,
 }: Params) {
   const [entries, setEntries] = useState<EntrySummary[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
