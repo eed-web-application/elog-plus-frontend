@@ -41,10 +41,10 @@ export default function EntryGroup({
 }: Props) {
   const representative = entries[0];
   const summaryId = useSummary(
-    headerKind === "none" || headerKind === "day"
+    headerKind === "none" || headerKind === "day" || !representative
       ? undefined
       : representative.shift?.id,
-    dateToDateString(representative.eventAt)
+    representative ? dateToDateString(representative.eventAt) : undefined
   );
 
   if (!representative) {
