@@ -309,71 +309,75 @@ export default function EntryForm({
               "block w-full mb-2"
             )}
           />
-          <label className="text-gray-500 mb-1 flex items-center">
-            <input
-              type="checkbox"
-              className={cn(Checkbox, "mr-2")}
-              checked={draft.summarizes !== undefined}
-              onChange={() =>
-                updateDraft({
-                  ...draft,
-                  summarizes: draft.summarizes
-                    ? undefined
-                    : {
-                        shiftId: "",
-                        date: dateToDateString(new Date()),
+          {kind === "newEntry" && (
+            <>
+              <label className="text-gray-500 mb-1 flex items-center">
+                <input
+                  type="checkbox"
+                  className={cn(Checkbox, "mr-2")}
+                  checked={draft.summarizes !== undefined}
+                  onChange={() =>
+                    updateDraft({
+                      ...draft,
+                      summarizes: draft.summarizes
+                        ? undefined
+                        : {
+                            shiftId: "",
+                            date: dateToDateString(new Date()),
+                          },
+                    })
+                  }
+                />
+                Shift summary
+              </label>
+              <div className="flex gap-3 mb-2">
+                <Select
+                  placeholder="Shift"
+                  required
+                  containerClassName="block w-full"
+                  className="w-full"
+                  noOptionsLabel={shifts ? undefined : "Select a logbook first"}
+                  options={(shifts || []).map(({ name, id }) => ({
+                    label: name,
+                    value: id,
+                  }))}
+                  value={draft.summarizes?.shiftId || null}
+                  setValue={(shift) =>
+                    updateDraft({
+                      ...draft,
+                      summarizes: draft.summarizes && {
+                        ...draft.summarizes,
+                        shiftId: shift || "",
                       },
-                })
-              }
-            />
-            Shift summary
-          </label>
-          <div className="flex gap-3 mb-2">
-            <Select
-              placeholder="Shift"
-              required
-              containerClassName="block w-full"
-              className="w-full"
-              noOptionsLabel={shifts ? undefined : "Select a logbook first"}
-              options={(shifts || []).map(({ name, id }) => ({
-                label: name,
-                value: id,
-              }))}
-              value={draft.summarizes?.shiftId || null}
-              setValue={(shift) =>
-                updateDraft({
-                  ...draft,
-                  summarizes: draft.summarizes && {
-                    ...draft.summarizes,
-                    shiftId: shift || "",
-                  },
-                })
-              }
-              invalid={invalid.includes("shiftName")}
-              onBlur={() => validate("shiftName")}
-              disabled={!draft.summarizes}
-            />
-            <input
-              type="date"
-              value={draft.summarizes?.date || ""}
-              onChange={(e) =>
-                updateDraft({
-                  ...draft,
-                  summarizes: draft.summarizes && {
-                    ...draft.summarizes,
-                    date: e.currentTarget.value,
-                  },
-                })
-              }
-              className={cn(
-                Input,
-                invalid.includes("shiftDate") && InputInvalid,
-                "block w-full"
-              )}
-              onBlur={() => validate("shiftDate")}
-              disabled={!draft.summarizes}
-            />
-          </div>
+                    })
+                  }
+                  invalid={invalid.includes("shiftName")}
+                  onBlur={() => validate("shiftName")}
+                  disabled={!draft.summarizes}
+                />
+                <input
+                  type="date"
+                  value={draft.summarizes?.date || ""}
+                  onChange={(e) =>
+                    updateDraft({
+                      ...draft,
+                      summarizes: draft.summarizes && {
+                        ...draft.summarizes,
+                        date: e.currentTarget.value,
+                      },
+                    })
+                  }
+                  className={cn(
+                    Input,
+                    invalid.includes("shiftDate") && InputInvalid,
+                    "block w-full"
+                  )}
+                  onBlur={() => validate("shiftDate")}
+                  disabled={!draft.summarizes}
+                />
+              </div>
+            </>
+          )}
 
           {/* Not using a label here, because there are some weird */}
           {/* interactions with having multiple inputs under the same label */}
