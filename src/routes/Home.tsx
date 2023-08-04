@@ -109,13 +109,13 @@ export default function Home() {
     document.addEventListener("mouseup", endDrag);
   }, [mouseMoveHandler, endDrag]);
 
-  let headerKind: EntryListProps["headerKind"];
+  let groupBy: EntryListProps["groupBy"];
   if (query.logbooks.length === 0) {
-    headerKind = "day";
+    groupBy = "day";
   } else if (query.logbooks.length === 1) {
-    headerKind = "shift";
+    groupBy = "shift";
   } else {
-    headerKind = "logbookShift";
+    groupBy = "logbookAndShift";
   }
 
   return (
@@ -155,12 +155,11 @@ export default function Home() {
               isLoading={isLoading}
               selectable
               expandable
-              headerKind={headerKind}
+              groupBy={groupBy}
               showFollowUps
               allowFollowUp
               allowSupersede
               allowSpotlightForFollowUps
-              allowSummarize
               onBottomVisible={reachedBottom ? undefined : getMoreEntries}
               spotlight={spotlight}
             />

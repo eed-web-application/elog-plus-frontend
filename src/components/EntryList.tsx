@@ -1,49 +1,49 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { EntrySummary, fetchShiftSummary } from "../api";
-import EntryRow from "./EntryRow";
+import { useCallback, useEffect, useMemo } from "react";
+import { EntrySummary } from "../api";
+import EntryGroup, { Props as EntryGroupProps } from "./EntryGroup";
 import Spinner from "./Spinner";
-import { Link } from "react-router-dom";
 import dateToDateString from "../utils/dateToDateString";
 
-function groupBy<K, V>(
+function rollingGroupBy<K, V>(
   list: Array<V>,
-  keyGetter: (input: V) => K
-): Map<K, Array<V>> {
-  const map = new Map();
+  groupBy: (input: V) => K
+): [K, V[]][] {
+  const groups: [K, V[]][] = [];
+  let currentGroup: V[] | undefined;
+  let currentGroupKey: K | undefined;
+
   list.forEach((item) => {
-    const key = keyGetter(item);
-    const collection = map.get(key);
-    if (!collection) {
-      map.set(key, [item]);
+    const groupKey = groupBy(item);
+
+    if (groupKey === currentGroupKey && currentGroup !== undefined) {
+      currentGroup.push(item);
     } else {
-      collection.push(item);
+      if (currentGroup && currentGroupKey) {
+        groups.push([currentGroupKey, currentGroup]);
+      }
+
+      currentGroupKey = groupKey;
+      currentGroup = [item];
     }
   });
-  return map;
+
+  if (currentGroupKey && currentGroup) {
+    groups.push([currentGroupKey, currentGroup]);
+  }
+
+  return groups;
 }
 
-export interface Props {
-  entries: EntrySummary[];
+export interface Props
+  extends Omit<
+    EntryGroupProps,
+    "headerKind" | "summaryButton" | "lastEntryRef" | "headerKind"
+  > {
   emptyLabel?: string;
-  spotlight?: string;
   selected?: string;
-  headerKind?: "shift" | "logbookShift" | "day" | "none";
+  groupBy?: EntryGroupProps["headerKind"];
   isLoading?: boolean;
-  expandable?: boolean;
-  selectable?: boolean;
-  expandDefault?: boolean;
-  showEntryDates?: boolean;
-  showFollowUps?: boolean;
-  allowFollowUp?: boolean;
-  allowSupersede?: boolean;
-  allowSpotlight?: boolean;
-  allowSpotlightForFollowUps?: boolean;
-  allowSummarize?: boolean;
   onBottomVisible?: () => void;
-}
-
-function getShiftIdent(entry: EntrySummary): string {
-  return JSON.stringify([entry.shift?.id, dateToDateString(entry.loggedAt)]);
 }
 
 /**
@@ -52,40 +52,11 @@ function getShiftIdent(entry: EntrySummary): string {
 export default function EntryList({
   entries,
   emptyLabel,
-  spotlight,
-  selected,
-  headerKind = "none",
+  groupBy = "none",
   isLoading,
-  expandable,
-  selectable,
-  expandDefault,
-  showEntryDates,
-  showFollowUps,
-  allowFollowUp,
-  allowSupersede,
-  allowSpotlight,
-  allowSpotlightForFollowUps,
-  allowSummarize,
   onBottomVisible,
+  ...rest
 }: Props) {
-  let currentHeader: string | undefined;
-  // Okay, shift summaries are a mess, so here what's going on:
-  // With header kind "shift" or "logbookShift", we want to
-  // display "View summary" linking to the summary if there exists a shift
-  // summary or "Summarize shift" if there does no exist a shift summary.
-  // However, we don't know if there exists a shift summary without first
-  // fetching the server. So, once the entries are loaded, we go through each
-  // one and map it to its "ShiftIdent" which just means a JSON string
-  // of an array where the first element is the shiftId and the second is
-  // the date of the shift. Then, we remove duplicates, and fetch the summaries
-  // and load them into `shiftSummaries`. Then, to render the header with
-  // the propery button, we convert the first entry of each block (which will
-  // have the same shift and date as the others in the same block) to its
-  // shiftIdent and finds it in `shiftSummaries`.
-  const [shiftSummaries, setShiftSummaries] = useState<
-    Record<string, string | null>
-  >({});
-
   const observer = useMemo(
     () =>
       new IntersectionObserver(([entry]) => {
@@ -109,48 +80,27 @@ export default function EntryList({
     return () => observer.disconnect();
   }, [observer]);
 
-  const renderHeader = useCallback(
-    (entry: EntrySummary) => {
-      const date = entry.loggedAt.toLocaleDateString("en-us", {
-        weekday: "long",
-        year: "numeric",
-        month: "short",
-        day: "numeric",
-      });
-      if (headerKind === "day") {
-        return date;
-      }
-      if (headerKind === "shift") {
-        return `${entry.shift?.name || "No shift"} • ${date}`;
-      }
-      if (headerKind === "logbookShift") {
-        return `${entry.logbook} • ${
-          entry.shift?.name || "No shift"
-        } • ${date}`;
-      }
-    },
-    [headerKind]
-  );
+  let entryGroups: [string, EntrySummary[]][] | undefined;
+  if (groupBy !== "none") {
+    let groupByFunc = (entry: EntrySummary) => dateToDateString(entry.eventAt);
 
-  const entryGroups = groupBy(entries, renderHeader);
+    if (groupBy === "shift") {
+      groupByFunc = (entry: EntrySummary) =>
+        JSON.stringify([
+          dateToDateString(entry.eventAt),
+          entry.shift?.id || null,
+        ]);
+    } else if (groupBy === "logbookAndShift") {
+      groupByFunc = (entry: EntrySummary) =>
+        JSON.stringify([
+          dateToDateString(entry.eventAt),
+          entry.shift?.id || null,
+          entry.logbook,
+        ]);
+    }
 
-  useEffect(() => {
-    const needsToBeChecked = new Set(
-      entries.filter((entry) => entry.shift).map(getShiftIdent)
-    );
-    needsToBeChecked.forEach(async (shiftIdent) => {
-      if (shiftIdent in shiftSummaries) {
-        return;
-      }
-
-      const [shiftId, date] = JSON.parse(shiftIdent);
-      const summaryId = (await fetchShiftSummary(shiftId, date)) || null;
-      setShiftSummaries((summaries) => ({
-        ...summaries,
-        [shiftIdent]: summaryId,
-      }));
-    });
-  }, [entries]);
+    entryGroups = rollingGroupBy(entries, groupByFunc);
+  }
 
   if (entries.length === 0 && !isLoading && emptyLabel) {
     return (
@@ -160,102 +110,23 @@ export default function EntryList({
 
   return (
     <>
-      {Array.from(entryGroups, ([headerText, entries], groupIndex) => {
-        let header;
-
-        if (headerKind !== "none" && headerText !== currentHeader) {
-          currentHeader = headerText;
-          header = <h3 className="text-lg truncate">{headerText}</h3>;
-        }
-
-        let summaryButton;
-        const shiftIdent = entries[0] ? getShiftIdent(entries[0]) : undefined;
-
-        if (
-          (headerKind === "shift" || headerKind === "logbookShift") &&
-          allowSummarize &&
-          shiftIdent &&
-          shiftIdent in shiftSummaries
-        ) {
-          const buttonBase =
-            "font-medium text-gray-700 hover:underline text-right";
-          if (shiftSummaries[shiftIdent]) {
-            summaryButton = (
-              <Link
-                to={{
-                  pathname: `/${shiftSummaries[shiftIdent]}`,
-                  search: window.location.search,
-                }}
-                className={buttonBase}
-              >
-                View summary
-              </Link>
-            );
-          } else {
-            summaryButton = (
-              <Link
-                to={{
-                  pathname: "/new-entry",
-                  search: window.location.search,
-                }}
-                state={{
-                  logbook: entries[0].logbook,
-                  summarizes: {
-                    shiftId: entries[0].shift?.id,
-                    date: dateToDateString(entries[0].eventAt),
-                  },
-                }}
-                className={buttonBase}
-              >
-                Summarize shift
-              </Link>
-            );
-          }
-        }
-
-        return (
-          <div
-            key={headerText || "only key because headerKind == 'none'"}
-            className="rounded-lg border mb-2 overflow-hidden"
-          >
-            {header && (
-              <div className="flex justify-between items-center border-b gap-3 px-3 pt-1.5 pb-1 bg-gray-100 whitespace-nowrap">
-                {header}
-                {summaryButton}
-              </div>
-            )}
-            {entries.map((entry, entryIndex) => {
-              const lastEntry =
-                entryIndex === entries.length - 1 &&
-                groupIndex === entryGroups.size - 1;
-              return (
-                <div
-                  key={entry.id}
-                  className={
-                    entryIndex === entries.length - 1 ? "" : "border-b"
-                  }
-                  ref={lastEntry ? observe : undefined}
-                >
-                  <EntryRow
-                    entry={entry}
-                    spotlight={spotlight === entry.id}
-                    expandable={expandable}
-                    selectable={selectable}
-                    showFollowUps={showFollowUps}
-                    expandedByDefault={expandDefault}
-                    showDate={showEntryDates}
-                    allowFollowUp={allowFollowUp}
-                    allowSupersede={allowSupersede}
-                    allowSpotlight={allowSpotlight}
-                    allowSpotlightForFollowUps={allowSpotlightForFollowUps}
-                    selected={entry.id === selected}
-                  />
-                </div>
-              );
-            })}
-          </div>
-        );
-      })}
+      {entryGroups ? (
+        entryGroups.map(([key, entries], groupIndex) => (
+          <EntryGroup
+            key={key}
+            entries={entries}
+            lastEntryRef={
+              entryGroups && groupIndex === entryGroups.length - 1
+                ? observe
+                : undefined
+            }
+            headerKind={groupBy}
+            {...rest}
+          />
+        ))
+      ) : (
+        <EntryGroup entries={entries} />
+      )}
 
       {isLoading && <Spinner large className="my-4 m-auto" />}
     </>
