@@ -59,8 +59,12 @@ export default function EntryForm({
   const [draft, updateDraft, removeDraft] = useDraftsStore((state) =>
     state.startDrafting(kind)
   );
-  const { tags, bumpTag } = useTags({
-    loadInitial: Boolean(draft.logbook),
+  const {
+    tags,
+    bumpTag,
+    loadInitial: loadTags,
+  } = useTags({
+    lazy: true,
     logbooks: draft.logbook ? [draft.logbook] : [],
   });
   const {
@@ -270,6 +274,7 @@ export default function EntryForm({
               predefinedOptions={tags || []}
               onOptionSelected={bumpTag}
               value={draft.tags}
+              onFocus={loadTags}
               setValue={(tags) => updateDraft({ ...draft, tags: tags || [] })}
             />
           </label>

@@ -2,8 +2,9 @@ import { useCallback, useEffect, useState } from "react";
 import { Logbook, ServerError, fetchLogbooks } from "../api";
 import reportServerError from "../reportServerError";
 
-export default function useLogbooks() {
+export default function useLogbooks(lazy = false) {
   const [logbooks, setLogbooks] = useState<Logbook[] | null>(null);
+  const hasLoaded = Boolean(logbooks);
 
   const fetch = useCallback(async () => {
     try {
@@ -17,8 +18,16 @@ export default function useLogbooks() {
   }, []);
 
   useEffect(() => {
-    fetch();
-  }, [fetch]);
+    if (!lazy && !hasLoaded) {
+      fetch();
+    }
+  }, [fetch, lazy, hasLoaded]);
 
-  return { logbooks, refresh: fetch };
+  const loadInitial = useCallback(() => {
+    if (!hasLoaded) {
+      fetch();
+    }
+  }, [hasLoaded, fetch]);
+
+  return { logbooks, loadInitial, refresh: fetch };
 }

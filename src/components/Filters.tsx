@@ -20,10 +20,14 @@ export interface Props {
 }
 
 export default function Filters({ filters, setFilters }: Props) {
-  const { logbooks } = useLogbooks();
-  const { tags, fetchTags, bumpTag } = useTags({
+  const { logbooks, loadInitial: loadLogbooks } = useLogbooks(true);
+  const {
+    tags,
+    loadInitial: loadTags,
+    bumpTag,
+  } = useTags({
     logbooks: filters.logbooks,
-    loadInitial: false,
+    lazy: true,
   });
 
   const logbookFilterLabel = useCallback(() => {
@@ -85,6 +89,7 @@ export default function Filters({ filters, setFilters }: Props) {
         label={logbookFilterLabel()}
         enabled={filters.logbooks.length !== 0}
         onDisable={() => setFilters({ ...filters, logbooks: [] })}
+        onOpen={loadLogbooks}
       >
         <MultiSelectMenu
           selected={filters.logbooks.map((name) => name.toUpperCase())}
@@ -102,7 +107,7 @@ export default function Filters({ filters, setFilters }: Props) {
         className="mr-3 mt-2"
         label={tagFilterLabel()}
         enabled={filters.tags.length !== 0}
-        onOpen={fetchTags}
+        onOpen={loadTags}
         onDisable={() => setFilters({ ...filters, tags: [] })}
       >
         <MultiSelectMenu

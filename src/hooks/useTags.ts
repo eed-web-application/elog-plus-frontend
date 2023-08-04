@@ -5,10 +5,10 @@ import reportServerError from "../reportServerError";
 
 export default function useTags({
   logbooks = [],
-  loadInitial = true,
+  lazy = false,
 }: {
   logbooks?: string[];
-  loadInitial?: boolean;
+  lazy?: boolean;
 }) {
   const [tagsLoaded, setTagsLoaded] = useState<Record<string, string[]>>({});
   const [bumpTag, sortTagsByMostRecent] = useTagUsageStore((state) => [
@@ -37,10 +37,21 @@ export default function useTags({
   }, [logbooksAsKey, logbooks]);
 
   useEffect(() => {
-    if (loadInitial && !hasTagsLoaded) {
+    if (!lazy && !hasTagsLoaded) {
       fetch();
     }
-  }, [fetch, loadInitial, hasTagsLoaded]);
+  }, [fetch, lazy, hasTagsLoaded]);
 
-  return { bumpTag, tags: sortTagsByMostRecent(tags), fetchTags: fetch };
+  const loadInitial = useCallback(() => {
+    if (!hasTagsLoaded) {
+      fetch();
+    }
+  }, [hasTagsLoaded, fetch]);
+
+  return {
+    bumpTag,
+    tags: sortTagsByMostRecent(tags),
+    loadInitial,
+    refresh: fetch,
+  };
 }
