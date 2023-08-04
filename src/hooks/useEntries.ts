@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { EntrySummary, ServerError, fetchEntries } from "../api";
 import reportServerError from "../reportServerError";
 
@@ -41,11 +41,14 @@ export default function useEntries({
   // Since we want to include all the entries in the same day of the date
   // and the backend only returns entries before the date, we make sure the
   // date is at the end of the day
-  let endOfEndDate: Date | null = null;
-  if (endDate) {
-    endOfEndDate = new Date(endDate);
-    endOfEndDate.setUTCHours(23, 59, 59, 999);
-  }
+  const endOfEndDate = useMemo(() => {
+    let endOfEndDate: Date | null = null;
+    if (endDate) {
+      endOfEndDate = new Date(endDate);
+      endOfEndDate.setUTCHours(23, 59, 59, 999);
+    }
+    return endOfEndDate;
+  }, [endDate]);
 
   const fetchSurroundingSpotlight = useCallback(async () => {
     setIsLoading(true);
