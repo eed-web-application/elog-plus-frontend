@@ -148,6 +148,9 @@ export default function EntryForm({
       removeDraft();
 
       queryClient.invalidateQueries({ queryKey: ["entries"] });
+      if (kind !== "newEntry") {
+        queryClient.invalidateQueries({ queryKey: ["entry", kind[1]] });
+      }
 
       onEntryCreated(id);
     }

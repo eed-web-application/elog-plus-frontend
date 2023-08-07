@@ -1,28 +1,22 @@
-import { useEffect, useState } from "react";
+import { ServerError, fetchEntry } from "../api";
+import { useQuery } from "@tanstack/react-query";
 import reportServerError from "../reportServerError";
-import { Entry, ServerError } from "../api";
-import { useEntriesStore } from "../entriesStore";
 
-export default function useEntry(entryId?: string) {
-  const [entry, setEntry] = useState<Entry | null>(null);
-  const getOrFetch = useEntriesStore((state) => state.getOrFetch);
-
-  useEffect(() => {
-    async function fetch(entryId: string) {
-      try {
-        await getOrFetch(entryId).then(setEntry);
-      } catch (e) {
-        if (!(e instanceof ServerError)) {
-          throw e;
-        }
-        reportServerError("Could not retrieve entry", e);
+export default function useEntry(entryId?: string, onError?: () => void) {
+  const { data } = useQuery({
+    queryKey: ["entry", entryId],
+    enabled: Boolean(entryId),
+    queryFn: () => fetchEntry(entryId as string),
+    useErrorBoundary: (e) => !(e instanceof ServerError),
+    onError: (e) => {
+      if (!(e instanceof ServerError)) {
+        throw e;
       }
-    }
 
-    if (!entry && entryId) {
-      fetch(entryId);
-    }
-  }, [getOrFetch, entry, entryId]);
+      reportServerError("Could not retrieve entry", e);
+      onError?.();
+    },
+  });
 
-  return entry;
+  return data;
 }

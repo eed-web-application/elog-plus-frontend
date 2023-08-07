@@ -14,17 +14,23 @@ import Home from "./routes/Home.tsx";
 import Supersede from "./routes/Supersede.tsx";
 import FollowUp from "./routes/FollowUp.tsx";
 import NewEntry from "./routes/NewEntry.tsx";
-import { useEntriesStore } from "./entriesStore.ts";
 import ViewEntry from "./routes/ViewEntry.tsx";
 import ErrorBoundary from "./routes/ErrorBoundary";
 import Admin from "./routes/Admin.tsx";
-import * as api from "./api";
+import { fetchEntry, ServerError } from "./api";
 import "./index.css";
 import reportServerError from "./reportServerError.tsx";
 
+const queryClient = new QueryClient();
+
 function entryLoader({ params }: { params: Params }) {
   if (params.entryId) {
-    return useEntriesStore.getState().getOrFetch(params.entryId);
+    const entryId = params.entryId as string;
+
+    return queryClient.fetchQuery({
+      queryKey: ["entry", entryId],
+      queryFn: () => fetchEntry(entryId),
+    });
   }
   return null;
 }
@@ -81,10 +87,8 @@ const router = createBrowserRouter([
   },
 ]);
 
-const queryClient = new QueryClient();
-
 window.addEventListener("unhandledrejection", (e) => {
-  if (e.reason instanceof api.ServerError) {
+  if (e.reason instanceof ServerError) {
     reportServerError("Unexpected error", e.reason);
   }
 });
