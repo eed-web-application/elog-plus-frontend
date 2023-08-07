@@ -1,10 +1,9 @@
-import { useCallback, useMemo, useRef } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useLocation, useOutlet, useSearchParams } from "react-router-dom";
 import cn from "classnames";
 import Filters, { Filters as FiltersObject } from "../components/Filters";
 import Navbar from "../components/Navbar";
 import EntryList, { Props as EntryListProps } from "../components/EntryList";
-import EntryRefreshContext from "../EntryRefreshContext";
 import useEntries from "../hooks/useEntries";
 import useIsSmallScreen from "../hooks/useIsSmallScreen";
 import { EntryQuery } from "../hooks/useEntries";
@@ -55,28 +54,46 @@ export default function Home() {
   const bodyRef = useRef<HTMLDivElement>(null);
   const gutterRef = useRef<HTMLDivElement>(null);
   const [searchParams, setSearchParams] = useSearchParams();
+  // Although the spotlight state in stored in the location state,
+  // this is used if the spotlighted entry is not loaded and thus needs to be
+  // fetched.
+  const [spotlightSearch, setSpotlightSearch] = useState<string | undefined>(
+    undefined
+  );
   const query = useMemo(() => deserializeQuery(searchParams), [searchParams]);
   const location = useLocation();
 
-  function setQuery(query: EntryQuery, preserveState = false) {
-    setSearchParams(serializeQuery(query), {
-      replace: true,
-      state: preserveState ? location.state : undefined,
-    });
-  }
+  const setQuery = useCallback(
+    (query: EntryQuery, preserveState = false) => {
+      setSearchParams(serializeQuery(query), {
+        replace: true,
+        state: preserveState ? location.state : undefined,
+      });
+    },
+    [location.state, setSearchParams]
+  );
 
-  function resetQuery() {
-    setQuery(DEFAULT_QUERY, true);
-  }
+  const { isLoading, entries, getMoreEntries, reachedBottom } = useEntries({
+    query,
+    spotlight: spotlightSearch,
+  });
 
   const spotlight = location.state?.spotlight;
-  const { refreshEntries, isLoading, entries, getMoreEntries, reachedBottom } =
-    useEntries({
-      ...query,
-      autoRefresh: true,
-      spotlight,
-      onSpotlightFetched: resetQuery,
-    });
+
+  // Ensure the spotlighted element is loaded and if not set, setSpotlightSearch
+  // to spotlight
+  useEffect(() => {
+    if (
+      spotlightSearch !== spotlight &&
+      entries !== undefined &&
+      !entries.some((entry) => entry.id === spotlight)
+    ) {
+      setSpotlightSearch(spotlight);
+      if (spotlight) {
+        setQuery(DEFAULT_QUERY, true);
+      }
+    }
+  }, [entries, spotlight, setQuery, spotlightSearch]);
 
   function onFiltersChange(filters: FiltersObject) {
     if (query.logbooks.join(",") !== filters.logbooks.join(",")) {
@@ -119,75 +136,73 @@ export default function Home() {
   }
 
   return (
-    <EntryRefreshContext.Provider value={refreshEntries}>
-      <div className="h-screen flex flex-col">
-        <div
-          className={cn(
-            "p-3 shadow z-10 relative",
-            // Padding for the absolutely positioned info button
-            !isSmallScreen && "px-12"
-          )}
-        >
-          <div className="container m-auto">
-            <Navbar
-              className="mb-1"
-              search={query.search}
-              onSearchChange={onSearchChange}
-            />
+    <div className="h-screen flex flex-col">
+      <div
+        className={cn(
+          "p-3 shadow z-10 relative",
+          // Padding for the absolutely positioned info button
+          !isSmallScreen && "px-12"
+        )}
+      >
+        <div className="container m-auto">
+          <Navbar
+            className="mb-1"
+            search={query.search}
+            onSearchChange={onSearchChange}
+          />
 
-            <InfoDialogButton />
-            <Filters filters={query} setFilters={onFiltersChange} />
-          </div>
-        </div>
-
-        <div className="flex-1 flex overflow-hidden">
-          <div
-            className={cn(
-              "px-3 pt-3 overflow-y-auto w-1/2",
-              (!outlet || isSmallScreen) && "flex-1 pr-3"
-            )}
-            ref={bodyRef}
-          >
-            <EntryList
-              entries={entries || []}
-              emptyLabel="No entries found"
-              selected={location.pathname.split("/")[1]}
-              isLoading={isLoading}
-              selectable
-              expandable
-              groupBy={groupBy}
-              showFollowUps
-              allowFollowUp
-              allowSupersede
-              allowSpotlightForFollowUps
-              onBottomVisible={reachedBottom ? undefined : getMoreEntries}
-              spotlight={spotlight}
-            />
-          </div>
-          {outlet && (
-            <>
-              {!isSmallScreen && (
-                <div
-                  className="relative border-r cursor-col-resize select-none"
-                  onMouseDown={startDrag}
-                  ref={gutterRef}
-                >
-                  <div className="absolute -left-3 w-6 h-full" />
-                </div>
-              )}
-              <div
-                className={cn(
-                  "overflow-y-auto pb-3",
-                  !isSmallScreen && "flex-1 flex-shrink"
-                )}
-                style={{ minWidth: isSmallScreen ? "auto" : MIN_PANE_WIDTH }}
-              >
-                {outlet}
-              </div>
-            </>
-          )}
+          <InfoDialogButton />
+          <Filters filters={query} setFilters={onFiltersChange} />
         </div>
       </div>
-    </EntryRefreshContext.Provider>
+
+      <div className="flex-1 flex overflow-hidden">
+        <div
+          className={cn(
+            "px-3 pt-3 overflow-y-auto w-1/2",
+            (!outlet || isSmallScreen) && "flex-1 pr-3"
+          )}
+          ref={bodyRef}
+        >
+          <EntryList
+            entries={entries || []}
+            emptyLabel="No entries found"
+            selected={location.pathname.split("/")[1]}
+            isLoading={isLoading}
+            selectable
+            expandable
+            groupBy={groupBy}
+            showFollowUps
+            allowFollowUp
+            allowSupersede
+            allowSpotlightForFollowUps
+            onBottomVisible={reachedBottom ? undefined : getMoreEntries}
+            spotlight={spotlight}
+          />
+        </div>
+        {outlet && (
+          <>
+            {!isSmallScreen && (
+              <div
+                className="relative border-r cursor-col-resize select-none"
+                onMouseDown={startDrag}
+                ref={gutterRef}
+              >
+                <div className="absolute -left-3 w-6 h-full" />
+              </div>
+            )}
+            <div
+              className={cn(
+                "overflow-y-auto pb-3",
+                !isSmallScreen && "flex-1 flex-shrink"
+              )}
+              style={{ minWidth: isSmallScreen ? "auto" : MIN_PANE_WIDTH }}
+            >
+              {outlet}
+            </div>
+          </>
+        )}
+      </div>
+    </div>
   );
 }

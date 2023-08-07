@@ -1,14 +1,8 @@
-import {
-  FormEvent,
-  Suspense,
-  lazy,
-  useCallback,
-  useContext,
-  useState,
-} from "react";
+import { FormEvent, Suspense, lazy, useCallback, useState } from "react";
 import cn from "classnames";
 import { useDropzone } from "react-dropzone";
 import { Link } from "react-router-dom";
+import { useQueryClient } from "@tanstack/react-query";
 import {
   EntryNew,
   ServerError,
@@ -27,7 +21,6 @@ import {
   LocalUploadedAttachment,
   useDraftsStore,
 } from "../draftsStore";
-import EntryRefreshContext from "../EntryRefreshContext";
 import TextDivider from "./TextDivider";
 import dateToDateString from "../utils/dateToDateString";
 import useAttachmentUploader, {
@@ -54,8 +47,8 @@ export default function EntryForm({
   onEntryCreated,
   kind = "newEntry",
 }: Props) {
+  const queryClient = useQueryClient();
   const { logbooks } = useLogbooks();
-  const refreshEntries = useContext(EntryRefreshContext);
   const [draft, updateDraft, removeDraft] = useDraftsStore((state) =>
     state.startDrafting(kind)
   );
@@ -153,7 +146,9 @@ export default function EntryForm({
     const id = await saveEntry(newEntry);
     if (id) {
       removeDraft();
-      refreshEntries();
+
+      queryClient.invalidateQueries({ queryKey: ["entries"] });
+
       onEntryCreated(id);
     }
   }
