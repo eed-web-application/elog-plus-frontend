@@ -13,7 +13,7 @@ import elogLogo from "../assets/temp_elog_logo.png";
 const MIN_PANE_WIDTH = 384;
 
 export default function Admin() {
-  const { logbooks, refresh } = useLogbooks();
+  const logbooks = useLogbooks();
   const { logbookId: selectedLogbookId } = useParams();
   const selectedLogbook = logbooks?.find(({ id }) => id === selectedLogbookId);
   const logbooksEdited = useLogbookFormsStore((state) =>
@@ -43,9 +43,8 @@ export default function Admin() {
   }, [mouseMoveHandler, endDrag]);
 
   const onSave = useCallback(() => {
-    refresh();
     toast.success("Saved logbook");
-  }, [refresh]);
+  }, []);
 
   return (
     <div className="flex flex-col max-h-screen">

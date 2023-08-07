@@ -48,7 +48,7 @@ export default function EntryForm({
   kind = "newEntry",
 }: Props) {
   const queryClient = useQueryClient();
-  const { logbooks } = useLogbooks();
+  const logbooks = useLogbooks({ critical: false });
   const [draft, updateDraft, removeDraft] = useDraftsStore((state) =>
     state.startDrafting(kind)
   );

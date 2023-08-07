@@ -1,33 +1,27 @@
-import { useCallback, useEffect, useState } from "react";
-import { Logbook, ServerError, fetchLogbooks } from "../api";
+import { ServerError, fetchLogbooks } from "../api";
 import reportServerError from "../reportServerError";
+import { useQuery } from "@tanstack/react-query";
 
-export default function useLogbooks(lazy = false) {
-  const [logbooks, setLogbooks] = useState<Logbook[] | null>(null);
-  const hasLoaded = Boolean(logbooks);
-
-  const fetch = useCallback(async () => {
-    try {
-      setLogbooks(await fetchLogbooks());
-    } catch (e) {
+export default function useLogbooks({
+  enabled = true,
+  critical = true,
+}: {
+  enabled?: boolean;
+  critical?: boolean;
+} = {}) {
+  const { data } = useQuery({
+    queryKey: ["logbooks"],
+    queryFn: () => fetchLogbooks(),
+    enabled,
+    useErrorBoundary: critical,
+    staleTime: 5 * 60 * 1000,
+    onError: (e) => {
       if (!(e instanceof ServerError)) {
         throw e;
       }
       reportServerError("Could not retrieve logbooks", e);
-    }
-  }, []);
+    },
+  });
 
-  useEffect(() => {
-    if (!lazy && !hasLoaded) {
-      fetch();
-    }
-  }, [fetch, lazy, hasLoaded]);
-
-  const loadInitial = useCallback(() => {
-    if (!hasLoaded) {
-      fetch();
-    }
-  }, [hasLoaded, fetch]);
-
-  return { logbooks, loadInitial, refresh: fetch };
+  return data;
 }

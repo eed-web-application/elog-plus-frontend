@@ -20,8 +20,10 @@ export interface Props {
 }
 
 export default function Filters({ filters, setFilters }: Props) {
+  const [isLogbooksOpen, setIsLogbooksOpen] = useState(false);
   const [isTagsOpen, setIsTagsOpen] = useState(false);
-  const { logbooks, loadInitial: loadLogbooks } = useLogbooks(true);
+
+  const logbooks = useLogbooks({ enabled: isLogbooksOpen });
   const { tags, bumpTag } = useTags({
     logbooks: filters.logbooks,
     enabled: isTagsOpen,
@@ -86,7 +88,8 @@ export default function Filters({ filters, setFilters }: Props) {
         label={logbookFilterLabel()}
         enabled={filters.logbooks.length !== 0}
         onDisable={() => setFilters({ ...filters, logbooks: [] })}
-        onOpen={loadLogbooks}
+        onOpen={() => setIsLogbooksOpen(true)}
+        onClose={() => setIsLogbooksOpen(false)}
       >
         <MultiSelectMenu
           selected={filters.logbooks.map((name) => name.toUpperCase())}

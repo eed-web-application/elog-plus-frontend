@@ -1,5 +1,6 @@
 import { FormEvent, useState } from "react";
 import cn from "classnames";
+import { useQueryClient } from "@tanstack/react-query";
 import {
   Logbook,
   LogbookUpdation,
@@ -23,6 +24,7 @@ export default function LogbookForm({ logbook, onSave }: Props) {
   const [form, setForm, removeForm] = useLogbookFormsStore((state) =>
     state.startEditing(logbook)
   );
+  const queryClient = useQueryClient();
 
   const [newTag, setNewTag] = useState<string>("");
   const [newShift, setNewShift] = useState<string>("");
@@ -100,6 +102,15 @@ export default function LogbookForm({ logbook, onSave }: Props) {
     try {
       await updateLogbook(logbookUpdation);
       removeForm();
+
+      queryClient.invalidateQueries({
+        predicate: ({ queryKey }) =>
+          queryKey[0] === "tags" &&
+          Array.isArray(queryKey[1]) &&
+          (queryKey[1].includes(logbook.name) || queryKey[1].length === 0),
+      });
+      queryClient.invalidateQueries({ queryKey: ["logbooks"] });
+
       onSave();
     } catch (e) {
       if (!(e instanceof ServerError)) {
