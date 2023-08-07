@@ -154,6 +154,16 @@ export default function EntryForm({
           Array.isArray(queryKey[1]) &&
           (queryKey[1].includes(newEntry.logbook) || queryKey[1].length === 0),
       });
+      if (newEntry.summarizes) {
+        queryClient.setQueryData(
+          [
+            "shiftSummary",
+            newEntry.summarizes.shiftId,
+            newEntry.summarizes.date,
+          ],
+          id
+        );
+      }
 
       onEntryCreated(id);
     }
