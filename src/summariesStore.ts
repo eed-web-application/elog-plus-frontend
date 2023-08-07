@@ -24,6 +24,7 @@ export const useSummariesStore = create<SummariesStore>((set, get) => ({
     if (summaryId) {
       state.update(shiftId, date, summaryId);
     }
+    return summaryId;
   },
   update: (shiftId: string, date: string, summaryId: string) => {
     set(({ summaries }) => {
