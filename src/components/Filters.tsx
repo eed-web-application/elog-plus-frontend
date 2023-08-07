@@ -1,4 +1,4 @@
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 import { EntryQuery } from "../hooks/useEntries";
 import FilterChip from "./FilterChip.tsx";
 import MultiSelectMenu from "./MultiSelectMenu.tsx";
@@ -20,14 +20,11 @@ export interface Props {
 }
 
 export default function Filters({ filters, setFilters }: Props) {
+  const [isTagsOpen, setIsTagsOpen] = useState(false);
   const { logbooks, loadInitial: loadLogbooks } = useLogbooks(true);
-  const {
-    tags,
-    loadInitial: loadTags,
-    bumpTag,
-  } = useTags({
+  const { tags, bumpTag } = useTags({
     logbooks: filters.logbooks,
-    lazy: true,
+    enabled: isTagsOpen,
   });
 
   const logbookFilterLabel = useCallback(() => {
@@ -107,7 +104,8 @@ export default function Filters({ filters, setFilters }: Props) {
         className="mr-3 mt-2"
         label={tagFilterLabel()}
         enabled={filters.tags.length !== 0}
-        onOpen={loadTags}
+        onOpen={() => setIsTagsOpen(true)}
+        onClose={() => setIsTagsOpen(false)}
         onDisable={() => setFilters({ ...filters, tags: [] })}
       >
         <MultiSelectMenu

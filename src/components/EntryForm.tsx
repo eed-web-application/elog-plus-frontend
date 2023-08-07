@@ -52,12 +52,9 @@ export default function EntryForm({
   const [draft, updateDraft, removeDraft] = useDraftsStore((state) =>
     state.startDrafting(kind)
   );
-  const {
-    tags,
-    bumpTag,
-    loadInitial: loadTags,
-  } = useTags({
-    lazy: true,
+  const [isTagsOpen, setIsTagsOpen] = useState(false);
+  const { tags, bumpTag } = useTags({
+    enabled: isTagsOpen,
     logbooks: draft.logbook ? [draft.logbook] : [],
   });
   const {
@@ -151,6 +148,12 @@ export default function EntryForm({
       if (kind !== "newEntry") {
         queryClient.invalidateQueries({ queryKey: ["entry", kind[1]] });
       }
+      queryClient.invalidateQueries({
+        predicate: ({ queryKey }) =>
+          queryKey[0] === "tags" &&
+          Array.isArray(queryKey[1]) &&
+          (queryKey[1].includes(newEntry.logbook) || queryKey[1].length === 0),
+      });
 
       onEntryCreated(id);
     }
@@ -272,7 +275,8 @@ export default function EntryForm({
               predefinedOptions={tags || []}
               onOptionSelected={bumpTag}
               value={draft.tags}
-              onFocus={loadTags}
+              onFocus={() => setIsTagsOpen(true)}
+              onBlur={() => setIsTagsOpen(false)}
               setValue={(tags) => updateDraft({ ...draft, tags: tags || [] })}
             />
           </label>
