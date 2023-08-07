@@ -73,7 +73,7 @@ export default function Home() {
   const { refreshEntries, isLoading, entries, getMoreEntries, reachedBottom } =
     useEntries({
       ...query,
-      hideSummaries: query.logbooks.length > 0,
+      autoRefresh: true,
       spotlight,
       onSpotlightFetched: resetQuery,
     });
