@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo } from "react";
+import { useCallback, useEffect, useMemo, useRef } from "react";
 import { EntrySummary } from "../api";
 import EntryGroup, { Props as EntryGroupProps } from "./EntryGroup";
 import Spinner from "./Spinner";
@@ -57,6 +57,8 @@ export default function EntryList({
   onBottomVisible,
   ...rest
 }: Props) {
+  const lastObserved = useRef<HTMLDivElement | null>(null);
+
   const observer = useMemo(
     () =>
       new IntersectionObserver(([entry]) => {
@@ -69,15 +71,26 @@ export default function EntryList({
 
   const observe = useCallback(
     (elem: HTMLDivElement | null) => {
+      if (lastObserved.current) {
+        observer.unobserve(lastObserved.current);
+      }
+
       if (elem) {
         observer.observe(elem);
+        lastObserved.current = elem;
       }
     },
     [observer]
   );
 
   useEffect(() => {
-    return () => observer.disconnect();
+    return () => {
+      if (lastObserved.current) {
+        observer.unobserve(lastObserved.current);
+      }
+
+      observer.disconnect();
+    };
   }, [observer]);
 
   let entryGroups: [string, EntrySummary[]][] | undefined;
