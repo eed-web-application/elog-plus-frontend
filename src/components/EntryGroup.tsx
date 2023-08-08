@@ -122,26 +122,23 @@ export default function EntryGroup({
         const isLastEntry = entryIndex === entries.length - 1;
 
         return (
-          <div
+          <EntryRow
             key={entry.id}
             className={isLastEntry ? "" : "border-b"}
             ref={isLastEntry ? lastEntryRef : undefined}
-          >
-            <EntryRow
-              entry={entry}
-              spotlight={spotlight === entry.id}
-              expandable={expandable}
-              selectable={selectable}
-              showFollowUps={showFollowUps}
-              expandedByDefault={expandDefault}
-              showDate={showEntryDates}
-              allowFollowUp={allowFollowUp}
-              allowSupersede={allowSupersede}
-              allowSpotlight={allowSpotlight}
-              allowSpotlightForFollowUps={allowSpotlightForFollowUps}
-              selected={entry.id === selected}
-            />
-          </div>
+            entry={entry}
+            spotlight={spotlight === entry.id}
+            expandable={expandable}
+            selectable={selectable}
+            showFollowUps={showFollowUps}
+            expandedByDefault={expandDefault}
+            showDate={showEntryDates}
+            allowFollowUp={allowFollowUp}
+            allowSupersede={allowSupersede}
+            allowSpotlight={allowSpotlight}
+            allowSpotlightForFollowUps={allowSpotlightForFollowUps}
+            selected={entry.id === selected}
+          />
         );
       })}
     </div>

@@ -5,6 +5,7 @@ import {
   useState,
   useRef,
   useEffect,
+  forwardRef,
 } from "react";
 import { Link, LinkProps } from "react-router-dom";
 import {
@@ -235,234 +236,246 @@ export interface Props {
  * Horizontal summary of an entry supporting actions (such as follow up or
  * spotlight) and expanding to see the body content and follows ups.
  */
-export default function EntryRow({
-  entry,
-  className,
-  spotlight,
-  selected,
-  selectable,
-  expandable,
-  showFollowUps,
-  expandedByDefault,
-  showDate,
-  allowFollowUp,
-  allowSupersede,
-  allowSpotlight,
-  allowSpotlightForFollowUps,
-}: PropsWithChildren<Props>) {
-  const [expanded, setExpanded] = useState(Boolean(expandedByDefault));
-  const fullEntry = useEntry(expanded ? entry.id : undefined, {
-    critical: false,
-    onError: () => setExpanded(false),
-  });
-
-  const [hasFollowUpDraft, hasSupersedingDraft] = useDraftsStore(
-    ({ drafts }) => [
-      Boolean(drafts[`followUp/${entry.id}`]),
-      Boolean(drafts[`supersede/${entry.id}`]),
-    ]
-  );
-
-  const rootRef = useCallback(
-    (elem: HTMLDivElement) => {
-      if (elem && spotlight) {
-        elem.scrollIntoView({
-          behavior: "smooth",
-          block: "center",
-          inline: "center",
-        });
-      }
+const EntryRow = forwardRef<HTMLDivElement, PropsWithChildren<Props>>(
+  (
+    {
+      entry,
+      className,
+      spotlight,
+      selected,
+      selectable,
+      expandable,
+      showFollowUps,
+      expandedByDefault,
+      showDate,
+      allowFollowUp,
+      allowSupersede,
+      allowSpotlight,
+      allowSpotlightForFollowUps,
     },
-    [spotlight]
-  );
+    ref
+  ) => {
+    const [expanded, setExpanded] = useState(Boolean(expandedByDefault));
+    const fullEntry = useEntry(expanded ? entry.id : undefined, {
+      critical: false,
+      onError: () => setExpanded(false),
+    });
 
-  const spotlightProps = useSpotlightProps(entry.id);
+    const [hasFollowUpDraft, hasSupersedingDraft] = useDraftsStore(
+      ({ drafts }) => [
+        Boolean(drafts[`followUp/${entry.id}`]),
+        Boolean(drafts[`supersede/${entry.id}`]),
+      ]
+    );
 
-  return (
-    <>
-      <div
-        ref={rootRef}
-        className={cn(
-          "flex items-center",
-          selectable && "cursor-pointer relative",
-          selected ? "bg-blue-50 hover:bg-blue-100" : "hover:bg-gray-50",
-          spotlight && "bg-yellow-100 hover:bg-yellow-200",
-          className
-        )}
-      >
-        <div className="px-2 flex flex-col justify-center items-center w-16">
-          {showDate && (
-            <div className="text-sm">
-              {entry.loggedAt.toLocaleDateString("en-us", {
-                month: "short",
-                day: "numeric",
+    const refForSpotlight = useCallback(
+      (elem: HTMLDivElement) => {
+        if (elem && spotlight) {
+          elem.scrollIntoView({
+            behavior: "smooth",
+            block: "center",
+            inline: "center",
+          });
+        }
+      },
+      [spotlight]
+    );
+
+    const refsMerged = useMergeRefs([refForSpotlight, ref]);
+
+    const spotlightProps = useSpotlightProps(entry.id);
+
+    return (
+      <>
+        <div
+          ref={refsMerged}
+          className={cn(
+            "flex items-center",
+            selectable && "cursor-pointer relative",
+            selected ? "bg-blue-50 hover:bg-blue-100" : "hover:bg-gray-50",
+            spotlight && "bg-yellow-100 hover:bg-yellow-200",
+            className
+          )}
+        >
+          <div className="px-2 flex flex-col justify-center items-center w-16">
+            {showDate && (
+              <div className="text-sm">
+                {entry.loggedAt.toLocaleDateString("en-us", {
+                  month: "short",
+                  day: "numeric",
+                })}
+              </div>
+            )}
+            <div className="leading-none">
+              {entry.loggedAt.toLocaleString("en-us", {
+                hour: "numeric",
+                minute: "numeric",
+                hour12: false,
               })}
             </div>
-          )}
-          <div className="leading-none">
-            {entry.loggedAt.toLocaleString("en-us", {
-              hour: "numeric",
-              minute: "numeric",
-              hour12: false,
-            })}
+          </div>
+          <div className="flex-1 flex flex-col py-1 overflow-hidden">
+            {selectable ? (
+              <Link
+                to={{
+                  pathname: `/${entry.id}`,
+                  search: window.location.search,
+                }}
+                // see https://inclusive-components.design/cards/
+                className="truncate leading-[1.2] after:absolute after:left-0 after:right-0 after:bottom-0 after:top-0"
+              >
+                {entry.title}
+              </Link>
+            ) : (
+              <div className="truncate leading-[1.2]">{entry.title}</div>
+            )}
+            <div className="flex items-center h-5">
+              <div className="text-sm text-gray-500 leading-none whitespace-nowrap uppercase">
+                {entry.logbook}
+              </div>
+              <div className="text-sm text-gray-500 leading-none whitespace-nowrap before:content-['•'] before:mx-1">
+                {entry.loggedBy}
+              </div>
+              <TagList tags={entry.tags} />
+            </div>
+          </div>
+          <div className="flex gap-2 pl-3">
+            <FloatingDelayGroup delay={200}>
+              {allowSpotlight && (
+                <RowButton
+                  tooltip="Spotlight"
+                  entrySelected={selected}
+                  entryHighlighted={spotlight}
+                  {...spotlightProps}
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth={1.5}
+                    stroke="currentColor"
+                    className="w-6 h-6"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"
+                    />
+                  </svg>
+                </RowButton>
+              )}
+
+              {allowSupersede && (
+                <RowButton
+                  tooltip="Supersede"
+                  to={{
+                    pathname: `/${entry.id}/supersede`,
+                    search: window.location.search,
+                  }}
+                  entrySelected={selected}
+                  entryHighlighted={spotlight}
+                  marked={hasSupersedingDraft}
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth={1.5}
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L6.832 19.82a4.5 4.5 0 01-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 011.13-1.897L16.863 4.487zm0 0L19.5 7.125"
+                      className="absolute "
+                    />
+                  </svg>
+                </RowButton>
+              )}
+
+              {allowFollowUp && (
+                <RowButton
+                  tooltip="Follow up"
+                  to={{
+                    pathname: `/${entry.id}/follow-up`,
+                    search: window.location.search,
+                  }}
+                  entrySelected={selected}
+                  entryHighlighted={spotlight}
+                  marked={hasFollowUpDraft}
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth={1.5}
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M15 15l6-6m0 0l-6-6m6 6H9a6 6 0 000 12h3"
+                    />
+                  </svg>
+                </RowButton>
+              )}
+              {expandable && (
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth={1.5}
+                  stroke="currentColor"
+                  tabIndex={0}
+                  className={cn(
+                    IconButton,
+                    "z-0",
+                    expanded && "rotate-180",
+                    spotlight && "hover:bg-yellow-300",
+                    selected && !spotlight && "hover:!bg-blue-200"
+                  )}
+                  onClick={() => setExpanded((expanded) => !expanded)}
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M19.5 8.25l-7.5 7.5-7.5-7.5"
+                  />
+                </svg>
+              )}
+            </FloatingDelayGroup>
           </div>
         </div>
-        <div className="flex-1 flex flex-col py-1 overflow-hidden">
-          {selectable ? (
-            <Link
-              to={{ pathname: `/${entry.id}`, search: window.location.search }}
-              // see https://inclusive-components.design/cards/
-              className="truncate leading-[1.2] after:absolute after:left-0 after:right-0 after:bottom-0 after:top-0"
+        {expanded && fullEntry && (
+          <>
+            <div
+              className={cn(
+                "p-2 pb-1 bg-gray-100",
+                fullEntry.text || "text-gray-500"
+              )}
             >
-              {entry.title}
-            </Link>
-          ) : (
-            <div className="truncate leading-[1.2]">{entry.title}</div>
-          )}
-          <div className="flex items-center h-5">
-            <div className="text-sm text-gray-500 leading-none whitespace-nowrap uppercase">
-              {entry.logbook}
+              <EntryBodyText body={fullEntry.text} showEmptyLabel />
+              <EntryFigureList attachments={fullEntry.attachments} />
             </div>
-            <div className="text-sm text-gray-500 leading-none whitespace-nowrap before:content-['•'] before:mx-1">
-              {entry.loggedBy}
-            </div>
-            <TagList tags={entry.tags} />
-          </div>
-        </div>
-        <div className="flex gap-2 pl-3">
-          <FloatingDelayGroup delay={200}>
-            {allowSpotlight && (
-              <RowButton
-                tooltip="Spotlight"
-                entrySelected={selected}
-                entryHighlighted={spotlight}
-                {...spotlightProps}
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth={1.5}
-                  stroke="currentColor"
-                  className="w-6 h-6"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"
-                  />
-                </svg>
-              </RowButton>
-            )}
-
-            {allowSupersede && (
-              <RowButton
-                tooltip="Supersede"
-                to={{
-                  pathname: `/${entry.id}/supersede`,
-                  search: window.location.search,
-                }}
-                entrySelected={selected}
-                entryHighlighted={spotlight}
-                marked={hasSupersedingDraft}
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth={1.5}
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L6.832 19.82a4.5 4.5 0 01-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 011.13-1.897L16.863 4.487zm0 0L19.5 7.125"
-                    className="absolute "
-                  />
-                </svg>
-              </RowButton>
-            )}
-
-            {allowFollowUp && (
-              <RowButton
-                tooltip="Follow up"
-                to={{
-                  pathname: `/${entry.id}/follow-up`,
-                  search: window.location.search,
-                }}
-                entrySelected={selected}
-                entryHighlighted={spotlight}
-                marked={hasFollowUpDraft}
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth={1.5}
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M15 15l6-6m0 0l-6-6m6 6H9a6 6 0 000 12h3"
-                  />
-                </svg>
-              </RowButton>
-            )}
-            {expandable && (
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth={1.5}
-                stroke="currentColor"
-                tabIndex={0}
-                className={cn(
-                  IconButton,
-                  "z-0",
-                  expanded && "rotate-180",
-                  spotlight && "hover:bg-yellow-300",
-                  selected && !spotlight && "hover:!bg-blue-200"
-                )}
-                onClick={() => setExpanded((expanded) => !expanded)}
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M19.5 8.25l-7.5 7.5-7.5-7.5"
+            {showFollowUps && (
+              <div className="ml-6 pt-2 pr-2">
+                <EntryList
+                  entries={fullEntry.followUps}
+                  selectable
+                  expandable
+                  showEntryDates
+                  showFollowUps={showFollowUps}
+                  allowFollowUp={allowFollowUp}
+                  allowSupersede={allowSupersede}
+                  allowSpotlight={allowSpotlightForFollowUps}
                 />
-              </svg>
+              </div>
             )}
-          </FloatingDelayGroup>
-        </div>
-      </div>
-      {expanded && fullEntry && (
-        <>
-          <div
-            className={cn(
-              "p-2 pb-1 bg-gray-100",
-              fullEntry.text || "text-gray-500"
-            )}
-          >
-            <EntryBodyText body={fullEntry.text} showEmptyLabel />
-            <EntryFigureList attachments={fullEntry.attachments} />
-          </div>
-          {showFollowUps && (
-            <div className="ml-6 pt-2 pr-2">
-              <EntryList
-                entries={fullEntry.followUps}
-                selectable
-                expandable
-                showEntryDates
-                showFollowUps={showFollowUps}
-                allowFollowUp={allowFollowUp}
-                allowSupersede={allowSupersede}
-                allowSpotlight={allowSpotlightForFollowUps}
-              />
-            </div>
-          )}
-        </>
-      )}
-    </>
-  );
-}
+          </>
+        )}
+      </>
+    );
+  }
+);
+
+export default EntryRow;
