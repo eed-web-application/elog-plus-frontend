@@ -32,7 +32,14 @@ export default function useEntries({ spotlight, query }: Params) {
     query.endDate.setUTCHours(23, 59, 59, 999);
   }
 
-  const { data, isLoading, fetchNextPage, hasNextPage } = useInfiniteQuery({
+  const {
+    data,
+    isLoading,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    isInitialLoading,
+  } = useInfiniteQuery({
     queryKey: ["entries", query, spotlight],
     queryFn: async ({ pageParam, queryKey }) => {
       const query = queryKey[1] as EntryQuery;
@@ -64,8 +71,8 @@ export default function useEntries({ spotlight, query }: Params) {
 
   return {
     entries: data?.pages.flat(),
-    isLoading,
+    isLoading: isLoading || isFetchingNextPage,
     getMoreEntries: fetchNextPage,
-    reachedBottom: !hasNextPage,
+    reachedBottom: !hasNextPage && !isInitialLoading,
   };
 }
