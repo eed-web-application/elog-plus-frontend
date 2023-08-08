@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef } from "react";
+import cn from "classnames";
 import { EntrySummary } from "../api";
 import EntryGroup, { Props as EntryGroupProps } from "./EntryGroup";
 import Spinner from "./Spinner";
@@ -141,7 +142,7 @@ export default function EntryList({
         <EntryGroup entries={entries} {...rest} />
       )}
 
-      {isLoading && <Spinner large className="my-4 m-auto" />}
+      <Spinner large className={cn("my-4 m-auto", !isLoading && "invisible")} />
     </>
   );
 }
