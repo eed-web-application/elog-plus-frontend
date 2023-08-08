@@ -125,7 +125,7 @@ export default function EntryList({
           />
         ))
       ) : (
-        <EntryGroup entries={entries} />
+        <EntryGroup entries={entries} {...rest} />
       )}
 
       {isLoading && <Spinner large className="my-4 m-auto" />}
