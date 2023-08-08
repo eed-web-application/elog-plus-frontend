@@ -251,9 +251,10 @@ export default function EntryRow({
   allowSpotlightForFollowUps,
 }: PropsWithChildren<Props>) {
   const [expanded, setExpanded] = useState(Boolean(expandedByDefault));
-  const fullEntry = useEntry(expanded ? entry.id : undefined, () =>
-    setExpanded(false)
-  );
+  const fullEntry = useEntry(expanded ? entry.id : undefined, {
+    critical: false,
+    onError: () => setExpanded(false),
+  });
 
   const [hasFollowUpDraft, hasSupersedingDraft] = useDraftsStore(
     ({ drafts }) => [

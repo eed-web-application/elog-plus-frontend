@@ -27,10 +27,12 @@ function entryLoader({ params }: { params: Params }) {
   if (params.entryId) {
     const entryId = params.entryId as string;
 
-    return queryClient.fetchQuery({
-      queryKey: ["entry", entryId],
-      queryFn: () => fetchEntry(entryId),
-    });
+    return queryClient
+      .prefetchQuery({
+        queryKey: ["entry", entryId],
+        queryFn: () => fetchEntry(entryId),
+      })
+      .then(() => null);
   }
   return null;
 }

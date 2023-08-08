@@ -1,13 +1,18 @@
-import { useLoaderData, useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
+import { toast } from "react-toastify";
 import EntryForm from "../components/EntryForm";
 import Pane from "../components/Pane";
-import { Entry } from "../api";
-import { toast } from "react-toastify";
+import useEntry from "../hooks/useEntry";
 
 export default function Supersede() {
   const navigate = useNavigate();
 
-  const entry = useLoaderData() as Entry;
+  const { entryId } = useParams();
+  const entry = useEntry(entryId);
+
+  if (!entry) {
+    return;
+  }
 
   return (
     <Pane>

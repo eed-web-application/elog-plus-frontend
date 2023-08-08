@@ -1,10 +1,15 @@
-import { useLoaderData } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import Pane from "../components/Pane";
-import { Entry } from "../api";
 import EntryView from "../components/EntryView";
+import useEntry from "../hooks/useEntry";
 
 export default function ViewEntry() {
-  const entry = useLoaderData() as Entry;
+  const { entryId } = useParams();
+  const entry = useEntry(entryId);
+
+  if (!entry) {
+    return;
+  }
 
   return (
     <Pane>
