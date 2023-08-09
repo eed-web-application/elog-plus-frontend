@@ -46,18 +46,17 @@ export default function EntryView({ entry }: Props) {
         <div className="text-sm text-gray-500 uppercase">{entry.logbook}</div>
       </div>
       {entry.followingUp && (
-        <div className="pb-2">
+        <>
           <TextDivider>Follows up</TextDivider>
-          <div className="px-3">
-            <EntryRow
-              entry={entry.followingUp}
-              showDate
-              expandable
-              selectable
-              allowSpotlight
-            />
-          </div>
-        </div>
+          <EntryRow
+            containerClassName="mt-1.5 mb-3.5 mx-3 rounded-lg border mb-2 overflow-hidden"
+            entry={entry.followingUp}
+            showDate
+            expandable
+            selectable
+            allowSpotlight
+          />
+        </>
       )}
       <div className="flex flex-col gap-1 px-3 py-2 border-t">
         <div>

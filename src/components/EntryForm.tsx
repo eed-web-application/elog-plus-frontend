@@ -228,8 +228,9 @@ export default function EntryForm({
             <TextDivider className="mt-11">
               {kind[0] === "followingUp" ? "Following up" : "Superseding"}
             </TextDivider>
-            <div className="border-b pb-2 px-3 mb-3">
+            <div className="border-b pt-1.5 pb-2 px-3 mb-3">
               <EntryRow
+                containerClassName="rounded-lg border mb-2 overflow-hidden"
                 entry={kind[1]}
                 showDate
                 expandable
