@@ -57,7 +57,7 @@ export default function useEntries({ spotlight, query }: Params) {
     },
     getNextPageParam: (lastPage) => {
       // If last page isn't full, then there is no next page.
-      if (lastPage.length !== ENTRIES_PER_PAGE) {
+      if (lastPage.length < ENTRIES_PER_PAGE) {
         return;
       }
 
