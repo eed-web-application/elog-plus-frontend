@@ -46,7 +46,7 @@ export default function EntryList({
           key={entry.id}
           entry={entry}
           containerClassName={index === entries.length - 1 ? "" : "border-b"}
-          spotlight={spotlight === entry.id}
+          highlighted={spotlight === entry.id}
           selected={entry.id === selected}
           {...rest}
         />

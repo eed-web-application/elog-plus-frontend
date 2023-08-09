@@ -1,4 +1,11 @@
-import { forwardRef, useCallback, useEffect, useMemo, useRef } from "react";
+import {
+  forwardRef,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import cn from "classnames";
 import Spinner from "./Spinner";
 import {
@@ -38,6 +45,7 @@ const EntryListGrouped = forwardRef<HTMLDivElement, Props>(
     },
     ref
   ) => {
+    const [prevSpotlight, setPrevSpotlight] = useState<string | null>(null);
     const parentRef = useRef<HTMLDivElement | null>(null);
 
     const [items, headerIndices] = useMemo(() => {
@@ -101,6 +109,23 @@ const EntryListGrouped = forwardRef<HTMLDivElement, Props>(
 
     const mergedRef = useMergeRefs([ref, parentRef]);
 
+    useEffect(() => {
+      if (!spotlight || prevSpotlight === spotlight) {
+        return;
+      }
+
+      const index = items.findIndex((entry) => entry.id === spotlight);
+      if (index === -1) {
+        return;
+      }
+
+      virtualizer.scrollToIndex(index, {
+        behavior: "smooth",
+        align: "center",
+      });
+      setPrevSpotlight(spotlight);
+    }, [spotlight, headerIndices, items, virtualizer, prevSpotlight]);
+
     if (entries.length === 0 && !isLoading && emptyLabel) {
       return (
         <div className="text-gray-500 text-center pt-6 text-lg">
@@ -157,7 +182,7 @@ const EntryListGrouped = forwardRef<HTMLDivElement, Props>(
                       entry={entry}
                       containerClassName="border-b"
                       className="px-2"
-                      spotlight={spotlight === entry.id}
+                      highlighted={spotlight === entry.id}
                       selected={entry.id === selected}
                       {...rest}
                     />

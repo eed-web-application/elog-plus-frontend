@@ -221,7 +221,7 @@ export interface Props extends ComponentProps<"div"> {
   entry: EntrySummary;
   containerClassName?: string;
   className?: string;
-  spotlight?: boolean;
+  highlighted?: boolean;
   selected?: boolean;
   selectable?: boolean;
   expandable?: boolean;
@@ -244,7 +244,7 @@ const EntryRow = forwardRef<HTMLDivElement, PropsWithChildren<Props>>(
       entry,
       containerClassName,
       className,
-      spotlight,
+      highlighted,
       selected,
       selectable,
       expandable,
@@ -272,30 +272,16 @@ const EntryRow = forwardRef<HTMLDivElement, PropsWithChildren<Props>>(
       ]
     );
 
-    const entryRowRef = useCallback(
-      (elem: HTMLDivElement) => {
-        if (elem && spotlight) {
-          elem.scrollIntoView({
-            behavior: "smooth",
-            block: "center",
-            inline: "center",
-          });
-        }
-      },
-      [spotlight]
-    );
-
     const spotlightProps = useSpotlightProps(entry.id);
 
     return (
       <div ref={ref} className={containerClassName} {...rest}>
         <div
-          ref={entryRowRef}
           className={cn(
             "flex items-center",
             selectable && "cursor-pointer relative",
             selected ? "bg-blue-50 hover:bg-blue-100" : "hover:bg-gray-50",
-            spotlight && "bg-yellow-100 hover:bg-yellow-200",
+            highlighted && "bg-yellow-100 hover:bg-yellow-200",
             className
           )}
         >
@@ -347,7 +333,7 @@ const EntryRow = forwardRef<HTMLDivElement, PropsWithChildren<Props>>(
                 <RowButton
                   tooltip="Spotlight"
                   entrySelected={selected}
-                  entryHighlighted={spotlight}
+                  entryHighlighted={highlighted}
                   {...spotlightProps}
                 >
                   <svg
@@ -375,7 +361,7 @@ const EntryRow = forwardRef<HTMLDivElement, PropsWithChildren<Props>>(
                     search: window.location.search,
                   }}
                   entrySelected={selected}
-                  entryHighlighted={spotlight}
+                  entryHighlighted={highlighted}
                   marked={hasSupersedingDraft}
                 >
                   <svg
@@ -403,7 +389,7 @@ const EntryRow = forwardRef<HTMLDivElement, PropsWithChildren<Props>>(
                     search: window.location.search,
                   }}
                   entrySelected={selected}
-                  entryHighlighted={spotlight}
+                  entryHighlighted={highlighted}
                   marked={hasFollowUpDraft}
                 >
                   <svg
@@ -433,8 +419,8 @@ const EntryRow = forwardRef<HTMLDivElement, PropsWithChildren<Props>>(
                     IconButton,
                     "z-0",
                     expanded && "rotate-180",
-                    spotlight && "hover:bg-yellow-300",
-                    selected && !spotlight && "hover:!bg-blue-200"
+                    highlighted && "hover:bg-yellow-300",
+                    selected && !highlighted && "hover:!bg-blue-200"
                   )}
                   onClick={() => setExpanded((expanded) => !expanded)}
                 >
