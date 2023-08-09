@@ -3,6 +3,7 @@ import cn from "classnames";
 import {
   FloatingFocusManager,
   FloatingOverlay,
+  FloatingPortal,
   useClick,
   useDismiss,
   useFloating,
@@ -107,38 +108,40 @@ export default function EntryFigureList({
       </div>
 
       {viewingFigure && (
-        <FloatingOverlay
-          lockScroll
-          className={cn("z-10 flex justify-center items-center", BackDrop)}
-        >
-          <FloatingFocusManager context={context}>
-            <div ref={refs.setFloating} {...getFloatingProps()}>
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth={1.5}
-                stroke="currentColor"
-                className={cn(
-                  IconButton,
-                  "absolute top-0 left-0 m-3 !w-10 !h-10 !p-1 bg-gray-700 hover:bg-gray-600 text-gray-200 ring-blue-50"
-                )}
-                tabIndex={0}
-                onClick={() => setViewingFigure(null)}
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M6 18L18 6M6 6l12 12"
+        <FloatingPortal>
+          <FloatingOverlay
+            lockScroll
+            className={cn("z-10 flex justify-center items-center", BackDrop)}
+          >
+            <FloatingFocusManager context={context}>
+              <div ref={refs.setFloating} {...getFloatingProps()}>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth={1.5}
+                  stroke="currentColor"
+                  className={cn(
+                    IconButton,
+                    "absolute top-0 left-0 m-3 !w-10 !h-10 !p-1 bg-gray-700 hover:bg-gray-600 text-gray-200 ring-blue-50"
+                  )}
+                  tabIndex={0}
+                  onClick={() => setViewingFigure(null)}
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+                <img
+                  className="max-h-screen"
+                  src={getAttachmentPreviewURL(viewingFigure)}
                 />
-              </svg>
-              <img
-                className="max-h-screen"
-                src={getAttachmentPreviewURL(viewingFigure)}
-              />
-            </div>
-          </FloatingFocusManager>
-        </FloatingOverlay>
+              </div>
+            </FloatingFocusManager>
+          </FloatingOverlay>
+        </FloatingPortal>
       )}
     </>
   );
