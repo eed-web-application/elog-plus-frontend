@@ -6,7 +6,7 @@ import {
   EditorContentProps,
   EditorEvents,
 } from "@tiptap/react";
-import cn from "classnames";
+import { twMerge } from "tailwind-merge";
 import { Input } from "./base";
 import { ComponentProps, PropsWithChildren, useEffect } from "react";
 import Underline from "@tiptap/extension-underline";
@@ -25,11 +25,11 @@ function MenuButton({
   return (
     <button
       {...rest}
-      className={cn(
-        "rounded text-black p-1",
-        disabled && "text-gray-400",
+      disabled={disabled}
+      className={twMerge(
+        "rounded text-black p-1 hover:bg-gray-100",
+        disabled && "text-gray-400 hover:bg-transparent",
         active && "bg-blue-500 hover:bg-blue-600 text-white",
-        !disabled && !active && "hover:bg-gray-100",
         className
       )}
       type="button"
@@ -104,7 +104,10 @@ function MenuButtonGroup({
   ...rest
 }: PropsWithChildren<ComponentProps<"div">>) {
   return (
-    <div className={cn("flex gap-1 px-2 items-center", className)} {...rest}>
+    <div
+      className={twMerge("flex gap-1 px-2 items-center", className)}
+      {...rest}
+    >
       {children}
     </div>
   );
@@ -331,9 +334,9 @@ export default function EntryBodyTextEditor({
     ],
     editorProps: {
       attributes: {
-        class: cn(
-          "prose focus:ring-0 rounded-t-none border-t-transparent max-w-none",
-          Input
+        class: twMerge(
+          Input,
+          "prose focus:ring-0 rounded-t-none border-t-transparent max-w-none"
         ),
       },
     },

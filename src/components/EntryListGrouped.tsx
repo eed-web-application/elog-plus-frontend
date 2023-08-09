@@ -6,7 +6,7 @@ import {
   useRef,
   useState,
 } from "react";
-import cn from "classnames";
+import { twMerge } from "tailwind-merge";
 import Spinner from "./Spinner";
 import {
   Range,
@@ -136,7 +136,10 @@ const EntryListGrouped = forwardRef<HTMLDivElement, Props>(
 
     return (
       <div
-        className={cn("overflow-x-auto h-full relative", containerClassName)}
+        className={twMerge(
+          "overflow-x-auto h-full relative",
+          containerClassName
+        )}
         ref={mergedRef}
       >
         {items.length > 1 && (
@@ -194,7 +197,7 @@ const EntryListGrouped = forwardRef<HTMLDivElement, Props>(
         )}
         <Spinner
           large
-          className={cn("my-4 m-auto", !isLoading && "invisible")}
+          className={twMerge("my-4 m-auto", !isLoading && "invisible")}
         />
       </div>
     );

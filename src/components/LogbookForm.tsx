@@ -1,5 +1,5 @@
 import { FormEvent, useState } from "react";
-import cn from "classnames";
+import { twMerge } from "tailwind-merge";
 import { useQueryClient } from "@tanstack/react-query";
 import {
   Logbook,
@@ -175,7 +175,7 @@ export default function LogbookForm({ logbook, onSave }: Props) {
         <input
           required
           type="text"
-          className={cn(
+          className={twMerge(
             Input,
             invalid.includes("name") && InputInvalid,
             "block w-full"
@@ -187,7 +187,7 @@ export default function LogbookForm({ logbook, onSave }: Props) {
       </label>
       <div className="text-gray-500">Tags</div>
       <div
-        className={cn(
+        className={twMerge(
           "mb-2 border rounded-lg bg-gray-50 w-full flex flex-col p-2",
           form.tags.length === 0 &&
             "items-center justify-center text-lg text-gray-500"
@@ -211,7 +211,7 @@ export default function LogbookForm({ logbook, onSave }: Props) {
                     strokeWidth="1.5"
                     stroke="currentColor"
                     tabIndex={0}
-                    className={cn(IconButton, "text-gray-500")}
+                    className={twMerge(IconButton, "text-gray-500")}
                     onClick={() => removeTag(index)}
                   >
                     <path
@@ -227,7 +227,7 @@ export default function LogbookForm({ logbook, onSave }: Props) {
         )}
         <form noValidate className="relative mt-2 w-full" onSubmit={createTag}>
           <input
-            className={cn(Input, "w-full pr-12")}
+            className={twMerge(Input, "w-full pr-12")}
             type="text"
             value={newTag}
             onChange={(e) => setNewTag(e.currentTarget.value)}
@@ -255,7 +255,7 @@ export default function LogbookForm({ logbook, onSave }: Props) {
       </div>
       <div className="text-gray-500">Shifts</div>
       <div
-        className={cn(
+        className={twMerge(
           "border rounded-lg bg-gray-50 w-full flex flex-col p-2",
           form.shifts.length === 0 &&
             "items-center justify-center text-lg text-gray-500"
@@ -273,7 +273,7 @@ export default function LogbookForm({ logbook, onSave }: Props) {
                 >
                   <input
                     type="text"
-                    className={cn(
+                    className={twMerge(
                       Input,
                       invalid.includes(`shiftName/${shift.id}`) && InputInvalid,
                       "flex-1 min-w-0"
@@ -291,7 +291,7 @@ export default function LogbookForm({ logbook, onSave }: Props) {
                   />
                   <div className="gap-2 self-end flex items-center">
                     <input
-                      className={cn(
+                      className={twMerge(
                         Input,
                         invalid.includes(`shiftFrom/${shift.id}`) &&
                           InputInvalid,
@@ -322,7 +322,7 @@ export default function LogbookForm({ logbook, onSave }: Props) {
                     />
                     <div className="text-gray-500">to</div>
                     <input
-                      className={cn(
+                      className={twMerge(
                         Input,
                         invalid.includes(`shiftTo/${shift.id}`) && InputInvalid,
                         "w-32"
@@ -358,7 +358,7 @@ export default function LogbookForm({ logbook, onSave }: Props) {
                     strokeWidth="1.5"
                     stroke="currentColor"
                     tabIndex={0}
-                    className={cn(IconButton, "text-gray-500")}
+                    className={twMerge(IconButton, "text-gray-500")}
                     onClick={() => removeShift(index)}
                   >
                     <path
@@ -378,7 +378,7 @@ export default function LogbookForm({ logbook, onSave }: Props) {
           onSubmit={createShift}
         >
           <input
-            className={cn(Input, "w-full pr-12")}
+            className={twMerge(Input, "w-full pr-12")}
             type="text"
             value={newShift}
             onChange={(e) => setNewShift(e.currentTarget.value)}
@@ -406,7 +406,7 @@ export default function LogbookForm({ logbook, onSave }: Props) {
       </div>
       <button
         disabled={updated}
-        className={cn(Button, "block ml-auto mt-3")}
+        className={twMerge(Button, "block ml-auto mt-3")}
         onClick={save}
       >
         Save

@@ -1,5 +1,5 @@
 import { ComponentProps, useState } from "react";
-import cn from "classnames";
+import { twMerge } from "tailwind-merge";
 import {
   FloatingFocusManager,
   FloatingOverlay,
@@ -86,7 +86,7 @@ export default function EntryFigureList({
           tabIndex={0}
           {...getReferenceProps()}
           onClick={() => setViewingFigure(figure.id)}
-          className={cn("cursor-pointer w-full")}
+          className={twMerge("cursor-pointer w-full")}
         />
       </div>
     );
@@ -94,7 +94,7 @@ export default function EntryFigureList({
 
   return (
     <>
-      <div className={cn("flex gap-3 pb-1", className)} {...rest}>
+      <div className={twMerge("flex gap-3 pb-1", className)} {...rest}>
         <div className="flex flex-col">
           {figures
             .filter((_, index) => index % 2 === 0)
@@ -111,7 +111,10 @@ export default function EntryFigureList({
         <FloatingPortal>
           <FloatingOverlay
             lockScroll
-            className={cn("z-10 flex justify-center items-center", BackDrop)}
+            className={twMerge(
+              BackDrop,
+              "z-10 flex justify-center items-center"
+            )}
           >
             <FloatingFocusManager context={context}>
               <div ref={refs.setFloating} {...getFloatingProps()}>
@@ -121,7 +124,7 @@ export default function EntryFigureList({
                   viewBox="0 0 24 24"
                   strokeWidth={1.5}
                   stroke="currentColor"
-                  className={cn(
+                  className={twMerge(
                     IconButton,
                     "absolute top-0 left-0 m-3 !w-10 !h-10 !p-1 bg-gray-700 hover:bg-gray-600 text-gray-200 ring-blue-50"
                   )}

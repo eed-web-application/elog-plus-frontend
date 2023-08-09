@@ -1,5 +1,5 @@
 import React, { ComponentProps } from "react";
-import cn from "classnames";
+import { twMerge } from "tailwind-merge";
 import AttachmentIcon from "./AttachmentIcon";
 import { Attachment, getAttachmentDownloadURL } from "../api";
 import Tooltip from "./Tooltip";
@@ -31,7 +31,10 @@ export default function AttachmentCard({
   return (
     <div
       {...rest}
-      className={cn(className, "relative w-20 overflow-hidden text-gray-500")}
+      className={twMerge(
+        "relative w-20 overflow-hidden text-gray-500",
+        className
+      )}
     >
       <div className="relative p-4 h-20 bg-gray-200 shadow flex flex-col justify-center items-center rounded-lg overflow-hidden">
         {isLoading ? (

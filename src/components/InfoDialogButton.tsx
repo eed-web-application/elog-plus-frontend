@@ -1,4 +1,4 @@
-import cn from "classnames";
+import { twMerge } from "tailwind-merge";
 import {
   FloatingFocusManager,
   FloatingOverlay,
@@ -64,7 +64,7 @@ export default function InfoDialogButton({
         strokeWidth={1.5}
         stroke="currentColor"
         {...rest}
-        className={cn(
+        className={twMerge(
           "absolute m-3 top-0.5 right-0 w-8 h-8 p-1 text-gray-800 hover:bg-gray-200 rounded-full cursor-pointer",
           className
         )}
@@ -80,7 +80,7 @@ export default function InfoDialogButton({
       {viewingInfoDialog && (
         <FloatingOverlay
           lockScroll
-          className={cn("z-10 flex justify-center items-center", BackDrop)}
+          className={twMerge(BackDrop, "z-10 flex justify-center items-center")}
         >
           <FloatingFocusManager context={context}>
             <div
@@ -105,7 +105,7 @@ export default function InfoDialogButton({
                 viewBox="0 0 24 24"
                 strokeWidth={1.5}
                 stroke="currentColor"
-                className={cn("absolute top-0 left-0 m-1", IconButton)}
+                className={twMerge(IconButton, "absolute top-0 left-0 m-1")}
                 onClick={() => setViewingInfoDialog(false)}
               >
                 <path

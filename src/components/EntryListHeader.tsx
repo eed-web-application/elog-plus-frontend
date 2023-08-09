@@ -1,4 +1,4 @@
-import cn from "classnames";
+import { twMerge } from "tailwind-merge";
 import { Link } from "react-router-dom";
 import { EntrySummary } from "../api";
 import useSummary from "../hooks/useSummary";
@@ -86,7 +86,7 @@ const EntryListHeader = forwardRef<HTMLDivElement, Props>(
 
     return (
       <div
-        className={cn(
+        className={twMerge(
           "flex justify-between items-center border-b gap-3 px-3 pt-1.5 pb-1 bg-gray-100 whitespace-nowrap",
           className
         )}

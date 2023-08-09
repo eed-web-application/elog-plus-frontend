@@ -1,4 +1,4 @@
-import cn from "classnames";
+import { twMerge } from "tailwind-merge";
 import { useState } from "react";
 import Spinner from "./Spinner";
 import { Input } from "./base";
@@ -60,7 +60,7 @@ export default function MultiSelectMenu({
     <>
       <input
         type="search"
-        className={cn("block w-64 rounded-b-none", Input)}
+        className={twMerge(Input, "block w-64 rounded-b-none")}
         placeholder="Search..."
         autoFocus
         onChange={(e) => setSearch(e.target.value)}
@@ -79,12 +79,12 @@ export default function MultiSelectMenu({
               <div
                 tabIndex={0}
                 key={option}
-                className={cn("px-2 p-1  cursor-pointer", {
-                  "bg-blue-200": optionSelected && focused,
-                  "bg-gray-100": !optionSelected && focused,
-                  "bg-blue-100 hover:bg-blue-200": optionSelected && !focused,
-                  "hover:bg-gray-100": !optionSelected && !focused,
-                })}
+                className={twMerge(
+                  "px-2 p-1 cursor-pointer hover:bg-gray-100",
+                  focused && "bg-gray-100",
+                  optionSelected && "bg-blue-100 hover:bg-blue-200",
+                  optionSelected && focused && "bg-blue-200"
+                )}
                 // To prevent blur on search input
                 onMouseDown={(e) => e.preventDefault()}
                 onClick={() => selectOption(option)}

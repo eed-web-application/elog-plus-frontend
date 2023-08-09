@@ -1,4 +1,4 @@
-import cn from "classnames";
+import { twMerge } from "tailwind-merge";
 import {
   ComponentPropsWithRef,
   PropsWithChildren,
@@ -34,13 +34,12 @@ const FilterChip = forwardRef<HTMLButtonElement, PropsWithChildren<Props>>(
       <button
         ref={ref}
         type="button"
-        className={cn(
-          "flex items-center text-gray-500 border rounded-2xl px-3",
+        className={twMerge(
+          "flex items-center text-gray-500 border rounded-2xl px-3 bg-gray-50 border-gray-300 hover:bg-gray-200 hover:border-gray-400",
           showCheck && enabled && "pl-2",
           ((onDisable && !enabled) || (showDownArrow && enabled)) && "pr-2",
-          enabled
-            ? "bg-blue-100 border-blue-100 hover:bg-blue-200 hover:border-blue-200"
-            : "bg-gray-50 border-gray-300 hover:bg-gray-200 hover:border-gray-400",
+          enabled &&
+            "bg-blue-100 border-blue-100 hover:bg-blue-200 hover:border-blue-200",
           className
         )}
         {...rest}

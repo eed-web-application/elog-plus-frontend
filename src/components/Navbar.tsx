@@ -1,4 +1,4 @@
-import cn from "classnames";
+import { twMerge } from "tailwind-merge";
 import { Link } from "react-router-dom";
 import { Button, Input } from "./base";
 import { ComponentProps, useEffect, useMemo, useState } from "react";
@@ -50,7 +50,7 @@ export default function Navbar({
   }, [setStagedSearch, search]);
 
   return (
-    <div className={cn("flex flex-wrap", className)} {...rest}>
+    <div className={twMerge("flex flex-wrap", className)} {...rest}>
       <Link to="/" className="text-center mb-3 w-full md:mb-0 md:w-auto">
         <Logo className="inline" />
       </Link>
@@ -64,7 +64,7 @@ export default function Navbar({
         <div className="relative w-full">
           <input
             type="search"
-            className={cn("block w-full", Input)}
+            className={twMerge("block w-full", Input)}
             placeholder="Search..."
             value={stagedSearch}
             onChange={(e) => searchFor(e.target.value)}
@@ -93,13 +93,13 @@ export default function Navbar({
       </form>
       <Link
         to={{ pathname: "/admin" }}
-        className={cn(Button, "mr-2 text-sm flex items-center")}
+        className={twMerge(Button, "mr-2 text-sm flex items-center")}
       >
         Admin Dashboard
       </Link>
       <Link
         to={{ pathname: "/new-entry", search: window.location.search }}
-        className={cn(Button, "relative")}
+        className={twMerge(Button, "relative")}
       >
         New Entry
         {hasNewEntryDraft && (

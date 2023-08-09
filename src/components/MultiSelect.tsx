@@ -1,5 +1,5 @@
 import { ComponentProps, useState } from "react";
-import cn from "classnames";
+import { twMerge } from "tailwind-merge";
 import { Input, InputDisabled, InputInvalid } from "./base";
 import { autoUpdate, size, useFloating } from "@floating-ui/react";
 import Spinner from "./Spinner";
@@ -106,13 +106,13 @@ export default function MultiSelect({
 
   return (
     <div
-      className={cn(
+      className={twMerge(
         Input,
         invalid && InputInvalid,
         disabled && InputDisabled,
+        "flex",
         focused && "outline-none ring-1 ring-blue-500 border-blue-500",
-        className,
-        "flex"
+        className
       )}
       ref={refs.setReference}
     >
@@ -184,7 +184,7 @@ export default function MultiSelect({
                   <div
                     tabIndex={0}
                     key={option}
-                    className={cn(
+                    className={twMerge(
                       "px-2 p-1 cursor-pointer hover:bg-gray-100",
                       cursor === index && "bg-gray-100"
                     )}
@@ -201,7 +201,7 @@ export default function MultiSelect({
               })}
               {showCreateButton && (
                 <div
-                  className={cn(
+                  className={twMerge(
                     "px-2 p-1 cursor-pointer hover:bg-gray-100",
                     cursor === filteredOptions.length && "bg-gray-100"
                   )}

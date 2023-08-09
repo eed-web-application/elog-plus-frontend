@@ -1,4 +1,4 @@
-import cn from "classnames";
+import { twMerge } from "tailwind-merge";
 import DOMPurify from "dompurify";
 import { ComponentProps } from "react";
 
@@ -18,10 +18,10 @@ export default function EntryBodyText({
 }: Props) {
   return (
     <div
-      className={cn(
+      className={twMerge(
         className,
-        !body && "text-gray-500",
-        "prose max-w-none overflow-x-auto"
+        "prose max-w-none overflow-x-auto",
+        !body && "text-gray-500"
       )}
       dangerouslySetInnerHTML={
         !body && showEmptyLabel

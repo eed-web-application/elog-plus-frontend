@@ -1,5 +1,5 @@
 import { ComponentProps, useEffect, useState } from "react";
-import cn from "classnames";
+import { twMerge } from "tailwind-merge";
 import { Input, InputDisabled, InputInvalid } from "./base";
 import { autoUpdate, size, useFloating } from "@floating-ui/react";
 import Spinner from "./Spinner";
@@ -103,11 +103,11 @@ export default function Select<O extends Option>({
 
   return (
     // Flex is to fix weird layout issues when the input is a button
-    <div className={cn(containerClassName, "relative flex")}>
+    <div className={twMerge("relative flex", containerClassName)}>
       <input
         {...rest}
         type={nonsearchable ? "button" : "text"}
-        className={cn(Input, invalid && InputInvalid, className)}
+        className={twMerge(Input, invalid && InputInvalid, className)}
         placeholder={value || !placeholder ? "" : placeholder}
         value={search}
         onChange={(e) => {
@@ -127,12 +127,12 @@ export default function Select<O extends Option>({
       />
       {
         <div
-          className={cn(
+          className={twMerge(
             // Using styles from Input to ensure padding is correct
             Input,
             disabled && InputDisabled,
-            className,
-            "absolute flex left-0 right-0 bottom-0 top-0 bg-transparent border-transparent pointer-events-none"
+            "absolute flex left-0 right-0 bottom-0 top-0 bg-transparent border-transparent pointer-events-none",
+            className
           )}
         >
           {value && !search ? valuesLabel : ""}
@@ -178,12 +178,12 @@ export default function Select<O extends Option>({
                   tabIndex={0}
                   key={typeof option === "string" ? option : option.value}
                   ref={(el) => (optionRefs.current[index] = el)}
-                  className={cn("px-2 p-1  cursor-pointer", {
-                    "bg-blue-200": selected && focused,
-                    "bg-gray-100": !selected && focused,
-                    "bg-blue-100 hover:bg-blue-200": selected && !focused,
-                    "hover:bg-gray-100": !selected && !focused,
-                  })}
+                  className={twMerge(
+                    "px-2 p-1 cursor-pointer hover:bg-gray-100",
+                    focused && "bg-gray-100",
+                    selected && "bg-blue-100 hover:bg-blue-200",
+                    selected && focused && "bg-blue-200"
+                  )}
                   onMouseDown={() => {
                     setValue(
                       typeof option === "string" ? option : option.value

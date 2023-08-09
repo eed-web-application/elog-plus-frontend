@@ -1,4 +1,4 @@
-import cn from "classnames";
+import { twMerge } from "tailwind-merge";
 import {
   PropsWithChildren,
   useCallback,
@@ -51,10 +51,10 @@ function RowButton({
   return (
     <Tooltip label={tooltip}>
       <Link
-        className={cn(
+        className={twMerge(
           IconButton,
           "rounded-full z-0 relative",
-          entrySelected && !entryHighlighted && "hover:!bg-blue-200",
+          entrySelected && "hover:bg-blue-200",
           entryHighlighted && "hover:bg-yellow-300"
         )}
         tabIndex={0}
@@ -176,7 +176,7 @@ function TagList({ tags }: { tags: string[] }) {
       {tags.map((tag, index) => (
         <Chip
           key={tag}
-          className={cn(
+          className={twMerge(
             "ml-1.5",
             overflowIndex !== null && index >= overflowIndex && "invisible"
           )}
@@ -188,7 +188,7 @@ function TagList({ tags }: { tags: string[] }) {
       <Chip
         ref={mergedDrawerRef}
         {...getReferenceProps()}
-        className={cn(
+        className={twMerge(
           "ml-1.5 absolute pointer-events-auto",
           overflowIndex === null && "invisible"
         )}
@@ -277,11 +277,13 @@ const EntryRow = forwardRef<HTMLDivElement, PropsWithChildren<Props>>(
     return (
       <div ref={ref} className={containerClassName} {...rest}>
         <div
-          className={cn(
+          className={twMerge(
             "flex items-center",
-            selectable && "cursor-pointer relative",
-            selected ? "bg-blue-50 hover:bg-blue-100" : "hover:bg-gray-50",
-            highlighted && "bg-yellow-100 hover:bg-yellow-200",
+            selectable && "cursor-pointer relative hover:bg-gray-50",
+            selected && "bg-blue-50",
+            selected && selectable && "hover:bg-blue-100",
+            highlighted && "bg-yellow-100",
+            highlighted && selectable && "hover:bg-yellow-200",
             className
           )}
         >
@@ -415,12 +417,12 @@ const EntryRow = forwardRef<HTMLDivElement, PropsWithChildren<Props>>(
                   strokeWidth={1.5}
                   stroke="currentColor"
                   tabIndex={0}
-                  className={cn(
+                  className={twMerge(
                     IconButton,
                     "z-0",
                     expanded && "rotate-180",
-                    highlighted && "hover:bg-yellow-300",
-                    selected && !highlighted && "hover:!bg-blue-200"
+                    selected && "hover:bg-blue-200",
+                    highlighted && "hover:bg-yellow-300"
                   )}
                   onClick={() => setExpanded((expanded) => !expanded)}
                 >
@@ -437,7 +439,7 @@ const EntryRow = forwardRef<HTMLDivElement, PropsWithChildren<Props>>(
         {expanded && fullEntry && (
           <>
             <div
-              className={cn(
+              className={twMerge(
                 "p-2 pb-1 bg-gray-100",
                 fullEntry.text || "text-gray-500"
               )}

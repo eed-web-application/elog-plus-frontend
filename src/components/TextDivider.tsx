@@ -1,5 +1,5 @@
 import { ComponentProps, PropsWithChildren } from "react";
-import cn from "classnames";
+import { twMerge } from "tailwind-merge";
 
 export default function TextDivider({
   children,
@@ -7,7 +7,7 @@ export default function TextDivider({
   ...rest
 }: PropsWithChildren<ComponentProps<"div">>) {
   return (
-    <div className={cn("flex items-center", className)} {...rest}>
+    <div className={twMerge("flex items-center", className)} {...rest}>
       <div className="flex-grow border-t"></div>
       <span className="flex-shrink mx-4 text-gray-500">{children}</span>
       <div className="flex-grow border-t"></div>

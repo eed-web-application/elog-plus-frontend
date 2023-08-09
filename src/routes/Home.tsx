@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useLocation, useOutlet, useSearchParams } from "react-router-dom";
-import cn from "classnames";
+import { twMerge } from "tailwind-merge";
 import Filters, { Filters as FiltersObject } from "../components/Filters";
 import Navbar from "../components/Navbar";
 import useEntries from "../hooks/useEntries";
@@ -140,7 +140,7 @@ export default function Home() {
   return (
     <div className="h-screen flex flex-col">
       <div
-        className={cn(
+        className={twMerge(
           "p-3 shadow z-10 relative",
           // Padding for the absolutely positioned info button
           !isSmallScreen && "px-12"
@@ -160,7 +160,7 @@ export default function Home() {
 
       <div className="flex-1 flex overflow-hidden">
         <EntryListGrouped
-          containerClassName={cn(
+          containerClassName={twMerge(
             "w-1/2",
             (!outlet || isSmallScreen) && "flex-1"
           )}
@@ -191,7 +191,7 @@ export default function Home() {
               </div>
             )}
             <div
-              className={cn(
+              className={twMerge(
                 "overflow-y-auto pb-3",
                 !isSmallScreen && "flex-1 flex-shrink"
               )}

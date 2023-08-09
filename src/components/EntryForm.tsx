@@ -1,5 +1,5 @@
 import { FormEvent, Suspense, lazy, useCallback, useState } from "react";
-import cn from "classnames";
+import { twMerge } from "tailwind-merge";
 import { useDropzone } from "react-dropzone";
 import { Link } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
@@ -202,7 +202,7 @@ export default function EntryForm({
     <Suspense fallback={<Spinner className="m-auto mt-16" />}>
       <Link
         to={{ pathname: "/", search: window.location.search }}
-        className={cn(IconButton, "my-1 float-right")}
+        className={twMerge(IconButton, "my-1 float-right")}
         onClick={() => removeDraft()}
       >
         <svg
@@ -247,7 +247,7 @@ export default function EntryForm({
             <input
               required
               type="text"
-              className={cn(
+              className={twMerge(
                 Input,
                 invalid.includes("title") && InputInvalid,
                 "block w-full"
@@ -294,7 +294,7 @@ export default function EntryForm({
           <label className="text-gray-500 mb-1 flex items-center">
             <input
               type="checkbox"
-              className={cn(Checkbox, "mr-2")}
+              className={twMerge(Checkbox, "mr-2")}
               checked={draft.eventAt !== undefined}
               onChange={() =>
                 updateDraft({
@@ -316,7 +316,7 @@ export default function EntryForm({
                 eventAt: new Date(e.currentTarget.value),
               })
             }
-            className={cn(
+            className={twMerge(
               Input,
               invalid.includes("eventAt") && InputInvalid,
               "block w-full mb-2"
@@ -327,7 +327,7 @@ export default function EntryForm({
               <label className="text-gray-500 mb-1 flex items-center">
                 <input
                   type="checkbox"
-                  className={cn(Checkbox, "mr-2")}
+                  className={twMerge(Checkbox, "mr-2")}
                   checked={draft.summarizes !== undefined}
                   onChange={() =>
                     updateDraft({
@@ -380,7 +380,7 @@ export default function EntryForm({
                       },
                     })
                   }
-                  className={cn(
+                  className={twMerge(
                     Input,
                     invalid.includes("shiftDate") && InputInvalid,
                     "block w-full"
@@ -404,7 +404,7 @@ export default function EntryForm({
           <label className="text-gray-500 block mb-2">
             Attachments
             <div
-              className={cn(
+              className={twMerge(
                 "relative cursor-pointer border rounded-lg bg-gray-50 w-full overflow-hidden flex flex-wrap m-auto",
                 attachments.length === 0
                   ? "items-center justify-center text-xl h-24"
@@ -431,7 +431,7 @@ export default function EntryForm({
           </label>
           <input
             type="submit"
-            className={cn(Button, "block ml-auto mt-2")}
+            className={twMerge(Button, "block ml-auto mt-2")}
             value={
               kind === "newEntry"
                 ? "Save"

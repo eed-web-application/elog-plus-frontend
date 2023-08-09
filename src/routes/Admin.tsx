@@ -1,7 +1,7 @@
 import { useCallback, useRef } from "react";
 import { toast } from "react-toastify";
 import { Link, useParams } from "react-router-dom";
-import cn from "classnames";
+import { twMerge } from "tailwind-merge";
 import Pane from "../components/Pane";
 import Spinner from "../components/Spinner";
 import useIsSmallScreen from "../hooks/useIsSmallScreen";
@@ -58,11 +58,11 @@ export default function Admin() {
       <div className="flex-1 flex overflow-hidden">
         <div
           ref={bodyRef}
-          className={cn(
+          className={twMerge(
             "w-1/2 flex flex-col justify-stretch p-3 overflow-y-auto",
             // Don't want to have border when loading
             logbooks ? "divide-y" : "justify-center w-full",
-            !selectedLogbook && "flex-1 pr-3"
+            !selectedLogbook && "flex-1"
           )}
         >
           <div className="text-xl mb-2 font-normal text-gray-500">Logbooks</div>
@@ -72,10 +72,10 @@ export default function Admin() {
                 key={logbook.id}
                 to={`/admin/${logbook.id}`}
                 tabIndex={0}
-                className={cn(
+                className={twMerge(
                   "p-2 hover:bg-gray-100 cursor-pointer uppercase",
                   selectedLogbook?.id === logbook.id &&
-                    "bg-blue-100 hover:!bg-blue-200"
+                    "bg-blue-100 hover:bg-blue-200"
                 )}
               >
                 {logbook.name}
@@ -97,7 +97,7 @@ export default function Admin() {
         </div>
         {selectedLogbook && (
           <div
-            className={cn("pb-3", !isSmallScreen && "flex-1 flex-shrink")}
+            className={twMerge("pb-3", !isSmallScreen && "flex-1 flex-shrink")}
             style={{ minWidth: isSmallScreen ? "auto" : MIN_PANE_WIDTH }}
           >
             <Pane home="/admin">

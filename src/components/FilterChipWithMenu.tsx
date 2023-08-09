@@ -1,4 +1,4 @@
-import cn from "classnames";
+import { twMerge } from "tailwind-merge";
 import { PropsWithChildren, useState } from "react";
 import {
   useFloating,
@@ -86,7 +86,7 @@ export default function FilterChipWithMenu({
         ref={refs.setReference}
         enabled={isOpen}
         onClick={onClick}
-        className={cn(
+        className={twMerge(
           // It looks weird to have an inline element on top of the button
           // and see the button creep through the side, so we make it invisible.
           inline && isOpen && "invisible",
@@ -101,7 +101,7 @@ export default function FilterChipWithMenu({
         <div
           ref={refs.setFloating}
           style={floatingStyles}
-          className={cn(!inline && "my-1", "shadow bg-white rounded-lg")}
+          className={twMerge("shadow bg-white rounded-lg", !inline && "my-1")}
           {...getFloatingProps()}
         >
           {children}
