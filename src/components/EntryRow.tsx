@@ -459,7 +459,7 @@ const EntryRow = forwardRef<HTMLDivElement, PropsWithChildren<Props>>(
               <EntryBodyText body={fullEntry.text} showEmptyLabel />
               <EntryFigureList attachments={fullEntry.attachments} />
             </div>
-            {showFollowUps && (
+            {showFollowUps && fullEntry.followUps.length > 0 && (
               <div className="ml-6 pt-2 pr-2">
                 <EntryList
                   entries={fullEntry.followUps}
