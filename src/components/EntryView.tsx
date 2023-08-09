@@ -64,11 +64,7 @@ export default function EntryView({ entry }: Props) {
           {entry.loggedBy}
         </div>
         <div>
-          <div className="text-gray-500">
-            {entry.loggedAt.getTime() === entry.eventAt.getTime()
-              ? "Event occurrend and logged at"
-              : "Logged at "}
-          </div>
+          <div className="text-gray-500">Logged at</div>
           {entry.loggedAt.toLocaleString("en-us", {
             year: "numeric",
             month: "short",
