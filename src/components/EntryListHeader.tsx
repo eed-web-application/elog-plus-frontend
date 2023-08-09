@@ -5,9 +5,32 @@ import useSummary from "../hooks/useSummary";
 import dateToDateString from "../utils/dateToDateString";
 import { ComponentProps, forwardRef } from "react";
 
+export type HeaderKind = "shift" | "logbookAndShift" | "day";
+
 export interface Props extends ComponentProps<"div"> {
-  headerKind: "shift" | "logbookAndShift" | "day";
+  headerKind: HeaderKind;
   representative: EntrySummary;
+}
+
+function headerTextRenderer(headerKind: HeaderKind, entry: EntrySummary) {
+  let headerText = new Date(entry.eventAt).toLocaleDateString("en-us", {
+    weekday: "long",
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  });
+
+  if (headerKind !== "day") {
+    headerText = `${
+      entry.shift ? entry.shift.name : "No shift"
+    } • ${headerText}`;
+
+    if (headerKind !== "shift") {
+      headerText = `${entry.logbook.toUpperCase()} • ${headerText}`;
+    }
+  }
+
+  return headerText;
 }
 
 const EntryListHeader = forwardRef<HTMLDivElement, Props>(
@@ -18,24 +41,6 @@ const EntryListHeader = forwardRef<HTMLDivElement, Props>(
         : representative.shift?.id,
       representative ? dateToDateString(representative.eventAt) : undefined
     );
-
-    let headerText;
-    headerText = new Date(representative.eventAt).toLocaleDateString("en-us", {
-      weekday: "long",
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-    });
-
-    if (headerKind !== "day") {
-      headerText = `${
-        representative.shift ? representative.shift.name : "No shift"
-      } • ${headerText}`;
-
-      if (headerKind !== "shift") {
-        headerText = `${representative.logbook.toUpperCase()} • ${headerText}`;
-      }
-    }
 
     let summaryButton;
 
@@ -76,6 +81,8 @@ const EntryListHeader = forwardRef<HTMLDivElement, Props>(
       }
     }
 
+    const headerText = headerTextRenderer(headerKind, representative);
+
     return (
       <div
         className={cn(
@@ -92,4 +99,12 @@ const EntryListHeader = forwardRef<HTMLDivElement, Props>(
   }
 );
 
-export default EntryListHeader;
+(
+  EntryListHeader as typeof EntryListHeader & {
+    textRenderer: typeof headerTextRenderer;
+  }
+).textRenderer = headerTextRenderer;
+
+export default EntryListHeader as typeof EntryListHeader & {
+  textRenderer: typeof headerTextRenderer;
+};

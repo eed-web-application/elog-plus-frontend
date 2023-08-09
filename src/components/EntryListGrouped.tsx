@@ -1,8 +1,6 @@
 import { forwardRef, useCallback, useEffect, useMemo, useRef } from "react";
 import cn from "classnames";
-import { EntrySummary } from "../api";
 import Spinner from "./Spinner";
-import dateToDateString from "../utils/dateToDateString";
 import {
   Range,
   defaultRangeExtractor,
@@ -43,30 +41,12 @@ const EntryListGrouped = forwardRef<HTMLDivElement, Props>(
     const parentRef = useRef<HTMLDivElement | null>(null);
 
     const [items, headerIndices] = useMemo(() => {
-      let groupByFunc = (entry: EntrySummary) =>
-        dateToDateString(entry.eventAt);
-
-      if (groupBy === "shift") {
-        groupByFunc = (entry: EntrySummary) =>
-          JSON.stringify([
-            dateToDateString(entry.eventAt),
-            entry.shift?.id || null,
-          ]);
-      } else if (groupBy === "logbookAndShift") {
-        groupByFunc = (entry: EntrySummary) =>
-          JSON.stringify([
-            dateToDateString(entry.eventAt),
-            entry.shift?.id || null,
-            entry.logbook,
-          ]);
-      }
-
       const items = [];
       const headerIndices = [];
       let currentHeader = null;
 
       for (const entry of entries) {
-        const header = groupByFunc(entry);
+        const header = EntryListHeader.textRenderer(groupBy, entry);
 
         if (header !== currentHeader) {
           currentHeader = header;
