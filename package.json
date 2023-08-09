@@ -13,6 +13,7 @@
     "@floating-ui/react": "^0.24.3",
     "@fortawesome/free-solid-svg-icons": "^6.4.0",
     "@tanstack/react-query": "^4.32.6",
+    "@tanstack/react-virtual": "3.0.0-beta.54",
     "@tiptap/extension-color": "^2.0.3",
     "@tiptap/extension-list-item": "^2.0.3",
     "@tiptap/extension-text-style": "^2.0.3",

@@ -6,6 +6,7 @@ import {
   useRef,
   useEffect,
   forwardRef,
+  ComponentProps,
 } from "react";
 import { Link, LinkProps } from "react-router-dom";
 import {
@@ -216,8 +217,9 @@ function TagList({ tags }: { tags: string[] }) {
   );
 }
 
-export interface Props {
+export interface Props extends ComponentProps<"div"> {
   entry: EntrySummary;
+  containerClassName?: string;
   className?: string;
   spotlight?: boolean;
   selected?: boolean;
@@ -240,6 +242,7 @@ const EntryRow = forwardRef<HTMLDivElement, PropsWithChildren<Props>>(
   (
     {
       entry,
+      containerClassName,
       className,
       spotlight,
       selected,
@@ -252,6 +255,7 @@ const EntryRow = forwardRef<HTMLDivElement, PropsWithChildren<Props>>(
       allowSupersede,
       allowSpotlight,
       allowSpotlightForFollowUps,
+      ...rest
     },
     ref
   ) => {
@@ -268,7 +272,7 @@ const EntryRow = forwardRef<HTMLDivElement, PropsWithChildren<Props>>(
       ]
     );
 
-    const refForSpotlight = useCallback(
+    const entryRowRef = useCallback(
       (elem: HTMLDivElement) => {
         if (elem && spotlight) {
           elem.scrollIntoView({
@@ -281,14 +285,12 @@ const EntryRow = forwardRef<HTMLDivElement, PropsWithChildren<Props>>(
       [spotlight]
     );
 
-    const refsMerged = useMergeRefs([refForSpotlight, ref]);
-
     const spotlightProps = useSpotlightProps(entry.id);
 
     return (
-      <>
+      <div ref={ref} className={containerClassName} {...rest}>
         <div
-          ref={refsMerged}
+          ref={entryRowRef}
           className={cn(
             "flex items-center",
             selectable && "cursor-pointer relative",
@@ -463,7 +465,7 @@ const EntryRow = forwardRef<HTMLDivElement, PropsWithChildren<Props>>(
                   entries={fullEntry.followUps}
                   selectable
                   expandable
-                  showEntryDates
+                  showDate
                   showFollowUps={showFollowUps}
                   allowFollowUp={allowFollowUp}
                   allowSupersede={allowSupersede}
@@ -473,7 +475,7 @@ const EntryRow = forwardRef<HTMLDivElement, PropsWithChildren<Props>>(
             )}
           </>
         )}
-      </>
+      </div>
     );
   }
 );

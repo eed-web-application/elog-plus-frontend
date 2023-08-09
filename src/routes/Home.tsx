@@ -3,12 +3,14 @@ import { useLocation, useOutlet, useSearchParams } from "react-router-dom";
 import cn from "classnames";
 import Filters, { Filters as FiltersObject } from "../components/Filters";
 import Navbar from "../components/Navbar";
-import EntryList, { Props as EntryListProps } from "../components/EntryList";
 import useEntries from "../hooks/useEntries";
 import useIsSmallScreen from "../hooks/useIsSmallScreen";
 import { EntryQuery } from "../hooks/useEntries";
 import { URLSearchParamsInit } from "react-router-dom";
 import InfoDialogButton from "../components/InfoDialogButton";
+import EntryListGrouped, {
+  Props as EntryListProps,
+} from "../components/EntryListGrouped";
 
 const DEFAULT_QUERY: EntryQuery = {
   logbooks: [],
@@ -157,29 +159,26 @@ export default function Home() {
       </div>
 
       <div className="flex-1 flex overflow-hidden">
-        <div
-          className={cn(
-            "px-3 pt-3 overflow-y-auto w-1/2",
-            (!outlet || isSmallScreen) && "flex-1 pr-3"
+        <EntryListGrouped
+          containerClassName={cn(
+            "w-1/2",
+            (!outlet || isSmallScreen) && "flex-1"
           )}
           ref={bodyRef}
-        >
-          <EntryList
-            entries={entries || []}
-            emptyLabel="No entries found"
-            selected={location.pathname.split("/")[1]}
-            isLoading={isLoading}
-            selectable
-            expandable
-            groupBy={groupBy}
-            showFollowUps
-            allowFollowUp
-            allowSupersede
-            allowSpotlightForFollowUps
-            onBottomVisible={reachedBottom ? undefined : getMoreEntries}
-            spotlight={spotlight}
-          />
-        </div>
+          entries={entries || []}
+          emptyLabel="No entries found"
+          selected={location.pathname.split("/")[1]}
+          isLoading={isLoading}
+          selectable
+          expandable
+          groupBy={groupBy}
+          showFollowUps
+          allowFollowUp
+          allowSupersede
+          allowSpotlightForFollowUps
+          onBottomVisible={reachedBottom ? undefined : getMoreEntries}
+          spotlight={spotlight}
+        />
         {outlet && (
           <>
             {!isSmallScreen && (

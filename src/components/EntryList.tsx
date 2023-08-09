@@ -1,148 +1,56 @@
-import { useCallback, useEffect, useMemo, useRef } from "react";
-import cn from "classnames";
 import { EntrySummary } from "../api";
-import EntryGroup, { Props as EntryGroupProps } from "./EntryGroup";
+import EntryRow, { Props as EntryRowProps } from "./EntryRow";
 import Spinner from "./Spinner";
-import dateToDateString from "../utils/dateToDateString";
-
-function rollingGroupBy<K, V>(
-  list: Array<V>,
-  groupBy: (input: V) => K
-): [K, V[]][] {
-  const groups: [K, V[]][] = [];
-  let currentGroup: V[] | undefined;
-  let currentGroupKey: K | undefined;
-
-  list.forEach((item) => {
-    const groupKey = groupBy(item);
-
-    if (groupKey === currentGroupKey && currentGroup !== undefined) {
-      currentGroup.push(item);
-    } else {
-      if (currentGroup && currentGroupKey) {
-        groups.push([currentGroupKey, currentGroup]);
-      }
-
-      currentGroupKey = groupKey;
-      currentGroup = [item];
-    }
-  });
-
-  if (currentGroupKey && currentGroup) {
-    groups.push([currentGroupKey, currentGroup]);
-  }
-
-  return groups;
-}
 
 export interface Props
-  extends Omit<
-    EntryGroupProps,
-    "headerKind" | "summaryButton" | "lastEntryRef" | "headerKind"
+  extends Pick<
+    EntryRowProps,
+    | "selectable"
+    | "expandable"
+    | "showFollowUps"
+    | "expandedByDefault"
+    | "showDate"
+    | "allowFollowUp"
+    | "allowSupersede"
+    | "allowSpotlight"
+    | "allowSpotlightForFollowUps"
   > {
-  emptyLabel?: string;
+  entries: EntrySummary[];
   selected?: string;
-  groupBy?: EntryGroupProps["headerKind"];
+  spotlight?: string;
   isLoading?: boolean;
-  onBottomVisible?: () => void;
 }
 
 /**
- * Customizable entry list grouped by header types
+ * Simple entry list
  */
 export default function EntryList({
   entries,
-  emptyLabel,
-  groupBy = "none",
+  selected,
+  spotlight,
   isLoading,
-  onBottomVisible,
   ...rest
 }: Props) {
-  const lastObserved = useRef<HTMLDivElement | null>(null);
-
-  const observer = useMemo(
-    () =>
-      new IntersectionObserver(([entry]) => {
-        if (entry.isIntersecting) {
-          onBottomVisible?.();
-        }
-      }),
-    [onBottomVisible]
-  );
-
-  const observe = useCallback(
-    (elem: HTMLDivElement | null) => {
-      if (lastObserved.current) {
-        observer.unobserve(lastObserved.current);
-      }
-
-      if (elem) {
-        observer.observe(elem);
-        lastObserved.current = elem;
-      }
-    },
-    [observer]
-  );
-
-  useEffect(() => {
-    return () => {
-      if (lastObserved.current) {
-        observer.unobserve(lastObserved.current);
-      }
-
-      observer.disconnect();
-    };
-  }, [observer]);
-
-  let entryGroups: [string, EntrySummary[]][] | undefined;
-  if (groupBy !== "none") {
-    let groupByFunc = (entry: EntrySummary) => dateToDateString(entry.eventAt);
-
-    if (groupBy === "shift") {
-      groupByFunc = (entry: EntrySummary) =>
-        JSON.stringify([
-          dateToDateString(entry.eventAt),
-          entry.shift?.id || null,
-        ]);
-    } else if (groupBy === "logbookAndShift") {
-      groupByFunc = (entry: EntrySummary) =>
-        JSON.stringify([
-          dateToDateString(entry.eventAt),
-          entry.shift?.id || null,
-          entry.logbook,
-        ]);
-    }
-
-    entryGroups = rollingGroupBy(entries, groupByFunc);
+  if (isLoading) {
+    return <Spinner large className="my-4 m-auto" />;
   }
 
-  if (entries.length === 0 && !isLoading && emptyLabel) {
-    return (
-      <div className="text-gray-500 text-center pt-6 text-lg">{emptyLabel}</div>
-    );
+  if (entries.length === 0) {
+    return;
   }
 
   return (
-    <>
-      {entryGroups ? (
-        entryGroups.map(([key, entries], groupIndex) => (
-          <EntryGroup
-            key={key}
-            entries={entries}
-            lastEntryRef={
-              entryGroups && groupIndex === entryGroups.length - 1
-                ? observe
-                : undefined
-            }
-            headerKind={groupBy}
-            {...rest}
-          />
-        ))
-      ) : (
-        <EntryGroup entries={entries} {...rest} />
-      )}
-
-      <Spinner large className={cn("my-4 m-auto", !isLoading && "invisible")} />
-    </>
+    <div className="rounded-lg border mb-2 overflow-hidden">
+      {entries.map((entry, index) => (
+        <EntryRow
+          key={entry.id}
+          entry={entry}
+          containerClassName={index === entries.length - 1 ? "" : "border-b"}
+          spotlight={spotlight === entry.id}
+          selected={entry.id === selected}
+          {...rest}
+        />
+      ))}
+    </div>
   );
 }

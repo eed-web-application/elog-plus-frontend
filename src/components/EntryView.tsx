@@ -158,12 +158,7 @@ export default function EntryView({ entry }: Props) {
         <>
           <TextDivider>History</TextDivider>
           <div className="mt-3 px-3 pb-3">
-            <EntryList
-              entries={entry.history}
-              showEntryDates
-              expandable
-              selectable
-            />
+            <EntryList entries={entry.history} showDate expandable selectable />
           </div>
         </>
       )}
@@ -173,7 +168,7 @@ export default function EntryView({ entry }: Props) {
           <div className="mt-3 px-3 pb-3">
             <EntryList
               entries={entry.followUps}
-              showEntryDates
+              showDate
               showFollowUps
               expandable
               selectable
