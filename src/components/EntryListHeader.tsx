@@ -33,6 +33,7 @@ function headerTextRenderer(headerKind: HeaderKind, entry: EntrySummary) {
   return headerText;
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 const EntryListHeader = forwardRef<HTMLDivElement, Props>(
   ({ headerKind, representative, className, ...rest }, ref) => {
     const summaryId = useSummary(
@@ -104,7 +105,6 @@ const EntryListHeader = forwardRef<HTMLDivElement, Props>(
     textRenderer: typeof headerTextRenderer;
   }
 ).textRenderer = headerTextRenderer;
-
 export default EntryListHeader as typeof EntryListHeader & {
   textRenderer: typeof headerTextRenderer;
 };
