@@ -128,7 +128,12 @@ const EntryListGrouped = forwardRef<HTMLDivElement, Props>(
 
     if (entries.length === 0 && !isLoading && emptyLabel) {
       return (
-        <div className="text-gray-500 text-center pt-6 text-lg">
+        <div
+          className={twMerge(
+            "text-gray-500 text-center pt-6 text-lg",
+            containerClassName
+          )}
+        >
           {emptyLabel}
         </div>
       );
