@@ -201,7 +201,7 @@ export default function EntryForm({
   );
 
   return (
-    <Suspense fallback={<Spinner className="m-auto mt-16" />}>
+    <Suspense fallback={<Spinner large className="mx-auto w-full" />}>
       <Link
         to={{ pathname: "/", search: window.location.search }}
         className={twMerge(IconButton, "my-1 float-right")}
@@ -227,7 +227,7 @@ export default function EntryForm({
           <div className="text-lg pl-3 py-2 mb-2 border-b">New entry</div>
         ) : (
           <>
-            <TextDivider className="mt-11">
+            <TextDivider className="w-full">
               {kind[0] === "followingUp" ? "Following up" : "Superseding"}
             </TextDivider>
             <div className="border-b pt-1.5 pb-2 px-3 mb-3">
