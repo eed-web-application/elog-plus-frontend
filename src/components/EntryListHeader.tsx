@@ -42,11 +42,16 @@ function headerTextRenderer(
 // eslint-disable-next-line react-refresh/only-export-components
 const EntryListHeader = forwardRef<HTMLDivElement, Props>(
   ({ headerKind, representative, dateBasedOn, className, ...rest }, ref) => {
+    const date =
+      dateBasedOn === "loggedAt"
+        ? representative.loggedAt
+        : representative.eventAt;
+
     const summaryId = useSummary(
       headerKind === "day" || !representative
         ? undefined
         : representative.shift?.id,
-      representative ? dateToDateString(representative.eventAt) : undefined
+      representative ? dateToDateString(date) : undefined
     );
 
     let summaryButton;
@@ -77,7 +82,7 @@ const EntryListHeader = forwardRef<HTMLDivElement, Props>(
               logbook: representative.logbook,
               summarizes: {
                 shiftId: representative.shift?.id,
-                date: dateToDateString(representative.eventAt),
+                date: dateToDateString(date),
               },
             }}
             className={buttonBase}
