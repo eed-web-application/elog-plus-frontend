@@ -1,6 +1,7 @@
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { fetchEntries } from "../api";
 
+const CONTEXT_SIZE = 6;
 const ENTRIES_PER_PAGE = 25;
 
 export interface EntryQuery {
@@ -50,8 +51,7 @@ export default function useEntries({ spotlight, query }: Params) {
         startDate: query?.startDate || undefined,
         endDate: query?.endDate || undefined,
         anchorId: pageParam || spotlight,
-        contextSize:
-          pageParam === undefined && spotlight ? ENTRIES_PER_PAGE : 0,
+        contextSize: pageParam === undefined && spotlight ? CONTEXT_SIZE : 0,
         limit: ENTRIES_PER_PAGE,
       });
     },

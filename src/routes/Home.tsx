@@ -1,5 +1,10 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useLocation, useOutlet, useSearchParams } from "react-router-dom";
+import {
+  useLocation,
+  useNavigate,
+  useOutlet,
+  useSearchParams,
+} from "react-router-dom";
 import { twMerge } from "tailwind-merge";
 import Filters, { Filters as FiltersObject } from "../components/Filters";
 import Navbar from "../components/Navbar";
@@ -64,6 +69,7 @@ export default function Home() {
   );
   const query = useMemo(() => deserializeQuery(searchParams), [searchParams]);
   const location = useLocation();
+  const navigate = useNavigate();
 
   const setQuery = useCallback(
     (query: EntryQuery, preserveState = false) => {
@@ -81,6 +87,15 @@ export default function Home() {
   });
 
   const spotlight = location.state?.spotlight;
+
+  // This is used when the user uses spotlight but the spotlighted entry is not
+  // already loaded. So, we use into a state of "spotlight search" where
+  // this is used to back back into the normal state.
+  const backToTop = useCallback(() => {
+    setSpotlightSearch(undefined);
+    // Delete state
+    navigate({ search: window.location.search }, { replace: true });
+  }, [navigate]);
 
   // Ensure the spotlighted element is loaded and if not set, setSpotlightSearch
   // to spotlight
@@ -179,6 +194,8 @@ export default function Home() {
           onBottomVisible={reachedBottom ? undefined : getMoreEntries}
           dateBasedOn={query.sortByLogDate ? "loggedAt" : "eventAt"}
           spotlight={spotlight}
+          showBackToTopButton={Boolean(spotlightSearch)}
+          onBackToTop={backToTop}
         />
         {outlet && (
           <>

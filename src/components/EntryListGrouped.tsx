@@ -7,6 +7,8 @@ import {
   useState,
 } from "react";
 import { twMerge } from "tailwind-merge";
+import { Link } from "react-router-dom";
+import { useMergeRefs } from "@floating-ui/react";
 import Spinner from "./Spinner";
 import {
   Range,
@@ -18,7 +20,7 @@ import { Props as EntryListProps } from "./EntryList";
 import EntryListHeader, {
   Props as EntryListHeaderProps,
 } from "./EntryListHeader";
-import { useMergeRefs } from "@floating-ui/react";
+import { Link as LinkStyle } from "./base";
 
 export interface Props extends EntryListProps {
   containerClassName: string;
@@ -26,6 +28,8 @@ export interface Props extends EntryListProps {
   groupBy: EntryListHeaderProps["headerKind"];
   dateBasedOn?: EntryListHeaderProps["dateBasedOn"];
   onBottomVisible?: () => void;
+  showBackToTopButton?: boolean;
+  onBackToTop?: () => void;
 }
 
 /**
@@ -43,6 +47,8 @@ const EntryListGrouped = forwardRef<HTMLDivElement, Props>(
       onBottomVisible,
       selected,
       spotlight,
+      showBackToTopButton = false,
+      onBackToTop,
       ...rest
     },
     ref
@@ -98,6 +104,7 @@ const EntryListGrouped = forwardRef<HTMLDivElement, Props>(
         },
         [headerIndices]
       ),
+      paddingStart: showBackToTopButton ? 50 : 0,
     });
 
     const virtualItems = virtualizer.getVirtualItems();
@@ -159,6 +166,17 @@ const EntryListGrouped = forwardRef<HTMLDivElement, Props>(
               style={{ height: `${virtualizer.getTotalSize()}px` }}
               className="relative w-full"
             >
+              {showBackToTopButton && (
+                <div
+                  tabIndex={0}
+                  className={twMerge(
+                    "w-full h-9 bg-gradient-to-b from-gray-200 block font-medium text-gray-700 hover:underline text-center pt-3 absolute top-0 z-10 cursor-pointer"
+                  )}
+                  onClick={onBackToTop}
+                >
+                  Back to top
+                </div>
+              )}
               <div
                 className="w-full"
                 style={{
