@@ -86,7 +86,7 @@ export default function EntryFigureList({
           tabIndex={0}
           {...getReferenceProps()}
           onClick={() => setViewingFigure(figure.id)}
-          className={twMerge("cursor-pointer w-full")}
+          className="cursor-pointer w-full"
         />
       </div>
     );

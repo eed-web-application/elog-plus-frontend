@@ -8,13 +8,13 @@ export interface EntrySummary {
   loggedBy: string;
   loggedAt: Date;
   eventAt: Date;
+  attachments: Attachment[];
   shift?: Shift;
 }
 
 export interface Entry extends EntrySummary {
   supersedeBy: string;
   text: string;
-  attachments: Attachment[];
   followUps: EntrySummary[];
   history?: EntrySummary[];
   followingUp?: EntrySummary;
@@ -77,6 +77,7 @@ export async function fetchEntries({
   anchorId?: string;
   hideSummaries?: boolean;
 }): Promise<EntrySummary[]> {
+  // await new Promise((res) => setTimeout(res, 1000));
   const params: Record<string, string> = {
     logbooks: logbooks.join(","),
     tags: tags.join(","),

@@ -21,7 +21,7 @@ import {
   useRole,
 } from "@floating-ui/react";
 import { IconButton } from "./base";
-import { EntrySummary } from "../api";
+import { EntrySummary, getAttachmentPreviewURL } from "../api";
 import EntryList from "./EntryList";
 import Chip from "./Chip";
 import EntryBodyText from "./EntryBodyText";
@@ -217,6 +217,32 @@ function TagList({ tags }: { tags: string[] }) {
   );
 }
 
+function InlineFigureList({
+  figures,
+  className,
+  ...rest
+}: {
+  figures: EntrySummary["attachments"];
+} & ComponentProps<"div">) {
+  return (
+    <div
+      className={twMerge("flex overflow-hidden gap-2 items-center", className)}
+      {...rest}
+    >
+      {figures.slice(0, 2).map((figure) => (
+        <img
+          key={figure.id}
+          src={getAttachmentPreviewURL(figure.id)}
+          className="w-8 h-8 rounded-md"
+        />
+      ))}
+      {figures.length > 2 && (
+        <div className="text-gray-500 text-xs">+{figures.length - 2}</div>
+      )}
+    </div>
+  );
+}
+
 export interface Props extends ComponentProps<"div"> {
   entry: EntrySummary;
   containerClassName?: string;
@@ -277,11 +303,16 @@ const EntryRow = forwardRef<HTMLDivElement, PropsWithChildren<Props>>(
     const spotlightProps = useSpotlightProps(entry.id);
     const date = dateBasedOn === "loggedAt" ? entry.loggedAt : entry.eventAt;
 
+    const figures =
+      entry?.attachments?.filter(
+        (attachment) => attachment.previewState === "Completed"
+      ) || [];
+
     return (
       <div ref={ref} className={containerClassName} {...rest}>
         <div
           className={twMerge(
-            "flex items-center",
+            "flex items-center group",
             selectable && "cursor-pointer relative hover:bg-gray-50",
             selected && "bg-blue-50",
             selected && selectable && "hover:bg-blue-100",
@@ -332,7 +363,11 @@ const EntryRow = forwardRef<HTMLDivElement, PropsWithChildren<Props>>(
               <TagList tags={entry.tags} />
             </div>
           </div>
-          <div className="flex gap-2 pl-3">
+          <InlineFigureList
+            className="group-hover:hidden px-2"
+            figures={figures}
+          />
+          <div className="hidden pl-3 group-hover:flex">
             <FloatingDelayGroup delay={200}>
               {allowSpotlight && (
                 <RowButton
@@ -412,39 +447,39 @@ const EntryRow = forwardRef<HTMLDivElement, PropsWithChildren<Props>>(
                   </svg>
                 </RowButton>
               )}
-              {expandable && (
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth={1.5}
-                  stroke="currentColor"
-                  tabIndex={0}
-                  className={twMerge(
-                    IconButton,
-                    "z-0",
-                    expanded && "rotate-180",
-                    selected && "hover:bg-blue-200",
-                    highlighted && "hover:bg-yellow-300"
-                  )}
-                  onClick={() => setExpanded((expanded) => !expanded)}
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M19.5 8.25l-7.5 7.5-7.5-7.5"
-                  />
-                </svg>
-              )}
             </FloatingDelayGroup>
           </div>
+          {expandable && (
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth={1.5}
+              stroke="currentColor"
+              tabIndex={0}
+              className={twMerge(
+                IconButton,
+                "z-0",
+                expanded && "rotate-180",
+                selected && "hover:bg-blue-200",
+                highlighted && "hover:bg-yellow-300"
+              )}
+              onClick={() => setExpanded((expanded) => !expanded)}
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M19.5 8.25l-7.5 7.5-7.5-7.5"
+              />
+            </svg>
+          )}
         </div>
         {expanded && fullEntry && (
           <>
             <div
               className={twMerge(
                 "p-2 pb-1 bg-gray-100",
-                fullEntry.text || "text-gray-500"
+                !fullEntry.text && "text-gray-500"
               )}
             >
               <EntryBodyText body={fullEntry.text} showEmptyLabel />
