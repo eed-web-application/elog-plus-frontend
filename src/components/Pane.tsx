@@ -68,7 +68,7 @@ export default function Pane({
       {...(fullscreen ? getFloatingProps() : {})}
       ref={fullscreen ? refs.setFloating : undefined}
       className={twMerge(
-        "overflow-y-auto mx-auto container flex-1",
+        "mx-auto container flex-1",
         fullscreen && "bg-white mt-6 rounded-lg w-auto"
       )}
     >

@@ -47,7 +47,7 @@ export default function Admin() {
   }, []);
 
   return (
-    <div className="flex flex-col max-h-screen">
+    <div className="flex flex-col h-screen">
       <div className="p-2 shadow z-10">
         <div className="container m-auto">
           <Link to="/" className="text-center mb-3 w-full md:mb-0 md:w-auto">
@@ -97,7 +97,10 @@ export default function Admin() {
         </div>
         {selectedLogbook && (
           <div
-            className={twMerge("pb-3", !isSmallScreen && "flex-1 flex-shrink")}
+            className={twMerge(
+              "pb-3 overflow-y-auto",
+              !isSmallScreen && "flex-1 flex-shrink"
+            )}
             style={{ minWidth: isSmallScreen ? "auto" : MIN_PANE_WIDTH }}
           >
             <Pane home="/admin">

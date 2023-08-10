@@ -9,6 +9,9 @@ import {
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
+import "dayjs/locale/en";
 
 import Home from "./routes/Home.tsx";
 import Supersede from "./routes/Supersede.tsx";
@@ -20,6 +23,8 @@ import Admin from "./routes/Admin.tsx";
 import { fetchEntry, ServerError } from "./api";
 import "./index.css";
 import reportServerError from "./reportServerError.tsx";
+
+dayjs.extend(utc);
 
 const queryClient = new QueryClient();
 
