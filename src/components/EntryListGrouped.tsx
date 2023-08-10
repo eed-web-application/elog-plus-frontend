@@ -197,7 +197,7 @@ const EntryListGrouped = forwardRef<HTMLDivElement, Props>(
         )}
         <Spinner
           large
-          className={twMerge("my-4 m-auto", !isLoading && "invisible")}
+          className={twMerge("mx-auto my-4", !isLoading && "invisible")}
         />
       </div>
     );

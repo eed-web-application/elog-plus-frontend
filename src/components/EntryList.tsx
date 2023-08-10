@@ -32,7 +32,7 @@ export default function EntryList({
   ...rest
 }: Props) {
   if (isLoading) {
-    return <Spinner large className="my-4 m-auto" />;
+    return <Spinner large className="mx-auto my-4" />;
   }
 
   if (entries.length === 0) {
