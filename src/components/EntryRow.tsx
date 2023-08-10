@@ -303,7 +303,7 @@ const EntryRow = forwardRef<HTMLDivElement, PropsWithChildren<Props>>(
               {date.toLocaleString("en-us", {
                 hour: "numeric",
                 minute: "numeric",
-                hour12: false,
+                hourCycle: "h23",
               })}
             </div>
           </div>

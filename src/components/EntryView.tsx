@@ -75,7 +75,7 @@ export default function EntryView({ entry }: Props) {
             hour: "numeric",
             minute: "numeric",
             second: "numeric",
-            hour12: false,
+            hourCycle: "h23",
           })}
         </div>
         {entry.eventAt &&
@@ -89,7 +89,7 @@ export default function EntryView({ entry }: Props) {
                 hour: "numeric",
                 minute: "numeric",
                 second: "numeric",
-                hour12: false,
+                hourCycle: "h23",
               })}
             </div>
           )}
