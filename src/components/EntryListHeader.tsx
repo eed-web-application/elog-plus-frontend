@@ -2,7 +2,7 @@ import { twMerge } from "tailwind-merge";
 import { Link } from "react-router-dom";
 import { EntrySummary } from "../api";
 import useSummary from "../hooks/useSummary";
-import dateToDateString from "../utils/dateToDateString";
+import { dateToYYYYMMDD } from "../utils/datetimeConversion";
 import { ComponentProps, forwardRef } from "react";
 
 export type HeaderKind = "shift" | "logbookAndShift" | "day";
@@ -51,7 +51,7 @@ const EntryListHeader = forwardRef<HTMLDivElement, Props>(
       headerKind === "day" || !representative
         ? undefined
         : representative.shift?.id,
-      representative ? dateToDateString(date) : undefined
+      representative ? dateToYYYYMMDD(date) : undefined
     );
 
     let summaryButton;
@@ -82,7 +82,7 @@ const EntryListHeader = forwardRef<HTMLDivElement, Props>(
               logbook: representative.logbook,
               summarizes: {
                 shiftId: representative.shift?.id,
-                date: dateToDateString(date),
+                date: dateToYYYYMMDD(date),
               },
             }}
             className={buttonBase}

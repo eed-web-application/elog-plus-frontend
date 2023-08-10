@@ -5,9 +5,9 @@ import MultiSelectMenu from "./MultiSelectMenu.tsx";
 import { Input } from "./base.ts";
 import Chip from "./Chip.tsx";
 import FilterChipWithMenu from "./FilterChipWithMenu.tsx";
-import dateToDateString from "../utils/dateToDateString.ts";
 import useLogbooks from "../hooks/useLogbooks.ts";
 import useTags from "../hooks/useTags.ts";
+import { yyyymmddToDate, dateToYYYYMMDD } from "../utils/datetimeConversion.ts";
 
 export type Filters = Pick<
   EntryQuery,
@@ -123,7 +123,7 @@ export default function Filters({ filters, setFilters }: Props) {
         className="mr-3 mt-2"
         label={
           filters.startDate
-            ? new Date(filters.startDate).toLocaleDateString("en-us", {
+            ? filters.startDate.toLocaleDateString("en-us", {
                 timeZone: "UTC",
                 year: "numeric",
                 month: "long",
@@ -139,9 +139,12 @@ export default function Filters({ filters, setFilters }: Props) {
           className={Input}
           type="date"
           autoFocus
-          value={filters.startDate ? dateToDateString(filters.startDate) : ""}
+          value={filters.startDate ? dateToYYYYMMDD(filters.startDate) : ""}
           onChange={(e) =>
-            setFilters({ ...filters, startDate: new Date(e.target.value) })
+            setFilters({
+              ...filters,
+              startDate: yyyymmddToDate(e.target.value),
+            })
           }
         />
       </FilterChipWithMenu>
@@ -165,9 +168,9 @@ export default function Filters({ filters, setFilters }: Props) {
           className={Input}
           type="date"
           autoFocus
-          value={filters.endDate ? dateToDateString(filters.endDate) : ""}
+          value={filters.endDate ? dateToYYYYMMDD(filters.endDate) : ""}
           onChange={(e) =>
-            setFilters({ ...filters, endDate: new Date(e.target.value) })
+            setFilters({ ...filters, endDate: yyyymmddToDate(e.target.value) })
           }
         />
       </FilterChipWithMenu>

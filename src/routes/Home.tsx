@@ -46,7 +46,7 @@ function serializeQuery(query: EntryQuery): URLSearchParamsInit {
       )
       .map(([key, value]) => [
         key,
-        value instanceof Date ? value.toISOString().split("T")[0] : value,
+        value instanceof Date ? value.toISOString() : value,
       ]) as [string, string][]
   );
 }

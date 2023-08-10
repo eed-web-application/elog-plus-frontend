@@ -10,7 +10,7 @@ import {
 } from "../api";
 import { Button, IconButton, Input, InputInvalid } from "./base";
 import { useLogbookFormsStore } from "../logbookFormsStore";
-import { localToUtc, utcToLocal } from "../utils/utcTimeConversion";
+import { localToUtc, utcToLocal } from "../utils/datetimeConversion";
 import reportServerError from "../reportServerError";
 
 interface Props {

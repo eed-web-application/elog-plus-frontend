@@ -22,12 +22,14 @@ import {
   useDraftsStore,
 } from "../draftsStore";
 import TextDivider from "./TextDivider";
-import dateToDateString from "../utils/dateToDateString";
 import useAttachmentUploader, {
   LocalAttachment,
 } from "../hooks/useAttachmentUploader";
 import Spinner from "./Spinner";
-import dateToDatetimeString from "../utils/dateToDatetimeString";
+import {
+  dateToDatetimeString,
+  dateToYYYYMMDD,
+} from "../utils/datetimeConversion";
 import useLogbooks from "../hooks/useLogbooks";
 import useTags from "../hooks/useTags";
 import reportServerError from "../reportServerError";
@@ -336,7 +338,7 @@ export default function EntryForm({
                         ? undefined
                         : {
                             shiftId: "",
-                            date: dateToDateString(new Date()),
+                            date: dateToYYYYMMDD(new Date()),
                           },
                     })
                   }
