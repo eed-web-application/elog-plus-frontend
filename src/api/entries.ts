@@ -39,6 +39,8 @@ function normalizeEntry<E extends Entry | EntrySummary>(entry: E): E {
   entry.loggedAt = new Date(entry.loggedAt + "Z");
   entry.eventAt = new Date(entry.eventAt + "Z");
 
+  entry.attachments = entry.attachments || [];
+
   if ("text" in entry) {
     if (entry.followUps) {
       entry.followUps = entry.followUps.map(normalizeEntry);

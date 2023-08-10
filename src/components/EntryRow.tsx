@@ -21,7 +21,7 @@ import {
   useRole,
 } from "@floating-ui/react";
 import { IconButton } from "./base";
-import { EntrySummary, getAttachmentPreviewURL } from "../api";
+import { Attachment, EntrySummary, getAttachmentPreviewURL } from "../api";
 import EntryList from "./EntryList";
 import Chip from "./Chip";
 import EntryBodyText from "./EntryBodyText";
@@ -223,7 +223,7 @@ function AttachmentList({
   className,
   ...rest
 }: {
-  attachments: EntrySummary["attachments"];
+  attachments: Attachment[];
 } & ComponentProps<"div">) {
   const figuresFirst = [...attachments];
   figuresFirst.sort(
@@ -375,7 +375,7 @@ const EntryRow = forwardRef<HTMLDivElement, PropsWithChildren<Props>>(
           </div>
           <AttachmentList
             className="group-hover:hidden px-2"
-            attachments={entry.attachments || []}
+            attachments={entry.attachments}
           />
           <div className="hidden pl-3 group-hover:flex">
             <FloatingDelayGroup delay={200}>
