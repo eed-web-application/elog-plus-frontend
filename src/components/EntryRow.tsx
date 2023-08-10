@@ -228,6 +228,7 @@ export interface Props extends ComponentProps<"div"> {
   showFollowUps?: boolean;
   expandedByDefault?: boolean;
   showDate?: boolean;
+  dateBasedOn?: "eventAt" | "loggedAt";
   allowFollowUp?: boolean;
   allowSupersede?: boolean;
   allowSpotlight?: boolean;
@@ -251,6 +252,7 @@ const EntryRow = forwardRef<HTMLDivElement, PropsWithChildren<Props>>(
       showFollowUps,
       expandedByDefault,
       showDate,
+      dateBasedOn = "eventAt",
       allowFollowUp,
       allowSupersede,
       allowSpotlight,
@@ -273,6 +275,7 @@ const EntryRow = forwardRef<HTMLDivElement, PropsWithChildren<Props>>(
     );
 
     const spotlightProps = useSpotlightProps(entry.id);
+    const date = dateBasedOn === "loggedAt" ? entry.loggedAt : entry.eventAt;
 
     return (
       <div ref={ref} className={containerClassName} {...rest}>
@@ -290,14 +293,14 @@ const EntryRow = forwardRef<HTMLDivElement, PropsWithChildren<Props>>(
           <div className="px-2 flex flex-col justify-center items-center w-16">
             {showDate && (
               <div className="text-sm">
-                {entry.loggedAt.toLocaleDateString("en-us", {
+                {date.toLocaleDateString("en-us", {
                   month: "short",
                   day: "numeric",
                 })}
               </div>
             )}
             <div className="leading-none">
-              {entry.loggedAt.toLocaleString("en-us", {
+              {date.toLocaleString("en-us", {
                 hour: "numeric",
                 minute: "numeric",
                 hour12: false,

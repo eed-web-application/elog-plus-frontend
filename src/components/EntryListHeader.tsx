@@ -10,10 +10,16 @@ export type HeaderKind = "shift" | "logbookAndShift" | "day";
 export interface Props extends ComponentProps<"div"> {
   headerKind: HeaderKind;
   representative: EntrySummary;
+  dateBasedOn?: "eventAt" | "loggedAt";
 }
 
-function headerTextRenderer(headerKind: HeaderKind, entry: EntrySummary) {
-  let headerText = new Date(entry.eventAt).toLocaleDateString("en-us", {
+function headerTextRenderer(
+  headerKind: HeaderKind,
+  entry: EntrySummary,
+  dateBasedOn: Props["dateBasedOn"] = "eventAt"
+) {
+  const date = dateBasedOn === "loggedAt" ? entry.eventAt : entry.loggedAt;
+  let headerText = new Date(date).toLocaleDateString("en-us", {
     weekday: "long",
     year: "numeric",
     month: "short",
@@ -35,7 +41,7 @@ function headerTextRenderer(headerKind: HeaderKind, entry: EntrySummary) {
 
 // eslint-disable-next-line react-refresh/only-export-components
 const EntryListHeader = forwardRef<HTMLDivElement, Props>(
-  ({ headerKind, representative, className, ...rest }, ref) => {
+  ({ headerKind, representative, dateBasedOn, className, ...rest }, ref) => {
     const summaryId = useSummary(
       headerKind === "day" || !representative
         ? undefined
@@ -82,7 +88,11 @@ const EntryListHeader = forwardRef<HTMLDivElement, Props>(
       }
     }
 
-    const headerText = headerTextRenderer(headerKind, representative);
+    const headerText = headerTextRenderer(
+      headerKind,
+      representative,
+      dateBasedOn
+    );
 
     return (
       <div

@@ -177,6 +177,7 @@ export default function Home() {
           allowSupersede
           allowSpotlightForFollowUps
           onBottomVisible={reachedBottom ? undefined : getMoreEntries}
+          dateBasedOn={query.sortByLogDate ? "loggedAt" : "eventAt"}
           spotlight={spotlight}
         />
         {outlet && (

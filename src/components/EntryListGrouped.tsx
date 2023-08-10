@@ -24,6 +24,7 @@ export interface Props extends EntryListProps {
   containerClassName: string;
   emptyLabel?: string;
   groupBy: EntryListHeaderProps["headerKind"];
+  dateBasedOn?: EntryListHeaderProps["dateBasedOn"];
   onBottomVisible?: () => void;
 }
 
@@ -38,6 +39,7 @@ const EntryListGrouped = forwardRef<HTMLDivElement, Props>(
       emptyLabel,
       groupBy,
       isLoading,
+      dateBasedOn,
       onBottomVisible,
       selected,
       spotlight,
@@ -54,7 +56,11 @@ const EntryListGrouped = forwardRef<HTMLDivElement, Props>(
       let currentHeader = null;
 
       for (const entry of entries) {
-        const header = EntryListHeader.textRenderer(groupBy, entry);
+        const header = EntryListHeader.textRenderer(
+          groupBy,
+          entry,
+          dateBasedOn
+        );
 
         if (header !== currentHeader) {
           currentHeader = header;
@@ -67,7 +73,7 @@ const EntryListGrouped = forwardRef<HTMLDivElement, Props>(
       }
 
       return [items, headerIndices];
-    }, [entries, groupBy]);
+    }, [entries, groupBy, dateBasedOn]);
 
     const stickyHeaderIndexRef = useRef(0);
 
@@ -192,6 +198,7 @@ const EntryListGrouped = forwardRef<HTMLDivElement, Props>(
                       className="px-2"
                       highlighted={spotlight === entry.id}
                       selected={entry.id === selected}
+                      dateBasedOn={dateBasedOn}
                       {...rest}
                     />
                   );
