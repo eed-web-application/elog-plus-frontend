@@ -30,6 +30,7 @@ import EntryFigureList from "./EntryFigureList";
 import useSpotlightProps from "../hooks/useSpotlightProps";
 import { useDraftsStore } from "../draftsStore";
 import useEntry from "../hooks/useEntry";
+import AttachmentIcon from "./AttachmentIcon";
 
 function RowButton({
   children,
@@ -217,27 +218,41 @@ function TagList({ tags }: { tags: string[] }) {
   );
 }
 
-function InlineFigureList({
-  figures,
+function AttachmentList({
+  attachments,
   className,
   ...rest
 }: {
-  figures: EntrySummary["attachments"];
+  attachments: EntrySummary["attachments"];
 } & ComponentProps<"div">) {
+  const figuresFirst = [...attachments];
+  figuresFirst.sort(
+    (a, b) =>
+      (b.previewState === "Completed" ? 1 : 0) -
+      (a.previewState === "Completed" ? 1 : 0)
+  );
+
   return (
-    <div
-      className={twMerge("flex overflow-hidden gap-2 items-center", className)}
-      {...rest}
-    >
-      {figures.slice(0, 2).map((figure) => (
-        <img
-          key={figure.id}
-          src={getAttachmentPreviewURL(figure.id)}
-          className="w-8 h-8 rounded-md"
-        />
-      ))}
-      {figures.length > 2 && (
-        <div className="text-gray-500 text-xs">+{figures.length - 2}</div>
+    <div className={twMerge("flex gap-2 items-center", className)} {...rest}>
+      {figuresFirst
+        .slice(0, 2)
+        .map((attachment) =>
+          attachment.previewState === "Completed" ? (
+            <img
+              key={attachment.id}
+              src={getAttachmentPreviewURL(attachment.id)}
+              className="w-8 h-8 rounded-md"
+            />
+          ) : (
+            <AttachmentIcon
+              key={attachment.id}
+              className="w-8 h-8 text-gray-500 bg-gray-200 p-1 rounded-md"
+              mimeType={attachment.contentType}
+            />
+          )
+        )}
+      {attachments.length > 2 && (
+        <div className="text-gray-500 text-xs">+{attachments.length - 2}</div>
       )}
     </div>
   );
@@ -303,11 +318,6 @@ const EntryRow = forwardRef<HTMLDivElement, PropsWithChildren<Props>>(
     const spotlightProps = useSpotlightProps(entry.id);
     const date = dateBasedOn === "loggedAt" ? entry.loggedAt : entry.eventAt;
 
-    const figures =
-      entry?.attachments?.filter(
-        (attachment) => attachment.previewState === "Completed"
-      ) || [];
-
     return (
       <div ref={ref} className={containerClassName} {...rest}>
         <div
@@ -363,9 +373,9 @@ const EntryRow = forwardRef<HTMLDivElement, PropsWithChildren<Props>>(
               <TagList tags={entry.tags} />
             </div>
           </div>
-          <InlineFigureList
+          <AttachmentList
             className="group-hover:hidden px-2"
-            figures={figures}
+            attachments={entry.attachments || []}
           />
           <div className="hidden pl-3 group-hover:flex">
             <FloatingDelayGroup delay={200}>
