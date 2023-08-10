@@ -7,7 +7,6 @@ import {
   useState,
 } from "react";
 import { twMerge } from "tailwind-merge";
-import { Link } from "react-router-dom";
 import { useMergeRefs } from "@floating-ui/react";
 import Spinner from "./Spinner";
 import {
@@ -20,7 +19,6 @@ import { Props as EntryListProps } from "./EntryList";
 import EntryListHeader, {
   Props as EntryListHeaderProps,
 } from "./EntryListHeader";
-import { Link as LinkStyle } from "./base";
 
 export interface Props extends EntryListProps {
   containerClassName: string;
