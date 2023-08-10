@@ -213,7 +213,7 @@ const EntryListGrouped = forwardRef<HTMLDivElement, Props>(
                       ref={virtualizer.measureElement}
                       entry={entry}
                       containerClassName="border-b"
-                      className="px-2"
+                      className="pr-2"
                       highlighted={spotlight === entry.id}
                       selected={entry.id === selected}
                       dateBasedOn={dateBasedOn}
