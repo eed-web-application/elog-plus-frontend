@@ -1,6 +1,8 @@
+import { useRef } from "react";
 import { EntrySummary } from "../api";
 import EntryRow, { Props as EntryRowProps } from "./EntryRow";
 import Spinner from "./Spinner";
+import { useResizeObserver } from "../hooks/useOnResize";
 
 export interface Props
   extends Pick<
@@ -31,6 +33,9 @@ export default function EntryList({
   isLoading,
   ...rest
 }: Props) {
+  const ref = useRef<HTMLDivElement>(null);
+  const Observer = useResizeObserver(ref.current);
+
   if (isLoading) {
     return <Spinner large className="mx-auto my-4" />;
   }
@@ -40,17 +45,19 @@ export default function EntryList({
   }
 
   return (
-    <div className="rounded-lg border mb-2 overflow-hidden">
-      {entries.map((entry, index) => (
-        <EntryRow
-          key={entry.id}
-          entry={entry}
-          containerClassName={index === entries.length - 1 ? "" : "border-b"}
-          highlighted={spotlight === entry.id}
-          selected={entry.id === selected}
-          {...rest}
-        />
-      ))}
-    </div>
+    <Observer>
+      <div className="rounded-lg border mb-2 overflow-hidden" ref={ref}>
+        {entries.map((entry, index) => (
+          <EntryRow
+            key={entry.id}
+            entry={entry}
+            containerClassName={index === entries.length - 1 ? "" : "border-b"}
+            highlighted={spotlight === entry.id}
+            selected={entry.id === selected}
+            {...rest}
+          />
+        ))}
+      </div>
+    </Observer>
   );
 }

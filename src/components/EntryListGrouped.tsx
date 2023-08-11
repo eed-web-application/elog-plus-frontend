@@ -19,6 +19,7 @@ import { Props as EntryListProps } from "./EntryList";
 import EntryListHeader, {
   Props as EntryListHeaderProps,
 } from "./EntryListHeader";
+import { useResizeObserver } from "../hooks/useOnResize";
 
 export interface Props extends EntryListProps {
   containerClassName: string;
@@ -53,6 +54,7 @@ const EntryListGrouped = forwardRef<HTMLDivElement, Props>(
   ) => {
     const [prevSpotlight, setPrevSpotlight] = useState<string | null>(null);
     const parentRef = useRef<HTMLDivElement | null>(null);
+    const Observer = useResizeObserver(parentRef.current);
 
     const [items, headerIndices] = useMemo(() => {
       const items = [];
@@ -151,83 +153,85 @@ const EntryListGrouped = forwardRef<HTMLDivElement, Props>(
     }
 
     return (
-      <div
-        className={twMerge(
-          "overflow-x-auto h-full relative",
-          containerClassName
-        )}
-        ref={mergedRef}
-      >
-        {items.length > 1 && (
-          <>
-            <div
-              style={{ height: `${virtualizer.getTotalSize()}px` }}
-              className="relative w-full"
-            >
-              {showBackToTopButton && (
-                <div
-                  tabIndex={0}
-                  className={twMerge(
-                    "w-full h-9 bg-gradient-to-b from-gray-200 block font-medium text-gray-700 hover:underline text-center pt-3 absolute top-0 z-10 cursor-pointer"
-                  )}
-                  onClick={onBackToTop}
-                >
-                  Back to top
-                </div>
-              )}
+      <Observer>
+        <div
+          className={twMerge(
+            "overflow-x-auto h-full relative",
+            containerClassName
+          )}
+          ref={mergedRef}
+        >
+          {items.length > 1 && (
+            <>
               <div
-                className="w-full"
-                style={{
-                  transform: `translateY(${
-                    virtualItems[1].start - virtualItems[0].size
-                  }px)`,
-                }}
+                style={{ height: `${virtualizer.getTotalSize()}px` }}
+                className="relative w-full"
               >
-                {virtualItems.map((virtualRow) => {
-                  const entry = items[virtualRow.index];
+                {showBackToTopButton && (
+                  <div
+                    tabIndex={0}
+                    className={twMerge(
+                      "w-full h-9 bg-gradient-to-b from-gray-200 block font-medium text-gray-700 hover:underline text-center pt-3 absolute top-0 z-10 cursor-pointer"
+                    )}
+                    onClick={onBackToTop}
+                  >
+                    Back to top
+                  </div>
+                )}
+                <div
+                  className="w-full"
+                  style={{
+                    transform: `translateY(${
+                      virtualItems[1].start - virtualItems[0].size
+                    }px)`,
+                  }}
+                >
+                  {virtualItems.map((virtualRow) => {
+                    const entry = items[virtualRow.index];
 
-                  if (headerIndices.includes(virtualRow.index)) {
+                    if (headerIndices.includes(virtualRow.index)) {
+                      return (
+                        <EntryListHeader
+                          key={virtualRow.key}
+                          data-index={virtualRow.index}
+                          ref={virtualizer.measureElement}
+                          className="sticky z-10"
+                          style={{
+                            top: `${
+                              -virtualItems[1].start + virtualItems[0].size
+                            }px`,
+                          }}
+                          headerKind={groupBy}
+                          representative={entry}
+                        />
+                      );
+                    }
+
                     return (
-                      <EntryListHeader
+                      <EntryRow
                         key={virtualRow.key}
                         data-index={virtualRow.index}
                         ref={virtualizer.measureElement}
-                        className="sticky z-10"
-                        style={{
-                          top: `${
-                            -virtualItems[1].start + virtualItems[0].size
-                          }px`,
-                        }}
-                        headerKind={groupBy}
-                        representative={entry}
+                        entry={entry}
+                        containerClassName="border-b"
+                        className="pr-2"
+                        highlighted={spotlight === entry.id}
+                        selected={entry.id === selected}
+                        dateBasedOn={dateBasedOn}
+                        {...rest}
                       />
                     );
-                  }
-
-                  return (
-                    <EntryRow
-                      key={virtualRow.key}
-                      data-index={virtualRow.index}
-                      ref={virtualizer.measureElement}
-                      entry={entry}
-                      containerClassName="border-b"
-                      className="pr-2"
-                      highlighted={spotlight === entry.id}
-                      selected={entry.id === selected}
-                      dateBasedOn={dateBasedOn}
-                      {...rest}
-                    />
-                  );
-                })}
+                  })}
+                </div>
               </div>
-            </div>
-          </>
-        )}
-        <Spinner
-          large
-          className={twMerge("mx-auto my-4", !isLoading && "invisible")}
-        />
-      </div>
+            </>
+          )}
+          <Spinner
+            large
+            className={twMerge("mx-auto my-4", !isLoading && "invisible")}
+          />
+        </div>
+      </Observer>
     );
   }
 );

@@ -31,6 +31,7 @@ import useSpotlightProps from "../hooks/useSpotlightProps";
 import { useDraftsStore } from "../draftsStore";
 import useEntry from "../hooks/useEntry";
 import AttachmentIcon from "./AttachmentIcon";
+import { useOnResize } from "../hooks/useOnResize";
 
 function RowButton({
   children,
@@ -151,23 +152,7 @@ function TagList({ tags }: { tags: string[] }) {
     setOverflowIndex(null);
   }, [overflowIndex]);
 
-  useEffect(() => {
-    if (!containerRef.current) {
-      return;
-    }
-
-    const containerElem = containerRef.current;
-
-    const observer = new ResizeObserver(() => {
-      updateTruncation();
-    });
-    observer.observe(containerElem);
-
-    return () => {
-      observer.unobserve(containerElem);
-      observer.disconnect();
-    };
-  }, [updateTruncation]);
+  useOnResize(updateTruncation, containerRef.current || undefined);
 
   return (
     <div
