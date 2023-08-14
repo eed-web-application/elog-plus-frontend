@@ -92,51 +92,32 @@ export default function Pane({
             />
           </svg>
         )}
-        {fullscreen ? (
-          <Link
-            to={home}
-            onClick={
-              isSmallScreen
-                ? undefined
-                : (e) => {
-                    e.preventDefault();
-                    setExplicitFullscreen(false);
-                  }
-            }
+        <Link
+          to={home}
+          onClick={
+            explicitFullscreen && !isSmallScreen
+              ? (e) => {
+                  e.preventDefault();
+                  setExplicitFullscreen(false);
+                }
+              : undefined
+          }
+          className={IconButton}
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            strokeWidth={1.5}
+            stroke="currentColor"
           >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={1.5}
-              stroke="currentColor"
-              className={IconButton}
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M6 18L18 6M6 6l12 12"
-              />
-            </svg>
-          </Link>
-        ) : (
-          <Link to={home}>
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={1.5}
-              stroke="currentColor"
-              className={IconButton}
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M6 18L18 6M6 6l12 12"
-              />
-            </svg>
-          </Link>
-        )}
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M6 18L18 6M6 6l12 12"
+            />
+          </svg>
+        </Link>
       </div>
       {children}
     </div>

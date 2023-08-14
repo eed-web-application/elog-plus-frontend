@@ -35,7 +35,7 @@ const FilterChip = forwardRef<HTMLButtonElement, PropsWithChildren<Props>>(
         ref={ref}
         type="button"
         className={twMerge(
-          "flex items-center text-gray-500 border rounded-2xl px-3 bg-gray-50 border-gray-300 hover:bg-gray-200 hover:border-gray-400",
+          "flex items-center text-gray-500 border rounded-2xl px-3 bg-gray-50 border-gray-300 hover:bg-gray-200 hover:border-gray-400 focus:outline outline-2 outline-blue-500",
           showCheck && enabled && "pl-2",
           ((onDisable && !enabled) || (showDownArrow && enabled)) && "pr-2",
           enabled &&

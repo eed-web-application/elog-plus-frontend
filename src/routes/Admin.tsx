@@ -73,7 +73,7 @@ export default function Admin() {
                 to={`/admin/${logbook.id}`}
                 tabIndex={0}
                 className={twMerge(
-                  "p-2 hover:bg-gray-100 cursor-pointer uppercase",
+                  "p-2 hover:bg-gray-100 cursor-pointer uppercase focus:outline focus:z-0 outline-2 outline-blue-500",
                   selectedLogbook?.id === logbook.id &&
                     "bg-blue-100 hover:bg-blue-200"
                 )}
