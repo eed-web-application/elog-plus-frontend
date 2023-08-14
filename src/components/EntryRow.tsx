@@ -1,12 +1,12 @@
 import { twMerge } from "tailwind-merge";
 import {
   PropsWithChildren,
-  useCallback,
   useState,
   useRef,
-  useEffect,
+  useLayoutEffect,
   forwardRef,
   ComponentProps,
+  RefObject,
 } from "react";
 import { Link, LinkProps } from "react-router-dom";
 import {
@@ -32,6 +32,10 @@ import { useDraftsStore } from "../draftsStore";
 import useEntry from "../hooks/useEntry";
 import AttachmentIcon from "./AttachmentIcon";
 import { useOnResize } from "../hooks/useOnResize";
+import useVariableTruncate from "../hooks/useVariableTruncate";
+import useTruncate from "../hooks/useTruncate";
+
+const ATTACHMENTS_PREVIEW_MAX_WIDTH = 1 / 4;
 
 function RowButton({
   children,
@@ -84,18 +88,11 @@ function RowButton({
  */
 function TagList({ tags }: { tags: string[] }) {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  const [overflowIndex, setOverflowIndex] = useState<number | null>(null);
-  const [drawerOffset, setDrawerOffset] = useState<number | null>(null);
-  const tagRefs = useRef<(HTMLDivElement | null)[]>(new Array(tags.length));
-  const containerRef = useRef<HTMLDivElement | null>(null);
-  const drawerRef = useRef<HTMLDivElement | null>(null);
 
   const { refs, floatingStyles, context } = useFloating({
     open: isDrawerOpen,
     onOpenChange: setIsDrawerOpen,
   });
-
-  const mergedDrawerRef = useMergeRefs([refs.setReference, drawerRef]);
 
   const hover = useHover(context, { move: false });
   const focus = useFocus(context);
@@ -109,54 +106,23 @@ function TagList({ tags }: { tags: string[] }) {
     role,
   ]);
 
-  // Iterates through each tag checking if it is outside the bounds of its
-  // parent. If one is found, then overflow index is set to its index, and
-  // it and all tags after it are hidden. To position the drawer correctly, we
-  // sum up width (and margin) of each visable tag and then position the drawer
-  // with that offset.
-  const updateTruncation = useCallback(() => {
-    if (!containerRef.current || !drawerRef.current) {
-      return;
-    }
-    const containerRect = containerRef.current.getBoundingClientRect();
-    const drawerRect = drawerRef.current.getBoundingClientRect();
-    let offset = 0;
+  const {
+    updateTruncation,
+    overflowIndex,
+    drawerOffset,
+    containerRef,
+    itemsRef: tagsRef,
+    drawerRef,
+  } = useVariableTruncate(tags.length);
 
-    for (let i = 0; i < tagRefs.current.length; i++) {
-      const el = tagRefs.current[i];
-      if (!el) {
-        continue;
-      }
-
-      const rect = el.getBoundingClientRect();
-      const styles = window.getComputedStyle(el);
-
-      const margin =
-        parseFloat(styles.marginRight) + parseFloat(styles.marginLeft);
-
-      if (
-        rect.right >
-        containerRect.right -
-          (overflowIndex === null || i === tagRefs.current.length - 1
-            ? 0
-            : drawerRect.width + margin)
-      ) {
-        setOverflowIndex(i);
-        setDrawerOffset(offset);
-        return;
-      }
-
-      offset += rect.width + margin;
-    }
-
-    setOverflowIndex(null);
-  }, [overflowIndex]);
+  const mergedDrawerRef = useMergeRefs([refs.setReference, drawerRef]);
 
   useOnResize(updateTruncation, containerRef.current || undefined);
+  useLayoutEffect(updateTruncation);
 
   return (
     <div
-      className="flex overflow-hidden relative w-full pointer-events-none"
+      className="flex flex-1 overflow-hidden relative w-full pointer-events-none"
       ref={(el) => (containerRef.current = el)}
     >
       {tags.map((tag, index) => (
@@ -166,7 +132,7 @@ function TagList({ tags }: { tags: string[] }) {
             "ml-1.5",
             overflowIndex !== null && index >= overflowIndex && "invisible"
           )}
-          ref={(el) => (tagRefs.current[index] = el)}
+          ref={(el) => (tagsRef.current[index] = el)}
         >
           {tag}
         </Chip>
@@ -206,38 +172,76 @@ function TagList({ tags }: { tags: string[] }) {
 function AttachmentList({
   attachments,
   className,
+  parentRef,
   ...rest
 }: {
   attachments: Attachment[];
+  parentRef: RefObject<HTMLDivElement>;
 } & ComponentProps<"div">) {
   const figuresFirst = [...attachments];
+  const containerRef = useRef(null);
+
   figuresFirst.sort(
     (a, b) =>
       (b.previewState === "Completed" ? 1 : 0) -
       (a.previewState === "Completed" ? 1 : 0)
   );
 
+  const { updateTruncation, overflowIndex, width } = useTruncate({
+    count: attachments.length,
+    itemWidth: 40,
+    drawerWidth: 24,
+    getMaxWidth: () =>
+      parentRef.current === null
+        ? Infinity
+        : parentRef.current.getBoundingClientRect().width *
+          ATTACHMENTS_PREVIEW_MAX_WIDTH,
+  });
+
+  const end = overflowIndex ?? attachments.length;
+
+  useOnResize(updateTruncation, containerRef.current || undefined);
+  useLayoutEffect(updateTruncation);
+
   return (
-    <div className={twMerge("flex gap-2 items-center", className)} {...rest}>
+    <div
+      className={twMerge(
+        "flex relative items-center overflow-hidden w-fit justify-end pointer-events-none",
+        className
+      )}
+      style={{ width: `${width}px` }}
+      ref={containerRef}
+      {...rest}
+    >
       {figuresFirst
-        .slice(0, 2)
+        .slice(0, end)
         .map((attachment) =>
           attachment.previewState === "Completed" ? (
             <img
               key={attachment.id}
               src={getAttachmentPreviewURL(attachment.id)}
-              className="w-8 h-8 rounded-md"
+              className={twMerge(
+                "flex-shrink-0 w-8 h-8 ml-2 rounded-md object-cover"
+              )}
             />
           ) : (
             <AttachmentIcon
               key={attachment.id}
-              className="w-8 h-8 text-gray-500 bg-gray-200 p-1 rounded-md"
+              className={twMerge(
+                "flex-shrink-0 w-8 h-8 ml-2 text-gray-500 bg-gray-200 p-1 rounded-md"
+              )}
               mimeType={attachment.contentType}
             />
           )
         )}
-      {attachments.length > 2 && (
-        <div className="text-gray-500 text-xs">+{attachments.length - 2}</div>
+      {overflowIndex !== null && (
+        <div
+          className={twMerge(
+            "text-gray-500 text-xs text-right w-6 flex-shrink-0"
+          )}
+        >
+          +{attachments.length - end}
+        </div>
       )}
     </div>
   );
@@ -287,6 +291,7 @@ const EntryRow = forwardRef<HTMLDivElement, PropsWithChildren<Props>>(
     },
     ref
   ) => {
+    const rowRef = useRef<HTMLDivElement>(null);
     const [expanded, setExpanded] = useState(Boolean(expandedByDefault));
     const fullEntry = useEntry(expanded ? entry.id : undefined, {
       critical: false,
@@ -306,6 +311,7 @@ const EntryRow = forwardRef<HTMLDivElement, PropsWithChildren<Props>>(
     return (
       <div ref={ref} className={containerClassName} {...rest}>
         <div
+          ref={rowRef}
           className={twMerge(
             "flex items-center group",
             selectable && "cursor-pointer relative hover:bg-gray-50",
@@ -349,20 +355,14 @@ const EntryRow = forwardRef<HTMLDivElement, PropsWithChildren<Props>>(
               <div className="truncate leading-[1.2]">{entry.title}</div>
             )}
             <div className="flex items-center h-5">
-              <div className="text-sm text-gray-500 leading-none whitespace-nowrap uppercase">
-                {entry.logbook}
-              </div>
-              <div className="text-sm text-gray-500 leading-none whitespace-nowrap before:content-['•'] before:mx-1">
-                {entry.loggedBy}
+              <div className="text-sm text-gray-500 leading-none whitespace-nowrap truncate">
+                {`${entry.logbook.toUpperCase()} • ${entry.loggedBy}`}
               </div>
               <TagList tags={entry.tags} />
             </div>
           </div>
-          <AttachmentList
-            className="group-hover:hidden px-2"
-            attachments={entry.attachments}
-          />
-          <div className="hidden pl-3 group-hover:flex">
+          <AttachmentList attachments={entry.attachments} parentRef={rowRef} />
+          <div className="pl-3 hidden group-hover:flex">
             <FloatingDelayGroup delay={200}>
               {allowSpotlight && (
                 <RowButton
