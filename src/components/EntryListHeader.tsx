@@ -18,7 +18,7 @@ function headerTextRenderer(
   entry: EntrySummary,
   dateBasedOn: Props["dateBasedOn"] = "eventAt"
 ) {
-  const date = dateBasedOn === "loggedAt" ? entry.eventAt : entry.loggedAt;
+  const date = dateBasedOn === "loggedAt" ? entry.loggedAt : entry.eventAt;
   let headerText = new Date(date).toLocaleDateString("en-us", {
     weekday: "long",
     year: "numeric",
