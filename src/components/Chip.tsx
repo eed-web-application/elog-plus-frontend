@@ -7,7 +7,7 @@ export interface Props extends ComponentPropsWithRef<"div"> {
   onDelete?: (event: React.MouseEvent<SVGSVGElement, MouseEvent>) => void;
 }
 
-const Chip = forwardRef<HTMLDivElement, Props>(function Tag(
+const Chip = forwardRef<HTMLDivElement, Props>(function Chip(
   { delectable, clickable, className, children, onDelete, ...rest },
   ref
 ) {
