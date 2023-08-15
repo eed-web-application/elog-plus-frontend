@@ -1,16 +1,6 @@
 import { ComponentPropsWithRef, forwardRef, useState } from "react";
 import { twMerge } from "tailwind-merge";
-import { BackDrop, Button, Modal, Radio, RadioLabel, TextButton } from "./base";
-import {
-  FloatingFocusManager,
-  FloatingOverlay,
-  useClick,
-  useDismiss,
-  useFloating,
-  useInteractions,
-  useMergeRefs,
-  useRole,
-} from "@floating-ui/react";
+import { Button, Modal, Radio, RadioLabel, TextButton } from "./base";
 
 export interface Props extends ComponentPropsWithRef<"div"> {
   tag: string;
