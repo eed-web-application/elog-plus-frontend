@@ -1,7 +1,7 @@
 import { twMerge } from "tailwind-merge";
 import { PropsWithChildren, useState } from "react";
 import { Link, To, useNavigate } from "react-router-dom";
-import { BackDrop, IconButton } from "./base";
+import { BackDrop, IconButton, Modal } from "./base";
 import IsPaneFullscreenContext from "../IsPaneFullscreenContext";
 import {
   FloatingFocusManager,
@@ -69,7 +69,7 @@ export default function Pane({
       ref={fullscreen ? refs.setFloating : undefined}
       className={twMerge(
         "mx-auto container flex-1",
-        fullscreen && "bg-white mt-6 rounded-lg w-auto"
+        fullscreen && [Modal, "mt-6"]
       )}
     >
       <div className="flex items-center pr-1 py-1 float-right">
