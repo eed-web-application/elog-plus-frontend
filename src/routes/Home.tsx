@@ -5,7 +5,7 @@ import {
   useOutlet,
   useSearchParams,
 } from "react-router-dom";
-import { twMerge } from "tailwind-merge";
+import { twJoin } from "tailwind-merge";
 import Filters, { Filters as FiltersObject } from "../components/Filters";
 import Navbar from "../components/Navbar";
 import useEntries from "../hooks/useEntries";
@@ -155,7 +155,7 @@ export default function Home() {
   return (
     <div className="h-screen flex flex-col">
       <div
-        className={twMerge(
+        className={twJoin(
           "p-3 shadow z-10 relative",
           // Padding for the absolutely positioned info button
           !isSmallScreen && "px-12"
@@ -175,7 +175,7 @@ export default function Home() {
 
       <div className="flex-1 flex overflow-hidden">
         <EntryListGrouped
-          containerClassName={twMerge(
+          containerClassName={twJoin(
             "w-1/2",
             (!outlet || isSmallScreen) && "flex-1"
           )}
@@ -209,7 +209,7 @@ export default function Home() {
               </div>
             )}
             <div
-              className={twMerge(
+              className={twJoin(
                 "overflow-y-auto pb-3",
                 !isSmallScreen && "flex-1 flex-shrink"
               )}

@@ -6,7 +6,7 @@ import {
   useRef,
   useState,
 } from "react";
-import { twMerge } from "tailwind-merge";
+import { twJoin, twMerge } from "tailwind-merge";
 import { useMergeRefs } from "@floating-ui/react";
 import Spinner from "./Spinner";
 import {
@@ -170,9 +170,7 @@ const EntryListGrouped = forwardRef<HTMLDivElement, Props>(
                 {showBackToTopButton && (
                   <div
                     tabIndex={0}
-                    className={twMerge(
-                      "w-full h-9 bg-gradient-to-b from-gray-200 block font-medium text-gray-700 hover:underline text-center pt-3 absolute top-0 z-10 cursor-pointer"
-                    )}
+                    className="w-full h-9 bg-gradient-to-b from-gray-200 block font-medium text-gray-700 hover:underline text-center pt-3 absolute top-0 z-10 cursor-pointer"
                     onClick={onBackToTop}
                   >
                     Back to top
@@ -228,7 +226,7 @@ const EntryListGrouped = forwardRef<HTMLDivElement, Props>(
           )}
           <Spinner
             large
-            className={twMerge("mx-auto my-4", !isLoading && "invisible")}
+            className={twJoin("mx-auto my-4", !isLoading && "invisible")}
           />
         </div>
       </Observer>

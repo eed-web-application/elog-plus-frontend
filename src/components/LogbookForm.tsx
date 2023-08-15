@@ -1,5 +1,5 @@
 import { FormEvent, useState } from "react";
-import { twMerge } from "tailwind-merge";
+import { twJoin, twMerge } from "tailwind-merge";
 import { useQueryClient } from "@tanstack/react-query";
 import {
   Logbook,
@@ -187,7 +187,7 @@ export default function LogbookForm({ logbook, onSave }: Props) {
       </label>
       <div className="text-gray-500">Tags</div>
       <div
-        className={twMerge(
+        className={twJoin(
           "mb-2 border rounded-lg bg-gray-50 w-full flex flex-col p-2",
           form.tags.length === 0 &&
             "items-center justify-center text-lg text-gray-500"
@@ -211,7 +211,7 @@ export default function LogbookForm({ logbook, onSave }: Props) {
                     strokeWidth="1.5"
                     stroke="currentColor"
                     tabIndex={0}
-                    className={twMerge(IconButton, "text-gray-500")}
+                    className={twJoin(IconButton, "text-gray-500")}
                     onClick={() => removeTag(index)}
                   >
                     <path
@@ -227,7 +227,7 @@ export default function LogbookForm({ logbook, onSave }: Props) {
         )}
         <form noValidate className="relative mt-2 w-full" onSubmit={createTag}>
           <input
-            className={twMerge(Input, "w-full pr-12")}
+            className={twJoin(Input, "w-full pr-12")}
             type="text"
             value={newTag}
             onChange={(e) => setNewTag(e.currentTarget.value)}
@@ -255,7 +255,7 @@ export default function LogbookForm({ logbook, onSave }: Props) {
       </div>
       <div className="text-gray-500">Shifts</div>
       <div
-        className={twMerge(
+        className={twJoin(
           "border rounded-lg bg-gray-50 w-full flex flex-col p-2",
           form.shifts.length === 0 &&
             "items-center justify-center text-lg text-gray-500"
@@ -358,7 +358,7 @@ export default function LogbookForm({ logbook, onSave }: Props) {
                     strokeWidth="1.5"
                     stroke="currentColor"
                     tabIndex={0}
-                    className={twMerge(IconButton, "text-gray-500")}
+                    className={twJoin(IconButton, "text-gray-500")}
                     onClick={() => removeShift(index)}
                   >
                     <path
@@ -406,7 +406,7 @@ export default function LogbookForm({ logbook, onSave }: Props) {
       </div>
       <button
         disabled={updated}
-        className={twMerge(Button, "block ml-auto mt-3")}
+        className={twJoin(Button, "block ml-auto mt-3")}
         onClick={save}
       >
         Save

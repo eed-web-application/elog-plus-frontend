@@ -1,4 +1,4 @@
-import { twMerge } from "tailwind-merge";
+import { twJoin, twMerge } from "tailwind-merge";
 import { PropsWithChildren, useState } from "react";
 import {
   useFloating,
@@ -101,7 +101,7 @@ export default function FilterChipWithMenu({
         <div
           ref={refs.setFloating}
           style={floatingStyles}
-          className={twMerge("shadow bg-white rounded-lg", !inline && "my-1")}
+          className={twJoin("shadow bg-white rounded-lg", !inline && "my-1")}
           {...getFloatingProps()}
         >
           {children}

@@ -1,5 +1,5 @@
 import { ComponentPropsWithRef, forwardRef, useState } from "react";
-import { twMerge } from "tailwind-merge";
+import { twJoin, twMerge } from "tailwind-merge";
 import { Button, Modal, Radio, RadioLabel, TextButton } from "./base";
 
 export interface Props extends ComponentPropsWithRef<"div"> {
@@ -29,7 +29,7 @@ const TagLogbookSelectorDialog = forwardRef<HTMLDivElement, Props>(
           {logbooks.map((logbook) => (
             <label
               key={logbook}
-              className={twMerge(
+              className={twJoin(
                 RadioLabel,
                 "flex items-center uppercase text-gray-500"
               )}

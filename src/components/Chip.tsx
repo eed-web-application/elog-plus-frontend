@@ -1,5 +1,5 @@
 import React, { ComponentPropsWithRef, forwardRef } from "react";
-import { twMerge } from "tailwind-merge";
+import { twJoin, twMerge } from "tailwind-merge";
 
 export interface Props extends ComponentPropsWithRef<"div"> {
   delectable?: boolean;
@@ -11,7 +11,7 @@ const Chip = forwardRef<HTMLDivElement, Props>(function Chip(
   { delectable, clickable, className, children, onDelete, ...rest },
   ref
 ) {
-  const base = twMerge(
+  const base = twJoin(
     "border-gray-400 border text-sm rounded-full flex justify-center items-center whitespace-nowrap w-fit",
     clickable && "hover:bg-gray-200"
   );

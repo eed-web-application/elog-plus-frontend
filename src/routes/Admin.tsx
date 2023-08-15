@@ -1,7 +1,7 @@
 import { useCallback, useRef } from "react";
 import { toast } from "react-toastify";
 import { Link, useParams } from "react-router-dom";
-import { twMerge } from "tailwind-merge";
+import { twJoin, twMerge } from "tailwind-merge";
 import Pane from "../components/Pane";
 import Spinner from "../components/Spinner";
 import useIsSmallScreen from "../hooks/useIsSmallScreen";
@@ -72,10 +72,11 @@ export default function Admin() {
                 key={logbook.id}
                 to={`/admin/${logbook.id}`}
                 tabIndex={0}
-                className={twMerge(
-                  "p-2 hover:bg-gray-100 cursor-pointer uppercase focus:outline focus:z-0 outline-2 outline-blue-500",
-                  selectedLogbook?.id === logbook.id &&
-                    "bg-blue-100 hover:bg-blue-200"
+                className={twJoin(
+                  "p-2 cursor-pointer uppercase focus:outline focus:z-0 outline-2 outline-blue-500",
+                  selectedLogbook?.id !== logbook.id
+                    ? "hover:bg-gray-100"
+                    : "bg-blue-100 hover:bg-blue-200"
                 )}
               >
                 {logbook.name}
@@ -97,7 +98,7 @@ export default function Admin() {
         </div>
         {selectedLogbook && (
           <div
-            className={twMerge(
+            className={twJoin(
               "pb-3 overflow-y-auto",
               !isSmallScreen && "flex-1 flex-shrink"
             )}

@@ -19,9 +19,9 @@ export default function EntryBodyText({
   return (
     <div
       className={twMerge(
-        className,
         "prose max-w-none overflow-x-auto",
-        !body && "text-gray-500"
+        !body && "text-gray-500",
+        className
       )}
       dangerouslySetInnerHTML={
         !body.trim() && showEmptyLabel

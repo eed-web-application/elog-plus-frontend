@@ -1,4 +1,4 @@
-import { twMerge } from "tailwind-merge";
+import { twJoin, twMerge } from "tailwind-merge";
 import { Entry } from "../api";
 import { Link } from "react-router-dom";
 import { Button, IconButton } from "./base";
@@ -27,7 +27,7 @@ export default function EntryView({ entry }: Props) {
     <>
       <Link
         {...spotlightProps}
-        className={twMerge(IconButton, "my-1 float-right")}
+        className={twJoin(IconButton, "my-1 float-right")}
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -44,7 +44,7 @@ export default function EntryView({ entry }: Props) {
           />
         </svg>
       </Link>
-      <div className={twMerge("px-3 pt-2", !entry.followingUp && "pb-2")}>
+      <div className={twJoin("px-3 pt-2", !entry.followingUp && "pb-2")}>
         <div className="text-lg -mb-1">{entry.title}</div>
         <div className="text-sm text-gray-500 uppercase">{entry.logbook}</div>
       </div>
@@ -147,7 +147,7 @@ export default function EntryView({ entry }: Props) {
             pathname: `/${entry.id}/follow-up`,
             search: window.location.search,
           }}
-          className={twMerge(Button, "inline-block ml-auto w-fit")}
+          className={twJoin(Button, "inline-block ml-auto w-fit")}
         >
           Follow up
         </Link>

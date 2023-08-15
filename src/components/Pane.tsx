@@ -1,4 +1,4 @@
-import { twMerge } from "tailwind-merge";
+import { twJoin } from "tailwind-merge";
 import { PropsWithChildren, useState } from "react";
 import { Link, To, useNavigate } from "react-router-dom";
 import { BackDrop, IconButton, Modal } from "./base";
@@ -67,7 +67,7 @@ export default function Pane({
     <div
       {...(fullscreen ? getFloatingProps() : {})}
       ref={fullscreen ? refs.setFloating : undefined}
-      className={twMerge(
+      className={twJoin(
         "mx-auto container flex-1",
         fullscreen && [Modal, "mt-6"]
       )}
@@ -126,7 +126,7 @@ export default function Pane({
   return (
     <IsPaneFullscreenContext.Provider value={fullscreen}>
       {fullscreen ? (
-        <FloatingOverlay lockScroll className={twMerge(BackDrop, "z-10")}>
+        <FloatingOverlay lockScroll className={twJoin(BackDrop, "z-10")}>
           <FloatingFocusManager context={context}>{inner}</FloatingFocusManager>
         </FloatingOverlay>
       ) : (

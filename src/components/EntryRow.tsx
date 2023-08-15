@@ -1,4 +1,4 @@
-import { twMerge } from "tailwind-merge";
+import { twJoin, twMerge } from "tailwind-merge";
 import {
   PropsWithChildren,
   useState,
@@ -59,7 +59,7 @@ function RowButton({
       <Link
         className={twMerge(
           IconButton,
-          "rounded-full z-0 relative",
+          "z-0 relative",
           entrySelected && "hover:bg-blue-200",
           entryHighlighted && "hover:bg-yellow-300"
         )}
@@ -128,7 +128,7 @@ function TagList({ tags }: { tags: string[] }) {
       {tags.map((tag, index) => (
         <Chip
           key={tag}
-          className={twMerge(
+          className={twJoin(
             "ml-1.5",
             overflowIndex !== null && index >= overflowIndex && "invisible"
           )}
@@ -140,7 +140,7 @@ function TagList({ tags }: { tags: string[] }) {
       <Chip
         ref={mergedDrawerRef}
         {...getReferenceProps()}
-        className={twMerge(
+        className={twJoin(
           "ml-1.5 absolute pointer-events-auto",
           overflowIndex === null && "invisible"
         )}
@@ -220,14 +220,14 @@ function AttachmentList({
             <img
               key={attachment.id}
               src={getAttachmentPreviewURL(attachment.id)}
-              className={twMerge(
+              className={twJoin(
                 "flex-shrink-0 w-8 h-8 ml-2 rounded-md object-cover"
               )}
             />
           ) : (
             <AttachmentIcon
               key={attachment.id}
-              className={twMerge(
+              className={twJoin(
                 "flex-shrink-0 w-8 h-8 ml-2 text-gray-500 bg-gray-200 p-1 rounded-md"
               )}
               mimeType={attachment.contentType}
@@ -236,7 +236,7 @@ function AttachmentList({
         )}
       {overflowIndex !== null && (
         <div
-          className={twMerge(
+          className={twJoin(
             "text-gray-500 text-xs text-right w-6 flex-shrink-0"
           )}
         >
@@ -472,7 +472,7 @@ const EntryRow = forwardRef<HTMLDivElement, PropsWithChildren<Props>>(
         {expanded && fullEntry && (
           <>
             <div
-              className={twMerge(
+              className={twJoin(
                 "p-2 pb-1 bg-gray-100",
                 !fullEntry.text && "text-gray-500"
               )}

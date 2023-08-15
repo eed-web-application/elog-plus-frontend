@@ -1,5 +1,5 @@
 import { FormEvent, Suspense, lazy, useCallback, useState } from "react";
-import { twMerge } from "tailwind-merge";
+import { twJoin, twMerge } from "tailwind-merge";
 import { useDropzone } from "react-dropzone";
 import { Link } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
@@ -329,7 +329,7 @@ export default function EntryForm({
               <label className="text-gray-500 mb-1 flex items-center">
                 <input
                   type="checkbox"
-                  className={twMerge(Checkbox, "mr-2")}
+                  className={twJoin(Checkbox, "mr-2")}
                   checked={draft.summarizes !== undefined}
                   onChange={() =>
                     updateDraft({
@@ -406,7 +406,7 @@ export default function EntryForm({
           <label className="text-gray-500 block mb-2">
             Attachments
             <div
-              className={twMerge(
+              className={twJoin(
                 "relative cursor-pointer border rounded-lg bg-gray-50 w-full overflow-hidden flex flex-wrap m-auto",
                 attachments.length === 0
                   ? "items-center justify-center text-xl h-24"
@@ -433,7 +433,7 @@ export default function EntryForm({
           </label>
           <input
             type="submit"
-            className={twMerge(Button, "block ml-auto mt-2")}
+            className={twJoin(Button, "block ml-auto mt-2")}
             value={
               kind === "newEntry"
                 ? "Save"

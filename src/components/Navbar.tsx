@@ -1,4 +1,4 @@
-import { twMerge } from "tailwind-merge";
+import { twJoin, twMerge } from "tailwind-merge";
 import { Link } from "react-router-dom";
 import { Button, Input } from "./base";
 import { ComponentProps, useEffect, useMemo, useState } from "react";
@@ -64,7 +64,7 @@ export default function Navbar({
         <div className="relative w-full">
           <input
             type="search"
-            className={twMerge("block w-full", Input)}
+            className={twJoin(Input, "block w-full")}
             placeholder="Search..."
             value={stagedSearch}
             onChange={(e) => searchFor(e.target.value)}
@@ -93,13 +93,13 @@ export default function Navbar({
       </form>
       <Link
         to={{ pathname: "/admin" }}
-        className={twMerge(Button, "mr-2 text-sm flex items-center")}
+        className={twJoin(Button, "mr-2 text-sm flex items-center")}
       >
         Admin Dashboard
       </Link>
       <Link
         to={{ pathname: "/new-entry", search: window.location.search }}
-        className={twMerge(Button, "relative")}
+        className={twJoin(Button, "relative")}
       >
         New Entry
         {hasNewEntryDraft && (

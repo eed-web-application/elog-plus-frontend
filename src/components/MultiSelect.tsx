@@ -1,5 +1,5 @@
 import { ComponentProps, useState } from "react";
-import { twMerge } from "tailwind-merge";
+import { twJoin, twMerge } from "tailwind-merge";
 import { Input, InputDisabled, InputInvalid } from "./base";
 import { autoUpdate, size, useFloating } from "@floating-ui/react";
 import Spinner from "./Spinner";
@@ -184,7 +184,7 @@ export default function MultiSelect({
                   <div
                     tabIndex={0}
                     key={option}
-                    className={twMerge(
+                    className={twJoin(
                       "px-2 p-1 cursor-pointer hover:bg-gray-100",
                       cursor === index && "bg-gray-100"
                     )}
@@ -201,7 +201,7 @@ export default function MultiSelect({
               })}
               {showCreateButton && (
                 <div
-                  className={twMerge(
+                  className={twJoin(
                     "px-2 p-1 cursor-pointer hover:bg-gray-100",
                     cursor === filteredOptions.length && "bg-gray-100"
                   )}

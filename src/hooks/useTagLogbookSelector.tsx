@@ -8,7 +8,7 @@ import {
   FloatingFocusManager,
 } from "@floating-ui/react";
 import { useCallback, useState } from "react";
-import { twMerge } from "tailwind-merge";
+import { twJoin } from "tailwind-merge";
 import { BackDrop } from "../components/base";
 import TagLogbookSelectorDialog from "../components/TagLogbookSelectorDialog";
 
@@ -58,7 +58,7 @@ export default function useTagLogbookSelector() {
   const Dialog = !isOpen ? undefined : (
     <FloatingOverlay
       lockScroll
-      className={twMerge(BackDrop, "z-10 flex justify-center items-center")}
+      className={twJoin(BackDrop, "z-10 flex justify-center items-center")}
     >
       <FloatingFocusManager context={context}>
         <TagLogbookSelectorDialog

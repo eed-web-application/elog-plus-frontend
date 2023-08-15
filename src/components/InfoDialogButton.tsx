@@ -1,4 +1,4 @@
-import { twMerge } from "tailwind-merge";
+import { twJoin, twMerge } from "tailwind-merge";
 import {
   FloatingFocusManager,
   FloatingOverlay,
@@ -80,7 +80,7 @@ export default function InfoDialogButton({
       {viewingInfoDialog && (
         <FloatingOverlay
           lockScroll
-          className={twMerge(BackDrop, "z-10 flex justify-center items-center")}
+          className={twJoin(BackDrop, "z-10 flex justify-center items-center")}
         >
           <FloatingFocusManager context={context}>
             <div
@@ -105,7 +105,7 @@ export default function InfoDialogButton({
                 viewBox="0 0 24 24"
                 strokeWidth={1.5}
                 stroke="currentColor"
-                className={twMerge(IconButton, "absolute top-0 left-0 m-1")}
+                className={twJoin(IconButton, "absolute top-0 left-0 m-1")}
                 onClick={() => setViewingInfoDialog(false)}
               >
                 <path

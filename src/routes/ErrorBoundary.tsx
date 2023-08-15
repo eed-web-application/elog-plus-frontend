@@ -1,5 +1,5 @@
 import { Link, useRouteError } from "react-router-dom";
-import { twMerge } from "tailwind-merge";
+import { twJoin } from "tailwind-merge";
 import { NotFoundError } from "../api";
 import { Link as LinkStyle } from "../components/base";
 
@@ -29,13 +29,13 @@ export default function ErrorBoundary() {
         </div>
       )}
       {is404 ? (
-        <Link to="/" className={twMerge(LinkStyle, "mt-4")}>
+        <Link to="/" className={twJoin(LinkStyle, "mt-4")}>
           Home
         </Link>
       ) : (
         <button
           type="button"
-          className={twMerge(LinkStyle, "mt-4")}
+          className={twJoin(LinkStyle, "mt-4")}
           onClick={() => window.location.reload()}
         >
           Refresh
