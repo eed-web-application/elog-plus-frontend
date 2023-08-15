@@ -24,13 +24,13 @@ export default function EntryBodyText({
         !body && "text-gray-500"
       )}
       dangerouslySetInnerHTML={
-        !body && showEmptyLabel
+        !body.trim() && showEmptyLabel
           ? undefined
           : { __html: DOMPurify.sanitize(body) }
       }
       {...rest}
     >
-      {!body && showEmptyLabel ? "No entry body" : undefined}
+      {!body.trim() && showEmptyLabel ? "No entry body" : undefined}
     </div>
   );
 }
