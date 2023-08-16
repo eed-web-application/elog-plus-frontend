@@ -1,10 +1,9 @@
 import { ComponentPropsWithoutRef } from "react";
-import useLogbooks from "../../hooks/useLogbooks";
 import { twMerge } from "tailwind-merge";
 import MultiSelect from "../MultiSelect";
 import useTags from "../../hooks/useTags";
 
-interface Props
+export interface Props
   extends Omit<ComponentPropsWithoutRef<"label">, "onBlur" | "onChange"> {
   logbooks: string[];
   value: (string | { new: string })[];

@@ -3,7 +3,7 @@ import useLogbooks from "../../hooks/useLogbooks";
 import { twMerge } from "tailwind-merge";
 import MultiSelect from "../MultiSelect";
 
-interface Props
+export interface Props
   extends Omit<ComponentPropsWithoutRef<"label">, "onBlur" | "onChange"> {
   value: string[];
   onChange: (value: string[]) => void;

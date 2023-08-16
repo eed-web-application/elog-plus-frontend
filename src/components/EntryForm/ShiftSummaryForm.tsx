@@ -4,7 +4,7 @@ import { Checkbox, Input, InputInvalid } from "../base";
 import Select from "../Select";
 import { Shift } from "../../api";
 
-interface Props {
+export interface Props {
   value: Draft["summarizes"];
   onChange: (value: Draft["summarizes"]) => void;
   shifts: Shift[];
