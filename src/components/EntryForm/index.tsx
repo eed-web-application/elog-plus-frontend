@@ -6,7 +6,6 @@ import { useQueryClient } from "@tanstack/react-query";
 import {
   EntryNew,
   ServerError,
-  Shift,
   createEntry,
   createTag,
   followUp,
@@ -14,7 +13,6 @@ import {
 } from "../../api";
 import { Button, Checkbox, IconButton, Input, InputInvalid } from "../base";
 import EntryRow from "../EntryRow";
-import Select from "../Select";
 import AttachmentCard from "../AttachmentCard";
 import {
   DraftFactory,
@@ -26,15 +24,13 @@ import useAttachmentUploader, {
   LocalAttachment,
 } from "../../hooks/useAttachmentUploader";
 import Spinner from "../Spinner";
-import {
-  dateToDatetimeString,
-  dateToYYYYMMDD,
-} from "../../utils/datetimeConversion";
+import { dateToDatetimeString } from "../../utils/datetimeConversion";
 import useLogbooks from "../../hooks/useLogbooks";
 import reportServerError from "../../reportServerError";
 import useTagLogbookSelector from "../../hooks/useTagLogbookSelector";
 import LogbookForm from "./LogbookForm";
 import TagForm from "./TagForm";
+import ShiftSummaryForm from "./ShiftSummaryForm";
 
 const EntryBodyTextEditor = lazy(() => import("../EntryBodyTextEditor"));
 
@@ -62,10 +58,6 @@ export default function EntryForm({
     upload: uploadAttachment,
     cancel: cancelUploadingAttachment,
   } = useAttachmentUploader();
-  let shifts: Shift[] | undefined;
-  if (draft.logbooks.length === 1) {
-    shifts = logbookMap[draft.logbooks[0]]?.shifts;
-  }
 
   const {
     getReferenceProps: getReferencePropsForLogbookSelector,
@@ -93,8 +85,6 @@ export default function EntryForm({
     },
     [kind]
   );
-
-  const isShiftSummariesDisabled = draft.logbooks.length !== 1;
 
   const validators = {
     title: () => Boolean(draft.title),
@@ -375,81 +365,16 @@ export default function EntryForm({
             )}
           />
           {kind === "newEntry" && (
-            <>
-              <label
-                className={twMerge(
-                  "text-gray-500 mb-1 flex items-center w-fit",
-                  isShiftSummariesDisabled && "text-gray-400"
-                )}
-              >
-                <input
-                  type="checkbox"
-                  className={twJoin(Checkbox, "mr-2")}
-                  checked={
-                    draft.summarizes !== undefined && !isShiftSummariesDisabled
-                  }
-                  disabled={isShiftSummariesDisabled}
-                  onChange={() =>
-                    updateDraft({
-                      ...draft,
-                      summarizes: draft.summarizes
-                        ? undefined
-                        : {
-                            shiftId: "",
-                            date: dateToYYYYMMDD(new Date()),
-                          },
-                    })
-                  }
-                />
-                Shift summary
-              </label>
-              <div className="flex gap-3 mb-2">
-                <Select
-                  placeholder="Shift"
-                  required
-                  containerClassName="block w-full"
-                  className="w-full"
-                  noOptionsLabel={shifts ? undefined : "Select a logbook first"}
-                  options={(shifts || []).map(({ name, id }) => ({
-                    label: name,
-                    value: id,
-                  }))}
-                  value={draft.summarizes?.shiftId || null}
-                  setValue={(shift) =>
-                    updateDraft({
-                      ...draft,
-                      summarizes: draft.summarizes && {
-                        ...draft.summarizes,
-                        shiftId: shift || "",
-                      },
-                    })
-                  }
-                  invalid={invalid.includes("shiftName")}
-                  onBlur={() => validate("shiftName")}
-                  disabled={!draft.summarizes || isShiftSummariesDisabled}
-                />
-                <input
-                  type="date"
-                  value={draft.summarizes?.date || ""}
-                  onChange={(e) =>
-                    updateDraft({
-                      ...draft,
-                      summarizes: draft.summarizes && {
-                        ...draft.summarizes,
-                        date: e.currentTarget.value,
-                      },
-                    })
-                  }
-                  className={twMerge(
-                    Input,
-                    invalid.includes("shiftDate") && InputInvalid,
-                    "block w-full"
-                  )}
-                  onBlur={() => validate("shiftDate")}
-                  disabled={!draft.summarizes || isShiftSummariesDisabled}
-                />
-              </div>
-            </>
+            <ShiftSummaryForm
+              value={draft.summarizes}
+              onChange={(summarizes) => updateDraft({ ...draft, summarizes })}
+              shifts={logbookMap[draft.logbooks[0] || ""]?.shifts || []}
+              disabled={draft.logbooks.length !== 1}
+              invalidShiftName={invalid.includes("shiftName")}
+              invalidDate={invalid.includes("shiftDate")}
+              onShiftNameBlur={() => validate("shiftName")}
+              onDateBlur={() => validate("shiftDate")}
+            />
           )}
 
           {/* Not using a label here, because there are some weird */}

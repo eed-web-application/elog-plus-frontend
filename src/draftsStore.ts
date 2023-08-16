@@ -11,13 +11,19 @@ export type LocalUploadedAttachment = Omit<Attachment, "previewState">;
 /**
  * An entry that hasn't been submitted to the server
  */
-export type Draft = Omit<EntryNew, "attachments" | "eventAt" | "tags"> & {
+export type Draft = Omit<
+  EntryNew,
+  "attachments" | "eventAt" | "tags" | "summarizes"
+> & {
   /**
    * `null` meaning checked but no date
    */
   eventAt?: Date | null;
   attachments: LocalUploadedAttachment[];
   tags: (string | { new: string })[];
+  summarizes: {
+    checked: boolean;
+  } & NonNullable<EntryNew["summarizes"]>;
 };
 
 export type DraftId = "newEntry" | `supersede/${string}` | `followUp/${string}`;
@@ -45,6 +51,11 @@ export const DEFAULT_DRAFT: Draft = {
   logbooks: [],
   attachments: [],
   tags: [],
+  summarizes: {
+    checked: false,
+    date: "",
+    shiftId: "",
+  },
 };
 
 /**
