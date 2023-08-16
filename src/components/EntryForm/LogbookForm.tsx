@@ -22,7 +22,7 @@ export default function LogbookForm({
   const { logbooks, isLoading } = useLogbooks();
 
   return (
-    <label className={twMerge("text-gray-500 block mb-2", className)} {...rest}>
+    <label className={twMerge("text-gray-500", className)} {...rest}>
       Logbook
       <MultiSelect
         required

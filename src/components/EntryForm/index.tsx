@@ -5,7 +5,6 @@ import { Link } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
 import {
   EntryNew,
-  Logbook,
   ServerError,
   Shift,
   createEntry,
@@ -15,7 +14,7 @@ import {
 } from "../../api";
 import { Button, Checkbox, IconButton, Input, InputInvalid } from "../base";
 import EntryRow from "../EntryRow";
-import MultiSelect from "../MultiSelect";
+import Select from "../Select";
 import AttachmentCard from "../AttachmentCard";
 import {
   DraftFactory,
@@ -32,10 +31,10 @@ import {
   dateToYYYYMMDD,
 } from "../../utils/datetimeConversion";
 import useLogbooks from "../../hooks/useLogbooks";
-import useTags from "../../hooks/useTags";
 import reportServerError from "../../reportServerError";
 import useTagLogbookSelector from "../../hooks/useTagLogbookSelector";
 import LogbookForm from "./LogbookForm";
+import TagForm from "./TagForm";
 
 const EntryBodyTextEditor = lazy(() => import("../EntryBodyTextEditor"));
 
@@ -58,13 +57,6 @@ export default function EntryForm({
     state.startDrafting(kind)
   );
 
-  const {
-    tags,
-    bumpTag,
-    isLoading: isTagsLoading,
-  } = useTags({
-    logbooks: draft.logbooks,
-  });
   const {
     uploading: attachmentsUploading,
     upload: uploadAttachment,
@@ -328,6 +320,7 @@ export default function EntryForm({
           </label>
           {kind === "newEntry" && (
             <LogbookForm
+              className="block mb-2"
               value={draft.logbooks}
               onChange={(logbooks) =>
                 updateDraft({
@@ -339,30 +332,17 @@ export default function EntryForm({
               onBlur={() => validate("logbooks")}
             />
           )}
-          <label className="text-gray-500 block mb-2">
-            Tags
-            <MultiSelect
-              disabled={isTagsLoading}
-              isLoading={isTagsLoading}
-              options={tags.map(({ name, id }) => ({
-                label: name,
-                value: id,
-              }))}
-              onOptionSelected={bumpTag}
-              value={draft.tags.map((tag) =>
-                typeof tag === "string" ? tag : { custom: tag.new }
-              )}
-              setValue={(tags) =>
-                updateDraft({
-                  ...draft,
-                  tags: (tags || []).map((tag) =>
-                    typeof tag === "string" ? tag : { new: tag.custom }
-                  ),
-                })
-              }
-              allowCustomOptions
-            />
-          </label>
+          <TagForm
+            className="block mb-2"
+            logbooks={draft.logbooks}
+            value={draft.tags}
+            onChange={(tags) =>
+              updateDraft({
+                ...draft,
+                tags,
+              })
+            }
+          />
           <label className="text-gray-500 mb-1 flex items-center">
             <input
               type="checkbox"
