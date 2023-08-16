@@ -28,7 +28,7 @@ export default function useTags({
     },
   });
 
-  const tags = sortTagsByMostRecent([...new Set(data)]);
+  const tags = sortTagsByMostRecent(data || []);
 
   return {
     bumpTag,

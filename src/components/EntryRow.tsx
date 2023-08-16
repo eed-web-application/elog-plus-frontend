@@ -21,7 +21,7 @@ import {
   useRole,
 } from "@floating-ui/react";
 import { IconButton } from "./base";
-import { Attachment, EntrySummary, getAttachmentPreviewURL } from "../api";
+import { Attachment, EntrySummary, Tag, getAttachmentPreviewURL } from "../api";
 import EntryList from "./EntryList";
 import Chip from "./Chip";
 import EntryBodyText from "./EntryBodyText";
@@ -86,7 +86,7 @@ function RowButton({
  * an overflow drawer (an ellipsis that when hovered, displays the rest of the
  * tags with floating element)
  */
-function TagList({ tags }: { tags: string[] }) {
+function TagList({ tags }: { tags: Tag[] }) {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
   const { refs, floatingStyles, context } = useFloating({
@@ -127,14 +127,14 @@ function TagList({ tags }: { tags: string[] }) {
     >
       {tags.map((tag, index) => (
         <Chip
-          key={tag}
+          key={tag.id}
           className={twJoin(
             "ml-1.5",
             overflowIndex !== null && index >= overflowIndex && "invisible"
           )}
           ref={(el) => (tagsRef.current[index] = el)}
         >
-          {tag}
+          {tag.name}
         </Chip>
       ))}
       <Chip
@@ -158,8 +158,8 @@ function TagList({ tags }: { tags: string[] }) {
             {...getFloatingProps()}
           >
             {tags.slice(overflowIndex).map((tag) => (
-              <Chip key={tag} className="mb-1.5">
-                {tag}
+              <Chip key={tag.id} className="mb-1.5">
+                {tag.name}
               </Chip>
             ))}
           </div>
@@ -356,7 +356,9 @@ const EntryRow = forwardRef<HTMLDivElement, PropsWithChildren<Props>>(
             )}
             <div className="flex items-center h-5">
               <div className="text-sm text-gray-500 leading-none whitespace-nowrap truncate">
-                {`${entry.logbook.toUpperCase()} • ${entry.loggedBy}`}
+                {`${entry.logbooks
+                  .map(({ name }) => name.toUpperCase())
+                  .join(", ")} • ${entry.loggedBy}`}
               </div>
               <TagList tags={entry.tags} />
             </div>

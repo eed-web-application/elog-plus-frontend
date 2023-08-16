@@ -5,9 +5,11 @@ import { Link } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
 import {
   EntryNew,
+  Logbook,
   ServerError,
   Shift,
   createEntry,
+  createTag,
   followUp,
   supersede,
 } from "../api";
@@ -33,6 +35,8 @@ import {
 import useLogbooks from "../hooks/useLogbooks";
 import useTags from "../hooks/useTags";
 import reportServerError from "../reportServerError";
+import useTagLogbookSelector from "../hooks/useTagLogbookSelector";
+import Tooltip from "./Tooltip";
 
 const EntryBodyTextEditor = lazy(() => import("./EntryBodyTextEditor"));
 
@@ -54,10 +58,9 @@ export default function EntryForm({
   const [draft, updateDraft, removeDraft] = useDraftsStore((state) =>
     state.startDrafting(kind)
   );
-  const [isTagsOpen, setIsTagsOpen] = useState(false);
+
   const { tags, bumpTag } = useTags({
-    enabled: isTagsOpen,
-    logbooks: draft.logbook ? [draft.logbook] : [],
+    logbooks: draft.logbooks,
   });
   const {
     uploading: attachmentsUploading,
@@ -65,9 +68,15 @@ export default function EntryForm({
     cancel: cancelUploadingAttachment,
   } = useAttachmentUploader();
   let shifts: Shift[] | undefined;
-  if (draft.logbook) {
-    shifts = logbooks?.find(({ name }) => name === draft.logbook)?.shifts;
+  if (draft.logbooks.length === 1) {
+    shifts = logbooks?.find(({ id }) => id === draft.logbooks[0])?.shifts;
   }
+
+  const {
+    getReferenceProps: getReferencePropsForLogbookSelector,
+    Dialog: LogbookSelectorDialog,
+    select: selectLogbook,
+  } = useTagLogbookSelector();
 
   const saveEntry = useCallback(
     async (newEntry: EntryNew) => {
@@ -90,9 +99,11 @@ export default function EntryForm({
     [kind]
   );
 
+  const isShiftSummariesDisabled = draft.logbooks.length !== 1;
+
   const validators = {
     title: () => Boolean(draft.title),
-    logbook: () => Boolean(draft.logbook),
+    logbooks: () => Boolean(draft.logbooks.length !== 0),
     eventAt: () => draft.eventAt !== null,
     shiftName: () => !draft.summarizes || Boolean(draft.summarizes.shiftId),
     shiftDate: () => !draft.summarizes || Boolean(draft.summarizes.date),
@@ -118,6 +129,56 @@ export default function EntryForm({
     return false;
   }
 
+  async function createTagAndUpdateDraft(
+    name: string
+  ): Promise<string | undefined> {
+    if (draft.logbooks.length === 0) {
+      return;
+    }
+
+    // Edge case where the user hits save and for some reason we haven't
+    // fetched any logbook.
+    if (!logbooks) {
+      return;
+    }
+
+    let logbook = draft.logbooks[0];
+
+    let tagId: string;
+    if (logbook && draft.logbooks.length === 1) {
+      tagId = await createTag(logbook, name);
+    } else {
+      const selectedLogbooks = draft.logbooks
+        .map((id) => logbooks.find((logbook) => logbook.id === id))
+        .filter((x) => x) as Logbook[];
+
+      logbook = await selectLogbook(name, selectedLogbooks);
+
+      // User hit cancel
+      if (!logbook) {
+        return;
+      }
+
+      tagId = await createTag(logbook, name);
+    }
+
+    updateDraft({
+      ...draft,
+      tags: draft.tags.map((tag) =>
+        typeof tag !== "string" && tag.new === name ? tagId : tag
+      ),
+    });
+
+    queryClient.invalidateQueries({
+      predicate: ({ queryKey }) =>
+        queryKey[0] === "tags" &&
+        Array.isArray(queryKey[1]) &&
+        (queryKey[1].includes(logbook) || queryKey[1].length === 0),
+    });
+
+    return tagId;
+  }
+
   async function submit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
 
@@ -131,6 +192,24 @@ export default function EntryForm({
       return;
     }
 
+    const tagIds = [];
+
+    for (const tag of draft.tags) {
+      if (typeof tag === "string") {
+        tagIds.push(tag);
+      } else {
+        const newTagId = await createTagAndUpdateDraft(tag.new);
+
+        if (!newTagId) {
+          return;
+        }
+
+        tagIds.push(newTagId);
+      }
+    }
+
+    console.log(draft.logbooks);
+
     const newEntry = {
       ...draft,
       attachments: draft.attachments.map(
@@ -138,6 +217,7 @@ export default function EntryForm({
         // attachment validator, so this is fine
         (attachment) => attachment.id as string
       ),
+      tags: tagIds,
       // This should be fine as the validators should ensure that this Draft
       // is indeed a EntryNew
     } as EntryNew;
@@ -150,12 +230,6 @@ export default function EntryForm({
       if (kind !== "newEntry") {
         queryClient.invalidateQueries({ queryKey: ["entry", kind[1]] });
       }
-      queryClient.invalidateQueries({
-        predicate: ({ queryKey }) =>
-          queryKey[0] === "tags" &&
-          Array.isArray(queryKey[1]) &&
-          (queryKey[1].includes(newEntry.logbook) || queryKey[1].length === 0),
-      });
       if (newEntry.summarizes) {
         queryClient.setQueryData(
           [
@@ -204,7 +278,7 @@ export default function EntryForm({
     <Suspense fallback={<Spinner large className="mx-auto w-full" />}>
       <Link
         to={{ pathname: "/", search: window.location.search }}
-        className={twMerge(IconButton, "my-1 float-right")}
+        className={twJoin(IconButton, "my-1 float-right")}
         onClick={() => removeDraft()}
       >
         <svg
@@ -262,21 +336,24 @@ export default function EntryForm({
           {kind === "newEntry" && (
             <label className="text-gray-500 block mb-2">
               Logbook
-              <Select
+              <MultiSelect
                 required
-                containerClassName="block w-full"
-                className="w-full"
-                options={(logbooks || []).map(({ name }) => name.toUpperCase())}
+                options={(logbooks || []).map(({ name, id }) => ({
+                  label: name.toUpperCase(),
+                  value: id,
+                }))}
                 isLoading={!logbooks}
-                value={draft.logbook.toUpperCase()}
-                setValue={(logbook) =>
+                value={draft.logbooks}
+                setValue={(logbooks) =>
                   updateDraft({
                     ...draft,
-                    logbook: (logbook || "").toLowerCase(),
+                    logbooks: logbooks.filter(
+                      (logbook) => typeof logbook === "string"
+                    ) as string[],
                   })
                 }
-                invalid={invalid.includes("logbook")}
-                onBlur={() => validate("logbook")}
+                invalid={invalid.includes("logbooks")}
+                onBlur={() => validate("logbooks")}
               />
             </label>
           )}
@@ -285,12 +362,23 @@ export default function EntryForm({
             <MultiSelect
               disabled={!tags}
               isLoading={!tags}
-              predefinedOptions={tags || []}
+              options={(tags || []).map(({ name, id }) => ({
+                label: name,
+                value: id,
+              }))}
               onOptionSelected={bumpTag}
-              value={draft.tags}
-              onFocus={() => setIsTagsOpen(true)}
-              onBlur={() => setIsTagsOpen(false)}
-              setValue={(tags) => updateDraft({ ...draft, tags: tags || [] })}
+              value={draft.tags.map((tag) =>
+                typeof tag === "string" ? tag : { custom: tag.new }
+              )}
+              setValue={(tags) =>
+                updateDraft({
+                  ...draft,
+                  tags: (tags || []).map((tag) =>
+                    typeof tag === "string" ? tag : { new: tag.custom }
+                  ),
+                })
+              }
+              allowCustomOptions
             />
           </label>
           <label className="text-gray-500 mb-1 flex items-center">
@@ -326,11 +414,19 @@ export default function EntryForm({
           />
           {kind === "newEntry" && (
             <>
-              <label className="text-gray-500 mb-1 flex items-center">
+              <label
+                className={twMerge(
+                  "text-gray-500 mb-1 flex items-center w-fit",
+                  isShiftSummariesDisabled && "text-gray-400"
+                )}
+              >
                 <input
                   type="checkbox"
                   className={twJoin(Checkbox, "mr-2")}
-                  checked={draft.summarizes !== undefined}
+                  checked={
+                    draft.summarizes !== undefined && !isShiftSummariesDisabled
+                  }
+                  disabled={isShiftSummariesDisabled}
                   onChange={() =>
                     updateDraft({
                       ...draft,
@@ -368,7 +464,7 @@ export default function EntryForm({
                   }
                   invalid={invalid.includes("shiftName")}
                   onBlur={() => validate("shiftName")}
-                  disabled={!draft.summarizes}
+                  disabled={!draft.summarizes || isShiftSummariesDisabled}
                 />
                 <input
                   type="date"
@@ -388,7 +484,7 @@ export default function EntryForm({
                     "block w-full"
                   )}
                   onBlur={() => validate("shiftDate")}
-                  disabled={!draft.summarizes}
+                  disabled={!draft.summarizes || isShiftSummariesDisabled}
                 />
               </div>
             </>
@@ -441,9 +537,11 @@ export default function EntryForm({
                 ? "Follow up"
                 : "Supersede"
             }
+            {...getReferencePropsForLogbookSelector()}
           />
         </form>
       </div>
+      {LogbookSelectorDialog}
     </Suspense>
   );
 }

@@ -8,11 +8,23 @@ import FilterChipWithMenu from "./FilterChipWithMenu.tsx";
 import useLogbooks from "../hooks/useLogbooks.ts";
 import useTags from "../hooks/useTags.ts";
 import { yyyymmddToDate, dateToYYYYMMDD } from "../utils/datetimeConversion.ts";
+import { Tag } from "../api/tags.ts";
+import { Logbook } from "../api/logbooks.ts";
 
 export type Filters = Pick<
   EntryQuery,
   "logbooks" | "tags" | "startDate" | "endDate" | "sortByLogDate"
 >;
+
+function extractTagLabel(tag: Tag) {
+  return tag.name;
+}
+function extractLogbookLabel(logbook: Logbook) {
+  return logbook.name.toUpperCase();
+}
+function extractKey(tagOrLogbook: Tag | Logbook) {
+  return tagOrLogbook.id;
+}
 
 export interface Props {
   filters: Filters;
@@ -20,33 +32,38 @@ export interface Props {
 }
 
 export default function Filters({ filters, setFilters }: Props) {
-  const [isLogbooksOpen, setIsLogbooksOpen] = useState(false);
-  const [isTagsOpen, setIsTagsOpen] = useState(false);
-
-  const logbooks = useLogbooks({ enabled: isLogbooksOpen });
+  const logbooks = useLogbooks();
   const { tags, bumpTag } = useTags({
     logbooks: filters.logbooks,
-    enabled: isTagsOpen,
   });
 
   const logbookFilterLabel = useCallback(() => {
-    if (filters.logbooks.length === 0) {
+    const firstSelectedId = filters.logbooks[0];
+
+    if (!firstSelectedId || !logbooks) {
       return "Logbook";
     }
 
-    let out = filters.logbooks[0].toUpperCase();
+    const firstLogbook = logbooks.find(({ id }) => id === firstSelectedId);
+
+    let label = firstLogbook?.name.toUpperCase();
+
     if (filters.logbooks.length > 1) {
-      out += ` and ${filters.logbooks.length - 1} other`;
+      label += ` and ${filters.logbooks.length - 1} other`;
       if (filters.logbooks.length > 2) {
-        out += "s";
+        label += "s";
       }
     }
 
-    return out;
-  }, [filters.logbooks]);
+    return label;
+  }, [filters.logbooks, logbooks]);
 
   const tagFilterLabel = useCallback(() => {
-    if (filters.tags.length === 0) {
+    const firstSelectedId = filters.tags[0];
+
+    console.log(firstSelectedId);
+    console.log(tags);
+    if (!firstSelectedId || !tags) {
       return "Tags";
     }
 
@@ -62,53 +79,59 @@ export default function Filters({ filters, setFilters }: Props) {
     return (
       <>
         <div className="flex items-center">
-          {filters.tags?.slice(0, 2).map((tag, index) => (
-            <Chip
-              key={tag}
-              className={
-                (index !== 1 && index !== filters.tags.length - 1) ||
-                andOtherText
-                  ? "mr-1"
-                  : ""
-              }
-            >
-              {tag}
-            </Chip>
-          ))}
+          {filters.tags?.slice(0, 2).map((tagId, index) => {
+            const tag = tags.find(({ id }) => id === tagId);
+
+            if (!tag) {
+              return;
+            }
+
+            return (
+              <Chip
+                key={tag.id}
+                className={
+                  (index !== 1 && index !== filters.tags.length - 1) ||
+                  andOtherText
+                    ? "mr-1"
+                    : ""
+                }
+              >
+                {tag.name}
+              </Chip>
+            );
+          })}
           {andOtherText}
         </div>
       </>
     );
-  }, [filters.tags]);
+  }, [filters.tags, tags]);
 
   return (
     <div className="flex flex-wrap">
       <FilterChipWithMenu
         className="mr-3 mt-2"
         label={logbookFilterLabel()}
-        enabled={filters.logbooks.length !== 0}
+        enabled={filters.logbooks.length !== 0 && Boolean(logbooks)}
         onDisable={() => setFilters({ ...filters, logbooks: [] })}
-        onOpen={() => setIsLogbooksOpen(true)}
-        onClose={() => setIsLogbooksOpen(false)}
       >
         <MultiSelectMenu
-          selected={filters.logbooks.map((name) => name.toUpperCase())}
+          selected={filters.logbooks}
           setSelected={(selected) =>
             setFilters({
               ...filters,
-              logbooks: selected.map((name) => name.toLowerCase()),
+              logbooks: selected,
             })
           }
           isLoading={logbooks === null}
-          options={(logbooks || []).map(({ name }) => name.toUpperCase())}
+          options={logbooks || []}
+          extractLabel={extractLogbookLabel}
+          extractKey={extractKey}
         />
       </FilterChipWithMenu>
       <FilterChipWithMenu
         className="mr-3 mt-2"
         label={tagFilterLabel()}
-        enabled={filters.tags.length !== 0}
-        onOpen={() => setIsTagsOpen(true)}
-        onClose={() => setIsTagsOpen(false)}
+        enabled={filters.tags.length !== 0 && Boolean(tags)}
         onDisable={() => setFilters({ ...filters, tags: [] })}
       >
         <MultiSelectMenu
@@ -116,7 +139,9 @@ export default function Filters({ filters, setFilters }: Props) {
           setSelected={(selected) => setFilters({ ...filters, tags: selected })}
           onOptionSelected={bumpTag}
           isLoading={tags === null}
-          options={tags || []}
+          options={tags}
+          extractLabel={extractTagLabel}
+          extractKey={extractKey}
         />
       </FilterChipWithMenu>
       <FilterChipWithMenu

@@ -22,7 +22,8 @@ export const Link =
 
 export const Checkbox = "w-5 h-5 accent-blue-500";
 
-export const Radio = "w-4 h-4 mr-2 text-blue-600 bg-gray-100 border-gray-300";
+export const Radio =
+  "w-4 h-4 mr-2 accent-blue-500 text-blue-600 bg-gray-100 border-gray-300";
 
 export const RadioLabel = "font-medium text-gray-900";
 

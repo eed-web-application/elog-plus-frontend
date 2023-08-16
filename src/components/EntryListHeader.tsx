@@ -27,12 +27,16 @@ function headerTextRenderer(
   });
 
   if (headerKind !== "day") {
-    headerText = `${
-      entry.shift ? entry.shift.name : "No shift"
-    } • ${headerText}`;
+    if (entry.shift.length > 0) {
+      headerText = `${entry.shift
+        .map(({ name }) => name)
+        .join(", ")} • ${headerText}`;
+    }
 
     if (headerKind !== "shift") {
-      headerText = `${entry.logbook.toUpperCase()} • ${headerText}`;
+      headerText = `${entry.logbooks
+        .map(({ name }) => name.toUpperCase())
+        .join(", ")} • ${headerText}`;
     }
   }
 
@@ -42,56 +46,58 @@ function headerTextRenderer(
 // eslint-disable-next-line react-refresh/only-export-components
 const EntryListHeader = forwardRef<HTMLDivElement, Props>(
   ({ headerKind, representative, dateBasedOn, className, ...rest }, ref) => {
-    const date =
-      dateBasedOn === "loggedAt"
-        ? representative.loggedAt
-        : representative.eventAt;
+    // FIXME: Disabled for now
 
-    const summaryId = useSummary(
-      headerKind === "day" || !representative
-        ? undefined
-        : representative.shift?.id,
-      representative ? dateToYYYYMMDD(date) : undefined
-    );
+    // const date =
+    //   dateBasedOn === "loggedAt"
+    //     ? representative.loggedAt
+    //     : representative.eventAt;
 
     let summaryButton;
 
-    if (summaryId !== undefined) {
-      const buttonBase = "font-medium text-gray-700 hover:underline text-right";
+    // const summaryId = useSummary(
+    //   headerKind === "day" || !representative
+    //     ? undefined
+    //     : representative.shift?.id,
+    //   representative ? dateToYYYYMMDD(date) : undefined
+    // );
 
-      if (summaryId) {
-        summaryButton = (
-          <Link
-            to={{
-              pathname: `/${summaryId}`,
-              search: window.location.search,
-            }}
-            className={buttonBase}
-          >
-            View summary
-          </Link>
-        );
-      } else {
-        summaryButton = (
-          <Link
-            to={{
-              pathname: "/new-entry",
-              search: window.location.search,
-            }}
-            state={{
-              logbook: representative.logbook,
-              summarizes: {
-                shiftId: representative.shift?.id,
-                date: dateToYYYYMMDD(date),
-              },
-            }}
-            className={buttonBase}
-          >
-            Summarize shift
-          </Link>
-        );
-      }
-    }
+    // if (summaryId !== undefined) {
+    //   const buttonBase = "font-medium text-gray-700 hover:underline text-right";
+    //
+    //   if (summaryId) {
+    //     summaryButton = (
+    //       <Link
+    //         to={{
+    //           pathname: `/${summaryId}`,
+    //           search: window.location.search,
+    //         }}
+    //         className={buttonBase}
+    //       >
+    //         View summary
+    //       </Link>
+    //     );
+    //   } else {
+    //     summaryButton = (
+    //       <Link
+    //         to={{
+    //           pathname: "/new-entry",
+    //           search: window.location.search,
+    //         }}
+    //         state={{
+    //           logbook: representative.logbook,
+    //           summarizes: {
+    //             shiftId: representative.shift?.id,
+    //             date: dateToYYYYMMDD(date),
+    //           },
+    //         }}
+    //         className={buttonBase}
+    //       >
+    //         Summarize shift
+    //       </Link>
+    //     );
+    //   }
+    // }
 
     const headerText = headerTextRenderer(
       headerKind,

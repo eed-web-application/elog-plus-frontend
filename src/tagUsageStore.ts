@@ -1,9 +1,10 @@
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
+import { Tag } from "./api";
 
 interface TagUsageState {
   lastUsed: Record<string, Date>;
-  sortByMostRecent(tags: string[]): string[];
+  sortByMostRecent(tags: Tag[]): Tag[];
   bump(tag: string): void;
 }
 
@@ -20,17 +21,17 @@ export const useTagUsageStore = create(
 
         const sortedTags = [...tags];
         sortedTags.sort((a, b) => {
-          if (!lastUsed[a] && !lastUsed[b]) {
-            return a.localeCompare(b);
+          if (!lastUsed[a.id] && !lastUsed[b.id]) {
+            return a.name.localeCompare(b.name);
           }
-          if (lastUsed[a] && !lastUsed[b]) {
+          if (lastUsed[a.id] && !lastUsed[b.id]) {
             return -1;
           }
-          if (!lastUsed[a] && lastUsed[b]) {
+          if (!lastUsed[a.id] && lastUsed[b.id]) {
             return 1;
           }
 
-          return lastUsed[b].getTime() - lastUsed[a].getTime();
+          return lastUsed[b.id].getTime() - lastUsed[a.id].getTime();
         });
 
         return sortedTags;

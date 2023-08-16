@@ -11,13 +11,19 @@ export async function fetchTags(
   }: {
     logbooks: string[];
   } = { logbooks: [] }
-): Promise<string[]> {
-  const data = await fetch("v1/tags", {
+): Promise<Tag[]> {
+  return fetch("v1/tags", {
     params: {
       logbooks: logbooks.join(","),
     },
   });
-  const tags = data.map((tag: Tag) => tag.name);
+}
 
-  return tags;
+export async function createTag(logbookId: string, name: string) {
+  return fetch(`v1/logbooks/${logbookId}/tags`, {
+    method: "POST",
+    body: {
+      name,
+    },
+  });
 }

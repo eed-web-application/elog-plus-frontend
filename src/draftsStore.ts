@@ -11,12 +11,13 @@ export type LocalUploadedAttachment = Omit<Attachment, "previewState">;
 /**
  * An entry that hasn't been submitted to the server
  */
-export type Draft = Omit<EntryNew, "attachments" | "eventAt"> & {
+export type Draft = Omit<EntryNew, "attachments" | "eventAt" | "tags"> & {
   /**
    * `null` meaning checked but no date
    */
   eventAt?: Date | null;
   attachments: LocalUploadedAttachment[];
+  tags: (string | { new: string })[];
 };
 
 export type DraftId = "newEntry" | `supersede/${string}` | `followUp/${string}`;
@@ -41,7 +42,7 @@ interface DraftsState {
 export const DEFAULT_DRAFT: Draft = {
   title: "",
   text: "",
-  logbook: "",
+  logbooks: [],
   attachments: [],
   tags: [],
 };
@@ -65,7 +66,11 @@ export const useDraftsStore = create(
         } else if (factory[0] === "superseding") {
           draftId = `supersede/${factory[1].id}`;
 
-          defaultDraft = factory[1];
+          defaultDraft = {
+            ...factory[1],
+            logbooks: factory[1].logbooks.map(({ id }) => id),
+            tags: factory[1].tags.map(({ id }) => id),
+          };
 
           // If eventAt is the same as loggedAt, then we consider
           // it as there being no explicit event time and and thus we ensure
@@ -78,7 +83,8 @@ export const useDraftsStore = create(
 
           defaultDraft = {
             ...DEFAULT_DRAFT,
-            logbook: factory[1].logbook,
+            logbooks: factory[1].logbooks.map(({ id }) => id),
+            tags: factory[1].tags.map(({ id }) => id),
           };
         }
 

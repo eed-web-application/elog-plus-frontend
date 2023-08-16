@@ -5,7 +5,7 @@ import { autoUpdate, size, useFloating } from "@floating-ui/react";
 import Spinner from "./Spinner";
 import useSelectCursor from "../hooks/useSelectCursor";
 
-export type Option = string | { value: string; label: string };
+export type Option = string | { label: string; value: string };
 
 interface Props<O extends Option>
   extends Omit<ComponentProps<"input">, "value"> {

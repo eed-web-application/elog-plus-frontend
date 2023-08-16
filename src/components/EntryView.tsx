@@ -46,7 +46,9 @@ export default function EntryView({ entry }: Props) {
       </Link>
       <div className={twJoin("px-3 pt-2", !entry.followingUp && "pb-2")}>
         <div className="text-lg -mb-1">{entry.title}</div>
-        <div className="text-sm text-gray-500 uppercase">{entry.logbook}</div>
+        <div className="text-sm text-gray-500 uppercase">
+          {entry.logbooks.map(({ name }) => name).join(", ")}
+        </div>
       </div>
       {entry.followingUp && (
         <>
@@ -104,8 +106,8 @@ export default function EntryView({ entry }: Props) {
             <div className="text-gray-500">Tags</div>
             <div className="flex flex-wrap">
               {entry.tags.map((tag) => (
-                <Chip key={tag} className="mr-1.5 mt-0.5">
-                  {tag}
+                <Chip key={tag.id} className="mr-1.5 mt-0.5">
+                  {tag.name}
                 </Chip>
               ))}
             </div>

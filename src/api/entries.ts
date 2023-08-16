@@ -1,15 +1,15 @@
-import { Attachment, NotFoundError, Shift, fetch } from ".";
+import { Attachment, Logbook, NotFoundError, Shift, Tag, fetch } from ".";
 
 export interface EntrySummary {
   id: string;
-  logbook: string;
-  tags: string[];
+  logbooks: Logbook[];
+  tags: Tag[];
   title: string;
   loggedBy: string;
   loggedAt: Date;
   eventAt: Date;
   attachments: Attachment[];
-  shift?: Shift;
+  shift: Shift[];
 }
 
 export interface Entry extends EntrySummary {
@@ -23,7 +23,7 @@ export interface Entry extends EntrySummary {
 export interface EntryNew {
   title: string;
   text: string;
-  logbook: string;
+  logbooks: string[];
   tags: string[];
   attachments: string[];
   eventAt?: Date;

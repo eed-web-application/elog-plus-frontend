@@ -1,10 +1,11 @@
 import { ComponentPropsWithRef, forwardRef, useState } from "react";
 import { twJoin, twMerge } from "tailwind-merge";
 import { Button, Modal, Radio, RadioLabel, TextButton } from "./base";
+import { Logbook } from "../api";
 
 export interface Props extends ComponentPropsWithRef<"div"> {
   tag: string;
-  logbooks: string[];
+  logbooks: Logbook[];
   onSave: (logbook: string) => void;
   onClose: () => void;
 }
@@ -28,7 +29,7 @@ const TagLogbookSelectorDialog = forwardRef<HTMLDivElement, Props>(
         <div className="max-h-48 overflow-y-auto px-6 py-3 gap-2 flex flex-col">
           {logbooks.map((logbook) => (
             <label
-              key={logbook}
+              key={logbook.id}
               className={twJoin(
                 RadioLabel,
                 "flex items-center uppercase text-gray-500"
@@ -37,10 +38,10 @@ const TagLogbookSelectorDialog = forwardRef<HTMLDivElement, Props>(
               <input
                 type="radio"
                 className={Radio}
-                checked={selected === logbook}
-                onChange={() => setSelected(logbook)}
+                checked={logbook.id === selected}
+                onChange={() => setSelected(logbook.id)}
               />
-              {logbook}
+              {logbook.name}
             </label>
           ))}
         </div>

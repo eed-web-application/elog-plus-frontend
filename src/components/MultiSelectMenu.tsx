@@ -4,28 +4,34 @@ import Spinner from "./Spinner";
 import { Input } from "./base";
 import useSelectCursor from "../hooks/useSelectCursor";
 
-export interface Props {
+export interface Props<O> {
+  options: O[];
   selected: string[];
-  onOptionSelected?: (option: string) => void;
   setSelected: (options: string[]) => void;
-  options: string[];
-  isLoading: boolean;
+  onOptionSelected?: (option: string) => void;
+  extractLabel: (option: O) => string;
+  extractKey: (option: O) => string;
+  isLoading?: boolean;
 }
 
 /**
  * Multiselect with search input directly above options and no floating elements
  */
-export default function MultiSelectMenu({
+export default function MultiSelectMenu<O>({
+  options,
   selected,
   setSelected,
   onOptionSelected,
-  options,
+  extractLabel,
+  extractKey,
   isLoading,
-}: Props) {
+}: Props<O>) {
   const [search, setSearch] = useState("");
 
   const filteredOptions = search
-    ? options.filter((option) => option.toLowerCase().includes(search))
+    ? options.filter((option) =>
+        extractLabel(option).toLowerCase().includes(search)
+      )
     : options;
 
   function selectOption(option: string) {
@@ -51,7 +57,7 @@ export default function MultiSelectMenu({
       e.preventDefault();
 
       if (filteredOptions[cursor]) {
-        selectOption(filteredOptions[cursor]);
+        selectOption(extractKey(filteredOptions[cursor]));
       }
     }
   }
@@ -73,12 +79,14 @@ export default function MultiSelectMenu({
           </div>
         ) : (
           filteredOptions.map((option, index) => {
+            const key = extractKey(option);
             const focused = cursor === index;
-            const optionSelected = selected.includes(option);
+            const optionSelected = selected.includes(key);
+
             return (
               <div
                 tabIndex={0}
-                key={option}
+                key={key}
                 className={twMerge(
                   "px-2 p-1 cursor-pointer hover:bg-gray-100",
                   focused && "bg-gray-100",
@@ -87,11 +95,11 @@ export default function MultiSelectMenu({
                 )}
                 // To prevent blur on search input
                 onMouseDown={(e) => e.preventDefault()}
-                onClick={() => selectOption(option)}
+                onClick={() => selectOption(key)}
                 onMouseEnter={() => setCursor(index)}
                 ref={(el) => (optionRefs.current[index] = el)}
               >
-                {option}
+                {extractLabel(option)}
               </div>
             );
           })

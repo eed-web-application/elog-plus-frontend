@@ -6,26 +6,50 @@ import Spinner from "./Spinner";
 import Chip from "./Chip";
 import useSelectCursor from "../hooks/useSelectCursor";
 
-interface Props extends Omit<ComponentProps<"input">, "value"> {
-  value: string[];
-  setValue: (value: string[]) => void;
-  onOptionSelected: (option: string) => void;
-  predefinedOptions: string[];
+type Option = { label: string; value: string };
+
+type Props = {
+  options: Option[];
+  onOptionSelected?: (option: string) => void;
   isLoading?: boolean;
   invalid?: boolean;
   disabled?: boolean;
+  value: (string | { custom: string })[];
+  setValue: (value: (string | { custom: string })[]) => void;
+  allowCustomOptions?: boolean;
+} & Omit<ComponentProps<"input">, "value">;
+
+function getLabel(option: string | Option | { custom: string }): string {
+  if (typeof option === "string") {
+    return option;
+  }
+  if ("custom" in option) {
+    return option.custom;
+  }
+  return option.label;
+}
+
+function getValue(option: string | Option | { custom: string }): string {
+  if (typeof option === "string") {
+    return option;
+  }
+  if ("custom" in option) {
+    return option.custom;
+  }
+  return option.value;
 }
 
 export default function MultiSelect({
   value,
   setValue,
   onOptionSelected,
-  predefinedOptions,
+  options,
   isLoading,
   className,
   placeholder,
   invalid,
   disabled,
+  allowCustomOptions,
   onBlur,
   onFocus,
   ...rest
@@ -35,17 +59,35 @@ export default function MultiSelect({
 
   const search = untrimedSearch.trim();
 
-  const filteredOptions = predefinedOptions.filter(
-    (option) =>
-      (!search || option.toLowerCase().includes(search.toLowerCase())) &&
-      !value.includes(option)
-  );
+  const selected = value
+    // TODO: O(n^2)
+    .map((selectedOption) =>
+      typeof selectedOption === "string"
+        ? options.find((option) => option.value === selectedOption)
+        : selectedOption
+    )
+    .filter((x) => x) as (Option | { custom: string })[];
 
-  const exactMatch = predefinedOptions
-    .concat(value)
+  const filteredOptions = options.filter((option) => {
+    const label = getLabel(option);
+    const value = getValue(option);
+
+    return (
+      (!search || label.toLowerCase().includes(search.toLowerCase())) &&
+      !selected.find((option) => getValue(option) === value)
+    );
+  });
+
+  const customOptions = (
+    value.filter((option) => typeof option !== "string") as { custom: string }[]
+  ).map(({ custom }) => custom);
+
+  const exactMatch = options
+    .map((option) => option.label)
+    .concat(customOptions)
     .find((option) => option.toLowerCase() === search.toLowerCase());
 
-  const showCreateButton = search && !exactMatch;
+  const showCreateButton = allowCustomOptions && search && !exactMatch;
 
   const { refs, floatingStyles } = useFloating({
     open: focused,
@@ -74,8 +116,10 @@ export default function MultiSelect({
       return;
     }
     setSearch("");
-    setValue([...value, search]);
-    onOptionSelected(search);
+    if (allowCustomOptions) {
+      setValue([...value, { custom: search }]);
+      onOptionSelected?.(search);
+    }
   }
 
   function toggleSelection(option: string) {
@@ -84,7 +128,7 @@ export default function MultiSelect({
       setValue(value.filter((otherOption) => otherOption !== option));
     } else {
       setValue([...value, option]);
-      onOptionSelected(option);
+      onOptionSelected?.(option);
     }
   }
 
@@ -96,7 +140,9 @@ export default function MultiSelect({
       if (cursor >= filteredOptions.length && showCreateButton) {
         createCustomOption();
       } else if (cursor >= 0 && filteredOptions.length > 0) {
-        toggleSelection(filteredOptions[cursor]);
+        const option = filteredOptions[cursor];
+
+        toggleSelection(getValue(option));
         setSearch("");
       }
     } else if (e.code === "Backspace" && search === "") {
@@ -117,19 +163,23 @@ export default function MultiSelect({
       ref={refs.setReference}
     >
       <div className="flex flex-wrap flex-1 items-center">
-        {value.map((option) => (
+        {selected.map((option) => (
           <Chip
             delectable
             className="mr-2"
-            key={option}
+            key={"custom" in option ? option.custom : option.value}
             onMouseDown={(e) => {
               e.preventDefault();
             }}
             onDelete={() =>
-              setValue(value.filter((otherOption) => otherOption !== option))
+              setValue(
+                value.filter(
+                  (otherOption) => getValue(otherOption) !== getValue(option)
+                )
+              )
             }
           >
-            {option}
+            {getLabel(option)}
           </Chip>
         ))}
         <input
@@ -183,19 +233,19 @@ export default function MultiSelect({
                 return (
                   <div
                     tabIndex={0}
-                    key={option}
+                    key={getValue(option)}
                     className={twJoin(
                       "px-2 p-1 cursor-pointer hover:bg-gray-100",
                       cursor === index && "bg-gray-100"
                     )}
                     onMouseDown={(e) => {
                       e.preventDefault();
-                      toggleSelection(option);
+                      toggleSelection(getValue(option));
                     }}
                     onMouseEnter={() => setCursor(index)}
                     ref={(el) => (optionRefs.current[index] = el)}
                   >
-                    {option}
+                    {getLabel(option)}
                   </div>
                 );
               })}
