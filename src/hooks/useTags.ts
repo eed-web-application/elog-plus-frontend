@@ -1,5 +1,5 @@
 import { useTagUsageStore } from "../tagUsageStore";
-import { ServerError, fetchTags } from "../api";
+import { ServerError, Tag, fetchTags } from "../api";
 import reportServerError from "../reportServerError";
 import { useQuery } from "@tanstack/react-query";
 
@@ -15,7 +15,7 @@ export default function useTags({
     state.sortByMostRecent,
   ]);
 
-  const { data } = useQuery({
+  const { data, isLoading } = useQuery({
     queryKey: ["tags", logbooks],
     queryFn: () => fetchTags({ logbooks }),
     enabled: enabled,
@@ -26,12 +26,22 @@ export default function useTags({
       }
       reportServerError("Could not retrieve tags", e);
     },
+    select: (tags) => {
+      const tagMap = tags.reduce<Record<string, Tag>>((acc, logbook) => {
+        acc[logbook.id] = logbook;
+        return acc;
+      }, {});
+
+      return { tags, tagMap };
+    },
   });
 
-  const tags = sortTagsByMostRecent(data || []);
+  const tags = sortTagsByMostRecent(data?.tags || []);
 
   return {
-    bumpTag,
     tags,
+    tagMap: data?.tagMap || {},
+    isLoading,
+    bumpTag,
   };
 }

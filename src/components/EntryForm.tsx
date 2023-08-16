@@ -62,7 +62,11 @@ export default function EntryForm({
     state.startDrafting(kind)
   );
 
-  const { tags, bumpTag } = useTags({
+  const {
+    tags,
+    bumpTag,
+    isLoading: isTagsLoading,
+  } = useTags({
     logbooks: draft.logbooks,
   });
   const {
@@ -353,9 +357,9 @@ export default function EntryForm({
           <label className="text-gray-500 block mb-2">
             Tags
             <MultiSelect
-              disabled={!tags}
-              isLoading={!tags}
-              options={(tags || []).map(({ name, id }) => ({
+              disabled={isTagsLoading}
+              isLoading={isTagsLoading}
+              options={tags.map(({ name, id }) => ({
                 label: name,
                 value: id,
               }))}

@@ -21,8 +21,8 @@ export default function useLogbooks({
       }
       reportServerError("Could not retrieve logbooks", e);
     },
-    select: (data) => {
-      const logbookMap = data.reduce<Record<string, Logbook>>(
+    select: (logbooks) => {
+      const logbookMap = logbooks.reduce<Record<string, Logbook>>(
         (acc, logbook) => {
           acc[logbook.id] = logbook;
           return acc;
@@ -30,7 +30,7 @@ export default function useLogbooks({
         {}
       );
 
-      return { logbookMap, logbooks: data };
+      return { logbookMap, logbooks };
     },
   });
 

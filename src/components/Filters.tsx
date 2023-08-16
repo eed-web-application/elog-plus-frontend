@@ -33,7 +33,12 @@ export interface Props {
 
 export default function Filters({ filters, setFilters }: Props) {
   const { logbooks, logbookMap, isLoading: isLogbooksLoading } = useLogbooks();
-  const { tags, bumpTag } = useTags({
+  const {
+    tags,
+    tagMap,
+    bumpTag,
+    isLoading: isTagsLoading,
+  } = useTags({
     logbooks: filters.logbooks,
   });
 
@@ -61,9 +66,7 @@ export default function Filters({ filters, setFilters }: Props) {
   const tagFilterLabel = useCallback(() => {
     const firstSelectedId = filters.tags[0];
 
-    console.log(firstSelectedId);
-    console.log(tags);
-    if (!firstSelectedId || !tags) {
+    if (!firstSelectedId || !isTagsLoading) {
       return "Tags";
     }
 
@@ -80,11 +83,7 @@ export default function Filters({ filters, setFilters }: Props) {
       <>
         <div className="flex items-center">
           {filters.tags?.slice(0, 2).map((tagId, index) => {
-            const tag = tags.find(({ id }) => id === tagId);
-
-            if (!tag) {
-              return;
-            }
+            const tag = tagMap[tagId];
 
             return (
               <Chip
@@ -104,7 +103,7 @@ export default function Filters({ filters, setFilters }: Props) {
         </div>
       </>
     );
-  }, [filters.tags, tags]);
+  }, [filters.tags, tagMap, isTagsLoading]);
 
   return (
     <div className="flex flex-wrap">
@@ -131,14 +130,14 @@ export default function Filters({ filters, setFilters }: Props) {
       <FilterChipWithMenu
         className="mr-3 mt-2"
         label={tagFilterLabel()}
-        enabled={filters.tags.length !== 0 && Boolean(tags)}
+        enabled={filters.tags.length !== 0 && !isTagsLoading}
         onDisable={() => setFilters({ ...filters, tags: [] })}
       >
         <MultiSelectMenu
           selected={filters.tags}
           setSelected={(selected) => setFilters({ ...filters, tags: selected })}
           onOptionSelected={bumpTag}
-          isLoading={tags === null}
+          isLoading={isTagsLoading}
           options={tags}
           extractLabel={extractTagLabel}
           extractKey={extractKey}
