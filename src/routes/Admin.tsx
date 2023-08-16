@@ -13,9 +13,13 @@ import elogLogo from "../assets/temp_elog_logo.png";
 const MIN_PANE_WIDTH = 384;
 
 export default function Admin() {
-  const logbooks = useLogbooks();
+  const { logbookMap, logbooks, isLoading: isLogbooksLoading } = useLogbooks();
   const { logbookId: selectedLogbookId } = useParams();
-  const selectedLogbook = logbooks?.find(({ id }) => id === selectedLogbookId);
+
+  const selectedLogbook = selectedLogbookId
+    ? logbookMap[selectedLogbookId]
+    : undefined;
+
   const logbooksEdited = useLogbookFormsStore((state) =>
     Object.keys(state.forms)
   );
@@ -66,7 +70,9 @@ export default function Admin() {
           )}
         >
           <div className="text-xl mb-2 font-normal text-gray-500">Logbooks</div>
-          {logbooks ? (
+          {isLogbooksLoading ? (
+            <Spinner className="self-center" />
+          ) : (
             logbooks.map((logbook) => (
               <Link
                 key={logbook.id}
@@ -85,8 +91,6 @@ export default function Admin() {
                 </span>
               </Link>
             ))
-          ) : (
-            <Spinner className="self-center" />
           )}
         </div>
         <div

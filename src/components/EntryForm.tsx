@@ -36,7 +36,6 @@ import useLogbooks from "../hooks/useLogbooks";
 import useTags from "../hooks/useTags";
 import reportServerError from "../reportServerError";
 import useTagLogbookSelector from "../hooks/useTagLogbookSelector";
-import Tooltip from "./Tooltip";
 
 const EntryBodyTextEditor = lazy(() => import("./EntryBodyTextEditor"));
 
@@ -54,7 +53,11 @@ export default function EntryForm({
   kind = "newEntry",
 }: Props) {
   const queryClient = useQueryClient();
-  const logbooks = useLogbooks({ critical: false });
+  const {
+    logbooks,
+    logbookMap,
+    isLoading: isLogbooksLoading,
+  } = useLogbooks({ critical: false });
   const [draft, updateDraft, removeDraft] = useDraftsStore((state) =>
     state.startDrafting(kind)
   );
@@ -69,7 +72,7 @@ export default function EntryForm({
   } = useAttachmentUploader();
   let shifts: Shift[] | undefined;
   if (draft.logbooks.length === 1) {
-    shifts = logbooks?.find(({ id }) => id === draft.logbooks[0])?.shifts;
+    shifts = logbookMap[draft.logbooks[0]]?.shifts;
   }
 
   const {
@@ -136,21 +139,13 @@ export default function EntryForm({
       return;
     }
 
-    // Edge case where the user hits save and for some reason we haven't
-    // fetched any logbook.
-    if (!logbooks) {
-      return;
-    }
-
     let logbook = draft.logbooks[0];
 
     let tagId: string;
     if (logbook && draft.logbooks.length === 1) {
       tagId = await createTag(logbook, name);
     } else {
-      const selectedLogbooks = draft.logbooks
-        .map((id) => logbooks.find((logbook) => logbook.id === id))
-        .filter((x) => x) as Logbook[];
+      const selectedLogbooks = draft.logbooks.map((id) => logbookMap[id]);
 
       logbook = await selectLogbook(name, selectedLogbooks);
 
@@ -207,8 +202,6 @@ export default function EntryForm({
         tagIds.push(newTagId);
       }
     }
-
-    console.log(draft.logbooks);
 
     const newEntry = {
       ...draft,
@@ -338,11 +331,11 @@ export default function EntryForm({
               Logbook
               <MultiSelect
                 required
-                options={(logbooks || []).map(({ name, id }) => ({
+                options={logbooks.map(({ name, id }) => ({
                   label: name.toUpperCase(),
                   value: id,
                 }))}
-                isLoading={!logbooks}
+                isLoading={isLogbooksLoading}
                 value={draft.logbooks}
                 setValue={(logbooks) =>
                   updateDraft({

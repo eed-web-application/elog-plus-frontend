@@ -1,4 +1,4 @@
-import { ServerError, fetchLogbooks } from "../api";
+import { Logbook, ServerError, fetchLogbooks } from "../api";
 import reportServerError from "../reportServerError";
 import { useQuery } from "@tanstack/react-query";
 
@@ -9,7 +9,7 @@ export default function useLogbooks({
   enabled?: boolean;
   critical?: boolean;
 } = {}) {
-  const { data } = useQuery({
+  const { data, isLoading } = useQuery({
     queryKey: ["logbooks"],
     queryFn: () => fetchLogbooks(),
     enabled,
@@ -21,7 +21,22 @@ export default function useLogbooks({
       }
       reportServerError("Could not retrieve logbooks", e);
     },
+    select: (data) => {
+      const logbookMap = data.reduce<Record<string, Logbook>>(
+        (acc, logbook) => {
+          acc[logbook.id] = logbook;
+          return acc;
+        },
+        {}
+      );
+
+      return { logbookMap, logbooks: data };
+    },
   });
 
-  return data;
+  return {
+    logbooks: data?.logbooks || [],
+    logbookMap: data?.logbookMap || {},
+    isLoading,
+  };
 }

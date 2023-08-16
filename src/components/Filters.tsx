@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useCallback } from "react";
 import { EntryQuery } from "../hooks/useEntries";
 import FilterChip from "./FilterChip.tsx";
 import MultiSelectMenu from "./MultiSelectMenu.tsx";
@@ -32,7 +32,7 @@ export interface Props {
 }
 
 export default function Filters({ filters, setFilters }: Props) {
-  const logbooks = useLogbooks();
+  const { logbooks, logbookMap, isLoading: isLogbooksLoading } = useLogbooks();
   const { tags, bumpTag } = useTags({
     logbooks: filters.logbooks,
   });
@@ -40,13 +40,13 @@ export default function Filters({ filters, setFilters }: Props) {
   const logbookFilterLabel = useCallback(() => {
     const firstSelectedId = filters.logbooks[0];
 
-    if (!firstSelectedId || !logbooks) {
+    if (!firstSelectedId || isLogbooksLoading) {
       return "Logbook";
     }
 
-    const firstLogbook = logbooks.find(({ id }) => id === firstSelectedId);
+    const firstLogbook = logbookMap[firstSelectedId];
 
-    let label = firstLogbook?.name.toUpperCase();
+    let label = firstLogbook.name.toUpperCase();
 
     if (filters.logbooks.length > 1) {
       label += ` and ${filters.logbooks.length - 1} other`;
@@ -56,7 +56,7 @@ export default function Filters({ filters, setFilters }: Props) {
     }
 
     return label;
-  }, [filters.logbooks, logbooks]);
+  }, [filters.logbooks, logbookMap, isLogbooksLoading]);
 
   const tagFilterLabel = useCallback(() => {
     const firstSelectedId = filters.tags[0];
