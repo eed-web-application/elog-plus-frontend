@@ -60,8 +60,16 @@ export default function useEntryBuilder({
     title: () => Boolean(draft.title),
     logbooks: () => Boolean(draft.logbooks.length !== 0),
     eventAt: () => draft.eventAt !== null,
-    shiftName: () => !draft.summarizes || Boolean(draft.summarizes.shiftId),
-    shiftDate: () => !draft.summarizes || Boolean(draft.summarizes.date),
+    shiftName: () =>
+      // If there is not only one logbook selected, then shift summaries are
+      // disabled and thus valid
+      draft.logbooks.length !== 1 ||
+      !draft.summarizes.checked ||
+      Boolean(draft.summarizes.shiftId),
+    shiftDate: () =>
+      draft.logbooks.length !== 1 ||
+      !draft.summarizes.checked ||
+      Boolean(draft.summarizes.date),
     // Ensure all attachments are downloaded
     attachments: () => attachmentsUploading.length === 0,
   };
@@ -180,6 +188,7 @@ export default function useEntryBuilder({
         // attachment validator, so this is fine
         (attachment) => attachment.id as string
       ),
+      summarizes: draft.summarizes.checked ? draft.summarizes : undefined,
       tags: tagIds,
       // This should be fine as the validators should ensure that this Draft
       // is indeed a EntryNew
