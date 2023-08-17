@@ -18,7 +18,7 @@ export default function FollowUp() {
     <Pane>
       <EntryForm
         kind={["followingUp", entry]}
-        onEntryCreated={(entryId) => {
+        onEntrySaved={(entryId) => {
           toast.success("Followed up entry");
           navigate({ pathname: `/${entryId}`, search: window.location.search });
         }}

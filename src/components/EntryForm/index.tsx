@@ -1,41 +1,26 @@
-import { FormEvent, Suspense, lazy, useCallback, useState } from "react";
+import { Suspense, lazy } from "react";
 import { twJoin, twMerge } from "tailwind-merge";
 import { useDropzone } from "react-dropzone";
 import { Link } from "react-router-dom";
-import { useQueryClient } from "@tanstack/react-query";
-import {
-  EntryNew,
-  ServerError,
-  createEntry,
-  createTag,
-  followUp,
-  supersede,
-} from "../../api";
 import { Button, Checkbox, IconButton, Input, InputInvalid } from "../base";
 import EntryRow from "../EntryRow";
 import AttachmentCard from "../AttachmentCard";
-import {
-  DraftFactory,
-  LocalUploadedAttachment,
-  useDraftsStore,
-} from "../../draftsStore";
+import { DraftFactory } from "../../draftsStore";
 import TextDivider from "../TextDivider";
-import useAttachmentUploader, {
-  LocalAttachment,
-} from "../../hooks/useAttachmentUploader";
+import { LocalAttachment } from "../../hooks/useAttachmentUploader";
 import Spinner from "../Spinner";
 import { dateToDatetimeString } from "../../utils/datetimeConversion";
 import useLogbooks from "../../hooks/useLogbooks";
-import reportServerError from "../../reportServerError";
 import useTagLogbookSelector from "../../hooks/useTagLogbookSelector";
 import LogbookForm from "./LogbookForm";
 import TagForm from "./TagForm";
 import ShiftSummaryForm from "./ShiftSummaryForm";
+import useEntryBuilder from "../../hooks/useEntryBuilder";
 
 const EntryBodyTextEditor = lazy(() => import("../EntryBodyTextEditor"));
 
 export interface Props {
-  onEntryCreated: (id: string) => void;
+  onEntrySaved: (id: string) => void;
   kind?: DraftFactory;
 }
 
@@ -43,206 +28,32 @@ export interface Props {
  * A form to either create a new entry, supersede an existing entry, or follow
  * up an entry
  */
-export default function EntryForm({
-  onEntryCreated,
-  kind = "newEntry",
-}: Props) {
-  const queryClient = useQueryClient();
+export default function EntryForm({ onEntrySaved, kind = "newEntry" }: Props) {
   const { logbookMap } = useLogbooks({ critical: false });
-  const [draft, updateDraft, removeDraft] = useDraftsStore((state) =>
-    state.startDrafting(kind)
-  );
-
-  const {
-    uploading: attachmentsUploading,
-    upload: uploadAttachment,
-    cancel: cancelUploadingAttachment,
-  } = useAttachmentUploader();
-
   const {
     getReferenceProps: getReferencePropsForLogbookSelector,
     Dialog: LogbookSelectorDialog,
     select: selectLogbook,
   } = useTagLogbookSelector();
 
-  const saveEntry = useCallback(
-    async (newEntry: EntryNew) => {
-      try {
-        if (kind === "newEntry") {
-          return await createEntry(newEntry);
-        }
-        if (kind[0] === "superseding") {
-          return await supersede(kind[1].id, newEntry);
-        }
-        return await followUp(kind[1].id, newEntry);
-      } catch (e) {
-        if (!(e instanceof ServerError)) {
-          throw e;
-        }
-
-        reportServerError("Could not save entry", e);
-      }
-    },
-    [kind]
-  );
-
-  const validators = {
-    title: () => Boolean(draft.title),
-    logbooks: () => Boolean(draft.logbooks.length !== 0),
-    eventAt: () => draft.eventAt !== null,
-    shiftName: () => !draft.summarizes || Boolean(draft.summarizes.shiftId),
-    shiftDate: () => !draft.summarizes || Boolean(draft.summarizes.date),
-    // Ensure all attachments are downloaded
-    attachments: () => attachmentsUploading.length === 0,
-  };
-
-  type Field = keyof typeof validators;
-
-  const [invalid, setInvalid] = useState<Field[]>([]);
-
-  function validate(field: Field): boolean {
-    if (validators[field]()) {
-      setInvalid((invalid) =>
-        invalid.filter((invalidField) => invalidField !== field)
-      );
-      return true;
-    }
-
-    if (!invalid.includes(field)) {
-      setInvalid((invalid) => [...invalid, field]);
-    }
-    return false;
-  }
-
-  async function createTagAndUpdateDraft(
-    name: string
-  ): Promise<string | undefined> {
-    if (draft.logbooks.length === 0) {
-      return;
-    }
-
-    let logbook = draft.logbooks[0];
-
-    let tagId: string;
-    if (logbook && draft.logbooks.length === 1) {
-      tagId = await createTag(logbook, name);
-    } else {
-      const selectedLogbooks = draft.logbooks.map((id) => logbookMap[id]);
-
-      logbook = await selectLogbook(name, selectedLogbooks);
-
-      // User hit cancel
-      if (!logbook) {
-        return;
-      }
-
-      tagId = await createTag(logbook, name);
-    }
-
-    updateDraft({
-      ...draft,
-      tags: draft.tags.map((tag) =>
-        typeof tag !== "string" && tag.new === name ? tagId : tag
-      ),
-    });
-
-    queryClient.invalidateQueries({
-      predicate: ({ queryKey }) =>
-        queryKey[0] === "tags" &&
-        Array.isArray(queryKey[1]) &&
-        (queryKey[1].includes(logbook) || queryKey[1].length === 0),
-    });
-
-    return tagId;
-  }
-
-  async function submit(e: FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-
-    let invalid = false;
-    for (const field in validators) {
-      if (!validate(field as Field)) {
-        invalid = true;
-      }
-    }
-    if (invalid) {
-      return;
-    }
-
-    const tagIds = [];
-
-    for (const tag of draft.tags) {
-      if (typeof tag === "string") {
-        tagIds.push(tag);
-      } else {
-        const newTagId = await createTagAndUpdateDraft(tag.new);
-
-        if (!newTagId) {
-          return;
-        }
-
-        tagIds.push(newTagId);
-      }
-    }
-
-    const newEntry = {
-      ...draft,
-      attachments: draft.attachments.map(
-        // We have already verified that all the ids are non null in the
-        // attachment validator, so this is fine
-        (attachment) => attachment.id as string
-      ),
-      tags: tagIds,
-      // This should be fine as the validators should ensure that this Draft
-      // is indeed a EntryNew
-    } as EntryNew;
-
-    const id = await saveEntry(newEntry);
-    if (id) {
-      removeDraft();
-
-      queryClient.invalidateQueries({ queryKey: ["entries"] });
-      if (kind !== "newEntry") {
-        queryClient.invalidateQueries({ queryKey: ["entry", kind[1]] });
-      }
-      if (newEntry.summarizes) {
-        queryClient.setQueryData(
-          [
-            "shiftSummary",
-            newEntry.summarizes.shiftId,
-            newEntry.summarizes.date,
-          ],
-          id
-        );
-      }
-
-      onEntryCreated(id);
-    }
-  }
-
-  async function removeAttachment(attachment: LocalAttachment) {
-    if (attachment.id) {
-      updateDraft({
-        ...draft,
-        attachments: draft.attachments.filter(({ id }) => id !== attachment.id),
-      });
-      return;
-    }
-
-    cancelUploadingAttachment(attachment.fileName);
-  }
+  const {
+    draft,
+    updateDraft,
+    validateField,
+    invalidFields,
+    uploadAttachments,
+    removeAttachment,
+    attachmentsUploading,
+    submitEntry,
+    removeDraft,
+  } = useEntryBuilder({
+    kind,
+    selectLogbookForNewTag: selectLogbook,
+    onEntrySaved: onEntrySaved,
+  });
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
-    onDrop: async (acceptedFiles) => {
-      const attachments = (
-        await Promise.all(acceptedFiles.map(uploadAttachment))
-      ).filter((x) => x) as LocalUploadedAttachment[];
-
-      updateDraft({
-        ...draft,
-        attachments: draft.attachments.concat(attachments),
-      });
-    },
+    onDrop: uploadAttachments,
   });
 
   const attachments = (draft.attachments as LocalAttachment[]).concat(
@@ -254,7 +65,7 @@ export default function EntryForm({
       <Link
         to={{ pathname: "/", search: window.location.search }}
         className={twJoin(IconButton, "my-1 float-right")}
-        onClick={() => removeDraft()}
+        onClick={removeDraft}
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -292,7 +103,14 @@ export default function EntryForm({
             </div>
           </>
         )}
-        <form noValidate onSubmit={submit} className="px-3">
+        <form
+          noValidate
+          onSubmit={(e) => {
+            e.preventDefault();
+            submitEntry();
+          }}
+          className="px-3"
+        >
           <label className="text-gray-500 block mb-2">
             Title
             <input
@@ -300,12 +118,12 @@ export default function EntryForm({
               type="text"
               className={twMerge(
                 Input,
-                invalid.includes("title") && InputInvalid,
+                invalidFields.includes("title") && InputInvalid,
                 "block w-full"
               )}
               value={draft.title}
               onChange={(e) => updateDraft({ ...draft, title: e.target.value })}
-              onBlur={() => validate("title")}
+              onBlur={() => validateField("title")}
             />
           </label>
           {kind === "newEntry" && (
@@ -318,8 +136,8 @@ export default function EntryForm({
                   logbooks,
                 })
               }
-              invalid={invalid.includes("logbooks")}
-              onBlur={() => validate("logbooks")}
+              invalid={invalidFields.includes("logbooks")}
+              onBlur={() => validateField("logbooks")}
             />
           )}
           <TagForm
@@ -360,7 +178,7 @@ export default function EntryForm({
             }
             className={twMerge(
               Input,
-              invalid.includes("eventAt") && InputInvalid,
+              invalidFields.includes("eventAt") && InputInvalid,
               "block w-full mb-2"
             )}
           />
@@ -370,10 +188,10 @@ export default function EntryForm({
               onChange={(summarizes) => updateDraft({ ...draft, summarizes })}
               shifts={logbookMap[draft.logbooks[0] || ""]?.shifts || []}
               disabled={draft.logbooks.length !== 1}
-              invalidShiftName={invalid.includes("shiftName")}
-              invalidDate={invalid.includes("shiftDate")}
-              onShiftNameBlur={() => validate("shiftName")}
-              onDateBlur={() => validate("shiftDate")}
+              invalidShiftName={invalidFields.includes("shiftName")}
+              invalidDate={invalidFields.includes("shiftDate")}
+              onShiftNameBlur={() => validateField("shiftName")}
+              onDateBlur={() => validateField("shiftDate")}
             />
           )}
 

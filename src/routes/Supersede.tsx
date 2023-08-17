@@ -18,7 +18,7 @@ export default function Supersede() {
     <Pane>
       <EntryForm
         kind={["superseding", entry]}
-        onEntryCreated={(entryId) => {
+        onEntrySaved={(entryId) => {
           toast.success("Superseded entry");
           navigate({ pathname: `/${entryId}`, search: window.location.search });
         }}

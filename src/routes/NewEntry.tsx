@@ -21,7 +21,7 @@ export default function NewEntry() {
     <Pane>
       <EntryForm
         kind="newEntry"
-        onEntryCreated={(entryId) => {
+        onEntrySaved={(entryId) => {
           toast.success("Created entry", { autoClose: 1000 });
           navigate({ pathname: `/${entryId}`, search: window.location.search });
         }}
