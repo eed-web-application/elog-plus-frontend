@@ -62,7 +62,7 @@ const EntryListGrouped = forwardRef<HTMLDivElement, Props>(
       let currentHeader = null;
 
       for (const entry of entries) {
-        const header = EntryListHeader.textRenderer(
+        const header = EntryListHeader.getHeaderKey(
           groupBy,
           entry,
           dateBasedOn

@@ -4,11 +4,12 @@ import { twJoin, twMerge } from "tailwind-merge";
 export interface Props extends ComponentPropsWithRef<"div"> {
   delectable?: boolean;
   clickable?: boolean;
+  leftIcon?: JSX.Element;
   onDelete?: (event: React.MouseEvent<SVGSVGElement, MouseEvent>) => void;
 }
 
 const Chip = forwardRef<HTMLDivElement, Props>(function Chip(
-  { delectable, clickable, className, children, onDelete, ...rest },
+  { delectable, clickable, className, children, leftIcon, onDelete, ...rest },
   ref
 ) {
   const base = twJoin(
@@ -16,10 +17,15 @@ const Chip = forwardRef<HTMLDivElement, Props>(function Chip(
     clickable && "hover:bg-gray-200"
   );
 
-  if (!delectable) {
+  if (!delectable && !leftIcon) {
     return (
       <div
-        className={twMerge(base, "px-1.5 py-0.5 leading-none", className)}
+        className={twMerge(
+          base,
+          "px-1.5 py-0.5 leading-none",
+          clickable && "cursor-pointer",
+          className
+        )}
         ref={ref}
         tabIndex={clickable ? 0 : undefined}
         {...rest}
@@ -31,11 +37,27 @@ const Chip = forwardRef<HTMLDivElement, Props>(function Chip(
 
   return (
     <div
-      className={twMerge(base, "overflow-hidden", className)}
+      className={twMerge(
+        base,
+        "overflow-hidden",
+        clickable && "cursor-pointer",
+        className
+      )}
+      tabIndex={clickable ? 0 : undefined}
       ref={ref}
       {...rest}
     >
-      <div className="pl-1.5 py-0.5 leading-none">{children}</div>
+      {leftIcon}
+
+      <div
+        className={twJoin(
+          "py-0.5 leading-none",
+          !leftIcon && "pl-1.5",
+          !delectable && "pr-1.5"
+        )}
+      >
+        {children}
+      </div>
 
       {delectable && (
         <svg
