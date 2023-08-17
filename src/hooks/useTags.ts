@@ -1,13 +1,17 @@
 import { useTagUsageStore } from "../tagUsageStore";
-import { ServerError, Tag, fetchTags } from "../api";
+import { LogbookSummary, ServerError, Tag, fetchTags } from "../api";
 import reportServerError from "../reportServerError";
 import { useQuery } from "@tanstack/react-query";
 
+/**
+ * Retrieve tags based on the logbooks provided. Will prefix tags with the
+ * logbook name if there are multiple tags with the same name.
+ */
 export default function useTags({
   logbooks = [],
   enabled = true,
 }: {
-  logbooks?: string[];
+  logbooks?: LogbookSummary[];
   enabled?: boolean;
 }) {
   const [bumpTag, sortTagsByMostRecent] = useTagUsageStore((state) => [
@@ -17,7 +21,8 @@ export default function useTags({
 
   const { data, isLoading } = useQuery({
     queryKey: ["tags", logbooks],
-    queryFn: () => fetchTags({ logbooks }),
+    // FIXME: use ids once server is updated to use ids
+    queryFn: () => fetchTags({ logbooks: logbooks.map(({ name }) => name) }),
     enabled: enabled,
     staleTime: 5 * 60 * 1000,
     onError: (e) => {
@@ -27,8 +32,24 @@ export default function useTags({
       reportServerError("Could not retrieve tags", e);
     },
     select: (tags) => {
-      const tagMap = tags.reduce<Record<string, Tag>>((acc, logbook) => {
-        acc[logbook.id] = logbook;
+      const tagCounts: Record<string, number> = {};
+
+      for (const tag of tags) {
+        if (tagCounts[tag.name]) {
+          tagCounts[tag.name]++;
+        } else {
+          tagCounts[tag.name] = 1;
+        }
+      }
+
+      for (const tag of tags) {
+        if (tagCounts[tag.name] > 1) {
+          tag.name = `${tag.logbook.name.toUpperCase()}:${tag.name}`;
+        }
+      }
+
+      const tagMap = tags.reduce<Record<string, Tag>>((acc, tag) => {
+        acc[tag.id] = tag;
         return acc;
       }, {});
 

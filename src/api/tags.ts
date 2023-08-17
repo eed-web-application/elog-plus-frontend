@@ -1,8 +1,9 @@
-import { fetch } from ".";
+import { LogbookSummary, fetch } from ".";
 
 export interface Tag {
   id: string;
   name: string;
+  logbook: LogbookSummary;
 }
 
 export async function fetchTags(

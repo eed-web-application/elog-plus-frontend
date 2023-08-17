@@ -29,7 +29,9 @@ export interface Props {
  * up an entry
  */
 export default function EntryForm({ onEntrySaved, kind = "newEntry" }: Props) {
-  const { logbookMap } = useLogbooks({ critical: false });
+  const { logbookMap, isLoading: isLogbooksLoading } = useLogbooks({
+    critical: false,
+  });
   const {
     getReferenceProps: getReferencePropsForLogbookSelector,
     Dialog: LogbookSelectorDialog,
@@ -142,8 +144,9 @@ export default function EntryForm({ onEntrySaved, kind = "newEntry" }: Props) {
           )}
           <TagForm
             className="block mb-2"
-            logbooks={draft.logbooks}
+            logbooks={draft.logbooks.map((id) => logbookMap[id])}
             value={draft.tags}
+            isLoading={isLogbooksLoading}
             onChange={(tags) =>
               updateDraft({
                 ...draft,

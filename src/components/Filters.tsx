@@ -39,7 +39,8 @@ export default function Filters({ filters, setFilters }: Props) {
     bumpTag,
     isLoading: isTagsLoading,
   } = useTags({
-    logbooks: filters.logbooks,
+    logbooks: filters.logbooks.map((id) => logbookMap[id]),
+    enabled: !isLogbooksLoading,
   });
 
   const logbookFilterLabel = useCallback(() => {

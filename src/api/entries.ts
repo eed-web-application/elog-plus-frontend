@@ -1,8 +1,15 @@
-import { Attachment, Logbook, NotFoundError, Shift, Tag, fetch } from ".";
+import {
+  Attachment,
+  LogbookSummary,
+  NotFoundError,
+  Shift,
+  Tag,
+  fetch,
+} from ".";
 
 export interface EntrySummary {
   id: string;
-  logbooks: Logbook[];
+  logbooks: LogbookSummary[];
   tags: Tag[];
   title: string;
   loggedBy: string;

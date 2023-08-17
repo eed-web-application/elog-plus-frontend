@@ -8,9 +8,12 @@ export interface Shift {
   to: string;
 }
 
-export interface Logbook {
+export interface LogbookSummary {
   id: string;
   name: string;
+}
+
+export interface Logbook extends LogbookSummary {
   tags: Tag[];
   shifts: Shift[];
 }
