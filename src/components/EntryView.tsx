@@ -1,3 +1,4 @@
+import { Fragment } from "react";
 import { twJoin, twMerge } from "tailwind-merge";
 import { Entry } from "../api";
 import { Link } from "react-router-dom";
@@ -95,10 +96,17 @@ export default function EntryView({ entry }: Props) {
               })}
             </div>
           )}
-        {entry.shift && (
+        {entry.shift.length > 0 && (
           <div>
             <div className="text-gray-500">During</div>
-            {entry.shift.name}
+            {entry.shift.length === 1
+              ? entry.shift[0].name
+              : entry.shift
+                  .map(
+                    ({ name, logbook }) =>
+                      `${logbook.name.toUpperCase()}:${name}`
+                  )
+                  .join(", ")}
           </div>
         )}
         {entry.tags.length > 0 && (
