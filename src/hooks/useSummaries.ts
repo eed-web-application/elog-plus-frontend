@@ -13,6 +13,7 @@ export default function useSummaries(shiftSummaries: ShiftSummaryIdent[]) {
   const queries = useQueries({
     queries: shiftSummaries.map(({ shiftId, date }) => ({
       queryKey: ["shiftSummary", shiftId, date],
+      staleTime: 5 * 60 * 1000,
       queryFn: async () =>
         (await fetchShiftSummary(shiftId as string, date as string)) || null,
     })),
