@@ -5,11 +5,13 @@ import {
   Editor,
   EditorContentProps,
   EditorEvents,
+  BubbleMenu,
 } from "@tiptap/react";
-import { twMerge } from "tailwind-merge";
-import { Input } from "./base";
-import { ComponentProps, PropsWithChildren, useEffect } from "react";
+import { twJoin, twMerge } from "tailwind-merge";
+import { Input, Modal } from "./base";
+import { ComponentProps, PropsWithChildren, useEffect, useState } from "react";
 import Underline from "@tiptap/extension-underline";
+import Link from "@tiptap/extension-link";
 import Select from "./Select";
 
 function MenuButton({
@@ -212,10 +214,14 @@ function MenuBar({ editor }: { editor: Editor | null }) {
             />
           </svg>
         </MenuButton>
+
         <MenuButton
-          onClick={() => editor.chain().focus().toggleStrike().run()}
-          disabled={!editor.can().chain().focus().toggleStrike().run()}
-          active={editor.isActive("strike")}
+          onClick={() =>
+            editor.isActive("link")
+              ? editor.chain().focus().unsetLink().run()
+              : editor.chain().focus().setLink({ href: "" }).run()
+          }
+          active={editor.isActive("link")}
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -225,11 +231,30 @@ function MenuBar({ editor }: { editor: Editor | null }) {
           >
             <path
               fillRule="evenodd"
-              d="M17.1538 14C17.3846 14.5161 17.5 15.0893 17.5 15.7196C17.5 17.0625 16.9762 18.1116 15.9286 18.867C14.8809 19.6223 13.4335 20 11.5862 20C9.94674 20 8.32335 19.6185 6.71592 18.8555V16.6009C8.23538 17.4783 9.7908 17.917 11.3822 17.917C13.9333 17.917 15.2128 17.1846 15.2208 15.7196C15.2208 15.0939 15.0049 14.5598 14.5731 14.1173C14.5339 14.0772 14.4939 14.0381 14.4531 14H3V12H21V14H17.1538ZM13.076 11H7.62908C7.4566 10.8433 7.29616 10.6692 7.14776 10.4778C6.71592 9.92084 6.5 9.24559 6.5 8.45207C6.5 7.21602 6.96583 6.165 7.89749 5.299C8.82916 4.43299 10.2706 4 12.2219 4C13.6934 4 15.1009 4.32808 16.4444 4.98426V7.13591C15.2448 6.44921 13.9293 6.10587 12.4978 6.10587C10.0187 6.10587 8.77917 6.88793 8.77917 8.45207C8.77917 8.87172 8.99709 9.23796 9.43293 9.55079C9.86878 9.86362 10.4066 10.1135 11.0463 10.3004C11.6665 10.4816 12.3431 10.7148 13.076 11H13.076Z"
+              d="M18.3643 15.5353L16.95 14.1211L18.3643 12.7069C20.3169 10.7543 20.3169 7.58847 18.3643 5.63585C16.4116 3.68323 13.2458 3.68323 11.2932 5.63585L9.87898 7.05007L8.46477 5.63585L9.87898 4.22164C12.6127 1.48797 17.0448 1.48797 19.7785 4.22164C22.5121 6.95531 22.5121 11.3875 19.7785 14.1211L18.3643 15.5353ZM15.5358 18.3638L14.1216 19.778C11.388 22.5117 6.9558 22.5117 4.22213 19.778C1.48846 17.0443 1.48846 12.6122 4.22213 9.87849L5.63634 8.46428L7.05055 9.87849L5.63634 11.2927C3.68372 13.2453 3.68372 16.4112 5.63634 18.3638C7.58896 20.3164 10.7548 20.3164 12.7074 18.3638L14.1216 16.9496L15.5358 18.3638ZM14.8287 7.75717L16.2429 9.17139L9.17187 16.2425L7.75766 14.8282L14.8287 7.75717Z"
               clipRule="evenodd"
             />
           </svg>
         </MenuButton>
+        {/* Disabling strike throughs, because it doesn't seem useful */}
+        {/* <MenuButton */}
+        {/*   onClick={() => editor.chain().focus().toggleStrike().run()} */}
+        {/*   disabled={!editor.can().chain().focus().toggleStrike().run()} */}
+        {/*   active={editor.isActive("strike")} */}
+        {/* > */}
+        {/*   <svg */}
+        {/*     xmlns="http://www.w3.org/2000/svg" */}
+        {/*     viewBox="0 0 24 24" */}
+        {/*     fill="currentColor" */}
+        {/*     className="w-6 h-6" */}
+        {/*   > */}
+        {/*     <path */}
+        {/*       fillRule="evenodd" */}
+        {/*       d="M17.1538 14C17.3846 14.5161 17.5 15.0893 17.5 15.7196C17.5 17.0625 16.9762 18.1116 15.9286 18.867C14.8809 19.6223 13.4335 20 11.5862 20C9.94674 20 8.32335 19.6185 6.71592 18.8555V16.6009C8.23538 17.4783 9.7908 17.917 11.3822 17.917C13.9333 17.917 15.2128 17.1846 15.2208 15.7196C15.2208 15.0939 15.0049 14.5598 14.5731 14.1173C14.5339 14.0772 14.4939 14.0381 14.4531 14H3V12H21V14H17.1538ZM13.076 11H7.62908C7.4566 10.8433 7.29616 10.6692 7.14776 10.4778C6.71592 9.92084 6.5 9.24559 6.5 8.45207C6.5 7.21602 6.96583 6.165 7.89749 5.299C8.82916 4.43299 10.2706 4 12.2219 4C13.6934 4 15.1009 4.32808 16.4444 4.98426V7.13591C15.2448 6.44921 13.9293 6.10587 12.4978 6.10587C10.0187 6.10587 8.77917 6.88793 8.77917 8.45207C8.77917 8.87172 8.99709 9.23796 9.43293 9.55079C9.86878 9.86362 10.4066 10.1135 11.0463 10.3004C11.6665 10.4816 12.3431 10.7148 13.076 11H13.076Z" */}
+        {/*       clipRule="evenodd" */}
+        {/*     /> */}
+        {/*   </svg> */}
+        {/* </MenuButton> */}
         <MenuButton
           onClick={() => editor.chain().focus().toggleCode().run()}
           disabled={!editor.can().chain().focus().toggleCode().run()}
@@ -307,6 +332,51 @@ function MenuBar({ editor }: { editor: Editor | null }) {
   );
 }
 
+function LinkBubbleMenu({
+  value,
+  onChange,
+  onRemove,
+}: {
+  value?: string;
+  onChange: (newValue: string, focus?: boolean) => void;
+  onRemove: () => void;
+}) {
+  const [stagedValue, setStagedValue] = useState(value || "");
+
+  useEffect(() => {
+    setStagedValue(value || "");
+  }, [value]);
+
+  return (
+    <div className={twJoin(Modal, "p-1.5 shadow-lg flex items-center")}>
+      <input
+        placeholder="http://www.google.com"
+        className={twMerge(Input, "text-sm")}
+        onChange={(e) => setStagedValue(e.target.value)}
+        value={stagedValue}
+        onBlur={() => {
+          onChange(stagedValue);
+        }}
+        onKeyDown={(e) => {
+          if (e.key === "Enter") {
+            onChange(stagedValue, true);
+          }
+        }}
+      />
+      <MenuButton className="ml-1" onClick={onRemove}>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          fill="currentColor"
+          className="w-5 h-5"
+        >
+          <path d="M17.657 14.8286L16.2428 13.4143L17.657 12.0001C19.2191 10.438 19.2191 7.90538 17.657 6.34328C16.0949 4.78118 13.5622 4.78118 12.0001 6.34328L10.5859 7.75749L9.17171 6.34328L10.5859 4.92907C12.9291 2.58592 16.7281 2.58592 19.0712 4.92907C21.4143 7.27221 21.4143 11.0712 19.0712 13.4143L17.657 14.8286ZM14.8286 17.657L13.4143 19.0712C11.0712 21.4143 7.27221 21.4143 4.92907 19.0712C2.58592 16.7281 2.58592 12.9291 4.92907 10.5859L6.34328 9.17171L7.75749 10.5859L6.34328 12.0001C4.78118 13.5622 4.78118 16.0949 6.34328 17.657C7.90538 19.2191 10.438 19.2191 12.0001 17.657L13.4143 16.2428L14.8286 17.657ZM14.8286 7.75749L16.2428 9.17171L9.17171 16.2428L7.75749 14.8286L14.8286 7.75749ZM5.77539 2.29303L7.70724 1.77539L8.74252 5.63909L6.81067 6.15673L5.77539 2.29303ZM15.2578 18.3612L17.1896 17.8435L18.2249 21.7072L16.293 22.2249L15.2578 18.3612ZM2.29303 5.77539L6.15673 6.81067L5.63909 8.74252L1.77539 7.70724L2.29303 5.77539ZM18.3612 15.2578L22.2249 16.293L21.7072 18.2249L17.8435 17.1896L18.3612 15.2578Z"></path>
+        </svg>
+      </MenuButton>
+    </div>
+  );
+}
+
 /**
  * WYSIWYG editor that renders to HTML
  */
@@ -329,8 +399,24 @@ export default function EntryBodyTextEditor({
           keepMarks: true,
           keepAttributes: false, // TODO : Making this as `false` becase marks are not preserved when I try to preserve attrs, awaiting a bit of help
         },
+        // dropcursor: false,
       }),
       Underline,
+      Link.extend({
+        // We don't want to keep any attributes (besides href) when drag and
+        // dropping. We, specifically, want to get rid of the class attribute,
+        // because when the user drags and drops an entry, the classes are
+        // kept.
+        addAttributes() {
+          return {
+            href: {
+              default: null,
+            },
+          };
+        },
+      }).configure({
+        openOnClick: false,
+      }),
     ],
     editorProps: {
       attributes: {
@@ -357,6 +443,25 @@ export default function EntryBodyTextEditor({
   return (
     <div>
       <MenuBar editor={editor} />
+      {editor && (
+        <BubbleMenu
+          editor={editor}
+          shouldShow={({ editor }) => editor.isActive("link")}
+        >
+          <LinkBubbleMenu
+            value={editor.getAttributes("link").href}
+            onChange={(value, focus) => {
+              (focus ? editor.chain().focus() : editor.chain())
+                .extendMarkRange("link")
+                .updateAttributes("link", { href: value })
+                .run();
+            }}
+            onRemove={() => {
+              editor.chain().focus().unsetLink().run();
+            }}
+          />
+        </BubbleMenu>
+      )}
       <EditorContent {...rest} editor={editor} />
     </div>
   );
