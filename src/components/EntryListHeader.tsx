@@ -7,10 +7,8 @@ import { ComponentProps, forwardRef } from "react";
 import Chip from "./Chip";
 import Tooltip from "./Tooltip";
 
-export type HeaderKind = "shift" | "logbookAndShift" | "day";
-
 export interface Props extends ComponentProps<"div"> {
-  headerKind: HeaderKind;
+  logbooksIncluded: string[];
   representative: EntrySummary;
   dateBasedOn?: "eventAt" | "loggedAt";
 }
@@ -28,7 +26,7 @@ interface HeaderInfo {
 }
 
 function getHeaderInfo(
-  headerKind: HeaderKind,
+  logbooksIncluded: string[],
   entry: EntrySummary,
   dateBasedOn: Props["dateBasedOn"] = "eventAt"
 ) {
@@ -44,13 +42,20 @@ function getHeaderInfo(
     shifts: [],
   };
 
-  if (headerKind !== "day") {
+  if (logbooksIncluded.length > 0) {
     for (const shift of entry.shift) {
-      const shiftInfo: ShiftInfo = { id: shift.id, name: shift.name };
+      if (!logbooksIncluded.includes(shift.logbook.id)) {
+        continue;
+      }
 
-      if (headerKind !== "shift") {
+      const shiftInfo: ShiftInfo = {
+        id: shift.id,
+        name: shift.name,
+        logbookId: shift.logbook.id,
+      };
+
+      if (logbooksIncluded.length > 1) {
         shiftInfo.logbook = shift.logbook.name;
-        shiftInfo.logbookId = shift.logbook.id;
       }
       info.shifts.push(shiftInfo);
     }
@@ -60,18 +65,19 @@ function getHeaderInfo(
 }
 
 function getHeaderKey(
-  headerKind: HeaderKind,
+  logbooksIncluded: string[],
   entry: EntrySummary,
   dateBasedOn: Props["dateBasedOn"] = "eventAt"
 ): string {
-  return JSON.stringify(getHeaderInfo(headerKind, entry, dateBasedOn));
+  return JSON.stringify(getHeaderInfo(logbooksIncluded, entry, dateBasedOn));
 }
 
 // eslint-disable-next-line react-refresh/only-export-components
 const EntryListHeader = forwardRef<HTMLDivElement, Props>(
-  ({ headerKind, representative, dateBasedOn, className, ...rest }, ref) => {
-    // FIXME: Disabled for now
-
+  (
+    { logbooksIncluded, representative, dateBasedOn, className, ...rest },
+    ref
+  ) => {
     const date = dateToYYYYMMDD(
       dateBasedOn === "loggedAt"
         ? representative.loggedAt
@@ -82,7 +88,7 @@ const EntryListHeader = forwardRef<HTMLDivElement, Props>(
 
     let shiftIds: ShiftSummaryIdent[] = [];
 
-    if (headerKind !== "day") {
+    if (logbooksIncluded.length > 0) {
       shiftIds = representative.shift.map(({ id }) => ({
         shiftId: id,
         date,
@@ -93,7 +99,7 @@ const EntryListHeader = forwardRef<HTMLDivElement, Props>(
       useSummaries(shiftIds);
 
     const { date: dateText, shifts } = getHeaderInfo(
-      headerKind,
+      logbooksIncluded,
       representative,
       dateBasedOn
     );

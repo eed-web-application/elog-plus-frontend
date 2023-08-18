@@ -143,15 +143,6 @@ export default function Home() {
     document.addEventListener("mouseup", endDrag);
   }, [mouseMoveHandler, endDrag]);
 
-  let groupBy: EntryListProps["groupBy"];
-  if (query.logbooks.length === 0) {
-    groupBy = "day";
-  } else if (query.logbooks.length === 1) {
-    groupBy = "shift";
-  } else {
-    groupBy = "logbookAndShift";
-  }
-
   return (
     <div className="h-screen flex flex-col">
       <div
@@ -186,7 +177,7 @@ export default function Home() {
           isLoading={isLoading}
           selectable
           expandable
-          groupBy={groupBy}
+          logbooksIncluded={query.logbooks}
           showFollowUps
           allowFollowUp
           allowSupersede

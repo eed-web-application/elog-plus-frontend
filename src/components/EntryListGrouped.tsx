@@ -24,7 +24,7 @@ import { useResizeObserver } from "../hooks/useOnResize";
 export interface Props extends EntryListProps {
   containerClassName: string;
   emptyLabel?: string;
-  groupBy: EntryListHeaderProps["headerKind"];
+  logbooksIncluded: string[];
   dateBasedOn?: EntryListHeaderProps["dateBasedOn"];
   onBottomVisible?: () => void;
   showBackToTopButton?: boolean;
@@ -40,7 +40,7 @@ const EntryListGrouped = forwardRef<HTMLDivElement, Props>(
       entries,
       containerClassName,
       emptyLabel,
-      groupBy,
+      logbooksIncluded,
       isLoading,
       dateBasedOn,
       onBottomVisible,
@@ -63,7 +63,7 @@ const EntryListGrouped = forwardRef<HTMLDivElement, Props>(
 
       for (const entry of entries) {
         const header = EntryListHeader.getHeaderKey(
-          groupBy,
+          logbooksIncluded,
           entry,
           dateBasedOn
         );
@@ -79,7 +79,7 @@ const EntryListGrouped = forwardRef<HTMLDivElement, Props>(
       }
 
       return [items, headerIndices];
-    }, [entries, groupBy, dateBasedOn]);
+    }, [entries, logbooksIncluded, dateBasedOn]);
 
     const stickyHeaderIndexRef = useRef(0);
 
@@ -199,7 +199,7 @@ const EntryListGrouped = forwardRef<HTMLDivElement, Props>(
                               -virtualItems[1].start + virtualItems[0].size
                             }px`,
                           }}
-                          headerKind={groupBy}
+                          logbooksIncluded={logbooksIncluded}
                           representative={entry}
                         />
                       );
