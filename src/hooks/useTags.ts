@@ -21,8 +21,7 @@ export default function useTags({
 
   const { data, isLoading } = useQuery({
     queryKey: ["tags", logbooks],
-    // FIXME: use ids once server is updated to use ids
-    queryFn: () => fetchTags({ logbooks: logbooks.map(({ name }) => name) }),
+    queryFn: () => fetchTags({ logbooks: logbooks.map(({ id }) => id) }),
     enabled: enabled,
     staleTime: 5 * 60 * 1000,
     onError: (e) => {

@@ -1,4 +1,3 @@
-import { Fragment } from "react";
 import { twJoin, twMerge } from "tailwind-merge";
 import { Entry } from "../api";
 import { Link } from "react-router-dom";
@@ -96,12 +95,12 @@ export default function EntryView({ entry }: Props) {
               })}
             </div>
           )}
-        {entry.shift.length > 0 && (
+        {entry.shifts.length > 0 && (
           <div>
             <div className="text-gray-500">During</div>
-            {entry.shift.length === 1
-              ? entry.shift[0].name
-              : entry.shift
+            {entry.shifts.length === 1
+              ? entry.shifts[0].name
+              : entry.shifts
                   .map(
                     ({ name, logbook }) =>
                       `${logbook.name.toUpperCase()}:${name}`
@@ -176,6 +175,21 @@ export default function EntryView({ entry }: Props) {
           <div className="mt-3 px-3 pb-3">
             <EntryList
               entries={entry.followUps}
+              showDate
+              showFollowUps
+              expandable
+              selectable
+              allowSpotlight
+            />
+          </div>
+        </>
+      )}
+      {entry.referencedBy.length > 0 && (
+        <>
+          <TextDivider>References</TextDivider>
+          <div className="mt-3 px-3 pb-3">
+            <EntryList
+              entries={entry.referencedBy}
               showDate
               showFollowUps
               expandable

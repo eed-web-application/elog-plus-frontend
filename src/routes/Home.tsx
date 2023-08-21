@@ -13,9 +13,7 @@ import useIsSmallScreen from "../hooks/useIsSmallScreen";
 import { EntryQuery } from "../hooks/useEntries";
 import { URLSearchParamsInit } from "react-router-dom";
 import InfoDialogButton from "../components/InfoDialogButton";
-import EntryListGrouped, {
-  Props as EntryListProps,
-} from "../components/EntryListGrouped";
+import EntryListGrouped from "../components/EntryListGrouped";
 
 const DEFAULT_QUERY: EntryQuery = {
   logbooks: [],

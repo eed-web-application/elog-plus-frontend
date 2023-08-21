@@ -43,7 +43,7 @@ function getHeaderInfo(
   };
 
   if (logbooksIncluded.length > 0) {
-    for (const shift of entry.shift) {
+    for (const shift of entry.shifts) {
       if (!logbooksIncluded.includes(shift.logbook.id)) {
         continue;
       }
@@ -89,7 +89,7 @@ const EntryListHeader = forwardRef<HTMLDivElement, Props>(
     let shiftIds: ShiftSummaryIdent[] = [];
 
     if (logbooksIncluded.length > 0) {
-      shiftIds = representative.shift.map(({ id }) => ({
+      shiftIds = representative.shifts.map(({ id }) => ({
         shiftId: id,
         date,
       }));

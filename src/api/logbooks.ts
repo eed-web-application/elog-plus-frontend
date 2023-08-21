@@ -20,8 +20,8 @@ export interface Logbook extends LogbookSummary {
 }
 
 export interface LogbookUpdation extends Omit<Logbook, "tags" | "shifts"> {
-  tags: (Omit<Tag, "id"> & Partial<Pick<Tag, "id">>)[];
-  shifts: (Omit<Shift, "id"> & Partial<Pick<Shift, "id">>)[];
+  tags: (Pick<Tag, "name"> & Partial<Pick<Tag, "id">>)[];
+  shifts: (Pick<Shift, "name" | "from" | "to"> & Partial<Pick<Shift, "id">>)[];
 }
 
 export async function fetchLogbooks(): Promise<Logbook[]> {

@@ -79,6 +79,7 @@ export const useDraftsStore = create(
 
           defaultDraft = {
             ...factory[1],
+            summarizes: { ...DEFAULT_DRAFT.summarizes },
             logbooks: factory[1].logbooks.map(({ id }) => id),
             tags: factory[1].tags.map(({ id }) => id),
           };

@@ -5,13 +5,13 @@ import { Logbook, Shift, Tag } from "./api";
  * Shift that has not been uploaded to the server yet. `id`s starting with an
  * underscore are not uploaded yet.
  */
-interface LocalShift extends Omit<Shift, "id"> {
+interface LocalShift extends Pick<Shift, "name" | "from" | "to"> {
   id: string | `_${string}`;
   name: string;
 }
 
 interface LogbookForm extends Omit<Logbook, "tags" | "shifts"> {
-  tags: (Omit<Tag, "id"> & { id?: string })[];
+  tags: (Pick<Tag, "name"> & { id?: string })[];
   shifts: LocalShift[];
 }
 

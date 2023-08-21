@@ -16,7 +16,7 @@ export interface EntrySummary {
   loggedAt: Date;
   eventAt: Date;
   attachments: Attachment[];
-  shift: Shift[];
+  shifts: Shift[];
 }
 
 export interface Entry extends EntrySummary {
@@ -25,6 +25,7 @@ export interface Entry extends EntrySummary {
   followUps: EntrySummary[];
   history?: EntrySummary[];
   followingUp?: EntrySummary;
+  referencedBy: EntrySummary[];
 }
 
 export interface EntryNew {
