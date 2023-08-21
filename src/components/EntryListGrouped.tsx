@@ -87,6 +87,16 @@ const EntryListGrouped = forwardRef<HTMLDivElement, Props>(
       count: items.length,
       getScrollElement: () => parentRef.current,
       estimateSize: useCallback(() => 50, []),
+      measureElement(el) {
+        // This extra space accounts for the margin between entry groups.
+        // It is put on the last entry of the group, because once the last entry
+        // is not rendered, then the whole group is not rendered and thus the
+        // margin is no longer in the layout.
+        if (el.getAttribute("data-last") === "true") {
+          return el.getBoundingClientRect().height + 12;
+        }
+        return el.getBoundingClientRect().height;
+      },
       rangeExtractor: useCallback(
         (range: Range) => {
           const topHeader = [...headerIndices]
@@ -192,13 +202,19 @@ const EntryListGrouped = forwardRef<HTMLDivElement, Props>(
                     if (headerIndices.includes(virtualRow.index)) {
                       if (currentGroup.length > 0) {
                         groups.push(
-                          <div key={virtualRow.key}>{currentGroup}</div>
+                          <div
+                            key={virtualRow.key}
+                            className="rounded-lg border mx-3 overflow-clip mt-3"
+                          >
+                            {currentGroup}
+                          </div>
                         );
                       }
 
                       currentGroup = [
                         <EntryListHeader
                           data-index={virtualRow.index}
+                          data-header
                           key={virtualRow.key}
                           ref={virtualizer.measureElement}
                           className="sticky z-10"
@@ -219,9 +235,9 @@ const EntryListGrouped = forwardRef<HTMLDivElement, Props>(
                       <EntryRow
                         key={virtualRow.key}
                         data-index={virtualRow.index}
+                        data-last={headerIndices.includes(virtualRow.index + 1)}
                         ref={virtualizer.measureElement}
                         entry={entry}
-                        containerClassName="border-b"
                         className="pr-2"
                         highlighted={spotlight === entry.id}
                         selected={entry.id === selected}
@@ -233,7 +249,11 @@ const EntryListGrouped = forwardRef<HTMLDivElement, Props>(
                     return groups;
                   }, [])}
 
-                  {currentGroup.length > 1 && <div>{currentGroup}</div>}
+                  {currentGroup.length > 1 && (
+                    <div className="rounded-lg border mx-3 overflow-clip mt-3">
+                      {currentGroup}
+                    </div>
+                  )}
                 </div>
               </div>
             </>
