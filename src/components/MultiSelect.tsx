@@ -59,24 +59,34 @@ export default function MultiSelect({
 
   const search = untrimedSearch.trim();
 
+  const optionsMap = options.reduce<
+    Record<string, Option | { custom: string }>
+  >((acc, option) => {
+    acc[getValue(option)] = option;
+    return acc;
+  }, {});
+
+  // Include custom options in the options map
+  for (const option of value) {
+    if (typeof option !== "string") {
+      optionsMap[option.custom] = option;
+    }
+  }
+
   const selected = value
-    // TODO: O(n^2)
     .map((selectedOption) =>
       typeof selectedOption === "string"
-        ? options.find((option) => option.value === selectedOption)
+        ? optionsMap[selectedOption]
         : selectedOption
     )
     .filter((x) => x) as (Option | { custom: string })[];
 
-  const filteredOptions = options.filter((option) => {
-    const label = getLabel(option);
-    const value = getValue(option);
-
-    return (
-      (!search || label.toLowerCase().includes(search.toLowerCase())) &&
-      !selected.find((option) => getValue(option) === value)
-    );
-  });
+  const filteredOptions = options.filter(
+    (option) =>
+      (!search || option.label.toLowerCase().includes(search.toLowerCase())) &&
+      // Exclude selected options
+      !value.includes(option.value)
+  );
 
   const customOptions = (
     value.filter((option) => typeof option !== "string") as { custom: string }[]
