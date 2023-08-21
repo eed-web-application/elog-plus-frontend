@@ -152,6 +152,8 @@ const EntryListGrouped = forwardRef<HTMLDivElement, Props>(
       );
     }
 
+    let currentGroup: JSX.Element[] = [];
+
     return (
       <Observer>
         <div
@@ -184,14 +186,20 @@ const EntryListGrouped = forwardRef<HTMLDivElement, Props>(
                     }px)`,
                   }}
                 >
-                  {virtualItems.map((virtualRow) => {
+                  {virtualItems.reduce<JSX.Element[]>((groups, virtualRow) => {
                     const entry = items[virtualRow.index];
 
                     if (headerIndices.includes(virtualRow.index)) {
-                      return (
+                      if (currentGroup.length > 0) {
+                        groups.push(
+                          <div key={virtualRow.key}>{currentGroup}</div>
+                        );
+                      }
+
+                      currentGroup = [
                         <EntryListHeader
-                          key={virtualRow.key}
                           data-index={virtualRow.index}
+                          key={virtualRow.key}
                           ref={virtualizer.measureElement}
                           className="sticky z-10"
                           style={{
@@ -201,11 +209,13 @@ const EntryListGrouped = forwardRef<HTMLDivElement, Props>(
                           }}
                           logbooksIncluded={logbooksIncluded}
                           representative={entry}
-                        />
-                      );
+                        />,
+                      ];
+
+                      return groups;
                     }
 
-                    return (
+                    currentGroup.push(
                       <EntryRow
                         key={virtualRow.key}
                         data-index={virtualRow.index}
@@ -219,7 +229,11 @@ const EntryListGrouped = forwardRef<HTMLDivElement, Props>(
                         {...rest}
                       />
                     );
-                  })}
+
+                    return groups;
+                  }, [])}
+
+                  <div>{currentGroup}</div>
                 </div>
               </div>
             </>
