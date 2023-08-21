@@ -67,7 +67,7 @@ export default function Filters({ filters, setFilters }: Props) {
   const tagFilterLabel = useCallback(() => {
     const firstSelectedId = filters.tags[0];
 
-    if (!firstSelectedId || !isTagsLoading) {
+    if (!firstSelectedId || isTagsLoading) {
       return "Tags";
     }
 
