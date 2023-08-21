@@ -233,7 +233,7 @@ const EntryListGrouped = forwardRef<HTMLDivElement, Props>(
                     return groups;
                   }, [])}
 
-                  <div>{currentGroup}</div>
+                  {currentGroup.length > 1 && <div>{currentGroup}</div>}
                 </div>
               </div>
             </>
