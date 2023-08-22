@@ -190,11 +190,11 @@ export default function Home() {
           <>
             {!isSmallScreen && (
               <div
-                className="relative border-r cursor-col-resize select-none"
+                className="relative border-r cursor-col-resize select-text"
                 onMouseDown={startDrag}
                 ref={gutterRef}
               >
-                <div className="absolute -left-3 w-6 h-full" />
+                <div className="absolute -left-3 w-6 h-full select-text" />
               </div>
             )}
             <div

@@ -34,6 +34,7 @@ import AttachmentIcon from "./AttachmentIcon";
 import { useOnResize } from "../hooks/useOnResize";
 import useVariableTruncate from "../hooks/useVariableTruncate";
 import useTruncate from "../hooks/useTruncate";
+import useDisplayTags from "../hooks/useDisplayTags";
 
 const ATTACHMENTS_PREVIEW_MAX_WIDTH = 1 / 4;
 
@@ -86,7 +87,7 @@ function RowButton({
  * an overflow drawer (an ellipsis that when hovered, displays the rest of the
  * tags with floating element)
  */
-function TagList({ tags }: { tags: Tag[] }) {
+function TagList({ tags }: { tags: string[] }) {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
   const { refs, floatingStyles, context } = useFloating({
@@ -127,14 +128,14 @@ function TagList({ tags }: { tags: Tag[] }) {
     >
       {tags.map((tag, index) => (
         <Chip
-          key={tag.id}
+          key={tag}
           className={twJoin(
             "ml-1.5",
             overflowIndex !== null && index >= overflowIndex && "invisible"
           )}
           ref={(el) => (tagsRef.current[index] = el)}
         >
-          {tag.name}
+          {tag}
         </Chip>
       ))}
       <Chip
@@ -158,8 +159,8 @@ function TagList({ tags }: { tags: Tag[] }) {
             {...getFloatingProps()}
           >
             {tags.slice(overflowIndex).map((tag) => (
-              <Chip key={tag.id} className="mb-1.5">
-                {tag.name}
+              <Chip key={tag} className="mb-1.5">
+                {tag}
               </Chip>
             ))}
           </div>
@@ -307,6 +308,7 @@ const EntryRow = forwardRef<HTMLDivElement, PropsWithChildren<Props>>(
 
     const spotlightProps = useSpotlightProps(entry.id);
     const date = dateBasedOn === "loggedAt" ? entry.loggedAt : entry.eventAt;
+    const tagNames = useDisplayTags(entry.tags, entry.logbooks.length);
 
     return (
       <div ref={ref} className={containerClassName} {...rest}>
@@ -360,7 +362,7 @@ const EntryRow = forwardRef<HTMLDivElement, PropsWithChildren<Props>>(
                   .map(({ name }) => name.toUpperCase())
                   .join(", ")} • ${entry.loggedBy}`}
               </div>
-              <TagList tags={entry.tags} />
+              <TagList tags={tagNames} />
             </div>
           </div>
           <AttachmentList attachments={entry.attachments} parentRef={rowRef} />

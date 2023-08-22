@@ -10,6 +10,7 @@ import EntryRow from "./EntryRow";
 import EntryFigureList from "./EntryFigureList";
 import TextDivider from "./TextDivider";
 import useSpotlightProps from "../hooks/useSpotlightProps";
+import useDisplayTags from "../hooks/useDisplayTags";
 
 export interface Props {
   entry: Entry;
@@ -22,6 +23,7 @@ export default function EntryView({ entry }: Props) {
   );
 
   const spotlightProps = useSpotlightProps(entry.id);
+  const tagNames = useDisplayTags(entry.tags, entry.logbooks.length);
 
   return (
     <>
@@ -112,9 +114,9 @@ export default function EntryView({ entry }: Props) {
           <div>
             <div className="text-gray-500">Tags</div>
             <div className="flex flex-wrap">
-              {entry.tags.map((tag) => (
-                <Chip key={tag.id} className="mr-1.5 mt-0.5">
-                  {tag.name}
+              {tagNames.map((tag) => (
+                <Chip key={tag} className="mr-1.5 mt-0.5">
+                  {tag}
                 </Chip>
               ))}
             </div>
