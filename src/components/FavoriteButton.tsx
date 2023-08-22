@@ -28,7 +28,7 @@ export default function FavoriteButton({
           viewBox="0 0 24 24"
           fill="currentColor"
           tabIndex={0}
-          className={twMerge(IconButton, className)}
+          className={twMerge(IconButton, "text-yellow-400", className)}
           onClick={() => toggleFavorite(entryId)}
           {...rest}
         >
