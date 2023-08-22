@@ -456,6 +456,7 @@ const EntryRow = forwardRef<HTMLDivElement, PropsWithChildren<Props>>(
               <FavoriteButton
                 entryId={entry.id}
                 className={twMerge(
+                  "z-0",
                   selected && "hover:bg-blue-200",
                   highlighted && "hover:bg-yellow-300"
                 )}
