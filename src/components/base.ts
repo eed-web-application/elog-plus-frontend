@@ -13,7 +13,7 @@ export const TextButton =
   "py-1 px-2 rounded-lg font-medium text-blue-500 hover:bg-blue-100 disabled:hover:bg-auto disabled:text-blue-200 disabled:font-normal";
 
 export const IconButton =
-  "w-9 h-9 p-2 hover:bg-gray-200 rounded-full cursor-pointer outline-2 outline-offset-0 outline-blue-500 focus:outline ";
+  "w-9 h-9 p-2 hover:bg-gray-200 rounded-full cursor-pointer outline-2 outline-offset-0 outline-blue-500 focus:outline select-none";
 
 export const BackDrop = "bg-gray-800 bg-opacity-60";
 
