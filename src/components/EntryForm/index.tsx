@@ -128,20 +128,18 @@ export default function EntryForm({ onEntrySaved, kind = "newEntry" }: Props) {
               onBlur={() => validateField("title")}
             />
           </label>
-          {kind === "newEntry" && (
-            <LogbookForm
-              className="block mb-2"
-              value={draft.logbooks}
-              onChange={(logbooks) =>
-                updateDraft({
-                  ...draft,
-                  logbooks,
-                })
-              }
-              invalid={invalidFields.includes("logbooks")}
-              onBlur={() => validateField("logbooks")}
-            />
-          )}
+          <LogbookForm
+            className="block mb-2"
+            value={draft.logbooks}
+            onChange={(logbooks) =>
+              updateDraft({
+                ...draft,
+                logbooks,
+              })
+            }
+            invalid={invalidFields.includes("logbooks")}
+            onBlur={() => validateField("logbooks")}
+          />
           <TagForm
             className="block mb-2"
             logbooks={draft.logbooks.map((id) => logbookMap[id])}
