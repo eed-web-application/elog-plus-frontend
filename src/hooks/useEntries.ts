@@ -46,7 +46,7 @@ function useFavoriteEntries({
     ? (entry: Entry) => entry.loggedAt
     : (entry: Entry) => entry.eventAt;
 
-  entries.sort((a, b) => sortBy(a).getTime() - sortBy(b).getTime());
+  entries.sort((a, b) => sortBy(b).getTime() - sortBy(a).getTime());
 
   return {
     entries,
