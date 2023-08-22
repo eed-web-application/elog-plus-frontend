@@ -1,5 +1,6 @@
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { fetchEntries } from "../api";
+import { useFavoritesStore } from "../favoritesStore";
 
 const CONTEXT_SIZE = 6;
 const ENTRIES_PER_PAGE = 25;
@@ -11,6 +12,7 @@ export interface EntryQuery {
   startDate: Date | null;
   endDate: Date | null;
   sortByLogDate: boolean;
+  onlyFavorites: boolean;
 }
 
 export interface Params extends Partial<EntryQuery> {
@@ -33,6 +35,8 @@ export default function useEntries({ spotlight, query }: Params) {
     query.endDate.setUTCHours(23, 59, 59, 999);
   }
 
+  const favorites = useFavoritesStore(({ favorites }) => favorites);
+
   const {
     data,
     isLoading,
@@ -46,7 +50,7 @@ export default function useEntries({ spotlight, query }: Params) {
       const query = queryKey[1] as EntryQuery;
       const spotlight = queryKey[2];
 
-      return fetchEntries({
+      const entries = await fetchEntries({
         ...query,
         startDate: query?.startDate || undefined,
         endDate: query?.endDate || undefined,
@@ -54,6 +58,12 @@ export default function useEntries({ spotlight, query }: Params) {
         contextSize: pageParam === undefined && spotlight ? CONTEXT_SIZE : 0,
         limit: ENTRIES_PER_PAGE,
       });
+
+      if (query.onlyFavorites) {
+        return entries.filter((entry) => favorites.has(entry.id));
+      }
+
+      return entries;
     },
     getNextPageParam: (lastPage) => {
       // If last page isn't full, then there is no next page.

@@ -22,6 +22,7 @@ const DEFAULT_QUERY: EntryQuery = {
   endDate: null,
   search: "",
   sortByLogDate: false,
+  onlyFavorites: false,
 };
 
 const MIN_PANE_WIDTH = 384;
@@ -37,6 +38,7 @@ function deserializeQuery(params: URLSearchParams): EntryQuery {
     endDate: endDate ? new Date(endDate) : DEFAULT_QUERY.endDate,
     search: params.get("search") ?? DEFAULT_QUERY.search,
     sortByLogDate: params.has("sortByLogDate"),
+    onlyFavorites: params.has("onlyFavorites"),
   };
 }
 
@@ -175,6 +177,7 @@ export default function Home() {
           isLoading={isLoading}
           logbooksIncluded={query.logbooks}
           showFollowUps
+          allowFavorite
           allowFollowUp
           allowSupersede
           allowSpotlightForFollowUps

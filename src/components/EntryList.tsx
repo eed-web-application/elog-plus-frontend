@@ -10,6 +10,7 @@ export interface Props
     | "showFollowUps"
     | "expandedByDefault"
     | "showDate"
+    | "allowFavorite"
     | "allowFollowUp"
     | "allowSupersede"
     | "allowSpotlight"
