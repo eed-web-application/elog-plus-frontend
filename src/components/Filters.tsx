@@ -51,7 +51,7 @@ export default function Filters({ filters, setFilters }: Props) {
   const logbookFilterLabel = useCallback(() => {
     const firstSelectedId = filters.logbooks[0];
 
-    if (!firstSelectedId || isLogbooksLoading) {
+    if (!firstSelectedId || isLogbooksLoading || filters.onlyFavorites) {
       return "Logbook";
     }
 
@@ -67,12 +67,12 @@ export default function Filters({ filters, setFilters }: Props) {
     }
 
     return label;
-  }, [filters.logbooks, logbookMap, isLogbooksLoading]);
+  }, [filters.logbooks, filters.onlyFavorites, logbookMap, isLogbooksLoading]);
 
   const tagFilterLabel = useCallback(() => {
     const firstSelectedId = filters.tags[0];
 
-    if (!firstSelectedId || isTagsLoading) {
+    if (!firstSelectedId || isTagsLoading || filters.onlyFavorites) {
       return "Tags";
     }
 
@@ -109,7 +109,7 @@ export default function Filters({ filters, setFilters }: Props) {
         </div>
       </>
     );
-  }, [filters.tags, tagMap, isTagsLoading]);
+  }, [filters.tags, filters.onlyFavorites, tagMap, isTagsLoading]);
 
   const favoritesLabel = useCallback(() => {
     return filters.onlyFavorites ? (
@@ -186,7 +186,7 @@ export default function Filters({ filters, setFilters }: Props) {
       <FilterChipWithMenu
         className="mr-3 mt-2"
         label={
-          filters.startDate
+          filters.startDate && !filters.onlyFavorites
             ? filters.startDate.toLocaleDateString("en-us", {
                 timeZone: "UTC",
                 year: "numeric",
@@ -216,7 +216,7 @@ export default function Filters({ filters, setFilters }: Props) {
       <FilterChipWithMenu
         className="mr-3 mt-2"
         label={
-          filters.endDate
+          filters.endDate && !filters.onlyFavorites
             ? filters.endDate.toLocaleDateString("en-us", {
                 timeZone: "UTC",
                 year: "numeric",

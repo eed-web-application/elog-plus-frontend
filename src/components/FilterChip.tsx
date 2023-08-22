@@ -26,7 +26,7 @@ const FilterChip = forwardRef<HTMLButtonElement, PropsWithChildren<Props>>(
   (
     {
       label,
-      active,
+      active: shouldBeActive,
       disabled,
       showCheck,
       showDownArrow,
@@ -40,6 +40,8 @@ const FilterChip = forwardRef<HTMLButtonElement, PropsWithChildren<Props>>(
       e.stopPropagation();
       onDisable?.(e);
     }
+
+    const active = shouldBeActive && !disabled;
 
     return (
       <button
