@@ -17,9 +17,10 @@ export interface EntrySummary {
   eventAt: Date;
   attachments: Attachment[];
   shifts: Shift[];
+  followingUp?: string;
 }
 
-export interface Entry extends EntrySummary {
+export interface Entry extends Omit<EntrySummary, "followingUp"> {
   supersedeBy: string;
   text: string;
   followUps: EntrySummary[];
