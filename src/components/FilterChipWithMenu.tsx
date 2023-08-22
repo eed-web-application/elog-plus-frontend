@@ -84,7 +84,7 @@ export default function FilterChipWithMenu({
     <>
       <FilterChip
         ref={refs.setReference}
-        enabled={isOpen}
+        active={isOpen}
         onClick={onClick}
         className={twMerge(
           // It looks weird to have an inline element on top of the button

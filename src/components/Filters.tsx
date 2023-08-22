@@ -148,7 +148,8 @@ export default function Filters({ filters, setFilters }: Props) {
       <FilterChipWithMenu
         className="mr-3 mt-2"
         label={logbookFilterLabel()}
-        enabled={filters.logbooks.length !== 0 && Boolean(logbooks)}
+        disabled={filters.onlyFavorites}
+        active={filters.logbooks.length !== 0 && Boolean(logbooks)}
         onDisable={() => setFilters({ ...filters, logbooks: [] })}
       >
         <MultiSelectMenu
@@ -168,7 +169,8 @@ export default function Filters({ filters, setFilters }: Props) {
       <FilterChipWithMenu
         className="mr-3 mt-2"
         label={tagFilterLabel()}
-        enabled={filters.tags.length !== 0 && !isTagsLoading}
+        disabled={filters.onlyFavorites}
+        active={filters.tags.length !== 0 && !isTagsLoading}
         onDisable={() => setFilters({ ...filters, tags: [] })}
       >
         <MultiSelectMenu
@@ -193,7 +195,8 @@ export default function Filters({ filters, setFilters }: Props) {
               })
             : "From"
         }
-        enabled={Boolean(filters.startDate)}
+        disabled={filters.onlyFavorites}
+        active={Boolean(filters.startDate)}
         onDisable={() => setFilters({ ...filters, startDate: null })}
         inline
       >
@@ -222,7 +225,8 @@ export default function Filters({ filters, setFilters }: Props) {
               })
             : "To"
         }
-        enabled={Boolean(filters.endDate)}
+        disabled={filters.onlyFavorites}
+        active={Boolean(filters.endDate)}
         onDisable={() => setFilters({ ...filters, endDate: null })}
         inline
       >
@@ -239,7 +243,7 @@ export default function Filters({ filters, setFilters }: Props) {
       <FilterChip
         className="mr-3 mt-2"
         label="Sort by log date"
-        enabled={filters.sortByLogDate}
+        active={filters.sortByLogDate}
         showCheck
         onClick={() =>
           setFilters({ ...filters, sortByLogDate: !filters.sortByLogDate })
@@ -248,7 +252,7 @@ export default function Filters({ filters, setFilters }: Props) {
       <FilterChip
         className="mr-3 mt-2"
         label={favoritesLabel()}
-        enabled={filters.onlyFavorites}
+        active={filters.onlyFavorites}
         onClick={() =>
           setFilters({ ...filters, onlyFavorites: !filters.onlyFavorites })
         }

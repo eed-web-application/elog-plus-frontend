@@ -1,5 +1,5 @@
-import { useInfiniteQuery } from "@tanstack/react-query";
-import { fetchEntries } from "../api";
+import { useInfiniteQuery, useQueries } from "@tanstack/react-query";
+import { Entry, fetchEntries, fetchEntry } from "../api";
 import { useFavoritesStore } from "../favoritesStore";
 
 const CONTEXT_SIZE = 6;
@@ -21,6 +21,41 @@ export interface Params extends Partial<EntryQuery> {
   onSpotlightFetched?: () => void;
 }
 
+function useFavoriteEntries({
+  favorites,
+  enabled,
+  sortByLogDate,
+}: {
+  favorites: string[];
+  enabled: boolean;
+  sortByLogDate: boolean;
+}) {
+  const queries = useQueries({
+    queries: favorites.map((entryId) => ({
+      queryKey: ["entry", entryId],
+      queryFn: () => fetchEntry(entryId as string),
+      enabled,
+    })),
+  });
+
+  const isLoading = queries.some(({ isLoading }) => isLoading);
+
+  const entries = queries.flatMap(({ data }) => data || []);
+
+  const sortBy = sortByLogDate
+    ? (entry: Entry) => entry.loggedAt
+    : (entry: Entry) => entry.eventAt;
+
+  entries.sort((a, b) => sortBy(a).getTime() - sortBy(b).getTime());
+
+  return {
+    entries,
+    isLoading,
+    reachedBottom: false,
+    getMoreEntries: () => undefined,
+  };
+}
+
 /**
  * Manages fetching entries with filtering and spotlighting supporting
  * infnite scroll
@@ -37,6 +72,12 @@ export default function useEntries({ spotlight, query }: Params) {
 
   const favorites = useFavoritesStore(({ favorites }) => favorites);
 
+  const favoriteEntriesQuery = useFavoriteEntries({
+    favorites: [...favorites],
+    enabled: query.onlyFavorites,
+    sortByLogDate: query.sortByLogDate,
+  });
+
   const {
     data,
     isLoading,
@@ -45,6 +86,7 @@ export default function useEntries({ spotlight, query }: Params) {
     isFetchingNextPage,
     isInitialLoading,
   } = useInfiniteQuery({
+    enabled: !query.onlyFavorites,
     queryKey: ["entries", query, spotlight],
     queryFn: async ({ pageParam, queryKey }) => {
       const query = queryKey[1] as EntryQuery;
@@ -78,6 +120,10 @@ export default function useEntries({ spotlight, query }: Params) {
     // invalid.
     useErrorBoundary: true,
   });
+
+  if (query.onlyFavorites) {
+    return favoriteEntriesQuery;
+  }
 
   return {
     entries: data?.pages.flat(),

@@ -7,9 +7,11 @@ import {
 } from "react";
 import { MouseEvent } from "react";
 
-export interface Props extends Omit<ComponentPropsWithRef<"button">, "label"> {
+export interface Props
+  extends Omit<ComponentPropsWithRef<"button">, "label" | "disabled"> {
   label: ReactNode;
-  enabled?: boolean;
+  active?: boolean;
+  disabled?: boolean;
   showCheck?: boolean;
   showDownArrow?: boolean;
   onDisable?: (e: MouseEvent<SVGSVGElement>) => void;
@@ -22,7 +24,16 @@ export interface Props extends Omit<ComponentPropsWithRef<"button">, "label"> {
  */
 const FilterChip = forwardRef<HTMLButtonElement, PropsWithChildren<Props>>(
   (
-    { label, enabled, showCheck, showDownArrow, onDisable, className, ...rest },
+    {
+      label,
+      active,
+      disabled,
+      showCheck,
+      showDownArrow,
+      onDisable,
+      className,
+      ...rest
+    },
     ref
   ) => {
     function disable(e: MouseEvent<SVGSVGElement>) {
@@ -34,17 +45,20 @@ const FilterChip = forwardRef<HTMLButtonElement, PropsWithChildren<Props>>(
       <button
         ref={ref}
         type="button"
+        disabled={disabled}
         className={twMerge(
-          "flex items-center text-gray-500 border rounded-2xl px-3 bg-gray-50 border-gray-300 hover:bg-gray-200 hover:border-gray-400 focus:outline outline-2 outline-blue-500",
-          showCheck && enabled && "pl-2",
-          ((onDisable && !enabled) || (showDownArrow && enabled)) && "pr-2",
-          enabled &&
+          "flex items-center text-gray-500 border rounded-2xl px-3 bg-gray-50 border-gray-300 outline-2 outline-blue-500",
+          !disabled && "hover:bg-gray-200 hover:border-gray-400 focus:outline",
+          showCheck && active && "pl-2",
+          ((onDisable && !active) || (showDownArrow && active)) && "pr-2",
+          active &&
             "bg-blue-100 border-blue-100 hover:bg-blue-200 hover:border-blue-200",
+          disabled && "text-gray-400 bg-white border-gray-200",
           className
         )}
         {...rest}
       >
-        {showCheck && enabled && (
+        {showCheck && active && (
           <svg
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
@@ -61,7 +75,7 @@ const FilterChip = forwardRef<HTMLButtonElement, PropsWithChildren<Props>>(
           </svg>
         )}
         <div className="py-1 whitespace-nowrap">{label}</div>
-        {onDisable && enabled && (
+        {onDisable && active && (
           <svg
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
@@ -78,7 +92,7 @@ const FilterChip = forwardRef<HTMLButtonElement, PropsWithChildren<Props>>(
             />
           </svg>
         )}
-        {showDownArrow && !enabled && (
+        {showDownArrow && !active && (
           <svg
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
