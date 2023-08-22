@@ -59,8 +59,6 @@ export default function EntryView({ entry }: Props) {
             containerClassName="mt-1.5 mb-3.5 mx-3 rounded-lg border mb-2 overflow-hidden"
             entry={entry.followingUp}
             showDate
-            expandable
-            selectable
             allowSpotlight
           />
         </>
@@ -167,7 +165,7 @@ export default function EntryView({ entry }: Props) {
         <>
           <TextDivider>History</TextDivider>
           <div className="mt-3 px-3 pb-3">
-            <EntryList entries={entry.history} showDate expandable selectable />
+            <EntryList entries={entry.history} showDate />
           </div>
         </>
       )}
@@ -179,8 +177,6 @@ export default function EntryView({ entry }: Props) {
               entries={entry.followUps}
               showDate
               showFollowUps
-              expandable
-              selectable
               allowSpotlight
             />
           </div>
@@ -194,8 +190,6 @@ export default function EntryView({ entry }: Props) {
               entries={entry.referencedBy}
               showDate
               showFollowUps
-              expandable
-              selectable
               allowSpotlight
             />
           </div>

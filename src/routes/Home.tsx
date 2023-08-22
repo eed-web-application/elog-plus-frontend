@@ -173,8 +173,6 @@ export default function Home() {
           emptyLabel="No entries found"
           selected={location.pathname.split("/")[1]}
           isLoading={isLoading}
-          selectable
-          expandable
           logbooksIncluded={query.logbooks}
           showFollowUps
           allowFollowUp

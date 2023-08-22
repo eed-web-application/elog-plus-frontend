@@ -97,9 +97,7 @@ export default function EntryForm({ onEntrySaved, kind = "newEntry" }: Props) {
                 containerClassName="rounded-lg border mb-2 overflow-hidden"
                 entry={kind[1]}
                 showDate
-                expandable
                 showFollowUps
-                selectable
                 allowSpotlight
               />
             </div>

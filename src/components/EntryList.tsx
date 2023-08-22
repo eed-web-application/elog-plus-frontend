@@ -7,8 +7,6 @@ import { useResizeObserver } from "../hooks/useOnResize";
 export interface Props
   extends Pick<
     EntryRowProps,
-    | "selectable"
-    | "expandable"
     | "showFollowUps"
     | "expandedByDefault"
     | "showDate"
