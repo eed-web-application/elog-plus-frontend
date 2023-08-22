@@ -11,6 +11,8 @@ import EntryFigureList from "./EntryFigureList";
 import TextDivider from "./TextDivider";
 import useSpotlightProps from "../hooks/useSpotlightProps";
 import useDisplayTags from "../hooks/useDisplayTags";
+import { useFavoritesStore } from "../favoritesStore";
+import FavoriteButton from "./FavoriteButton";
 
 export interface Props {
   entry: Entry;
@@ -46,6 +48,7 @@ export default function EntryView({ entry }: Props) {
           />
         </svg>
       </Link>
+      <FavoriteButton className="my-1 float-right" entryId={entry.id} />
       <div className={twJoin("px-3 pt-2", !entry.followingUp && "pb-2")}>
         <div className="text-lg -mb-1">{entry.title}</div>
         <div className="text-sm text-gray-500 uppercase">
