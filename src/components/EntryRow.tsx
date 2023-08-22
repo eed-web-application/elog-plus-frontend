@@ -249,7 +249,7 @@ function AttachmentList({
 }
 
 export interface Props extends ComponentProps<"div"> {
-  entry: EntrySummary;
+  entry: Omit<EntrySummary, "followingUp"> & { followingUp?: unknown };
   containerClassName?: string;
   className?: string;
   highlighted?: boolean;
@@ -345,7 +345,7 @@ const EntryRow = forwardRef<HTMLDivElement, PropsWithChildren<Props>>(
               // see https://inclusive-components.design/cards/
               className="truncate leading-[1.2] after:absolute after:left-0 after:right-0 after:bottom-0 after:top-0"
             >
-              {entry.followingUp && (
+              {Boolean(entry.followingUp) && (
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   viewBox="0 0 20 20"
