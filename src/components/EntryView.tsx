@@ -202,7 +202,7 @@ export default function EntryView({ entry }: Props) {
           </div>
         </>
       )}
-      {entry.referencedBy.length > 0 && (
+      {entry.referencedBy && entry.referencedBy.length > 0 && (
         <>
           <TextDivider>Reference By</TextDivider>
           <div className="mt-3 px-3 pb-3">
