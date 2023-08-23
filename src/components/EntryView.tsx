@@ -11,8 +11,8 @@ import EntryFigureList from "./EntryFigureList";
 import TextDivider from "./TextDivider";
 import useSpotlightProps from "../hooks/useSpotlightProps";
 import useDisplayTags from "../hooks/useDisplayTags";
-import { useFavoritesStore } from "../favoritesStore";
 import FavoriteButton from "./FavoriteButton";
+import useReferences from "../hooks/useReferences";
 
 export interface Props {
   entry: Entry;
@@ -26,6 +26,10 @@ export default function EntryView({ entry }: Props) {
 
   const spotlightProps = useSpotlightProps(entry.id);
   const tagNames = useDisplayTags(entry.tags, entry.logbooks.length);
+
+  const references = useReferences(
+    entry.referencesInBody ? undefined : entry.id
+  );
 
   return (
     <>
@@ -185,9 +189,22 @@ export default function EntryView({ entry }: Props) {
           </div>
         </>
       )}
-      {entry.referencedBy.length > 0 && (
+      {references && references.length > 0 && (
         <>
           <TextDivider>References</TextDivider>
+          <div className="mt-3 px-3 pb-3">
+            <EntryList
+              entries={references}
+              showDate
+              showFollowUps
+              allowSpotlight
+            />
+          </div>
+        </>
+      )}
+      {entry.referencedBy.length > 0 && (
+        <>
+          <TextDivider>Reference By</TextDivider>
           <div className="mt-3 px-3 pb-3">
             <EntryList
               entries={entry.referencedBy}

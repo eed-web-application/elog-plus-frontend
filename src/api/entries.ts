@@ -27,6 +27,7 @@ export interface Entry extends Omit<EntrySummary, "followingUp"> {
   history?: EntrySummary[];
   followingUp?: EntrySummary;
   referencedBy: EntrySummary[];
+  referencesInBody: boolean;
 }
 
 export interface EntryNew {
@@ -139,6 +140,12 @@ export async function fetchEntry(id: string): Promise<Entry> {
 
   const entry: Entry = normalizeEntry(data);
   return entry;
+}
+
+export async function fetchReferences(id: string): Promise<EntrySummary[]> {
+  const entries = await fetch(`v1/entries/${id}/references`);
+
+  return entries.map(normalizeEntry);
 }
 
 export function fetchShiftSummary(
