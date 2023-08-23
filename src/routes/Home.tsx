@@ -91,8 +91,8 @@ export default function Home() {
   const spotlight = location.state?.spotlight;
 
   // This is used when the user uses spotlight but the spotlighted entry is not
-  // already loaded. So, we use into a state of "spotlight search" where
-  // this is used to back back into the normal state.
+  // already loaded. When this happens, we go into a state of "spotlight search"
+  // where this function is then used to back into the normal state.
   const backToTop = useCallback(() => {
     setSpotlightSearch(undefined);
     // Delete state
@@ -105,7 +105,12 @@ export default function Home() {
     if (
       spotlightSearch !== spotlight &&
       entries !== undefined &&
-      !entries.some((entry) => entry.id === spotlight)
+      !entries.some((entry) => entry.id === spotlight) &&
+      // `spotlight` must truthy because if the user goes into spotlight search,
+      // then clicks the spotlight is removed (either by clicking on an entry
+      // or any other means of navigation), we want to stay in the spotlight
+      // search state.
+      spotlight
     ) {
       setSpotlightSearch(spotlight);
       if (spotlight) {
