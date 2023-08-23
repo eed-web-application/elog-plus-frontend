@@ -26,7 +26,7 @@ export interface Entry extends Omit<EntrySummary, "followingUp"> {
   followUps: EntrySummary[];
   history?: EntrySummary[];
   followingUp?: EntrySummary;
-  referencedBy: EntrySummary[];
+  referencedBy?: EntrySummary[];
   referencesInBody: boolean;
 }
 
