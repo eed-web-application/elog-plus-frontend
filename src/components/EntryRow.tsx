@@ -21,7 +21,7 @@ import {
   useRole,
 } from "@floating-ui/react";
 import { IconButton } from "./base";
-import { Attachment, EntrySummary, getAttachmentPreviewURL } from "../api";
+import { Attachment, EntrySummary } from "../api";
 import EntryList from "./EntryList";
 import Chip from "./Chip";
 import EntryBodyText from "./EntryBodyText";
@@ -221,7 +221,7 @@ function AttachmentList({
           attachment.previewState === "Completed" ? (
             <img
               key={attachment.id}
-              src={getAttachmentPreviewURL(attachment.id)}
+              src={`data:image/png;base64,${attachment.miniPreview}`}
               className={twJoin(
                 "flex-shrink-0 w-8 h-8 ml-2 rounded-md object-cover"
               )}

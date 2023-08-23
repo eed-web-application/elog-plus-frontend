@@ -6,7 +6,10 @@ import { Attachment, Entry, EntryNew } from "./api";
  * Attachment that has been uploaded to the server, but we don't have all its
  * properties (mostly because it was just uploaded).
  */
-export type LocalUploadedAttachment = Omit<Attachment, "previewState">;
+export type LocalUploadedAttachment = Omit<
+  Attachment,
+  "previewState" | "miniPreview"
+>;
 
 /**
  * An entry that hasn't been submitted to the server

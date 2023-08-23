@@ -4,6 +4,7 @@ export interface Attachment {
   id: string;
   fileName: string;
   contentType: string;
+  miniPreview: string;
   previewState:
     | "Waiting"
     | "Processing"

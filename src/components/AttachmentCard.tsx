@@ -8,9 +8,12 @@ export type Props = ComponentProps<"div"> & {
   isLoading?: boolean;
   onRemove?: () => void;
 } & (
-    | { attachment: Omit<Attachment, "previewState">; downloadable: true }
     | {
-        attachment: Omit<Attachment, "id" | "previewState">;
+        attachment: Omit<Attachment, "previewState" | "miniPreview">;
+        downloadable: true;
+      }
+    | {
+        attachment: Omit<Attachment, "id" | "previewState" | "miniPreview">;
         downloadable?: false;
       }
   );
