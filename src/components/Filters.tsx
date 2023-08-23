@@ -15,6 +15,7 @@ export type Filters = Pick<
   EntryQuery,
   | "logbooks"
   | "tags"
+  | "requireAllTags"
   | "startDate"
   | "endDate"
   | "sortByLogDate"
@@ -181,6 +182,20 @@ export default function Filters({ filters, setFilters }: Props) {
           options={tags}
           extractLabel={extractTagLabel}
           extractKey={extractKey}
+          searchButton={
+            <button
+              type="button"
+              className="bg-gray-100 rounded-tr border border-l-transparent border-gray-300 hover:bg-gray-200 flex justify-center items-center px-2 w-12"
+              onClick={() =>
+                setFilters({
+                  ...filters,
+                  requireAllTags: !filters.requireAllTags,
+                })
+              }
+            >
+              {filters.requireAllTags ? "All" : "Any"}
+            </button>
+          }
         />
       </FilterChipWithMenu>
       <FilterChipWithMenu

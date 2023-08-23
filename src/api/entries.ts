@@ -74,6 +74,7 @@ export async function fetchEntries({
   sortByLogDate = false,
   logbooks = [],
   tags = [],
+  requireAllTags,
   anchorId,
   hideSummaries,
 }: {
@@ -85,6 +86,7 @@ export async function fetchEntries({
   sortByLogDate?: boolean;
   logbooks?: string[];
   tags?: string[];
+  requireAllTags?: boolean;
   anchorId?: string;
   hideSummaries?: boolean;
 }): Promise<EntrySummary[]> {
@@ -118,6 +120,10 @@ export async function fetchEntries({
   if (hideSummaries) {
     params.hideSummaries = "true";
   }
+  if (requireAllTags) {
+    params.requireAllTags = "true";
+  }
+
   const data = await fetch("v1/entries", { params });
   return data.map(normalizeEntry);
 }

@@ -18,6 +18,7 @@ import EntryListGrouped from "../components/EntryListGrouped";
 const DEFAULT_QUERY: EntryQuery = {
   logbooks: [],
   tags: [],
+  requireAllTags: false,
   startDate: null,
   endDate: null,
   search: "",
@@ -34,6 +35,7 @@ function deserializeQuery(params: URLSearchParams): EntryQuery {
   return {
     logbooks: params.get("logbooks")?.split(",") ?? DEFAULT_QUERY.logbooks,
     tags: params.get("tags")?.split(",") ?? DEFAULT_QUERY.tags,
+    requireAllTags: params.has("requireAllTags"),
     startDate: startDate ? new Date(startDate) : DEFAULT_QUERY.startDate,
     endDate: endDate ? new Date(endDate) : DEFAULT_QUERY.endDate,
     search: params.get("search") ?? DEFAULT_QUERY.search,

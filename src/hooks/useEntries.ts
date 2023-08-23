@@ -9,6 +9,7 @@ export interface EntryQuery {
   search: string;
   logbooks: string[];
   tags: string[];
+  requireAllTags: boolean;
   startDate: Date | null;
   endDate: Date | null;
   sortByLogDate: boolean;

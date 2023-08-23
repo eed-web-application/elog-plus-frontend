@@ -1,5 +1,5 @@
 import { twMerge } from "tailwind-merge";
-import { useState } from "react";
+import { ReactNode, useState } from "react";
 import Spinner from "./Spinner";
 import { Input } from "./base";
 import useSelectCursor from "../hooks/useSelectCursor";
@@ -11,6 +11,7 @@ export interface Props<O> {
   onOptionSelected?: (option: string) => void;
   extractLabel: (option: O) => string;
   extractKey: (option: O) => string;
+  searchButton?: ReactNode;
   isLoading?: boolean;
 }
 
@@ -24,6 +25,7 @@ export default function MultiSelectMenu<O>({
   onOptionSelected,
   extractLabel,
   extractKey,
+  searchButton,
   isLoading,
 }: Props<O>) {
   const [search, setSearch] = useState("");
@@ -62,16 +64,30 @@ export default function MultiSelectMenu<O>({
     }
   }
 
+  const searchInput = (
+    <input
+      type="search"
+      className={twMerge(
+        Input,
+        "block w-64 rounded-b-none",
+        searchButton && "rounded-r-none"
+      )}
+      placeholder="Search..."
+      autoFocus
+      onChange={(e) => setSearch(e.target.value)}
+      onKeyDown={onInputKeyDown}
+    />
+  );
+
   return (
     <>
-      <input
-        type="search"
-        className={twMerge(Input, "block w-64 rounded-b-none")}
-        placeholder="Search..."
-        autoFocus
-        onChange={(e) => setSearch(e.target.value)}
-        onKeyDown={onInputKeyDown}
-      />
+      {searchButton ? (
+        <div className="flex w-full rounded-t overflow-hidden">
+          {searchInput} {searchButton}
+        </div>
+      ) : (
+        searchInput
+      )}
       <div className="max-h-64 overflow-y-auto">
         {filteredOptions.length === 0 || isLoading ? (
           <div className="text-gray-500 text-center w-full py-3">
