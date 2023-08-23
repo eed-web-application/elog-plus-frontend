@@ -58,6 +58,9 @@ function normalizeEntry<E extends Entry | EntrySummary>(entry: E): E {
     entry.history = entry.history
       ? entry.history.map(normalizeEntry)
       : undefined;
+    entry.referencedBy = entry.referencedBy
+      ? entry.referencedBy.map(normalizeEntry)
+      : undefined;
     entry.followingUp = entry.followingUp
       ? normalizeEntry(entry.followingUp)
       : undefined;
@@ -135,6 +138,7 @@ export async function fetchEntry(id: string): Promise<Entry> {
       includeFollowUps: "true",
       includeHistory: "true",
       includeFollowingUps: "true",
+      includeReferencedBy: "true",
     },
   });
 
