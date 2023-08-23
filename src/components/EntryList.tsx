@@ -1,5 +1,5 @@
 import { useRef } from "react";
-import { EntrySummary } from "../api";
+import { Entry, EntrySummary } from "../api";
 import EntryRow, { Props as EntryRowProps } from "./EntryRow";
 import Spinner from "./Spinner";
 import { useResizeObserver } from "../hooks/useOnResize";
@@ -16,7 +16,7 @@ export interface Props
     | "allowSpotlight"
     | "allowSpotlightForFollowUps"
   > {
-  entries: EntrySummary[];
+  entries: (EntrySummary | Entry)[];
   selected?: string;
   spotlight?: string;
   isLoading?: boolean;

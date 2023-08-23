@@ -1,6 +1,6 @@
 import { twMerge } from "tailwind-merge";
 import { Link } from "react-router-dom";
-import { EntrySummary } from "../api";
+import { Entry, EntrySummary } from "../api";
 import useSummaries, { ShiftSummaryIdent } from "../hooks/useSummaries";
 import { dateToYYYYMMDD } from "../utils/datetimeConversion";
 import { ComponentProps, forwardRef } from "react";
@@ -9,7 +9,7 @@ import Tooltip from "./Tooltip";
 
 export interface Props extends ComponentProps<"div"> {
   logbooksIncluded: string[];
-  representative: EntrySummary;
+  representative: EntrySummary | Entry;
   dateBasedOn?: "eventAt" | "loggedAt";
 }
 
@@ -27,7 +27,7 @@ interface HeaderInfo {
 
 function getHeaderInfo(
   logbooksIncluded: string[],
-  entry: EntrySummary,
+  entry: EntrySummary | Entry,
   dateBasedOn: Props["dateBasedOn"] = "eventAt"
 ) {
   const date = dateBasedOn === "loggedAt" ? entry.loggedAt : entry.eventAt;
@@ -66,7 +66,7 @@ function getHeaderInfo(
 
 function getHeaderKey(
   logbooksIncluded: string[],
-  entry: EntrySummary,
+  entry: EntrySummary | Entry,
   dateBasedOn: Props["dateBasedOn"] = "eventAt"
 ): string {
   return JSON.stringify(getHeaderInfo(logbooksIncluded, entry, dateBasedOn));
