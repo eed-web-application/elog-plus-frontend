@@ -182,7 +182,7 @@ const EntryListGrouped = forwardRef<HTMLDivElement, Props>(
                 {showBackToTopButton && (
                   <div
                     tabIndex={0}
-                    className="w-full h-9 bg-gradient-to-b from-gray-200 block font-medium text-gray-700 hover:underline text-center pt-3 absolute top-0 z-10 cursor-pointer"
+                    className="w-full h-9 bg-gradient-to-b from-gray-200 block font-medium text-gray-700 hover:underline text-center pt-3 absolute top-0 z-10 cursor-pointer -mt-3"
                     onClick={onBackToTop}
                   >
                     Back to top
