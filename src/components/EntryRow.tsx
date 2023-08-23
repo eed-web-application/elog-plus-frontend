@@ -31,7 +31,7 @@ import useSpotlightProps from "../hooks/useSpotlightProps";
 import { useDraftsStore } from "../draftsStore";
 import useEntry from "../hooks/useEntry";
 import AttachmentIcon from "./AttachmentIcon";
-import { useOnResize } from "../hooks/useOnResize";
+import { useOnResize, useTriggerResize } from "../hooks/useOnResize";
 import useVariableTruncate from "../hooks/useVariableTruncate";
 import useTruncate from "../hooks/useTruncate";
 import useDisplayTags from "../hooks/useDisplayTags";
@@ -88,7 +88,7 @@ function RowButton({
  * an overflow drawer (an ellipsis that when hovered, displays the rest of the
  * tags with floating element)
  */
-function TagList({ tags }: { tags: string[] }) {
+function TagList({ tags, entryId }: { tags: string[]; entryId: string }) {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
   const { refs, floatingStyles, context } = useFloating({
@@ -119,7 +119,7 @@ function TagList({ tags }: { tags: string[] }) {
 
   const mergedDrawerRef = useMergeRefs([refs.setReference, drawerRef]);
 
-  useOnResize(updateTruncation, containerRef.current || undefined);
+  useOnResize(updateTruncation, containerRef.current || undefined, entryId);
   useLayoutEffect(updateTruncation);
 
   return (
@@ -309,10 +309,14 @@ const EntryRow = forwardRef<HTMLDivElement, PropsWithChildren<Props>>(
     const date = dateBasedOn === "loggedAt" ? entry.loggedAt : entry.eventAt;
     const tagNames = useDisplayTags(entry.tags, entry.logbooks.length);
 
+    const triggerResize = useTriggerResize(entry.id);
+
     return (
       <div ref={ref} className={containerClassName} {...rest}>
         <div
           ref={rowRef}
+          onMouseEnter={triggerResize}
+          onMouseLeave={triggerResize}
           className={twMerge(
             "flex items-center group cursor-pointer relative hover:bg-gray-50",
             selected && "bg-blue-50",
@@ -367,7 +371,7 @@ const EntryRow = forwardRef<HTMLDivElement, PropsWithChildren<Props>>(
                   .map(({ name }) => name.toUpperCase())
                   .join(", ")} • ${entry.loggedBy}`}
               </div>
-              <TagList tags={tagNames} />
+              <TagList tags={tagNames} entryId={entry.id} />
             </div>
           </div>
           <AttachmentList attachments={entry.attachments} parentRef={rowRef} />

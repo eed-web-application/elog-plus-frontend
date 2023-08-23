@@ -9,21 +9,28 @@ import {
 } from "react";
 
 type Context = null | {
-  registerListener: (listener: () => void) => void;
+  registerListener: (listener: () => void, key?: string) => void;
   removeListener: (listener: () => void) => void;
+  triggerResize: (key: string) => void;
 };
 
 const ResizeManagerContext = createContext<Context>(null);
+
+let idCounter = 0;
 
 /**
  * All calls to `useOnResize` will run their listener when `observe` is resized
  * superseding its default functionality.
  */
 export function useResizeObserver(observe: HTMLElement | null) {
-  const listenersRef = useRef<(() => void)[]>([]);
+  const listenersRef = useRef<Record<string, () => void>>({});
 
   const onResize = useCallback(() => {
-    listenersRef.current.forEach((listener) => listener());
+    Object.values(listenersRef.current).forEach((listener) => listener());
+  }, []);
+
+  const triggerResize = useCallback((key: string) => {
+    listenersRef.current[key]();
   }, []);
 
   useEffect(() => {
@@ -47,20 +54,30 @@ export function useResizeObserver(observe: HTMLElement | null) {
         {
           ...props,
           value: {
-            registerListener: (listener: () => void) =>
-              listenersRef.current.push(listener),
-            removeListener: (listener: () => void) => {
-              const index = listenersRef.current.findIndex(listener);
-
-              if (index !== -1) {
-                listenersRef.current.splice(index, 1);
+            registerListener: (listener, key) => {
+              if (key) {
+                listenersRef.current[key] = listener;
+              } else {
+                listenersRef.current[`_${idCounter}`] = listener;
+                idCounter++;
               }
             },
+            removeListener: (listener: () => void) => {
+              const pair = Object.entries(listenersRef.current).find(
+                // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                ([_, otherListener]) => otherListener === listener
+              );
+
+              if (pair !== undefined) {
+                delete listenersRef.current[pair[0]];
+              }
+            },
+            triggerResize,
           },
         },
         props.children
       ),
-    []
+    [triggerResize]
   );
 }
 
@@ -69,15 +86,19 @@ export function useResizeObserver(observe: HTMLElement | null) {
  * uses the hook useResizeObserver, then `listener` will only run when that
  * component resizes.
  */
-export function useOnResize(listener: () => void, observe?: HTMLElement) {
+export function useOnResize(
+  listener: () => void,
+  observe?: HTMLElement,
+  key?: string
+) {
   const context = useContext(ResizeManagerContext);
 
   const registerListener = context?.registerListener;
-  const removeListener = context?.registerListener;
+  const removeListener = context?.removeListener;
 
   useEffect(() => {
     if (registerListener && removeListener) {
-      registerListener(listener);
+      registerListener(listener, key);
 
       return () => removeListener(listener);
     }
@@ -95,5 +116,13 @@ export function useOnResize(listener: () => void, observe?: HTMLElement) {
         observer.disconnect();
       };
     }
-  }, [registerListener, removeListener, observe, listener]);
+  }, [registerListener, removeListener, observe, listener, key]);
+}
+
+export function useTriggerResize(key: string) {
+  const context = useContext(ResizeManagerContext);
+
+  const triggerResize = context?.triggerResize;
+
+  return useCallback(() => triggerResize?.(key), [key, triggerResize]);
 }
