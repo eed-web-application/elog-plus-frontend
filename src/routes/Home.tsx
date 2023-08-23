@@ -140,10 +140,15 @@ export default function Home() {
     document.removeEventListener("mouseup", endDrag);
   }, [mouseMoveHandler]);
 
-  const startDrag = useCallback(() => {
-    document.addEventListener("mousemove", mouseMoveHandler);
-    document.addEventListener("mouseup", endDrag);
-  }, [mouseMoveHandler, endDrag]);
+  const startDrag = useCallback(
+    (e: React.MouseEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
+      document.addEventListener("mousemove", mouseMoveHandler);
+      document.addEventListener("mouseup", endDrag);
+    },
+    [mouseMoveHandler, endDrag]
+  );
 
   return (
     <div className="h-screen flex flex-col">
@@ -197,7 +202,10 @@ export default function Home() {
                 onMouseDown={startDrag}
                 ref={gutterRef}
               >
-                <div className="absolute -left-3 w-6 h-full select-text" />
+                {/* We specifically want the handle/gutter to lean more right 
+                than left, because we don't want overlay it above the the scroll 
+                bar for the entry list */}
+                <div className="absolute -left-1 w-4 h-full select-text" />
               </div>
             )}
             <div
