@@ -164,6 +164,72 @@ const EntryListGrouped = forwardRef<HTMLDivElement, Props>(
 
     let currentGroup: JSX.Element[] = [];
 
+    let groups;
+
+    if (items.length > 1) {
+      groups = virtualItems.reduce<JSX.Element[]>((groups, virtualRow) => {
+        const entry = items[virtualRow.index];
+
+        if (headerIndices.includes(virtualRow.index)) {
+          if (currentGroup.length > 0) {
+            groups.push(
+              <div
+                key={currentGroup[0].key}
+                className="rounded-lg border mx-3 overflow-clip mt-3"
+              >
+                {currentGroup}
+              </div>
+            );
+          }
+
+          currentGroup = [
+            <EntryListHeader
+              data-index={virtualRow.index}
+              data-header
+              key={`header_${entry.id}`}
+              ref={virtualizer.measureElement}
+              className="sticky z-10"
+              style={{
+                top: `${-virtualItems[1].start + virtualItems[0].size}px`,
+              }}
+              logbooksIncluded={logbooksIncluded}
+              representative={entry}
+            />,
+          ];
+
+          return groups;
+        }
+
+        currentGroup.push(
+          <EntryRow
+            key={entry.id}
+            data-index={virtualRow.index}
+            data-last={headerIndices.includes(virtualRow.index + 1)}
+            ref={virtualizer.measureElement}
+            entry={entry}
+            className="pr-2"
+            highlighted={spotlight === entry.id}
+            selected={entry.id === selected}
+            dateBasedOn={dateBasedOn}
+            {...rest}
+          />
+        );
+
+        return groups;
+      }, []);
+
+      if (currentGroup.length > 1) {
+        groups.push(
+          <div
+            key={currentGroup[0].key}
+            className="rounded-lg border mx-3 overflow-clip mt-3"
+          >
+            {currentGroup}
+          </div>
+        );
+      }
+    }
+
     return (
       <Observer>
         <div
@@ -173,7 +239,7 @@ const EntryListGrouped = forwardRef<HTMLDivElement, Props>(
           )}
           ref={mergedRef}
         >
-          {items.length > 1 && (
+          {groups && (
             <>
               <div
                 style={{ height: `${virtualizer.getTotalSize()}px` }}
@@ -196,64 +262,7 @@ const EntryListGrouped = forwardRef<HTMLDivElement, Props>(
                     }px)`,
                   }}
                 >
-                  {virtualItems.reduce<JSX.Element[]>((groups, virtualRow) => {
-                    const entry = items[virtualRow.index];
-
-                    if (headerIndices.includes(virtualRow.index)) {
-                      if (currentGroup.length > 0) {
-                        groups.push(
-                          <div
-                            key={virtualRow.key}
-                            className="rounded-lg border mx-3 overflow-clip mt-3"
-                          >
-                            {currentGroup}
-                          </div>
-                        );
-                      }
-
-                      currentGroup = [
-                        <EntryListHeader
-                          data-index={virtualRow.index}
-                          data-header
-                          key={virtualRow.key}
-                          ref={virtualizer.measureElement}
-                          className="sticky z-10"
-                          style={{
-                            top: `${
-                              -virtualItems[1].start + virtualItems[0].size
-                            }px`,
-                          }}
-                          logbooksIncluded={logbooksIncluded}
-                          representative={entry}
-                        />,
-                      ];
-
-                      return groups;
-                    }
-
-                    currentGroup.push(
-                      <EntryRow
-                        key={virtualRow.key}
-                        data-index={virtualRow.index}
-                        data-last={headerIndices.includes(virtualRow.index + 1)}
-                        ref={virtualizer.measureElement}
-                        entry={entry}
-                        className="pr-2"
-                        highlighted={spotlight === entry.id}
-                        selected={entry.id === selected}
-                        dateBasedOn={dateBasedOn}
-                        {...rest}
-                      />
-                    );
-
-                    return groups;
-                  }, [])}
-
-                  {currentGroup.length > 1 && (
-                    <div className="rounded-lg border mx-3 overflow-clip mt-3">
-                      {currentGroup}
-                    </div>
-                  )}
+                  {groups}
                 </div>
               </div>
             </>
