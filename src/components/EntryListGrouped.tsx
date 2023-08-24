@@ -189,7 +189,7 @@ const EntryListGrouped = forwardRef<HTMLDivElement, Props>(
               data-header
               key={`header_${entry.id}`}
               ref={virtualizer.measureElement}
-              className="sticky z-10"
+              className="sticky z-20"
               style={{
                 top: `${-virtualItems[1].start + virtualItems[0].size}px`,
               }}
