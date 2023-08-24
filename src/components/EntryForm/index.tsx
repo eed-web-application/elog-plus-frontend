@@ -2,7 +2,6 @@ import { Suspense, lazy } from "react";
 import { twJoin, twMerge } from "tailwind-merge";
 import { useDropzone } from "react-dropzone";
 import { Link } from "react-router-dom";
-import DateTimePicker from "react-datetime-picker";
 import { Button, Checkbox, IconButton, Input, InputInvalid } from "../base";
 import EntryRow from "../EntryRow";
 import AttachmentCard from "../AttachmentCard";

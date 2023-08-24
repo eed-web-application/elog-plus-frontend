@@ -2,7 +2,6 @@ import DatetimePicker from "react-datetime-picker";
 import "react-calendar/dist/Calendar.css";
 import { ComponentPropsWithoutRef } from "react";
 import { twMerge } from "tailwind-merge";
-import { Input } from "./base";
 import "./DateTimeInput.css";
 
 export interface Props extends ComponentPropsWithoutRef<typeof DatetimePicker> {
