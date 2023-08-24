@@ -200,7 +200,7 @@ export default function useEntryBuilder({
 
       queryClient.invalidateQueries({ queryKey: ["entries"] });
       if (kind !== "newEntry") {
-        queryClient.invalidateQueries({ queryKey: ["entry", kind[1]] });
+        queryClient.invalidateQueries({ queryKey: ["entry", kind[1].id] });
       }
       if (newEntry.summarizes) {
         queryClient.setQueryData(
