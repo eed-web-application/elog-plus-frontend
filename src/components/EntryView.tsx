@@ -204,7 +204,7 @@ export default function EntryView({ entry }: Props) {
       )}
       {entry.referencedBy && entry.referencedBy.length > 0 && (
         <>
-          <TextDivider>Reference By</TextDivider>
+          <TextDivider>Referenced By</TextDivider>
           <div className="mt-3 px-3 pb-3">
             <EntryList
               entries={entry.referencedBy}
