@@ -2,6 +2,7 @@ import { Suspense, lazy } from "react";
 import { twJoin, twMerge } from "tailwind-merge";
 import { useDropzone } from "react-dropzone";
 import { Link } from "react-router-dom";
+import DateTimePicker from "react-datetime-picker";
 import { Button, Checkbox, IconButton, Input, InputInvalid } from "../base";
 import EntryRow from "../EntryRow";
 import AttachmentCard from "../AttachmentCard";
@@ -16,6 +17,7 @@ import LogbookForm from "./LogbookForm";
 import TagForm from "./TagForm";
 import ShiftSummaryForm from "./ShiftSummaryForm";
 import useEntryBuilder from "../../hooks/useEntryBuilder";
+import DateTimeInput from "../DateTimeInput";
 
 const EntryBodyTextEditor = lazy(() => import("../EntryBodyTextEditor"));
 
@@ -164,22 +166,17 @@ export default function EntryForm({ onEntrySaved, kind = "newEntry" }: Props) {
             />
             Explicit event time
           </label>
-          <input
-            type="datetime-local"
+          <DateTimeInput
             disabled={draft.eventAt === undefined}
-            step="1"
+            invalid={invalidFields.includes("eventAt")}
             value={draft.eventAt ? dateToDatetimeString(draft.eventAt) : ""}
-            onChange={(e) =>
+            onChange={(date) =>
               updateDraft({
                 ...draft,
-                eventAt: new Date(e.currentTarget.value),
+                eventAt: date,
               })
             }
-            className={twMerge(
-              Input,
-              invalidFields.includes("eventAt") && InputInvalid,
-              "block w-full mb-2"
-            )}
+            className="block w-full mb-2"
           />
           {kind === "newEntry" && (
             <ShiftSummaryForm
