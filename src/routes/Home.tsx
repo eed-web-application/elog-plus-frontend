@@ -188,6 +188,7 @@ export default function Home() {
           selected={location.pathname.split("/")[1]}
           isLoading={isLoading}
           logbooksIncluded={query.logbooks}
+          showReferences
           showFollowUps
           allowFavorite
           allowFollowUp

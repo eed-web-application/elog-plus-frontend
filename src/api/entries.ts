@@ -18,9 +18,12 @@ export interface EntrySummary {
   attachments: Attachment[];
   shifts: Shift[];
   followingUp?: string;
+  references: string[];
+  referencedBy: string[];
 }
 
-export interface Entry extends Omit<EntrySummary, "followingUp"> {
+export interface Entry
+  extends Omit<EntrySummary, "followingUp" | "referencedBy"> {
   supersedeBy: string;
   text: string;
   followUps: EntrySummary[];

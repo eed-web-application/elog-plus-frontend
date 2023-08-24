@@ -36,6 +36,7 @@ import useVariableTruncate from "../hooks/useVariableTruncate";
 import useTruncate from "../hooks/useTruncate";
 import useDisplayTags from "../hooks/useDisplayTags";
 import FavoriteButton from "./FavoriteButton";
+import TextDivider from "./TextDivider";
 
 const ATTACHMENTS_PREVIEW_MAX_WIDTH = 1 / 4;
 
@@ -250,12 +251,16 @@ function AttachmentList({
 }
 
 export interface Props extends ComponentProps<"div"> {
-  entry: Omit<EntrySummary, "followingUp"> & { followingUp?: unknown };
+  entry: Omit<EntrySummary, "followingUp" | "referencedBy"> & {
+    followingUp?: unknown;
+    referencedBy?: unknown[];
+  };
   containerClassName?: string;
   className?: string;
   highlighted?: boolean;
   selected?: boolean;
   showFollowUps?: boolean;
+  showReferences?: boolean;
   expandedByDefault?: boolean;
   showDate?: boolean;
   dateBasedOn?: "eventAt" | "loggedAt";
@@ -279,6 +284,7 @@ const EntryRow = forwardRef<HTMLDivElement, PropsWithChildren<Props>>(
       highlighted,
       selected,
       showFollowUps,
+      showReferences,
       expandedByDefault,
       showDate,
       dateBasedOn = "eventAt",
@@ -311,8 +317,65 @@ const EntryRow = forwardRef<HTMLDivElement, PropsWithChildren<Props>>(
 
     const triggerResize = useTriggerResize(entry.id);
 
+    let referenceIcon;
+
+    if (
+      entry.referencedBy &&
+      entry.referencedBy?.length > 0 &&
+      entry.references?.length > 0
+    ) {
+      referenceIcon = (
+        // https://remixicon.com/icon/arrow-left-right-line
+        <Tooltip label="Referenced by and references other entries">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="currentColor"
+            className="w-4 h-4 inline text-gray-500 mr-1 relative z-10"
+          >
+            <path d="M16.0503 12.0498L21 16.9996L16.0503 21.9493L14.636 20.5351L17.172 17.9988L4 17.9996V15.9996L17.172 15.9988L14.636 13.464L16.0503 12.0498ZM7.94975 2.0498L9.36396 3.46402L6.828 5.9988L20 5.99955V7.99955L6.828 7.9988L9.36396 10.5351L7.94975 11.9493L3 6.99955L7.94975 2.0498Z" />
+          </svg>
+        </Tooltip>
+      );
+    } else if (entry.referencedBy && entry.referencedBy?.length > 0) {
+      referenceIcon = (
+        <Tooltip label="Referenced by other entries">
+          {/* https://remixicon.com/icon/arrow-go-back-line */}
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="currentColor"
+            className="w-4 h-4 inline text-gray-500 mr-1 relative z-10"
+          >
+            <path d="M10.0003 5.00014L19.0002 5L19.0002 7L12.0003 7.00011L12.0002 17.1719L15.9499 13.2222L17.3642 14.6364L11.0002 21.0004L4.63623 14.6364L6.05044 13.2222L10.0002 17.172L10.0003 5.00014Z" />
+          </svg>
+        </Tooltip>
+      );
+    } else if (entry.references?.length > 0) {
+      referenceIcon = (
+        <Tooltip label="References other entries">
+          {/* https://remixicon.com/icon/corner-up-left-line */}
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="currentColor"
+            className="w-4 h-4 inline text-gray-500 mr-1 relative z-10"
+          >
+            <path d="M19.0003 10.0003L19.0004 19.0002L17.0004 19.0002L17.0003 12.0003L6.82845 12.0002L10.7782 15.9499L9.36396 17.3642L3 11.0002L9.36396 4.63623L10.7782 6.05044L6.8284 10.0002L19.0003 10.0003Z" />
+          </svg>
+        </Tooltip>
+      );
+    }
+
     return (
-      <div ref={ref} className={containerClassName} {...rest}>
+      <div
+        ref={ref}
+        className={twMerge(
+          containerClassName,
+          expanded && fullEntry && "border-b"
+        )}
+        {...rest}
+      >
         <div
           ref={rowRef}
           onMouseEnter={triggerResize}
@@ -352,6 +415,7 @@ const EntryRow = forwardRef<HTMLDivElement, PropsWithChildren<Props>>(
               // see https://inclusive-components.design/cards/
               className="truncate leading-[1.2] after:absolute after:left-0 after:right-0 after:bottom-0 after:top-0"
             >
+              {referenceIcon}
               {Boolean(entry.followingUp) && (
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -503,17 +567,38 @@ const EntryRow = forwardRef<HTMLDivElement, PropsWithChildren<Props>>(
               <EntryFigureList attachments={fullEntry.attachments} />
             </div>
             {showFollowUps && fullEntry.followUps.length > 0 && (
-              <div className="ml-6 pt-2 pr-2">
-                <EntryList
-                  entries={fullEntry.followUps}
-                  showDate
-                  showFollowUps={showFollowUps}
-                  allowFollowUp={allowFollowUp}
-                  allowSupersede={allowSupersede}
-                  allowSpotlight={allowSpotlightForFollowUps}
-                />
-              </div>
+              <>
+                <div className="ml-6 pt-2 pr-2">
+                  <EntryList
+                    entries={fullEntry.followUps}
+                    showDate
+                    showFollowUps
+                    showReferences={showReferences}
+                    allowFollowUp={allowFollowUp}
+                    allowSupersede={allowSupersede}
+                    allowSpotlight={allowSpotlightForFollowUps}
+                  />
+                </div>
+              </>
             )}
+            {showReferences &&
+              fullEntry.referencedBy &&
+              fullEntry.referencedBy.length > 0 && (
+                <>
+                  <TextDivider>Referenced By</TextDivider>
+                  <div className="ml-6 pt-2 pr-2">
+                    <EntryList
+                      entries={fullEntry.referencedBy}
+                      showDate
+                      showFollowUps={showFollowUps}
+                      showReferences
+                      allowFollowUp={allowFollowUp}
+                      allowSupersede={allowSupersede}
+                      allowSpotlight={allowSpotlightForFollowUps}
+                    />
+                  </div>
+                </>
+              )}
           </>
         )}
       </div>

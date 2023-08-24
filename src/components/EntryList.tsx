@@ -8,6 +8,7 @@ export interface Props
   extends Pick<
     EntryRowProps,
     | "showFollowUps"
+    | "showReferences"
     | "expandedByDefault"
     | "showDate"
     | "allowFavorite"
