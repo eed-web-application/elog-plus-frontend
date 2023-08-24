@@ -87,6 +87,7 @@ const EntryListGrouped = forwardRef<HTMLDivElement, Props>(
       count: items.length,
       getScrollElement: () => parentRef.current,
       estimateSize: useCallback(() => 50, []),
+      overscan: 25,
       measureElement(el) {
         // This extra space accounts for the margin between entry groups.
         // It is put on the last entry of the group, because once the last entry
