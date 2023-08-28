@@ -1,0 +1,16 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: elog-plus-frontend-ingress
+spec:
+  rules:
+    - host: accel-webapp-dev
+      http:
+        paths:
+          - pathType: Prefix
+            path: /
+            backend:
+              service:
+                name: elog-plus-frontend-service
+                port:
+                  number: 80

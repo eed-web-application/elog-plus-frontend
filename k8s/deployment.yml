@@ -1,0 +1,17 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: elog-plus-frontend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: elog-plus-frontend
+  template:
+    metadata:
+      labels:
+        app: elog-plus-frontend
+    spec:
+      containers:
+        - name: elog-plus-frontend
+          image: ghcr.io/eed-web-application/elog-plus-frontend:sha-b698fef
