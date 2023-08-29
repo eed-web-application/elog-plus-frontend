@@ -1,6 +1,7 @@
 import { twMerge } from "tailwind-merge";
 import DOMPurify from "dompurify";
 import { ComponentProps } from "react";
+import { useNavigate } from "react-router-dom";
 
 interface Props extends ComponentProps<"div"> {
   body: string;
@@ -16,8 +17,30 @@ export default function EntryBodyText({
   showEmptyLabel,
   ...rest
 }: Props) {
+  const navigate = useNavigate();
+
+  function clickHandler(e: React.MouseEvent<HTMLDivElement>) {
+    if (!e.target) {
+      return;
+    }
+
+    const targetLink = (e.target as HTMLElement).closest("a");
+    if (!targetLink) {
+      return;
+    }
+
+    if (targetLink.host !== window.location.host) {
+      return;
+    }
+
+    e.preventDefault();
+
+    navigate(targetLink.pathname);
+  }
+
   return (
     <div
+      onClick={clickHandler}
       className={twMerge(
         "prose max-w-none overflow-x-auto",
         !body && "text-gray-500",
