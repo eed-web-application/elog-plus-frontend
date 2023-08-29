@@ -191,7 +191,9 @@ const EntryListGrouped = forwardRef<HTMLDivElement, Props>(
               ref={virtualizer.measureElement}
               className="sticky z-20"
               style={{
-                top: `${-virtualItems[1].start + virtualItems[0].size}px`,
+                top: `${Math.floor(
+                  -virtualItems[1].start + virtualItems[0].size
+                )}px`,
               }}
               logbooksIncluded={logbooksIncluded}
               representative={entry}
