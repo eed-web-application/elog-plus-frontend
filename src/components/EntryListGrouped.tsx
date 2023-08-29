@@ -86,7 +86,7 @@ const EntryListGrouped = forwardRef<HTMLDivElement, Props>(
     const virtualizer = useVirtualizer({
       count: items.length,
       getScrollElement: () => parentRef.current,
-      estimateSize: useCallback(() => 50, []),
+      estimateSize: useCallback(() => 48, []),
       overscan: 25,
       measureElement(el) {
         // This extra space accounts for the margin between entry groups.
