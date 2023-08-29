@@ -35,7 +35,7 @@ export interface Props extends EntryListProps {
  * Customizable entry list grouped by header types
  */
 const EntryListGrouped = forwardRef<HTMLDivElement, Props>(
-  (
+  function EntryListGrouped(
     {
       entries,
       containerClassName,
@@ -51,7 +51,7 @@ const EntryListGrouped = forwardRef<HTMLDivElement, Props>(
       ...rest
     },
     ref
-  ) => {
+  ) {
     const [prevSpotlight, setPrevSpotlight] = useState<string | null>(null);
     const parentRef = useRef<HTMLDivElement | null>(null);
     const Observer = useResizeObserver(parentRef.current);
