@@ -1,10 +1,10 @@
 import {
   PropsWithChildren,
   createContext,
-  createElement,
   useCallback,
   useContext,
   useEffect,
+  useMemo,
   useRef,
 } from "react";
 
@@ -47,37 +47,36 @@ export function useResizeObserver(observe: HTMLElement | null) {
     };
   }, [onResize, observe]);
 
-  return useCallback(
-    (props: PropsWithChildren<unknown>) =>
-      createElement(
-        ResizeManagerContext.Provider,
-        {
-          ...props,
-          value: {
-            registerListener: (listener, key) => {
-              if (key) {
-                listenersRef.current[key] = listener;
-              } else {
-                listenersRef.current[`_${idCounter}`] = listener;
-                idCounter++;
-              }
-            },
-            removeListener: (listener: () => void) => {
-              const pair = Object.entries(listenersRef.current).find(
-                // eslint-disable-next-line @typescript-eslint/no-unused-vars
-                ([_, otherListener]) => otherListener === listener
-              );
+  const value = useMemo<Context>(
+    () => ({
+      registerListener: (listener, key) => {
+        if (key) {
+          listenersRef.current[key] = listener;
+        } else {
+          listenersRef.current[`_${idCounter}`] = listener;
+          idCounter++;
+        }
+      },
+      removeListener: (listener: () => void) => {
+        const pair = Object.entries(listenersRef.current).find(
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+          ([_, otherListener]) => otherListener === listener
+        );
 
-              if (pair !== undefined) {
-                delete listenersRef.current[pair[0]];
-              }
-            },
-            triggerResize,
-          },
-        },
-        props.children
-      ),
+        if (pair !== undefined) {
+          delete listenersRef.current[pair[0]];
+        }
+      },
+      triggerResize,
+    }),
     [triggerResize]
+  );
+
+  return useCallback(
+    (props: PropsWithChildren<unknown>) => (
+      <ResizeManagerContext.Provider {...props} value={value} />
+    ),
+    [value]
   );
 }
 
