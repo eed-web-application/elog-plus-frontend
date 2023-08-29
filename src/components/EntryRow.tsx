@@ -273,7 +273,7 @@ export interface Props extends ComponentProps<"div"> {
  * spotlight) and expanding to see the body content and follows ups.
  */
 const EntryRow = forwardRef<HTMLDivElement, PropsWithChildren<Props>>(
-  (
+  function EntryRow(
     {
       entry,
       containerClassName,
@@ -293,7 +293,7 @@ const EntryRow = forwardRef<HTMLDivElement, PropsWithChildren<Props>>(
       ...rest
     },
     ref
-  ) => {
+  ) {
     const rowRef = useRef<HTMLDivElement>(null);
     const [expanded, setExpanded] = useState(Boolean(expandedByDefault));
     const fullEntry = useEntry(expanded ? entry.id : undefined, {
@@ -301,11 +301,11 @@ const EntryRow = forwardRef<HTMLDivElement, PropsWithChildren<Props>>(
       onError: () => setExpanded(false),
     });
 
-    const [hasFollowUpDraft, hasSupersedingDraft] = useDraftsStore(
-      ({ drafts }) => [
-        Boolean(drafts[`followUp/${entry.id}`]),
-        Boolean(drafts[`supersede/${entry.id}`]),
-      ]
+    const hasFollowUpDraft = useDraftsStore((state) =>
+      Boolean(state.drafts[`followUp/${entry.id}`])
+    );
+    const hasSupersedingDraft = useDraftsStore((state) =>
+      Boolean(state.drafts[`supersede/${entry.id}`])
     );
 
     const spotlightProps = useSpotlightProps(entry.id);
