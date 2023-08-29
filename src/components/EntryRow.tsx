@@ -7,6 +7,7 @@ import {
   forwardRef,
   ComponentProps,
   RefObject,
+  memo,
 } from "react";
 import { Link, LinkProps } from "react-router-dom";
 import {
@@ -272,8 +273,8 @@ export interface Props extends ComponentProps<"div"> {
  * Horizontal summary of an entry supporting actions (such as follow up or
  * spotlight) and expanding to see the body content and follows ups.
  */
-const EntryRow = forwardRef<HTMLDivElement, PropsWithChildren<Props>>(
-  function EntryRow(
+const EntryRow = memo(
+  forwardRef<HTMLDivElement, PropsWithChildren<Props>>(function EntryRow(
     {
       entry,
       containerClassName,
@@ -600,7 +601,7 @@ const EntryRow = forwardRef<HTMLDivElement, PropsWithChildren<Props>>(
         )}
       </div>
     );
-  }
+  })
 );
 
 export default EntryRow;
