@@ -1,10 +1,10 @@
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
-import { EntrySummary } from "./api";
+import { Entry } from "./api";
 
 interface TagUsageState {
   favorites: Set<string>;
-  filter(entries: EntrySummary[]): EntrySummary[];
+  filter(entries: Entry[]): Entry[];
   toggleFavorite(entryId: string): void;
 }
 

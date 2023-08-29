@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
-import { Attachment, Entry, EntryNew } from "./api";
+import { Attachment, EntryFull, EntryNew } from "./api";
 
 /**
  * Attachment that has been uploaded to the server, but we don't have all its
@@ -36,8 +36,8 @@ export type DraftId = "newEntry" | `supersede/${string}` | `followUp/${string}`;
  */
 export type DraftFactory =
   | "newEntry"
-  | ["followingUp", Entry]
-  | ["superseding", Entry];
+  | ["followingUp", EntryFull]
+  | ["superseding", EntryFull];
 
 interface DraftsState {
   drafts: Partial<Record<DraftId, Draft>>;

@@ -1,5 +1,5 @@
 import { twJoin, twMerge } from "tailwind-merge";
-import { Entry } from "../api";
+import { EntryFull } from "../api";
 import { Link } from "react-router-dom";
 import { Button, IconButton } from "./base";
 import EntryList from "./EntryList";
@@ -15,7 +15,7 @@ import FavoriteButton from "./FavoriteButton";
 import useReferences from "../hooks/useReferences";
 
 export interface Props {
-  entry: Entry;
+  entry: EntryFull;
 }
 
 // Detailed view of an entry with acitons such as supersede and follow up.

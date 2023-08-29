@@ -7,7 +7,7 @@ import {
   fetch,
 } from ".";
 
-export interface EntrySummary {
+interface EntrySummary {
   id: string;
   logbooks: LogbookSummary[];
   tags: Tag[];
@@ -22,16 +22,18 @@ export interface EntrySummary {
   referencedBy: string[];
 }
 
-export interface Entry
+export interface EntryFull
   extends Omit<EntrySummary, "followingUp" | "referencedBy"> {
   supersedeBy: string;
   text: string;
-  followUps: EntrySummary[];
-  history?: EntrySummary[];
-  followingUp?: EntrySummary;
-  referencedBy?: EntrySummary[];
+  followUps: Entry[];
+  history?: Entry[];
+  followingUp?: Entry;
+  referencedBy?: Entry[];
   referencesInBody: boolean;
 }
+
+export type Entry = EntrySummary | EntryFull;
 
 export interface EntryNew {
   title: string;
@@ -46,7 +48,7 @@ export interface EntryNew {
   };
 }
 
-function normalizeEntry<E extends Entry | EntrySummary>(entry: E): E {
+function normalizeEntry<E extends Entry>(entry: E): E {
   // Java is weird and doesn't add the Z at the end of its dates, so this is
   // what we gotta do
   entry.loggedAt = new Date(entry.loggedAt + "Z");
@@ -135,17 +137,17 @@ export async function fetchEntries({
   return data.map(normalizeEntry);
 }
 
-export async function fetchEntry(id: string): Promise<Entry> {
-  const data = await fetch(`v1/entries/${id}`, {
+export async function fetchEntry(id: string): Promise<EntryFull> {
+  const data = (await fetch(`v1/entries/${id}`, {
     params: {
       includeFollowUps: "true",
       includeHistory: "true",
       includeFollowingUps: "true",
       includeReferencedBy: "true",
     },
-  });
+  })) as EntryFull;
 
-  const entry: Entry = normalizeEntry(data);
+  const entry = normalizeEntry(data);
   return entry;
 }
 

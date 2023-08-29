@@ -21,7 +21,7 @@ import {
   useRole,
 } from "@floating-ui/react";
 import { IconButton } from "./base";
-import { Attachment, EntrySummary } from "../api";
+import { Attachment, Entry } from "../api";
 import EntryList from "./EntryList";
 import Chip from "./Chip";
 import EntryBodyText from "./EntryBodyText";
@@ -251,10 +251,7 @@ function AttachmentList({
 }
 
 export interface Props extends ComponentProps<"div"> {
-  entry: Omit<EntrySummary, "followingUp" | "referencedBy"> & {
-    followingUp?: unknown;
-    referencedBy?: unknown[];
-  };
+  entry: Entry;
   containerClassName?: string;
   className?: string;
   highlighted?: boolean;
