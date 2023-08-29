@@ -14,10 +14,10 @@ export default function useTags({
   logbooks?: LogbookSummary[];
   enabled?: boolean;
 }) {
-  const [bumpTag, sortTagsByMostRecent] = useTagUsageStore((state) => [
-    state.bump,
-    state.sortByMostRecent,
-  ]);
+  const bumpTag = useTagUsageStore((state) => state.bump);
+  const sortTagsByMostRecent = useTagUsageStore(
+    (state) => state.sortByMostRecent
+  );
 
   const { data, isLoading } = useQuery({
     queryKey: ["tags", logbooks],
