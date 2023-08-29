@@ -13,12 +13,10 @@ export default function FavoriteButton({
   entryId: string;
   favoriteIconClassName?: string;
 } & ComponentProps<"svg">) {
-  const { isFavorited, toggleFavorite } = useFavoritesStore(
-    ({ favorites, toggleFavorite }) => ({
-      isFavorited: favorites.has(entryId),
-      toggleFavorite,
-    })
+  const isFavorited = useFavoritesStore((state) =>
+    state.favorites.has(entryId)
   );
+  const toggleFavorite = useFavoritesStore((state) => state.toggleFavorite);
 
   return (
     <Tooltip label={isFavorited ? "Unfavorite" : "Favorite"}>
