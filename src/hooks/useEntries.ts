@@ -123,11 +123,11 @@ export default function useEntries({ spotlight, query }: Params) {
     useErrorBoundary: true,
   });
 
+  const entries = useMemo(() => data?.pages.flat(), [data?.pages]);
+
   if (query.onlyFavorites) {
     return favoriteEntriesQuery;
   }
-
-  const entries = useMemo(() => data?.pages.flat(), [data?.pages]);
 
   return {
     entries,
