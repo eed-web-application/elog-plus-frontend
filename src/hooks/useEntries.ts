@@ -1,6 +1,7 @@
 import { useInfiniteQuery, useQueries } from "@tanstack/react-query";
 import { Entry, fetchEntries, fetchEntry } from "../api";
 import { useFavoritesStore } from "../favoritesStore";
+import { useMemo } from "react";
 
 const CONTEXT_SIZE = 6;
 const ENTRIES_PER_PAGE = 25;
@@ -126,8 +127,10 @@ export default function useEntries({ spotlight, query }: Params) {
     return favoriteEntriesQuery;
   }
 
+  const entries = useMemo(() => data?.pages.flat(), [data?.pages]);
+
   return {
-    entries: data?.pages.flat(),
+    entries,
     isLoading: isLoading || isFetchingNextPage,
     getMoreEntries: fetchNextPage,
     reachedBottom: !hasNextPage && !isInitialLoading,
