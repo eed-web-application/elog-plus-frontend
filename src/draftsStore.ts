@@ -6,9 +6,9 @@ import { Attachment, EntryFull, EntryNew } from "./api";
  * Attachment that has been uploaded to the server, but we don't have all its
  * properties (mostly because it was just uploaded).
  */
-export type LocalUploadedAttachment = Omit<
+export type LocalUploadedAttachment = Pick<
   Attachment,
-  "previewState" | "miniPreview"
+  "id" | "fileName" | "contentType"
 >;
 
 /**

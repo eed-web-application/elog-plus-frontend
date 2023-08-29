@@ -4,11 +4,10 @@ import { ServerError, uploadAttachment } from "../api";
 import reportServerError from "../reportServerError";
 
 /**
- * Attachment that hasn't been uploaded to the server yet (basically a file)
+ * Attachment that may or may not have been uploaded to the server yet (basically a file)
  */
-export type LocalAttachment = {
-  id?: string;
-} & Omit<LocalUploadedAttachment, "id">;
+export type LocalAttachment = Omit<LocalUploadedAttachment, "id"> &
+  Partial<Pick<LocalUploadedAttachment, "id">>;
 
 export default function useAttachmentUploader() {
   const [uploading, setUploading] = useState<Record<string, LocalAttachment>>(
