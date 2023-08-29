@@ -379,7 +379,7 @@ const EntryRow = memo(
           onMouseEnter={triggerResize}
           onMouseLeave={triggerResize}
           className={twMerge(
-            "flex items-center group cursor-pointer relative hover:bg-gray-50",
+            "flex items-center group cursor-pointer relative h-12 hover:bg-gray-50",
             selected && "bg-blue-50",
             selected && "hover:bg-blue-100",
             highlighted && "bg-yellow-100",
