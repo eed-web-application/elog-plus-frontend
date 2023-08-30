@@ -6,7 +6,7 @@ import { useMemo } from "react";
 const CONTEXT_SIZE = 6;
 const ENTRIES_PER_PAGE = 25;
 
-export interface EntryQuery {
+export type EntryQuery = {
   search: string;
   logbooks: string[];
   tags: string[];
@@ -15,7 +15,7 @@ export interface EntryQuery {
   endDate: Date | null;
   sortByLogDate: boolean;
   onlyFavorites: boolean;
-}
+};
 
 export interface Params extends Partial<EntryQuery> {
   spotlight?: string;
@@ -93,6 +93,8 @@ export default function useEntries({ spotlight, query }: Params) {
     queryFn: async ({ pageParam, queryKey }) => {
       const query = queryKey[1] as EntryQuery;
       const spotlight = queryKey[2];
+
+      console.log(query);
 
       const entries = await fetchEntries({
         ...query,

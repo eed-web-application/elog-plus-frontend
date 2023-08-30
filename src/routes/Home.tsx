@@ -11,9 +11,9 @@ import Navbar from "../components/Navbar";
 import useEntries from "../hooks/useEntries";
 import useIsSmallScreen from "../hooks/useIsSmallScreen";
 import { EntryQuery } from "../hooks/useEntries";
-import { URLSearchParamsInit } from "react-router-dom";
 import InfoDialogButton from "../components/InfoDialogButton";
 import EntryListGrouped from "../components/EntryListGrouped";
+import serializeParams, { ParamsObject } from "../utils/serializeParams";
 
 const DEFAULT_QUERY: EntryQuery = {
   logbooks: [],
@@ -44,20 +44,6 @@ function deserializeQuery(params: URLSearchParams): EntryQuery {
   };
 }
 
-function serializeQuery(query: EntryQuery): URLSearchParamsInit {
-  return (
-    Object.entries(query)
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      .filter(([_, value]) =>
-        Array.isArray(value) ? value.length > 0 : Boolean(value)
-      )
-      .map(([key, value]) => [
-        key,
-        value instanceof Date ? value.toISOString() : value,
-      ]) as [string, string][]
-  );
-}
-
 export default function Home() {
   const isSmallScreen = useIsSmallScreen();
   const bodyRef = useRef<HTMLDivElement>(null);
@@ -75,7 +61,7 @@ export default function Home() {
 
   const setQuery = useCallback(
     (query: EntryQuery, preserveState = false) => {
-      setSearchParams(serializeQuery(query), {
+      setSearchParams(serializeParams(query as ParamsObject), {
         replace: true,
         state: preserveState ? location.state : undefined,
       });

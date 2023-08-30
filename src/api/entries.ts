@@ -6,6 +6,7 @@ import {
   Tag,
   fetch,
 } from ".";
+import serializeParams, { ParamsObject } from "../utils/serializeParams";
 
 interface EntrySummary {
   id: string;
@@ -74,19 +75,7 @@ function normalizeEntry<E extends Entry>(entry: E): E {
   return entry;
 }
 
-export async function fetchEntries({
-  startDate,
-  endDate,
-  limit,
-  contextSize,
-  search,
-  sortByLogDate = false,
-  logbooks = [],
-  tags = [],
-  requireAllTags,
-  anchorId,
-  hideSummaries,
-}: {
+export type EntriesQuery = {
   startDate?: Date;
   endDate?: Date;
   limit?: number;
@@ -98,42 +87,30 @@ export async function fetchEntries({
   requireAllTags?: boolean;
   anchorId?: string;
   hideSummaries?: boolean;
-}): Promise<EntrySummary[]> {
-  // await new Promise((res) => setTimeout(res, 1000));
-  const params: Record<string, string> = {
-    logbooks: logbooks.join(","),
-    tags: tags.join(","),
-  };
+};
 
-  if (startDate) {
-    params.startDate = startDate.toISOString().slice(0, -1);
+export async function fetchEntries(
+  query: EntriesQuery
+): Promise<EntrySummary[]> {
+  console.log(query);
+  const params: ParamsObject = Object.assign(
+    {
+      sortByLogDate: false,
+      logbooks: [],
+      tags: [],
+    },
+    query
+  );
+
+  // Remove Z (see normalizeEntry function)
+  if (query.startDate) {
+    params.startDate = query.startDate.toISOString().slice(0, -1);
   }
-  if (endDate) {
-    params.endDate = endDate.toISOString().slice(0, -1);
-  }
-  if (limit) {
-    params.limit = limit.toString();
-  }
-  if (contextSize) {
-    params.contextSize = contextSize.toString();
-  }
-  if (search) {
-    params.search = search;
-  }
-  if (sortByLogDate) {
-    params.sortByLogDate = "true";
-  }
-  if (anchorId) {
-    params.anchorId = anchorId;
-  }
-  if (hideSummaries) {
-    params.hideSummaries = "true";
-  }
-  if (requireAllTags) {
-    params.requireAllTags = "true";
+  if (query.endDate) {
+    params.endDate = query.endDate.toISOString().slice(0, -1);
   }
 
-  const data = await fetch("v1/entries", { params });
+  const data = await fetch("v1/entries", { params: serializeParams(params) });
   return data.map(normalizeEntry);
 }
 
