@@ -11,13 +11,13 @@ const commitHash = child.execSync("git rev-parse --short HEAD").toString();
 export default defineConfig({
   server: {
     proxy: {
-      "/api": {
+      "/api/elog": {
         target: "http://localhost:8080",
         // target: "http://eed-fpga/api/elogs",
         changeOrigin: true,
         secure: false,
         ws: true,
-        rewrite: (path) => path.replace(/^\/api/, ""),
+        rewrite: (path) => path.replace(/^\/api\/elog/, ""),
       },
     },
   },
