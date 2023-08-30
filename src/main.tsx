@@ -44,50 +44,53 @@ function shouldRevalidate({
   return currentParams.entryId !== nextParams.entryId;
 }
 
-const router = createBrowserRouter([
-  {
-    errorElement: <ErrorBoundary />,
-    children: [
-      {
-        path: "/admin",
-        element: <Admin />,
-      },
-      {
-        path: "/admin/:logbookId",
-        element: <Admin />,
-      },
-      {
-        path: "/",
-        element: <Home />,
-        errorElement: <ErrorBoundary />,
-        children: [
-          {
-            path: ":entryId/supersede",
-            loader: entryLoader,
-            shouldRevalidate,
-            element: <Supersede />,
-          },
-          {
-            path: ":entryId/follow-up",
-            loader: entryLoader,
-            shouldRevalidate,
-            element: <FollowUp />,
-          },
-          {
-            path: ":entryId",
-            loader: entryLoader,
-            shouldRevalidate,
-            element: <ViewEntry />,
-          },
-          {
-            path: "new-entry",
-            element: <NewEntry />,
-          },
-        ],
-      },
-    ],
-  },
-]);
+const router = createBrowserRouter(
+  [
+    {
+      errorElement: <ErrorBoundary />,
+      children: [
+        {
+          path: "/admin",
+          element: <Admin />,
+        },
+        {
+          path: "/admin/:logbookId",
+          element: <Admin />,
+        },
+        {
+          path: "/",
+          element: <Home />,
+          errorElement: <ErrorBoundary />,
+          children: [
+            {
+              path: ":entryId/supersede",
+              loader: entryLoader,
+              shouldRevalidate,
+              element: <Supersede />,
+            },
+            {
+              path: ":entryId/follow-up",
+              loader: entryLoader,
+              shouldRevalidate,
+              element: <FollowUp />,
+            },
+            {
+              path: ":entryId",
+              loader: entryLoader,
+              shouldRevalidate,
+              element: <ViewEntry />,
+            },
+            {
+              path: "new-entry",
+              element: <NewEntry />,
+            },
+          ],
+        },
+      ],
+    },
+  ],
+  { basename: "/elog/" }
+);
 
 window.addEventListener("unhandledrejection", (e) => {
   if (e.reason instanceof ServerError) {
