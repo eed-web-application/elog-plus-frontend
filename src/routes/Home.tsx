@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   useLocation,
   useNavigate,
@@ -14,6 +14,7 @@ import { EntryQuery } from "../hooks/useEntries";
 import InfoDialogButton from "../components/InfoDialogButton";
 import EntryListGrouped from "../components/EntryListGrouped";
 import serializeParams, { ParamsObject } from "../utils/serializeParams";
+import SideSheet from "../components/SideSheet";
 
 const DEFAULT_QUERY: EntryQuery = {
   logbooks: [],
@@ -25,8 +26,6 @@ const DEFAULT_QUERY: EntryQuery = {
   sortByLogDate: false,
   onlyFavorites: false,
 };
-
-const MIN_PANE_WIDTH = 384;
 
 function deserializeQuery(params: URLSearchParams): EntryQuery {
   const startDate = params.get("startDate");
@@ -46,8 +45,6 @@ function deserializeQuery(params: URLSearchParams): EntryQuery {
 
 export default function Home() {
   const isSmallScreen = useIsSmallScreen();
-  const bodyRef = useRef<HTMLDivElement>(null);
-  const gutterRef = useRef<HTMLDivElement>(null);
   const [searchParams, setSearchParams] = useSearchParams();
   // Although the spotlight state in stored in the location state,
   // this is used if the spotlighted entry is not loaded and thus needs to be
@@ -109,6 +106,7 @@ export default function Home() {
     if (query.logbooks.join(",") !== filters.logbooks.join(",")) {
       filters.tags = [];
     }
+
     setQuery({ ...query, ...filters });
   }
 
@@ -117,29 +115,6 @@ export default function Home() {
   }
 
   const outlet = useOutlet();
-
-  const mouseMoveHandler = useCallback((e: MouseEvent) => {
-    if (bodyRef.current && gutterRef.current) {
-      const gutterRect = gutterRef.current.getBoundingClientRect();
-      bodyRef.current.style.flexBasis =
-        Math.max(e.clientX - gutterRect.width / 2, MIN_PANE_WIDTH) + "px";
-    }
-  }, []);
-
-  const endDrag = useCallback(() => {
-    document.removeEventListener("mousemove", mouseMoveHandler);
-    document.removeEventListener("mouseup", endDrag);
-  }, [mouseMoveHandler]);
-
-  const startDrag = useCallback(
-    (e: React.MouseEvent) => {
-      e.preventDefault();
-      e.stopPropagation();
-      document.addEventListener("mousemove", mouseMoveHandler);
-      document.addEventListener("mouseup", endDrag);
-    },
-    [mouseMoveHandler, endDrag]
-  );
 
   return (
     <div className="h-screen flex flex-col">
@@ -162,13 +137,9 @@ export default function Home() {
         </div>
       </div>
 
-      <div className="flex-1 flex overflow-hidden">
+      <SideSheet sheetBody={outlet}>
         <EntryListGrouped
-          containerClassName={twJoin(
-            "w-1/2",
-            (!outlet || isSmallScreen) && "flex-1"
-          )}
-          ref={bodyRef}
+          containerClassName="min-w-[384px] flex-1"
           entries={entries || []}
           emptyLabel="No entries found"
           selected={location.pathname.split("/")[1]}
@@ -186,32 +157,7 @@ export default function Home() {
           showBackToTopButton={Boolean(spotlightSearch)}
           onBackToTop={backToTop}
         />
-        {outlet && (
-          <>
-            {!isSmallScreen && (
-              <div
-                className="relative border-r cursor-col-resize select-text"
-                onMouseDown={startDrag}
-                ref={gutterRef}
-              >
-                {/* We specifically want the handle/gutter to lean more right 
-                than left, because we don't want overlay it above the the scroll 
-                bar for the entry list */}
-                <div className="absolute -left-1 w-4 h-full select-text" />
-              </div>
-            )}
-            <div
-              className={twJoin(
-                "overflow-y-auto pb-3",
-                !isSmallScreen && "flex-1 flex-shrink"
-              )}
-              style={{ minWidth: isSmallScreen ? "auto" : MIN_PANE_WIDTH }}
-            >
-              {outlet}
-            </div>
-          </>
-        )}
-      </div>
+      </SideSheet>
     </div>
   );
 }

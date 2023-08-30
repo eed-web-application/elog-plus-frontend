@@ -1,6 +1,5 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import EntryForm from "../components/EntryForm";
-import Pane from "../components/Pane";
 import { useDraftsStore } from "../draftsStore";
 import { useEffect } from "react";
 import { toast } from "react-toastify";
@@ -18,14 +17,12 @@ export default function NewEntry() {
   const navigate = useNavigate();
 
   return (
-    <Pane>
-      <EntryForm
-        kind="newEntry"
-        onEntrySaved={(entryId) => {
-          toast.success("Created entry", { autoClose: 1000 });
-          navigate({ pathname: `/${entryId}`, search: window.location.search });
-        }}
-      />
-    </Pane>
+    <EntryForm
+      kind="newEntry"
+      onEntrySaved={(entryId) => {
+        toast.success("Created entry", { autoClose: 1000 });
+        navigate({ pathname: `/${entryId}`, search: window.location.search });
+      }}
+    />
   );
 }

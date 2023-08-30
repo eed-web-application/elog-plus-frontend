@@ -1,5 +1,5 @@
 import { twJoin } from "tailwind-merge";
-import { PropsWithChildren, useState } from "react";
+import { ComponentProps, forwardRef, useState } from "react";
 import { Link, To, useNavigate } from "react-router-dom";
 import { BackDrop, IconButton, Modal } from "./base";
 import IsPaneFullscreenContext from "../IsPaneFullscreenContext";
@@ -10,24 +10,30 @@ import {
   useDismiss,
   useFloating,
   useInteractions,
+  useMergeRefs,
   useRole,
 } from "@floating-ui/react";
 import useIsSmallScreen from "../hooks/useIsSmallScreen";
 
-type Props = {
+export interface Props extends ComponentProps<"div"> {
   fullscreenByDefault?: boolean;
   home?: To;
-};
+}
 
 /**
  * Both a side sheet and a modal in one. Switches to fullscreen automatically
  * if the screen size is small.
  */
-export default function Pane({
-  children,
-  fullscreenByDefault = false,
-  home = { pathname: "/", search: window.location.search },
-}: PropsWithChildren<Props>) {
+const Pane = forwardRef<HTMLDivElement, Props>(function Pane(
+  {
+    children,
+    fullscreenByDefault = false,
+    home = { pathname: "/", search: window.location.search },
+    className,
+    ...rest
+  },
+  ref
+) {
   const [explicitFullscreen, setExplicitFullscreen] =
     useState(fullscreenByDefault);
   const isSmallScreen = useIsSmallScreen();
@@ -63,14 +69,18 @@ export default function Pane({
     click,
   ]);
 
+  const mergedRefs = useMergeRefs([ref, refs.setFloating]);
+
   const inner = (
     <div
-      {...(fullscreen ? getFloatingProps() : {})}
-      ref={fullscreen ? refs.setFloating : undefined}
+      ref={mergedRefs}
       className={twJoin(
-        "mx-auto container flex-1",
-        fullscreen && [Modal, "mt-6"]
+        "mx-auto container",
+        fullscreen && [Modal, "mt-6"],
+        className
       )}
+      {...(fullscreen ? getFloatingProps() : {})}
+      {...rest}
     >
       <div className="flex items-center pr-1 py-1 float-right">
         {fullscreen || (
@@ -134,4 +144,6 @@ export default function Pane({
       )}
     </IsPaneFullscreenContext.Provider>
   );
-}
+});
+
+export default Pane;
