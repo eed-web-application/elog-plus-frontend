@@ -80,7 +80,7 @@ export default function InfoDialogButton({
       {viewingInfoDialog && (
         <FloatingOverlay
           lockScroll
-          className={twJoin(BackDrop, "z-10 flex justify-center items-center")}
+          className={twJoin(BackDrop, "z-20 flex justify-center items-center")}
         >
           <FloatingFocusManager context={context}>
             <div
