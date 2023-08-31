@@ -17,6 +17,7 @@ import TagForm from "./TagForm";
 import ShiftSummaryForm from "./ShiftSummaryForm";
 import useEntryBuilder from "../../hooks/useEntryBuilder";
 import DateTimeInput from "../DateTimeInput";
+import useTags from "../../hooks/useTags";
 
 const EntryBodyTextEditor = lazy(() => import("../EntryBodyTextEditor"));
 
@@ -33,6 +34,8 @@ export default function EntryForm({ onEntrySaved, kind = "newEntry" }: Props) {
   const { logbookMap, isLoading: isLogbooksLoading } = useLogbooks({
     critical: false,
   });
+  const { tagMap } = useTags();
+
   const {
     getReferenceProps: getReferencePropsForLogbookSelector,
     Dialog: LogbookSelectorDialog,
@@ -130,12 +133,20 @@ export default function EntryForm({ onEntrySaved, kind = "newEntry" }: Props) {
           <LogbookForm
             className="block mb-2"
             value={draft.logbooks}
-            onChange={(logbooks) =>
+            onChange={(logbooks) => {
+              // Ensure all tags used are in a selected logbook
+              const updatedTags = draft.tags.filter(
+                (tag) =>
+                  typeof tag !== "string" ||
+                  logbooks.includes(tagMap[tag].logbook.id)
+              );
+
               updateDraft({
                 ...draft,
                 logbooks,
-              })
-            }
+                tags: updatedTags,
+              });
+            }}
             invalid={invalidFields.includes("logbooks")}
             onBlur={() => validateField("logbooks")}
           />
