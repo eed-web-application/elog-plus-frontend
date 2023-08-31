@@ -10,8 +10,16 @@ interface LocalShift extends Pick<Shift, "name" | "from" | "to"> {
   name: string;
 }
 
-interface LogbookForm extends Omit<Logbook, "tags" | "shifts"> {
-  tags: (Pick<Tag, "name"> & { id?: string })[];
+/**
+ * Tag that may not have been updated to the server yet. If `id` is undefined,
+ * then the tag has not been uploaded to the server
+ */
+interface LocalTag extends Pick<Tag, "name"> {
+  id?: Tag["id"];
+}
+
+interface LogbookForm extends Pick<Logbook, "id" | "name" | "permissions"> {
+  tags: LocalTag[];
   shifts: LocalShift[];
 }
 

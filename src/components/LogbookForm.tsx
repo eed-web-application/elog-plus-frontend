@@ -4,6 +4,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import {
   Logbook,
   LogbookUpdation,
+  Permissions,
   ServerError,
   Shift,
   updateLogbook,
@@ -12,6 +13,8 @@ import { Button, IconButton, Input, InputInvalid } from "./base";
 import { useLogbookFormsStore } from "../logbookFormsStore";
 import { localToUtc, utcToLocal } from "../utils/datetimeConversion";
 import reportServerError from "../reportServerError";
+import Select from "./Select";
+import useGroups from "../hooks/useGroups";
 
 interface Props {
   logbook: Logbook;
@@ -20,14 +23,24 @@ interface Props {
 
 let idCounter = 0;
 
+const DEFAULT_PERMISSIONS: Permissions = {
+  read: true,
+  write: false,
+};
+
 export default function LogbookForm({ logbook, onSave }: Props) {
   const [form, setForm, removeForm] = useLogbookFormsStore((state) =>
     state.startEditing(logbook)
   );
   const queryClient = useQueryClient();
 
+  const { groups } = useGroups();
+
   const [newTag, setNewTag] = useState<string>("");
   const [newShift, setNewShift] = useState<string>("");
+  const [newGroupPermission, setNewGroupPermission] = useState<string | null>(
+    null
+  );
 
   const validators = {
     name: () => Boolean(form.name),
@@ -142,6 +155,23 @@ export default function LogbookForm({ logbook, onSave }: Props) {
     });
   }
 
+  function createPermission(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+
+    if (!newGroupPermission) {
+      return;
+    }
+
+    setNewGroupPermission(null);
+    setForm({
+      ...form,
+      permissions: [
+        ...form.permissions,
+        { group: newGroupPermission, permissions: DEFAULT_PERMISSIONS },
+      ],
+    });
+  }
+
   function removeTag(index: number) {
     const newTags = [...form.tags];
     newTags.splice(index, 1);
@@ -154,6 +184,13 @@ export default function LogbookForm({ logbook, onSave }: Props) {
     newShifts.splice(index, 1);
 
     setForm({ ...form, shifts: newShifts });
+  }
+
+  function removePermission(index: number) {
+    const newPermissions = [...form.permissions];
+    newPermissions.splice(index, 1);
+
+    setForm({ ...form, permissions: newPermissions });
   }
 
   function changeShiftName(index: number, name: string) {
@@ -256,7 +293,7 @@ export default function LogbookForm({ logbook, onSave }: Props) {
       <div className="text-gray-500">Shifts</div>
       <div
         className={twJoin(
-          "border rounded-lg bg-gray-50 w-full flex flex-col p-2",
+          "border mb-2 rounded-lg bg-gray-50 w-full flex flex-col p-2",
           form.shifts.length === 0 &&
             "items-center justify-center text-lg text-gray-500"
         )}
@@ -386,6 +423,103 @@ export default function LogbookForm({ logbook, onSave }: Props) {
           <button
             type="submit"
             className="absolute right-0 top-0 bottom-0 flex items-center justify-center bg-blue-500 rounded-r-lg text-white p-2.5"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth={1.5}
+              stroke="currentColor"
+              className="w-5 h-5"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M12 4.5v15m7.5-7.5h-15"
+              />
+            </svg>
+          </button>
+        </form>
+      </div>
+      <div className="text-gray-500">Permissions</div>
+      <div
+        className={twJoin(
+          "border rounded-lg bg-gray-50 w-full flex flex-col p-2",
+          form.permissions.length === 0 &&
+            "items-center justify-center text-lg text-gray-500"
+        )}
+      >
+        {form.permissions.length === 0 ? (
+          <div className="my-3">No permissions. Create one below.</div>
+        ) : (
+          <>
+            <div className="divide-y">
+              {form.permissions.map((permission, index) => (
+                <div
+                  key={permission.group}
+                  className="flex justify-between px-2 py-1 items-center"
+                >
+                  <div className="flex-grow">{permission.group}</div>
+
+                  <Select
+                    className="w-32"
+                    value={permission.permissions.write ? "Write" : "Read"}
+                    options={["Write", "Read"]}
+                    setValue={(permission) => {
+                      const updatedPermissions = [...form.permissions];
+                      updatedPermissions[index] = {
+                        ...updatedPermissions[index],
+                        permissions:
+                          permission === "Write"
+                            ? { write: true, read: true }
+                            : { write: false, read: true },
+                      };
+                      setForm({ ...form, permissions: updatedPermissions });
+                    }}
+                    nonsearchable
+                  />
+
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth="1.5"
+                    stroke="currentColor"
+                    tabIndex={0}
+                    className={twJoin(IconButton, "text-gray-500")}
+                    onClick={() => removePermission(index)}
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M6 18L18 6M6 6l12 12"
+                    />
+                  </svg>
+                </div>
+              ))}
+            </div>
+          </>
+        )}
+        <form
+          noValidate
+          className="relative mt-2 w-full"
+          onSubmit={createPermission}
+        >
+          <Select
+            className={twMerge(Input, "w-full pr-12")}
+            value={newGroupPermission}
+            options={(groups || []).filter(
+              (name) =>
+                !form.permissions.find(
+                  (permission) => permission.group === name
+                )
+            )}
+            setValue={setNewGroupPermission}
+          />
+          <button
+            type="submit"
+            className="absolute right-0 top-0 bottom-0 flex items-center justify-center bg-blue-500 rounded-r-lg text-white p-2.5 disabled:bg-blue-300 disabled:text-gray-100"
+            disabled={!newGroupPermission}
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"

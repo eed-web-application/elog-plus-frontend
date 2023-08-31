@@ -125,34 +125,34 @@ export default function Select<O extends Option>({
         onKeyDown={onInputKeyDown}
         disabled={disabled}
       />
-      {
-        <div
-          className={twMerge(
-            // Using styles from Input to ensure padding is correct
-            Input,
-            disabled && InputDisabled,
-            "absolute flex left-0 right-0 bottom-0 top-0 bg-transparent border-transparent pointer-events-none",
-            className
-          )}
-        >
-          {value && !search ? valuesLabel : ""}
 
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            strokeWidth="1.5"
-            stroke="currentColor"
-            className="cursor-pointer self-end ml-auto w-6 h-6 text-gray-500"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M19.5 8.25l-7.5 7.5-7.5-7.5"
-            />
-          </svg>
-        </div>
-      }
+      <div
+        className={twMerge(
+          // Using styles from Input to ensure padding is correct
+          Input,
+          disabled && InputDisabled,
+          "absolute flex left-0 right-0 bottom-0 top-0 bg-transparent border-transparent pointer-events-none",
+          className
+        )}
+      >
+        {value && !search ? valuesLabel : ""}
+
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          strokeWidth="1.5"
+          stroke="currentColor"
+          className="cursor-pointer self-end ml-auto w-6 h-6 text-gray-500"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="M19.5 8.25l-7.5 7.5-7.5-7.5"
+          />
+        </svg>
+      </div>
+
       {isOpen && (
         <div
           ref={refs.setFloating}
