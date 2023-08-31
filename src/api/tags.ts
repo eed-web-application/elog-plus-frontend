@@ -20,7 +20,10 @@ export async function fetchTags(
   });
 }
 
-export async function createTag(logbookId: string, name: string) {
+export async function createTag(
+  logbookId: string,
+  name: string
+): Promise<string> {
   return fetch(`v1/logbooks/${logbookId}/tags`, {
     method: "POST",
     body: {

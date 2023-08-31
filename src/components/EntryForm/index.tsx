@@ -54,7 +54,7 @@ export default function EntryForm({ onEntrySaved, kind = "newEntry" }: Props) {
     removeDraft,
   } = useEntryBuilder({
     kind,
-    selectLogbookForNewTag: selectLogbook,
+    selectLogbooksForNewTag: selectLogbook,
     onEntrySaved: onEntrySaved,
   });
 

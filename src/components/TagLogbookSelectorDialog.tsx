@@ -1,12 +1,12 @@
 import { ComponentPropsWithRef, forwardRef, useState } from "react";
 import { twJoin, twMerge } from "tailwind-merge";
-import { Button, Modal, Radio, RadioLabel, TextButton } from "./base";
+import { Button, Checkbox, Modal, CheckboxLabel, TextButton } from "./base";
 import { Logbook } from "../api";
 
 export interface Props extends ComponentPropsWithRef<"div"> {
   tag: string;
   logbooks: Logbook[];
-  onSave: (logbook: string) => void;
+  onSave: (logbooks: string[]) => void;
   onClose: () => void;
 }
 
@@ -15,7 +15,7 @@ const TagLogbookSelectorDialog = forwardRef<HTMLDivElement, Props>(
     { tag, logbooks, onSave, onClose, className, ...rest },
     ref
   ) {
-    const [selected, setSelected] = useState<string | null>(null);
+    const [selected, setSelected] = useState<string[]>([]);
 
     return (
       <div
@@ -31,15 +31,21 @@ const TagLogbookSelectorDialog = forwardRef<HTMLDivElement, Props>(
             <label
               key={logbook.id}
               className={twJoin(
-                RadioLabel,
+                CheckboxLabel,
                 "flex items-center uppercase text-gray-500"
               )}
             >
               <input
-                type="radio"
-                className={Radio}
-                checked={logbook.id === selected}
-                onChange={() => setSelected(logbook.id)}
+                type="checkbox"
+                className={twJoin(Checkbox, "mr-2")}
+                checked={selected.includes(logbook.id)}
+                onChange={() =>
+                  setSelected((selected) =>
+                    selected.includes(logbook.id)
+                      ? selected.filter((id) => id !== logbook.id)
+                      : [...selected, logbook.id]
+                  )
+                }
               />
               {logbook.name}
             </label>
@@ -56,8 +62,8 @@ const TagLogbookSelectorDialog = forwardRef<HTMLDivElement, Props>(
           <button
             type="button"
             className={Button}
-            disabled={selected === null}
-            onClick={selected ? () => onSave(selected) : undefined}
+            disabled={selected.length === 0}
+            onClick={selected.length === 0 ? undefined : () => onSave(selected)}
           >
             Save
           </button>

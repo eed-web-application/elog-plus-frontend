@@ -26,10 +26,10 @@ export interface Props {
    * When multiple logbooks are selected and the user created a new tag,
    * this function is used to select which logbook the tag is saved in.
    */
-  selectLogbookForNewTag: (
+  selectLogbooksForNewTag: (
     tagName: string,
     logbooks: Logbook[]
-  ) => Promise<string | null>;
+  ) => Promise<string[] | null>;
   onEntrySaved: (id: string) => void;
 }
 
@@ -39,7 +39,7 @@ export interface Props {
  */
 export default function useEntryBuilder({
   kind,
-  selectLogbookForNewTag,
+  selectLogbooksForNewTag,
   onEntrySaved,
 }: Props) {
   const queryClient = useQueryClient();
@@ -91,46 +91,56 @@ export default function useEntryBuilder({
   }
 
   const createTagAndUpdateDraft = useCallback(
-    async (name: string): Promise<string | undefined> => {
+    async (name: string): Promise<string[] | undefined> => {
       if (draft.logbooks.length === 0) {
         return;
       }
 
-      let logbook: string | null = draft.logbooks[0];
+      let newTagIds: string[];
+      let logbooksInvalidated: string[];
 
-      let tagId: string;
-      if (logbook && draft.logbooks.length === 1) {
-        tagId = await createTag(logbook, name);
+      if (draft.logbooks.length === 1) {
+        newTagIds = [await createTag(draft.logbooks[0], name)];
+        logbooksInvalidated = draft.logbooks;
       } else {
         const selectedLogbooks = draft.logbooks.map((id) => logbookMap[id]);
 
-        logbook = await selectLogbookForNewTag(name, selectedLogbooks);
+        const saveInLogbooks = await selectLogbooksForNewTag(
+          name,
+          selectedLogbooks
+        );
 
         // User hit cancel
-        if (!logbook) {
+        if (!saveInLogbooks) {
           return;
         }
 
-        tagId = await createTag(logbook, name);
+        newTagIds = await Promise.all(
+          saveInLogbooks.map((logbook) => createTag(logbook, name))
+        );
+
+        logbooksInvalidated = saveInLogbooks;
       }
 
       updateDraft({
         ...draft,
-        tags: draft.tags.map((tag) =>
-          typeof tag !== "string" && tag.new === name ? tagId : tag
+        tags: draft.tags.flatMap((tag) =>
+          typeof tag !== "string" && tag.new === name ? newTagIds : tag
         ),
       });
 
-      queryClient.invalidateQueries({
-        predicate: ({ queryKey }) =>
-          queryKey[0] === "tags" &&
-          Array.isArray(queryKey[1]) &&
-          (queryKey[1].includes(logbook) || queryKey[1].length === 0),
-      });
+      logbooksInvalidated.forEach((logbook) =>
+        queryClient.invalidateQueries({
+          predicate: ({ queryKey }) =>
+            queryKey[0] === "tags" &&
+            Array.isArray(queryKey[1]) &&
+            (queryKey[1].includes(logbook) || queryKey[1].length === 0),
+        })
+      );
 
-      return tagId;
+      return newTagIds;
     },
-    [draft, logbookMap, queryClient, selectLogbookForNewTag, updateDraft]
+    [draft, logbookMap, queryClient, selectLogbooksForNewTag, updateDraft]
   );
 
   const saveEntry = useCallback(
@@ -171,13 +181,13 @@ export default function useEntryBuilder({
       if (typeof tag === "string") {
         tagIds.push(tag);
       } else {
-        const newTagId = await createTagAndUpdateDraft(tag.new);
+        const newTagIds = await createTagAndUpdateDraft(tag.new);
 
-        if (!newTagId) {
+        if (!newTagIds) {
           return;
         }
 
-        tagIds.push(newTagId);
+        tagIds.push(...newTagIds);
       }
     }
 

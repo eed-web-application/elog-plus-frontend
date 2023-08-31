@@ -17,14 +17,14 @@ export default function useTagLogbookSelector() {
   const [tag, setTag] = useState<string | null>(null);
   const [logbooks, setLogbooks] = useState<Logbook[] | null>(null);
   const [onSave, setOnSave] = useState<
-    ((logbook: string | null) => void) | null
+    ((logbooks: string[] | null) => void) | null
   >(null);
 
   const select = useCallback(async (tag: string, logbooks: Logbook[]) => {
     setTag(tag);
     setLogbooks(logbooks);
 
-    return new Promise<string>((resolve) => setOnSave(() => resolve));
+    return new Promise<string[]>((resolve) => setOnSave(() => resolve));
   }, []);
 
   const isOpen = tag && logbooks && onSave;
@@ -66,9 +66,9 @@ export default function useTagLogbookSelector() {
           ref={refs.setFloating}
           tag={tag}
           logbooks={logbooks}
-          onSave={(logbook) => {
+          onSave={(logbooks) => {
             close();
-            onSave(logbook);
+            onSave(logbooks);
           }}
           onClose={() => {
             close();
