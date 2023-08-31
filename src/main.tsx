@@ -89,7 +89,7 @@ const router = createBrowserRouter(
       ],
     },
   ],
-  { basename: "/elog/" }
+  { basename: "/elog" }
 );
 
 window.addEventListener("unhandledrejection", (e) => {
