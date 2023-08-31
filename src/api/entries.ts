@@ -92,7 +92,6 @@ export type EntriesQuery = {
 export async function fetchEntries(
   query: EntriesQuery
 ): Promise<EntrySummary[]> {
-  console.log(query);
   const params: ParamsObject = Object.assign(
     {
       sortByLogDate: false,

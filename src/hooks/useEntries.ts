@@ -94,8 +94,6 @@ export default function useEntries({ spotlight, query }: Params) {
       const query = queryKey[1] as EntryQuery;
       const spotlight = queryKey[2];
 
-      console.log(query);
-
       const entries = await fetchEntries({
         ...query,
         startDate: query?.startDate || undefined,
