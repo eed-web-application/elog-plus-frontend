@@ -1,7 +1,12 @@
 import { ComponentProps, useEffect, useState } from "react";
 import { twMerge } from "tailwind-merge";
 import { Input, InputDisabled, InputInvalid } from "./base";
-import { autoUpdate, size, useFloating } from "@floating-ui/react";
+import {
+  FloatingPortal,
+  autoUpdate,
+  size,
+  useFloating,
+} from "@floating-ui/react";
 import Spinner from "./Spinner";
 import useSelectCursor from "../hooks/useSelectCursor";
 
@@ -154,51 +159,54 @@ export default function Select<O extends Option>({
       </div>
 
       {isOpen && (
-        <div
-          ref={refs.setFloating}
-          style={floatingStyles}
-          className="max-h-64 overflow-y-auto rounded-lg shadow mt-2 text-black bg-white z-10"
-        >
-          {filteredOptions.length === 0 || isLoading ? (
-            <div className="text-gray-500 text-center w-full py-3">
-              {isLoading ? (
-                <Spinner className="m-auto" />
-              ) : (
-                noOptionsLabel || "No options"
-              )}
-            </div>
-          ) : (
-            filteredOptions.map((option, index) => {
-              const selected =
-                value === (typeof option === "string" ? option : option.value);
-              const focused = cursor === index;
+        <FloatingPortal>
+          <div
+            ref={refs.setFloating}
+            style={floatingStyles}
+            className="max-h-64 overflow-y-auto rounded-lg shadow mt-2 text-black bg-white z-10"
+          >
+            {filteredOptions.length === 0 || isLoading ? (
+              <div className="text-gray-500 text-center w-full py-3">
+                {isLoading ? (
+                  <Spinner className="m-auto" />
+                ) : (
+                  noOptionsLabel || "No options"
+                )}
+              </div>
+            ) : (
+              filteredOptions.map((option, index) => {
+                const selected =
+                  value ===
+                  (typeof option === "string" ? option : option.value);
+                const focused = cursor === index;
 
-              return (
-                <div
-                  tabIndex={0}
-                  key={typeof option === "string" ? option : option.value}
-                  ref={(el) => (optionRefs.current[index] = el)}
-                  className={twMerge(
-                    "px-2 p-1 cursor-pointer hover:bg-gray-100",
-                    focused && "bg-gray-100",
-                    selected && "bg-blue-100 hover:bg-blue-200",
-                    selected && focused && "bg-blue-200"
-                  )}
-                  onMouseDown={() => {
-                    setValue(
-                      typeof option === "string" ? option : option.value
-                    );
-                  }}
-                  onMouseEnter={() => {
-                    setCursor(index);
-                  }}
-                >
-                  {typeof option === "string" ? option : option.label}
-                </div>
-              );
-            })
-          )}
-        </div>
+                return (
+                  <div
+                    tabIndex={0}
+                    key={typeof option === "string" ? option : option.value}
+                    ref={(el) => (optionRefs.current[index] = el)}
+                    className={twMerge(
+                      "px-2 p-1 cursor-pointer hover:bg-gray-100",
+                      focused && "bg-gray-100",
+                      selected && "bg-blue-100 hover:bg-blue-200",
+                      selected && focused && "bg-blue-200"
+                    )}
+                    onMouseDown={() => {
+                      setValue(
+                        typeof option === "string" ? option : option.value
+                      );
+                    }}
+                    onMouseEnter={() => {
+                      setCursor(index);
+                    }}
+                  >
+                    {typeof option === "string" ? option : option.label}
+                  </div>
+                );
+              })
+            )}
+          </div>
+        </FloatingPortal>
       )}
     </div>
   );
