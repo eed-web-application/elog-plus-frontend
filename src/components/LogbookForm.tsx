@@ -506,7 +506,7 @@ export default function LogbookForm({ logbook, onSave }: Props) {
           onSubmit={createPermission}
         >
           <Select
-            className={twMerge(Input, "w-full pr-12")}
+            className="w-full pr-12"
             value={newGroupPermission}
             options={(groups || []).filter(
               (name) =>
