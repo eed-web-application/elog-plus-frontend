@@ -1,5 +1,5 @@
-import { ComponentProps, useState } from "react";
-import { twMerge } from "tailwind-merge";
+import { ComponentProps, useCallback, useState } from "react";
+import { twJoin, twMerge } from "tailwind-merge";
 import {
   FloatingFocusManager,
   FloatingOverlay,
@@ -16,6 +16,7 @@ import {
   getAttachmentPreviewURL,
 } from "../api";
 import { BackDrop, IconButton } from "./base";
+import Spinner from "./Spinner";
 
 export interface Props extends ComponentProps<"div"> {
   attachments: Attachment[];
@@ -55,56 +56,77 @@ export default function EntryFigureList({
     role,
   ]);
 
-  function renderFigure(figure: Attachment, index: number) {
-    return (
-      <div key={figure.id}>
-        <div className="flex">
-          <div className="mt-2 mb-1 text-gray-500">Figure {index + 1}</div>
-          <a
-            className={IconButton}
-            download={figure.fileName}
-            href={getAttachmentDownloadURL(figure.id)}
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={1.5}
-              stroke="currentColor"
-              className="h-full"
+  const Figure = useCallback(
+    ({ figure, index }: { figure: Attachment; index: number }) => {
+      const [isLoaded, setIsLoaded] = useState(false);
+
+      return (
+        <div key={figure.id}>
+          <div className="flex relative">
+            <div className="mt-2 mb-1 text-gray-500">Figure {index + 1}</div>
+            <a
+              className={IconButton}
+              download={figure.fileName}
+              href={getAttachmentDownloadURL(figure.id)}
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"
-              />
-            </svg>
-          </a>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={1.5}
+                stroke="currentColor"
+                className="h-full"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"
+                />
+              </svg>
+            </a>
+          </div>
+          <img
+            src={getAttachmentPreviewURL(figure.id)}
+            tabIndex={0}
+            {...getReferenceProps()}
+            onClick={() => setViewingFigure(figure.id)}
+            className={twJoin(
+              "cursor-pointer w-full",
+              isLoaded ? "block" : "hidden"
+            )}
+            onLoad={() => setIsLoaded(true)}
+          />
+          {!isLoaded && <Spinner className="w-full my-3" />}
         </div>
-        <img
-          src={getAttachmentPreviewURL(figure.id)}
-          tabIndex={0}
-          {...getReferenceProps()}
-          onClick={() => setViewingFigure(figure.id)}
-          className="cursor-pointer w-full"
-        />
-      </div>
-    );
-  }
+      );
+    },
+    [getReferenceProps]
+  );
 
   return (
     <>
       <div className={twMerge("flex gap-3 pb-1", className)} {...rest}>
-        <div className="flex flex-col">
+        <div
+          className={twJoin(
+            "flex flex-col",
+            figures.length > 1 ? "basis-1/2" : "flex-1"
+          )}
+        >
           {figures
             .filter((_, index) => index % 2 === 0)
-            .map((figure, index) => renderFigure(figure, index * 2))}
+            .map((figure, index) => (
+              <Figure figure={figure} index={index * 2} />
+            ))}
         </div>
-        <div className="flex flex-col">
-          {figures
-            .filter((_, index) => index % 2 === 1)
-            .map((figure, index) => renderFigure(figure, index * 2 + 1))}
-        </div>
+        {figures.length > 1 && (
+          <div className="flex flex-col basis-1/2">
+            {figures
+              .filter((_, index) => index % 2 === 1)
+              .map((figure, index) => (
+                <Figure figure={figure} index={index * 2 + 1} />
+              ))}
+          </div>
+        )}
       </div>
 
       {viewingFigure && (
