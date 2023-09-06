@@ -1,15 +1,4 @@
-import {
-  useClick,
-  useDismiss,
-  useRole,
-  useInteractions,
-  useFloating,
-  FloatingOverlay,
-  FloatingFocusManager,
-} from "@floating-ui/react";
 import { useCallback, useState } from "react";
-import { twJoin } from "tailwind-merge";
-import { BackDrop } from "../components/base";
 import TagLogbookSelectorDialog from "../components/TagLogbookSelectorDialog";
 import { Logbook } from "../api";
 
@@ -27,58 +16,27 @@ export default function useTagLogbookSelector() {
     return new Promise<string[] | null>((resolve) => setOnSave(() => resolve));
   }, []);
 
-  const isOpen = tag && logbooks && onSave;
-
   function close() {
     setTag(null);
     setLogbooks(null);
     setOnSave(null);
   }
 
-  const { refs, context } = useFloating({
-    open: Boolean(isOpen),
-    onOpenChange: (isOpen) => {
-      if (!isOpen) {
+  const Dialog = (
+    <TagLogbookSelectorDialog
+      isOpen={Boolean(tag && logbooks && onSave)}
+      tag={tag || ""}
+      logbooks={logbooks || []}
+      onSave={(logbooks) => {
         close();
-      }
-    },
-  });
-
-  const click = useClick(context);
-  const dismiss = useDismiss(context, {
-    outsidePressEvent: "mousedown",
-  });
-  const role = useRole(context);
-
-  const { getReferenceProps, getFloatingProps } = useInteractions([
-    click,
-    dismiss,
-    role,
-  ]);
-
-  const Dialog = !isOpen ? undefined : (
-    <FloatingOverlay
-      lockScroll
-      className={twJoin(BackDrop, "z-10 flex justify-center items-center")}
-    >
-      <FloatingFocusManager context={context}>
-        <TagLogbookSelectorDialog
-          ref={refs.setFloating}
-          tag={tag}
-          logbooks={logbooks}
-          onSave={(logbooks) => {
-            close();
-            onSave(logbooks);
-          }}
-          onClose={() => {
-            close();
-            onSave(null);
-          }}
-          {...getFloatingProps()}
-        />
-      </FloatingFocusManager>
-    </FloatingOverlay>
+        onSave?.(logbooks);
+      }}
+      onClose={() => {
+        close();
+        onSave?.(null);
+      }}
+    />
   );
 
-  return { getReferenceProps, select, Dialog };
+  return { select, Dialog };
 }

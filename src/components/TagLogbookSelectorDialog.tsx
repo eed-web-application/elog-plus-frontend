@@ -1,32 +1,46 @@
-import { ComponentPropsWithRef, forwardRef, useState } from "react";
-import { twJoin, twMerge } from "tailwind-merge";
-import { Button, Checkbox, Modal, CheckboxLabel, TextButton } from "./base";
+import { ComponentPropsWithRef, useState } from "react";
+import { twJoin } from "tailwind-merge";
+import { Button, Checkbox, CheckboxLabel, TextButton } from "./base";
 import { Logbook } from "../api";
+import Dialog from "./Dialog";
 
-export interface Props extends ComponentPropsWithRef<"div"> {
-  tag: string;
-  logbooks: Logbook[];
+export type Props = ComponentPropsWithRef<"div"> & {
   onSave: (logbooks: string[]) => void;
   onClose: () => void;
-}
+} & (
+    | {
+        isOpen: true;
+        tag: string;
+        logbooks: Logbook[];
+      }
+    | { isOpen?: false }
+  );
 
-const TagLogbookSelectorDialog = forwardRef<HTMLDivElement, Props>(
-  function TagLogbookSelectorDialog(
-    { tag, logbooks, onSave, onClose, className, ...rest },
-    ref
-  ) {
-    const [selected, setSelected] = useState<string[]>([]);
+export default function TagLogbookSelectorDialog({
+  onSave,
+  onClose,
+  className,
+  ...rest
+}: Props) {
+  const [selected, setSelected] = useState<string[]>([]);
+  const tag = rest.isOpen ? rest.tag : "";
+  const logbooks = rest.isOpen ? rest.logbooks : [];
 
-    return (
-      <div
-        ref={ref}
-        className={twMerge(Modal, "max-w-md w-full", className)}
-        {...rest}
-      >
-        <h1 className="p-6 pt-5 pb-3 border-b text-xl">
+  return (
+    <Dialog
+      controlled
+      isOpen={rest.isOpen}
+      onOpenChange={(isOpen) => {
+        if (!isOpen) {
+          onClose();
+        }
+      }}
+    >
+      <Dialog.Content className="max-w-md w-full">
+        <Dialog.Section className="text-xl">
           Save tag <span className="text-gray-500">{tag}</span> in
-        </h1>
-        <div className="max-h-48 overflow-y-auto px-6 py-3 gap-2 flex flex-col">
+        </Dialog.Section>
+        <Dialog.Section className="max-h-48 overflow-y-auto gap-2 flex flex-col">
           {logbooks.map((logbook) => (
             <label
               key={logbook.id}
@@ -50,8 +64,8 @@ const TagLogbookSelectorDialog = forwardRef<HTMLDivElement, Props>(
               {logbook.name}
             </label>
           ))}
-        </div>
-        <div className="flex gap-3 justify-end p-3 border-t">
+        </Dialog.Section>
+        <Dialog.Section className="flex gap-3 justify-end">
           <button
             type="button"
             className={TextButton}
@@ -67,10 +81,8 @@ const TagLogbookSelectorDialog = forwardRef<HTMLDivElement, Props>(
           >
             Save
           </button>
-        </div>
-      </div>
-    );
-  }
-);
-
-export default TagLogbookSelectorDialog;
+        </Dialog.Section>
+      </Dialog.Content>
+    </Dialog>
+  );
+}

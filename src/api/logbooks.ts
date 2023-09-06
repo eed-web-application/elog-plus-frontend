@@ -61,3 +61,10 @@ export async function updateLogbook(logbook: LogbookUpdation) {
     body: logbook,
   });
 }
+
+export async function createLogbook(name: string) {
+  return await fetch(`v1/logbooks`, {
+    method: "POST",
+    body: { name },
+  });
+}
