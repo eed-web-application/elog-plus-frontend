@@ -2,7 +2,6 @@ import { useCallback, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import {
   EntryNew,
-  Logbook,
   ServerError,
   createEntry,
   createTag,
@@ -18,18 +17,9 @@ import useAttachmentUploader, {
   LocalAttachment,
 } from "./useAttachmentUploader";
 import reportServerError from "../reportServerError";
-import useLogbooks from "./useLogbooks";
 
 export interface Props {
   kind: DraftFactory;
-  /**
-   * When multiple logbooks are selected and the user created a new tag,
-   * this function is used to select which logbook the tag is saved in.
-   */
-  selectLogbooksForNewTag: (
-    tagName: string,
-    logbooks: Logbook[]
-  ) => Promise<string[] | null>;
   onEntrySaved: (id: string) => void;
 }
 
@@ -37,13 +27,8 @@ export interface Props {
  * Handles all the logic in creating new entries: draft storage,
  * draft validation, attachments uploading, creating new tags, etc.
  */
-export default function useEntryBuilder({
-  kind,
-  selectLogbooksForNewTag,
-  onEntrySaved,
-}: Props) {
+export default function useEntryBuilder({ kind, onEntrySaved }: Props) {
   const queryClient = useQueryClient();
-  const { logbookMap } = useLogbooks({ critical: false });
   const [draft, updateDraft, removeDraft] = useDraftsStore((state) =>
     state.startDrafting(kind)
   );
@@ -90,59 +75,6 @@ export default function useEntryBuilder({
     return false;
   }
 
-  const createTagAndUpdateDraft = useCallback(
-    async (name: string): Promise<string[] | undefined> => {
-      if (draft.logbooks.length === 0) {
-        return;
-      }
-
-      let newTagIds: string[];
-      let logbooksInvalidated: string[];
-
-      if (draft.logbooks.length === 1) {
-        newTagIds = [await createTag(draft.logbooks[0], name)];
-        logbooksInvalidated = draft.logbooks;
-      } else {
-        const selectedLogbooks = draft.logbooks.map((id) => logbookMap[id]);
-
-        const saveInLogbooks = await selectLogbooksForNewTag(
-          name,
-          selectedLogbooks
-        );
-
-        // User hit cancel
-        if (!saveInLogbooks) {
-          return;
-        }
-
-        newTagIds = await Promise.all(
-          saveInLogbooks.map((logbook) => createTag(logbook, name))
-        );
-
-        logbooksInvalidated = saveInLogbooks;
-      }
-
-      updateDraft({
-        ...draft,
-        tags: draft.tags.flatMap((tag) =>
-          typeof tag !== "string" && tag.new === name ? newTagIds : tag
-        ),
-      });
-
-      logbooksInvalidated.forEach((logbook) =>
-        queryClient.invalidateQueries({
-          predicate: ({ queryKey }) =>
-            queryKey[0] === "tags" &&
-            Array.isArray(queryKey[1]) &&
-            (queryKey[1].includes(logbook) || queryKey[1].length === 0),
-        })
-      );
-
-      return newTagIds;
-    },
-    [draft, logbookMap, queryClient, selectLogbooksForNewTag, updateDraft]
-  );
-
   const saveEntry = useCallback(
     async (newEntry: EntryNew) => {
       try {
@@ -175,19 +107,16 @@ export default function useEntryBuilder({
       return;
     }
 
-    const tagIds = [];
+    const tagIds: string[] = [];
 
     for (const tag of draft.tags) {
       if (typeof tag === "string") {
         tagIds.push(tag);
       } else {
-        const newTagIds = await createTagAndUpdateDraft(tag.new);
+        const tagId = await createTag(tag.logbook, tag.name);
 
-        if (!newTagIds) {
-          return;
-        }
-
-        tagIds.push(...newTagIds);
+        tagIds.push(tagId);
+        queryClient.invalidateQueries({ queryKey: ["logbook", tag.logbook] });
       }
     }
 

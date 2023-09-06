@@ -8,15 +8,17 @@ import useSelectCursor from "../hooks/useSelectCursor";
 
 type Option = { label: string; value: string };
 
-type Props = {
+type Props<C extends { custom: string }> = {
   options: Option[];
   onOptionSelected?: (option: string) => void;
   isLoading?: boolean;
   invalid?: boolean;
   disabled?: boolean;
-  value: (string | { custom: string })[];
-  setValue: (value: (string | { custom: string })[]) => void;
+  value: (string | C)[];
+  setValue: (value: (string | C)[]) => void;
   allowCustomOptions?: boolean;
+  canCreate?: (query: string) => boolean;
+  onCreate?: (name: string) => void;
 } & Omit<ComponentProps<"input">, "value">;
 
 function getLabel(option: string | Option | { custom: string }): string {
@@ -39,7 +41,7 @@ function getValue(option: string | Option | { custom: string }): string {
   return option.value;
 }
 
-export default function MultiSelect({
+export default function MultiSelect<C extends { custom: string }>({
   value,
   setValue,
   onOptionSelected,
@@ -50,10 +52,12 @@ export default function MultiSelect({
   invalid,
   disabled,
   allowCustomOptions,
+  canCreate,
+  onCreate,
   onBlur,
   onFocus,
   ...rest
-}: Props) {
+}: Props<C>) {
   const [untrimedSearch, setSearch] = useState("");
   const [focused, setFocused] = useState(false);
 
@@ -97,7 +101,8 @@ export default function MultiSelect({
     .concat(customOptions)
     .find((option) => option.toLowerCase() === search.toLowerCase());
 
-  const showCreateButton = allowCustomOptions && search && !exactMatch;
+  const showCreateButton =
+    search && !exactMatch && (canCreate ? canCreate(search) : true);
 
   const { refs, floatingStyles } = useFloating({
     open: focused,
@@ -125,11 +130,10 @@ export default function MultiSelect({
     if (!search) {
       return;
     }
+
     setSearch("");
-    if (allowCustomOptions) {
-      setValue([...value, { custom: search }]);
-      onOptionSelected?.(search);
-    }
+    onCreate?.(search);
+    onOptionSelected?.(search);
   }
 
   function toggleSelection(option: string) {
@@ -265,7 +269,14 @@ export default function MultiSelect({
                     "px-2 p-1 cursor-pointer hover:bg-gray-100",
                     cursor === filteredOptions.length && "bg-gray-100"
                   )}
-                  onMouseDown={createCustomOption}
+                  onMouseDown={(e) => {
+                    // In the TagForm, when the create button is clicked,
+                    // a dialog is opened, so we have this here to ensure
+                    // that the dialog doesn't immediately close by this click.
+                    e.stopPropagation();
+
+                    createCustomOption();
+                  }}
                   onMouseEnter={() => setCursor(filteredOptions.length)}
                   ref={(el) =>
                     (optionRefs.current[filteredOptions.length] = el)

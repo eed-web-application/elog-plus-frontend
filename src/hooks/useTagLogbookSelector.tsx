@@ -24,7 +24,7 @@ export default function useTagLogbookSelector() {
     setTag(tag);
     setLogbooks(logbooks);
 
-    return new Promise<string[]>((resolve) => setOnSave(() => resolve));
+    return new Promise<string[] | null>((resolve) => setOnSave(() => resolve));
   }, []);
 
   const isOpen = tag && logbooks && onSave;

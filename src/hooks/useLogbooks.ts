@@ -19,6 +19,7 @@ export default function useLogbooks({
       if (!(e instanceof ServerError)) {
         throw e;
       }
+
       reportServerError("Could not retrieve logbooks", e);
     },
     select: (logbooks) => {

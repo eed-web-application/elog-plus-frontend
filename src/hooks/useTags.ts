@@ -31,22 +31,6 @@ export default function useTags({
       reportServerError("Could not retrieve tags", e);
     },
     select: (tags) => {
-      const tagCounts: Record<string, number> = {};
-
-      for (const tag of tags) {
-        if (tagCounts[tag.name]) {
-          tagCounts[tag.name]++;
-        } else {
-          tagCounts[tag.name] = 1;
-        }
-      }
-
-      for (const tag of tags) {
-        if (tagCounts[tag.name] > 1) {
-          tag.name = `${tag.logbook.name.toUpperCase()}:${tag.name}`;
-        }
-      }
-
       const tagMap = tags.reduce<Record<string, Tag>>((acc, tag) => {
         acc[tag.id] = tag;
         return acc;

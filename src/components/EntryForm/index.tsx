@@ -11,7 +11,6 @@ import { LocalAttachment } from "../../hooks/useAttachmentUploader";
 import Spinner from "../Spinner";
 import { dateToDatetimeString } from "../../utils/datetimeConversion";
 import useLogbooks from "../../hooks/useLogbooks";
-import useTagLogbookSelector from "../../hooks/useTagLogbookSelector";
 import LogbookForm from "./LogbookForm";
 import TagForm from "./TagForm";
 import ShiftSummaryForm from "./ShiftSummaryForm";
@@ -37,12 +36,6 @@ export default function EntryForm({ onEntrySaved, kind = "newEntry" }: Props) {
   const { tagMap } = useTags();
 
   const {
-    getReferenceProps: getReferencePropsForLogbookSelector,
-    Dialog: LogbookSelectorDialog,
-    select: selectLogbook,
-  } = useTagLogbookSelector();
-
-  const {
     draft,
     updateDraft,
     validateField,
@@ -54,7 +47,6 @@ export default function EntryForm({ onEntrySaved, kind = "newEntry" }: Props) {
     removeDraft,
   } = useEntryBuilder({
     kind,
-    selectLogbooksForNewTag: selectLogbook,
     onEntrySaved: onEntrySaved,
   });
 
@@ -135,10 +127,10 @@ export default function EntryForm({ onEntrySaved, kind = "newEntry" }: Props) {
             value={draft.logbooks}
             onChange={(logbooks) => {
               // Ensure all tags used are in a selected logbook
-              const updatedTags = draft.tags.filter(
-                (tag) =>
-                  typeof tag !== "string" ||
-                  logbooks.includes(tagMap[tag].logbook.id)
+              const updatedTags = draft.tags.filter((tag) =>
+                typeof tag === "string"
+                  ? logbooks.includes(tagMap[tag].logbook.id)
+                  : logbooks.includes(tag.logbook)
               );
 
               updateDraft({
@@ -152,7 +144,11 @@ export default function EntryForm({ onEntrySaved, kind = "newEntry" }: Props) {
           />
           <TagForm
             className="block mb-2"
-            logbooks={draft.logbooks.map((id) => logbookMap[id])}
+            logbooks={
+              isLogbooksLoading
+                ? []
+                : draft.logbooks.map((id) => logbookMap[id])
+            }
             value={draft.tags}
             isLoading={isLogbooksLoading}
             onChange={(tags) =>
@@ -248,11 +244,9 @@ export default function EntryForm({ onEntrySaved, kind = "newEntry" }: Props) {
                 ? "Follow up"
                 : "Supersede"
             }
-            {...getReferencePropsForLogbookSelector()}
           />
         </form>
       </div>
-      {LogbookSelectorDialog}
     </Suspense>
   );
 }

@@ -11,6 +11,8 @@ export type LocalUploadedAttachment = Pick<
   "id" | "fileName" | "contentType"
 >;
 
+type NewTag = { name: string; logbook: string };
+
 /**
  * An entry that hasn't been submitted to the server
  */
@@ -23,7 +25,7 @@ export type Draft = Omit<
    */
   eventAt?: Date | null;
   attachments: LocalUploadedAttachment[];
-  tags: (string | { new: string })[];
+  tags: (string | NewTag)[];
   summarizes: {
     checked: boolean;
   } & NonNullable<EntryNew["summarizes"]>;

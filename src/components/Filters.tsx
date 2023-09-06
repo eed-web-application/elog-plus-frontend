@@ -23,7 +23,7 @@ export type Filters = Pick<
 >;
 
 function extractTagLabel(tag: Tag) {
-  return tag.name;
+  return `${tag.logbook.name.toUpperCase()}:${tag.name}`;
 }
 function extractLogbookLabel(logbook: Logbook) {
   return logbook.name.toUpperCase();
@@ -102,7 +102,7 @@ export default function Filters({ filters, setFilters }: Props) {
                     : ""
                 }
               >
-                {tag.name}
+                {tag.logbook.name.toUpperCase()}:{tag.name}
               </Chip>
             );
           })}
