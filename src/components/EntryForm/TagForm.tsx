@@ -67,7 +67,14 @@ export default function TagForm({
           setValue={async (tags) => onChange(tags)}
           canCreate={(query) =>
             logbooks.some(
-              (logbook) => !logbook.tags.some((tag) => tag.name === query)
+              (logbook) =>
+                !logbook.tags.some((tag) => tag.name === query) &&
+                // Need to take into account the tags created by the user
+                !value.some(
+                  (option) =>
+                    typeof option === "string" ||
+                    (option.logbook === logbook.id && option.name === query)
+                )
             )
           }
           onCreate={async (name) => {
