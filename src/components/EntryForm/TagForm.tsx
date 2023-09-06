@@ -54,26 +54,31 @@ export default function TagForm({
             value: id,
           }))}
           onOptionSelected={bumpTag}
-          value={value.map((tag) =>
-            typeof tag === "string"
-              ? tag
-              : {
-                  ...tag,
-                  custom: `${logbookMap[tag.logbook].name.toUpperCase()}:${
-                    tag.name
-                  }`,
-                }
-          )}
-          setValue={async (tags) => onChange(tags)}
+          value={
+            isLoading
+              ? []
+              : value.map((tag) =>
+                  typeof tag === "string"
+                    ? tag
+                    : {
+                        ...tag,
+                        custom: `${logbookMap[
+                          tag.logbook
+                        ].name.toUpperCase()}:${tag.name}`,
+                      }
+                )
+          }
+          setValue={(tags) => onChange(tags)}
           canCreate={(query) =>
             logbooks.some(
               (logbook) =>
                 !logbook.tags.some((tag) => tag.name === query) &&
-                // Need to take into account the tags created by the user
+                // Need to take into account newly created tags
                 !value.some(
-                  (option) =>
-                    typeof option === "string" ||
-                    (option.logbook === logbook.id && option.name === query)
+                  (tag) =>
+                    typeof tag !== "string" &&
+                    tag.logbook === logbook.id &&
+                    tag.name === query
                 )
             )
           }
@@ -81,11 +86,12 @@ export default function TagForm({
             const logbooksWithoutTag = logbooks.filter(
               (logbook) =>
                 !logbook.tags.some((tag) => tag.name === name) &&
-                // Need to take into account the tags created by the user
+                // Need to take into account newly created tags
                 !value.some(
-                  (option) =>
-                    typeof option === "string" ||
-                    (option.logbook === logbook.id && option.name === name)
+                  (tag) =>
+                    typeof tag !== "string" &&
+                    tag.logbook === logbook.id &&
+                    tag.name === name
                 )
             );
 
