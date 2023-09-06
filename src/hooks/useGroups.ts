@@ -3,15 +3,17 @@ import reportServerError from "../reportServerError";
 import { useQuery } from "@tanstack/react-query";
 
 export default function useGroups({
+  search,
   enabled = true,
   critical = true,
 }: {
+  search: string;
   enabled?: boolean;
   critical?: boolean;
-} = {}) {
+}) {
   const { data, isLoading } = useQuery({
-    queryKey: ["groups"],
-    queryFn: () => fetchGroups(),
+    queryKey: ["groups", search],
+    queryFn: () => fetchGroups(search),
     enabled,
     useErrorBoundary: critical,
     staleTime: 5 * 60 * 1000,
@@ -19,6 +21,7 @@ export default function useGroups({
       if (!(e instanceof ServerError)) {
         throw e;
       }
+
       reportServerError("Could not retrieve groups", e);
     },
   });

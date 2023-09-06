@@ -34,13 +34,14 @@ export default function LogbookForm({ logbook, onSave }: Props) {
   );
   const queryClient = useQueryClient();
 
-  const { groups } = useGroups();
-
   const [newTag, setNewTag] = useState<string>("");
   const [newShift, setNewShift] = useState<string>("");
   const [newGroupPermission, setNewGroupPermission] = useState<string | null>(
     null
   );
+  const [groupSearch, setGroupSearch] = useState("");
+
+  const { groups, isLoading } = useGroups({ search: groupSearch });
 
   const validators = {
     name: () => Boolean(form.name),
@@ -508,12 +509,16 @@ export default function LogbookForm({ logbook, onSave }: Props) {
           <Select
             className="w-full pr-12"
             value={newGroupPermission}
-            options={(groups || []).filter(
-              (name) =>
-                !form.permissions.find(
-                  (permission) => permission.group === name
-                )
-            )}
+            onSearchChange={setGroupSearch}
+            isLoading={isLoading}
+            options={(groups || [])
+              .filter(
+                (group) =>
+                  !form.permissions.some(
+                    (permission) => permission.group === group.commonName
+                  )
+              )
+              .map((group) => group.commonName)}
             setValue={setNewGroupPermission}
           />
           <button

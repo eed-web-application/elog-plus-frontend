@@ -100,4 +100,4 @@ export * from "./attachments";
 export * from "./entries";
 export * from "./logbooks";
 export * from "./tags";
-export * from "./groups";
+export * from "./auth";

@@ -1,4 +1,4 @@
-import { ComponentProps, useEffect, useState } from "react";
+import { ComponentProps, useCallback, useEffect, useState } from "react";
 import { twMerge } from "tailwind-merge";
 import { Input, InputDisabled, InputInvalid } from "./base";
 import {
@@ -22,6 +22,7 @@ interface Props<O extends Option>
   invalid?: boolean;
   nonsearchable?: boolean;
   noOptionsLabel?: string;
+  onSearchChange?: (search: string) => void;
 }
 
 export default function Select<O extends Option>({
@@ -35,12 +36,21 @@ export default function Select<O extends Option>({
   invalid,
   nonsearchable,
   noOptionsLabel,
+  onSearchChange,
   onBlur,
   disabled,
   ...rest
 }: Props<O>) {
   const [search, setSearch] = useState("");
   const [isOpen, setIsOpen] = useState(false);
+
+  const updateSearch = useCallback(
+    (search: string) => {
+      setSearch(search);
+      onSearchChange?.(search);
+    },
+    [setSearch, onSearchChange]
+  );
 
   const filteredOptions = search
     ? options.filter((option) =>
@@ -76,7 +86,7 @@ export default function Select<O extends Option>({
 
   useEffect(() => {
     if (value && !isOpen) {
-      setSearch("");
+      updateSearch("");
     }
   }, [value, isOpen]);
 
@@ -100,7 +110,7 @@ export default function Select<O extends Option>({
       if (isOpen) {
         const option = filteredOptions[cursor];
         setValue(typeof option == "string" ? option : option.value);
-        setSearch("");
+        updateSearch("");
         setIsOpen(false);
       }
     }
@@ -116,7 +126,7 @@ export default function Select<O extends Option>({
         placeholder={value || !placeholder ? "" : placeholder}
         value={search}
         onChange={(e) => {
-          setSearch(e.target.value);
+          updateSearch(e.target.value);
           if (!isOpen) {
             setIsOpen(true);
           }
