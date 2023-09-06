@@ -24,7 +24,12 @@ export interface GroupPermission {
   permissions: Permissions;
 }
 
-export type Permission = GroupPermission;
+export interface UserPermission {
+  userId: string;
+  permissions: Permissions;
+}
+
+export type Permission = GroupPermission | UserPermission;
 
 export interface Logbook extends LogbookSummary {
   tags: Tag[];

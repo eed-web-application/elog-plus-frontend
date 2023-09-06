@@ -2,11 +2,13 @@ import { FormEvent, useState } from "react";
 import { twJoin, twMerge } from "tailwind-merge";
 import { useQueryClient } from "@tanstack/react-query";
 import {
+  GroupPermission,
   Logbook,
   LogbookUpdation,
   Permissions,
   ServerError,
   Shift,
+  UserPermission,
   updateLogbook,
 } from "../api";
 import { Button, IconButton, Input, InputInvalid } from "./base";
@@ -15,6 +17,7 @@ import { localToUtc, utcToLocal } from "../utils/datetimeConversion";
 import reportServerError from "../reportServerError";
 import Select from "./Select";
 import useGroups from "../hooks/useGroups";
+import useUsers from "../hooks/useUsers";
 
 interface Props {
   logbook: Logbook;
@@ -39,9 +42,20 @@ export default function LogbookForm({ logbook, onSave }: Props) {
   const [newGroupPermission, setNewGroupPermission] = useState<string | null>(
     null
   );
+  const [newUserPermission, setNewUserPermissions] = useState<string | null>(
+    null
+  );
   const [groupSearch, setGroupSearch] = useState("");
+  const [userSearch, setUserSearch] = useState("");
 
-  const { groups, isLoading } = useGroups({ search: groupSearch });
+  const { groups, isLoading: isGroupsLoading } = useGroups({
+    search: groupSearch,
+  });
+  const {
+    users,
+    userMap,
+    isLoading: isUsersLoading,
+  } = useUsers({ search: userSearch });
 
   const validators = {
     name: () => Boolean(form.name),
@@ -156,7 +170,7 @@ export default function LogbookForm({ logbook, onSave }: Props) {
     });
   }
 
-  function createPermission(e: FormEvent<HTMLFormElement>) {
+  function createGroupPermission(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
 
     if (!newGroupPermission) {
@@ -169,6 +183,23 @@ export default function LogbookForm({ logbook, onSave }: Props) {
       permissions: [
         ...form.permissions,
         { group: newGroupPermission, permissions: DEFAULT_PERMISSIONS },
+      ],
+    });
+  }
+
+  function createUserPermission(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+
+    if (!newUserPermission) {
+      return;
+    }
+
+    setNewUserPermissions(null);
+    setForm({
+      ...form,
+      permissions: [
+        ...form.permissions,
+        { userId: newUserPermission, permissions: DEFAULT_PERMISSIONS },
       ],
     });
   }
@@ -204,6 +235,12 @@ export default function LogbookForm({ logbook, onSave }: Props) {
     });
   }
 
+  const userPermissions = form.permissions.filter(
+    (permission) => "userId" in permission
+  ) as UserPermission[];
+  const groupPermissions = form.permissions.filter(
+    (permission) => "group" in permission
+  ) as GroupPermission[];
   const updated = JSON.stringify(form) === JSON.stringify(logbook);
 
   return (
@@ -442,20 +479,20 @@ export default function LogbookForm({ logbook, onSave }: Props) {
           </button>
         </form>
       </div>
-      <div className="text-gray-500">Permissions</div>
+      <div className="text-gray-500">Group Permissions</div>
       <div
         className={twJoin(
-          "border rounded-lg bg-gray-50 w-full flex flex-col p-2",
-          form.permissions.length === 0 &&
+          "border rounded-lg bg-gray-50 w-full flex flex-col p-2 mb-2",
+          groupPermissions.length === 0 &&
             "items-center justify-center text-lg text-gray-500"
         )}
       >
-        {form.permissions.length === 0 ? (
+        {groupPermissions.length === 0 ? (
           <div className="my-3">No permissions. Create one below.</div>
         ) : (
           <>
             <div className="divide-y">
-              {form.permissions.map((permission, index) => (
+              {groupPermissions.map((permission) => (
                 <div
                   key={permission.group}
                   className="flex justify-between px-2 py-1 items-center"
@@ -466,12 +503,16 @@ export default function LogbookForm({ logbook, onSave }: Props) {
                     className="w-32"
                     value={permission.permissions.write ? "Write" : "Read"}
                     options={["Write", "Read"]}
-                    setValue={(permission) => {
+                    setValue={(updatedPermission) => {
                       const updatedPermissions = [...form.permissions];
+                      const index = form.permissions.findIndex(
+                        (otherPermission) => otherPermission === permission
+                      );
+
                       updatedPermissions[index] = {
                         ...updatedPermissions[index],
                         permissions:
-                          permission === "Write"
+                          updatedPermission === "Write"
                             ? { write: true, read: true }
                             : { write: false, read: true },
                       };
@@ -488,7 +529,13 @@ export default function LogbookForm({ logbook, onSave }: Props) {
                     stroke="currentColor"
                     tabIndex={0}
                     className={twJoin(IconButton, "text-gray-500")}
-                    onClick={() => removePermission(index)}
+                    onClick={() =>
+                      removePermission(
+                        form.permissions.findIndex(
+                          (otherPermission) => otherPermission === permission
+                        )
+                      )
+                    }
                   >
                     <path
                       strokeLinecap="round"
@@ -504,17 +551,17 @@ export default function LogbookForm({ logbook, onSave }: Props) {
         <form
           noValidate
           className="relative mt-2 w-full"
-          onSubmit={createPermission}
+          onSubmit={createGroupPermission}
         >
           <Select
             className="w-full pr-12"
             value={newGroupPermission}
             onSearchChange={setGroupSearch}
-            isLoading={isLoading}
+            isLoading={isGroupsLoading}
             options={(groups || [])
               .filter(
                 (group) =>
-                  !form.permissions.some(
+                  !groupPermissions.some(
                     (permission) => permission.group === group.commonName
                   )
               )
@@ -525,6 +572,119 @@ export default function LogbookForm({ logbook, onSave }: Props) {
             type="submit"
             className="absolute right-0 top-0 bottom-0 flex items-center justify-center bg-blue-500 rounded-r-lg text-white p-2.5 disabled:bg-blue-300 disabled:text-gray-100"
             disabled={!newGroupPermission}
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth={1.5}
+              stroke="currentColor"
+              className="w-5 h-5"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M12 4.5v15m7.5-7.5h-15"
+              />
+            </svg>
+          </button>
+        </form>
+      </div>
+      <div className="text-gray-500">User Permissions</div>
+      <div
+        className={twJoin(
+          "border rounded-lg bg-gray-50 w-full flex flex-col p-2",
+          userPermissions.length === 0 &&
+            "items-center justify-center text-lg text-gray-500"
+        )}
+      >
+        {userPermissions.length === 0 ? (
+          <div className="my-3">No user permissions. Create one below.</div>
+        ) : (
+          <>
+            <div className="divide-y">
+              {userPermissions.map((permission) => (
+                <div
+                  key={permission.userId}
+                  className="flex justify-between px-2 py-1 items-center"
+                >
+                  <div className="flex-grow">
+                    {userMap[permission.userId].gecos}
+                  </div>
+
+                  <Select
+                    className="w-32"
+                    value={permission.permissions.write ? "Write" : "Read"}
+                    options={["Write", "Read"]}
+                    setValue={(updatedPermission) => {
+                      const updatedPermissions = [...form.permissions];
+                      const index = form.permissions.findIndex(
+                        (otherPermission) => otherPermission === permission
+                      );
+
+                      updatedPermissions[index] = {
+                        ...updatedPermissions[index],
+                        permissions:
+                          updatedPermission === "Write"
+                            ? { write: true, read: true }
+                            : { write: false, read: true },
+                      };
+                      setForm({ ...form, permissions: updatedPermissions });
+                    }}
+                    nonsearchable
+                  />
+
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth="1.5"
+                    stroke="currentColor"
+                    tabIndex={0}
+                    className={twJoin(IconButton, "text-gray-500")}
+                    onClick={() =>
+                      removePermission(
+                        form.permissions.findIndex(
+                          (otherPermission) => otherPermission === permission
+                        )
+                      )
+                    }
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M6 18L18 6M6 6l12 12"
+                    />
+                  </svg>
+                </div>
+              ))}
+            </div>
+          </>
+        )}
+        <form
+          noValidate
+          className="relative mt-2 w-full"
+          onSubmit={createUserPermission}
+        >
+          <Select
+            className="w-full pr-12"
+            value={newUserPermission}
+            onSearchChange={setUserSearch}
+            isLoading={isUsersLoading}
+            options={(users || [])
+              .filter(
+                (user) =>
+                  !userPermissions.some(
+                    (permission) => permission.userId === user.uid
+                  )
+              )
+              .map((user) => ({ label: user.gecos, value: user.uid }))}
+            setValue={setNewUserPermissions}
+          />
+          <button
+            type="submit"
+            className="absolute right-0 top-0 bottom-0 flex items-center justify-center bg-blue-500 rounded-r-lg text-white p-2.5 disabled:bg-blue-300 disabled:text-gray-100"
+            disabled={!newUserPermission}
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
