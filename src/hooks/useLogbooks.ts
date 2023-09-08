@@ -1,17 +1,25 @@
-import { Logbook, ServerError, fetchLogbooks } from "../api";
+import { Logbook, LogbookWithAuth, ServerError, fetchLogbooks } from "../api";
 import reportServerError from "../reportServerError";
 import { useQuery } from "@tanstack/react-query";
 
-export default function useLogbooks({
+export default function useLogbooks<A extends boolean>({
   enabled = true,
   critical = true,
+  requireWrite = false,
+  includeAuth,
 }: {
   enabled?: boolean;
   critical?: boolean;
-} = {}) {
+  requireWrite?: boolean;
+  includeAuth?: A;
+} = {}): {
+  logbooks: (A extends true ? LogbookWithAuth : Logbook)[];
+  logbookMap: Record<string, A extends true ? LogbookWithAuth : Logbook>;
+  isLoading: boolean;
+} {
   const { data, isLoading } = useQuery({
-    queryKey: ["logbooks"],
-    queryFn: () => fetchLogbooks(),
+    queryKey: ["logbooks", includeAuth, requireWrite],
+    queryFn: () => fetchLogbooks<A>({ includeAuth, requireWrite }),
     enabled,
     useErrorBoundary: critical,
     staleTime: 5 * 60 * 1000,
@@ -23,13 +31,12 @@ export default function useLogbooks({
       reportServerError("Could not retrieve logbooks", e);
     },
     select: (logbooks) => {
-      const logbookMap = logbooks.reduce<Record<string, Logbook>>(
-        (acc, logbook) => {
-          acc[logbook.id] = logbook;
-          return acc;
-        },
-        {}
-      );
+      const logbookMap = logbooks.reduce<
+        Record<string, A extends true ? LogbookWithAuth : Logbook>
+      >((acc, logbook) => {
+        acc[logbook.id] = logbook;
+        return acc;
+      }, {});
 
       return { logbookMap, logbooks };
     },

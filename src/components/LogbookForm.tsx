@@ -2,34 +2,29 @@ import { FormEvent, useState } from "react";
 import { twJoin, twMerge } from "tailwind-merge";
 import { useQueryClient } from "@tanstack/react-query";
 import {
-  GroupPermission,
-  Logbook,
   LogbookUpdation,
-  Permissions,
   ServerError,
   Shift,
-  UserPermission,
   updateLogbook,
+  AuthorizationType,
+  LogbookWithAuth,
 } from "../api";
 import { Button, IconButton, Input, InputInvalid } from "./base";
 import { useLogbookFormsStore } from "../logbookFormsStore";
 import { localToUtc, utcToLocal } from "../utils/datetimeConversion";
 import reportServerError from "../reportServerError";
 import Select from "./Select";
-import useGroups from "../hooks/useGroups";
+// import useGroups from "../hooks/useGroups";
 import useUsers from "../hooks/useUsers";
 
 interface Props {
-  logbook: Logbook;
+  logbook: LogbookWithAuth;
   onSave: () => void;
 }
 
-let idCounter = 0;
+const DEFAULT_AUTHORIZATION: AuthorizationType = "Read";
 
-const DEFAULT_PERMISSIONS: Permissions = {
-  read: true,
-  write: false,
-};
+let idCounter = 0;
 
 export default function LogbookForm({ logbook, onSave }: Props) {
   const [form, setForm, removeForm] = useLogbookFormsStore((state) =>
@@ -39,23 +34,19 @@ export default function LogbookForm({ logbook, onSave }: Props) {
 
   const [newTag, setNewTag] = useState<string>("");
   const [newShift, setNewShift] = useState<string>("");
-  const [newGroupPermission, setNewGroupPermission] = useState<string | null>(
-    null
-  );
-  const [newUserPermission, setNewUserPermissions] = useState<string | null>(
-    null
-  );
-  const [groupSearch, setGroupSearch] = useState("");
+  // const [newGroupAuthorization, setNewGroupAuthorization] = useState<
+  //   string | null
+  // >(null);
+  const [newUserAuthorization, setNewUserAuthorizations] = useState<
+    string | null
+  >(null);
+  // const [groupSearch, setGroupSearch] = useState("");
   const [userSearch, setUserSearch] = useState("");
 
-  const { groups, isLoading: isGroupsLoading } = useGroups({
-    search: groupSearch,
-  });
-  const {
-    users,
-    userMap,
-    isLoading: isUsersLoading,
-  } = useUsers({ search: userSearch });
+  // const { groups, isLoading: isGroupsLoading } = useGroups({
+  //   search: groupSearch,
+  // });
+  const { users, isLoading: isUsersLoading } = useUsers({ search: userSearch });
 
   const validators = {
     name: () => Boolean(form.name),
@@ -118,9 +109,33 @@ export default function LogbookForm({ logbook, onSave }: Props) {
       return;
     }
 
-    // Remove temp ids
+    // Covers the case whree a user deletes a tag and creates a new one with
+    // the same name
+    const resolvedTags = form.tags.map((tag) => {
+      if (tag.id) {
+        return tag;
+      }
+
+      return logbook.tags.find(({ name }) => name === tag.name) || tag;
+    });
+
+    const resolvedAuthorization = form.authorizations.map((authorization) => {
+      if (authorization.id) {
+        return authorization;
+      }
+
+      return (
+        logbook.authorizations.find(
+          ({ owner }) => owner === authorization.owner
+        ) || authorization
+      );
+    });
+
     const logbookUpdation: LogbookUpdation = {
       ...form,
+      tags: resolvedTags,
+      authorization: resolvedAuthorization,
+      // Remove temp ids
       shifts: form.shifts.map(({ id, ...shift }) => ({
         ...(shift as Shift),
         id: id.startsWith("_") ? undefined : id,
@@ -129,7 +144,6 @@ export default function LogbookForm({ logbook, onSave }: Props) {
 
     try {
       await updateLogbook(logbookUpdation);
-      removeForm();
 
       queryClient.invalidateQueries({
         predicate: ({ queryKey }) =>
@@ -137,8 +151,10 @@ export default function LogbookForm({ logbook, onSave }: Props) {
           Array.isArray(queryKey[1]) &&
           (queryKey[1].includes(logbook.name) || queryKey[1].length === 0),
       });
-      queryClient.invalidateQueries({ queryKey: ["logbooks"] });
 
+      await queryClient.invalidateQueries({ queryKey: ["logbooks"] });
+
+      removeForm();
       onSave();
     } catch (e) {
       if (!(e instanceof ServerError)) {
@@ -170,36 +186,40 @@ export default function LogbookForm({ logbook, onSave }: Props) {
     });
   }
 
-  function createGroupPermission(e: FormEvent<HTMLFormElement>) {
+  // function createGroupAuthorization(e: FormEvent<HTMLFormElement>) {
+  //   e.preventDefault();
+  //
+  //   if (!newGroupAuthorization) {
+  //     return;
+  //   }
+  //
+  //   setNewGroupAuthorization(null);
+  //   setForm({
+  //     ...form,
+  //     authorizations: [
+  //       ...form.authorizations,
+  //       // FIXME
+  //       // { group: newGroupAuthorization, authorizations: DEFAULT_authorizations },
+  //     ],
+  //   });
+  // }
+
+  function createUserAuthorization(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
 
-    if (!newGroupPermission) {
+    if (!newUserAuthorization) {
       return;
     }
 
-    setNewGroupPermission(null);
+    setNewUserAuthorizations(null);
     setForm({
       ...form,
-      permissions: [
-        ...form.permissions,
-        { group: newGroupPermission, permissions: DEFAULT_PERMISSIONS },
-      ],
-    });
-  }
-
-  function createUserPermission(e: FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-
-    if (!newUserPermission) {
-      return;
-    }
-
-    setNewUserPermissions(null);
-    setForm({
-      ...form,
-      permissions: [
-        ...form.permissions,
-        { userId: newUserPermission, permissions: DEFAULT_PERMISSIONS },
+      authorizations: [
+        ...form.authorizations,
+        {
+          owner: newUserAuthorization,
+          authorizationType: DEFAULT_AUTHORIZATION,
+        },
       ],
     });
   }
@@ -218,11 +238,11 @@ export default function LogbookForm({ logbook, onSave }: Props) {
     setForm({ ...form, shifts: newShifts });
   }
 
-  function removePermission(index: number) {
-    const newPermissions = [...form.permissions];
-    newPermissions.splice(index, 1);
+  function removeAuthorization(index: number) {
+    const newAuthorizations = [...form.authorizations];
+    newAuthorizations.splice(index, 1);
 
-    setForm({ ...form, permissions: newPermissions });
+    setForm({ ...form, authorizations: newAuthorizations });
   }
 
   function changeShiftName(index: number, name: string) {
@@ -235,12 +255,13 @@ export default function LogbookForm({ logbook, onSave }: Props) {
     });
   }
 
-  const userPermissions = form.permissions.filter(
-    (permission) => "userId" in permission
-  ) as UserPermission[];
-  const groupPermissions = form.permissions.filter(
-    (permission) => "group" in permission
-  ) as GroupPermission[];
+  const userAuthorizations = form.authorizations;
+  // FIXME
+  // const groupAuthorizations = [];
+  // const groupAuthorizations = form.authorizations.filter(
+  //   (authorization) => "group" in authorization
+  // ) as GroupAuthorization[];
+
   const updated = JSON.stringify(form) === JSON.stringify(logbook);
 
   return (
@@ -479,44 +500,51 @@ export default function LogbookForm({ logbook, onSave }: Props) {
           </button>
         </form>
       </div>
-      <div className="text-gray-500">Group Permissions</div>
+      {/*
+      <div className="text-gray-500">Group Authorizations</div>
       <div
         className={twJoin(
           "border rounded-lg bg-gray-50 w-full flex flex-col p-2 mb-2",
-          groupPermissions.length === 0 &&
+          groupAuthorizations.length === 0 &&
             "items-center justify-center text-lg text-gray-500"
         )}
       >
-        {groupPermissions.length === 0 ? (
-          <div className="my-3">No permissions. Create one below.</div>
+        {groupAuthorizations.length === 0 ? (
+          <div className="my-3">No authorizations. Create one below.</div>
         ) : (
           <>
             <div className="divide-y">
-              {groupPermissions.map((permission) => (
+              {groupAuthorizations.map((authorization) => (
                 <div
-                  key={permission.group}
+                  key={authorization.group}
                   className="flex justify-between px-2 py-1 items-center"
                 >
-                  <div className="flex-grow">{permission.group}</div>
+                  <div className="flex-grow">{authorization.group}</div>
 
                   <Select
                     className="w-32"
-                    value={permission.permissions.write ? "Write" : "Read"}
+                    value={
+                      authorization.authorizations.write ? "Write" : "Read"
+                    }
                     options={["Write", "Read"]}
-                    setValue={(updatedPermission) => {
-                      const updatedPermissions = [...form.permissions];
-                      const index = form.permissions.findIndex(
-                        (otherPermission) => otherPermission === permission
+                    setValue={(updatedAuthorization) => {
+                      const updatedAuthorizations = [...form.authorizations];
+                      const index = form.authorizations.findIndex(
+                        (otherAuthorization) =>
+                          otherAuthorization === authorization
                       );
 
-                      updatedPermissions[index] = {
-                        ...updatedPermissions[index],
-                        permissions:
-                          updatedPermission === "Write"
+                      updatedAuthorizations[index] = {
+                        ...updatedAuthorizations[index],
+                        authorizations:
+                          updatedAuthorization === "Write"
                             ? { write: true, read: true }
                             : { write: false, read: true },
                       };
-                      setForm({ ...form, permissions: updatedPermissions });
+                      setForm({
+                        ...form,
+                        authorizations: updatedAuthorizations,
+                      });
                     }}
                     nonsearchable
                   />
@@ -530,9 +558,10 @@ export default function LogbookForm({ logbook, onSave }: Props) {
                     tabIndex={0}
                     className={twJoin(IconButton, "text-gray-500")}
                     onClick={() =>
-                      removePermission(
-                        form.permissions.findIndex(
-                          (otherPermission) => otherPermission === permission
+                      removeAuthorization(
+                        form.authorizations.findIndex(
+                          (otherAuthorization) =>
+                            otherAuthorization === authorization
                         )
                       )
                     }
@@ -551,27 +580,27 @@ export default function LogbookForm({ logbook, onSave }: Props) {
         <form
           noValidate
           className="relative mt-2 w-full"
-          onSubmit={createGroupPermission}
+          onSubmit={createGroupAuthorization}
         >
           <Select
             className="w-full pr-12"
-            value={newGroupPermission}
+            value={newGroupAuthorization}
             onSearchChange={setGroupSearch}
             isLoading={isGroupsLoading}
             options={(groups || [])
               .filter(
                 (group) =>
-                  !groupPermissions.some(
-                    (permission) => permission.group === group.commonName
+                  !groupAuthorizations.some(
+                    (authorization) => authorization.group === group.commonName
                   )
               )
               .map((group) => group.commonName)}
-            setValue={setNewGroupPermission}
+            setValue={setNewGroupAuthorization}
           />
           <button
             type="submit"
             className="absolute right-0 top-0 bottom-0 flex items-center justify-center bg-blue-500 rounded-r-lg text-white p-2.5 disabled:bg-blue-300 disabled:text-gray-100"
-            disabled={!newGroupPermission}
+            disabled={!newGroupAuthorization}
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -589,47 +618,53 @@ export default function LogbookForm({ logbook, onSave }: Props) {
             </svg>
           </button>
         </form>
-      </div>
-      <div className="text-gray-500">User Permissions</div>
+      </div> */}
+      <div className="text-gray-500">User Authorizations</div>
       <div
         className={twJoin(
           "border rounded-lg bg-gray-50 w-full flex flex-col p-2",
-          userPermissions.length === 0 &&
+          userAuthorizations.length === 0 &&
             "items-center justify-center text-lg text-gray-500"
         )}
       >
-        {userPermissions.length === 0 ? (
-          <div className="my-3">No user permissions. Create one below.</div>
+        {userAuthorizations.length === 0 ? (
+          <div className="my-3">No user authorizations. Create one below.</div>
         ) : (
           <>
             <div className="divide-y">
-              {userPermissions.map((permission) => (
+              {userAuthorizations.map((authorization) => (
                 <div
-                  key={permission.userId}
+                  key={authorization.owner}
                   className="flex justify-between px-2 py-1 items-center"
                 >
-                  <div className="flex-grow">
-                    {userMap[permission.userId].gecos}
-                  </div>
+                  <div className="flex-grow">{authorization.owner}</div>
 
                   <Select
                     className="w-32"
-                    value={permission.permissions.write ? "Write" : "Read"}
+                    value={authorization.authorizationType}
                     options={["Write", "Read"]}
-                    setValue={(updatedPermission) => {
-                      const updatedPermissions = [...form.permissions];
-                      const index = form.permissions.findIndex(
-                        (otherPermission) => otherPermission === permission
+                    setValue={(updatedAuthorization) => {
+                      const updatedAuthorizations = [...form.authorizations];
+                      const index = form.authorizations.findIndex(
+                        (otherAuthorization) =>
+                          otherAuthorization === authorization
                       );
 
-                      updatedPermissions[index] = {
-                        ...updatedPermissions[index],
-                        permissions:
-                          updatedPermission === "Write"
-                            ? { write: true, read: true }
-                            : { write: false, read: true },
+                      if (
+                        updatedAuthorization !== "Read" &&
+                        updatedAuthorization !== "Write"
+                      ) {
+                        return;
+                      }
+
+                      updatedAuthorizations[index] = {
+                        ...updatedAuthorizations[index],
+                        authorizationType: updatedAuthorization,
                       };
-                      setForm({ ...form, permissions: updatedPermissions });
+                      setForm({
+                        ...form,
+                        authorizations: updatedAuthorizations,
+                      });
                     }}
                     nonsearchable
                   />
@@ -643,9 +678,10 @@ export default function LogbookForm({ logbook, onSave }: Props) {
                     tabIndex={0}
                     className={twJoin(IconButton, "text-gray-500")}
                     onClick={() =>
-                      removePermission(
-                        form.permissions.findIndex(
-                          (otherPermission) => otherPermission === permission
+                      removeAuthorization(
+                        form.authorizations.findIndex(
+                          (otherAuthorization) =>
+                            otherAuthorization === authorization
                         )
                       )
                     }
@@ -664,27 +700,27 @@ export default function LogbookForm({ logbook, onSave }: Props) {
         <form
           noValidate
           className="relative mt-2 w-full"
-          onSubmit={createUserPermission}
+          onSubmit={createUserAuthorization}
         >
           <Select
             className="w-full pr-12"
-            value={newUserPermission}
+            value={newUserAuthorization}
             onSearchChange={setUserSearch}
             isLoading={isUsersLoading}
             options={(users || [])
               .filter(
                 (user) =>
-                  !userPermissions.some(
-                    (permission) => permission.userId === user.uid
+                  !userAuthorizations.some(
+                    (authorization) => authorization.owner === user.mail
                   )
               )
-              .map((user) => ({ label: user.gecos, value: user.uid }))}
-            setValue={setNewUserPermissions}
+              .map((user) => ({ label: user.gecos, value: user.mail }))}
+            setValue={setNewUserAuthorizations}
           />
           <button
             type="submit"
             className="absolute right-0 top-0 bottom-0 flex items-center justify-center bg-blue-500 rounded-r-lg text-white p-2.5 disabled:bg-blue-300 disabled:text-gray-100"
-            disabled={!newUserPermission}
+            disabled={!newUserAuthorization}
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"

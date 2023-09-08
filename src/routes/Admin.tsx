@@ -14,7 +14,11 @@ import { Button, Input, TextButton } from "../components/base";
 import { useQueryClient } from "@tanstack/react-query";
 
 export default function Admin() {
-  const { logbookMap, logbooks, isLoading: isLogbooksLoading } = useLogbooks();
+  const {
+    logbookMap,
+    logbooks,
+    isLoading: isLogbooksLoading,
+  } = useLogbooks({ requireWrite: true, includeAuth: true });
   const { logbookId: selectedLogbookId } = useParams();
   // null means dialog not open
   const [newLogbookName, setNewLogbookName] = useState<string | null>(null);
@@ -43,7 +47,7 @@ export default function Admin() {
     navigate(`/admin/${logbookId}`);
     setNewLogbookName(null);
     queryClient.invalidateQueries({ queryKey: ["logbooks"] });
-  }, [newLogbookName]);
+  }, [newLogbookName, navigate, queryClient]);
 
   return (
     <Dialog controlled isOpen={newLogbookName !== null}>

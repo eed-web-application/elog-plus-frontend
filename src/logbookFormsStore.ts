@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { Logbook, Shift, Tag } from "./api";
+import { Authorization, LogbookWithAuth, Shift, Tag } from "./api";
 
 /**
  * Shift that has not been uploaded to the server yet. `id`s starting with an
@@ -18,15 +18,21 @@ interface LocalTag extends Pick<Tag, "name"> {
   id?: Tag["id"];
 }
 
-interface LogbookForm extends Pick<Logbook, "id" | "name" | "permissions"> {
+interface LocalAuthorization
+  extends Pick<Authorization, "authorizationType" | "owner"> {
+  id?: string;
+}
+
+interface LogbookForm extends Pick<LogbookWithAuth, "id" | "name"> {
   tags: LocalTag[];
   shifts: LocalShift[];
+  authorizations: LocalAuthorization[];
 }
 
 interface LogbookFormsState {
   forms: Record<string, LogbookForm>;
   startEditing: (
-    logbook: Logbook
+    logbook: LogbookWithAuth
   ) => [LogbookForm, (newValue: LogbookForm) => void, () => void];
   removeForm: (logbookId: string) => void;
   upsertForm: (newValue: LogbookForm) => void;

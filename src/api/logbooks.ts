@@ -14,38 +14,51 @@ export interface LogbookSummary {
   name: string;
 }
 
-export interface Permissions {
-  read: boolean;
-  write: boolean;
-}
+export type AuthorizationType = "Read" | "Write" | "Admin";
 
-export interface GroupPermission {
-  group: string;
-  permissions: Permissions;
+export interface Authorization {
+  id: string;
+  authorizationType: AuthorizationType;
+  owner: string;
+  resource: string;
 }
-
-export interface UserPermission {
-  userId: string;
-  permissions: Permissions;
-}
-
-export type Permission = GroupPermission | UserPermission;
 
 export interface Logbook extends LogbookSummary {
   tags: Tag[];
   shifts: Shift[];
-  permissions: Permission[];
+}
+
+export interface LogbookWithAuth extends Logbook {
+  authorizations: Authorization[];
 }
 
 export interface LogbookUpdation extends Omit<Logbook, "tags" | "shifts"> {
   tags: (Pick<Tag, "name"> & Partial<Pick<Tag, "id">>)[];
   shifts: (Pick<Shift, "name" | "from" | "to"> & Partial<Pick<Shift, "id">>)[];
+  authorization: (Pick<Authorization, "owner" | "authorizationType"> &
+    Partial<Pick<Authorization, "id">>)[];
 }
 
-export async function fetchLogbooks(): Promise<Logbook[]> {
-  return (await fetch("v1/logbooks")).map((logbook: Logbook) => {
-    logbook.permissions = [];
-    return logbook;
+export async function fetchLogbooks<A extends boolean | undefined>({
+  includeAuth = false,
+  requireWrite = false,
+}: {
+  includeAuth?: A;
+  requireWrite?: boolean;
+} = {}): Promise<(A extends true ? LogbookWithAuth : Logbook)[]> {
+  const params: Record<string, string> = {};
+
+  if (includeAuth) {
+    params.includeAuthorizations = "true";
+  }
+
+  params.filterForAuthorizationTypes = requireWrite
+    ? ""
+    : // FIXME:
+      "Read,Write,Admin";
+
+  return await fetch("v1/logbooks", {
+    params,
   });
 }
 
