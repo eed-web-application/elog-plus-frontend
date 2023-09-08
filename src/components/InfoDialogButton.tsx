@@ -1,15 +1,5 @@
-import { twJoin, twMerge } from "tailwind-merge";
-import {
-  FloatingFocusManager,
-  FloatingOverlay,
-  useClick,
-  useDismiss,
-  useFloating,
-  useInteractions,
-  useRole,
-} from "@floating-ui/react";
-import { ComponentProps, useCallback, useEffect, useState } from "react";
-import { BackDrop, IconButton } from "./base";
+import { twMerge } from "tailwind-merge";
+import { ComponentProps, useCallback, useState } from "react";
 import Logo from "./Logo";
 import { ServerError, ServerVersion, fetchVersion } from "../api";
 import reportServerError from "../reportServerError";
