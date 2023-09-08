@@ -1,7 +1,13 @@
 import { ComponentProps, useState } from "react";
 import { twJoin, twMerge } from "tailwind-merge";
 import { Input, InputDisabled, InputInvalid } from "./base";
-import { autoUpdate, size, useFloating } from "@floating-ui/react";
+import {
+  autoUpdate,
+  flip,
+  offset,
+  size,
+  useFloating,
+} from "@floating-ui/react";
 import Spinner from "./Spinner";
 import Chip from "./Chip";
 import useSelectCursor from "../hooks/useSelectCursor";
@@ -108,12 +114,16 @@ export default function MultiSelect<C extends { custom: string }>({
     open: focused,
     placement: "bottom-start",
     middleware: [
+      offset(4),
+      flip({ padding: 8 }),
       size({
-        apply({ rects, elements }) {
+        apply({ rects, elements, availableHeight }) {
           Object.assign(elements.floating.style, {
-            width: `${rects.reference.width}px`,
+            maxHeight: `${availableHeight}px`,
+            minWidth: `${rects.reference.width}px`,
           });
         },
+        padding: 8,
       }),
     ],
     whileElementsMounted: autoUpdate,
@@ -235,7 +245,7 @@ export default function MultiSelect<C extends { custom: string }>({
         <div
           ref={refs.setFloating}
           style={floatingStyles}
-          className="max-h-64 overflow-y-auto rounded-lg shadow mt-2 text-black bg-white z-10"
+          className="max-h-64 overflow-y-auto rounded-lg shadow text-black bg-white z-10"
         >
           {isLoading ? (
             <div className="text-center w-full py-3">

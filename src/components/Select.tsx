@@ -4,6 +4,8 @@ import { Input, InputDisabled, InputInvalid } from "./base";
 import {
   FloatingPortal,
   autoUpdate,
+  flip,
+  offset,
   size,
   useFloating,
 } from "@floating-ui/react";
@@ -73,12 +75,16 @@ export default function Select<O extends Option>({
     onOpenChange: setIsOpen,
     placement: "bottom-start",
     middleware: [
+      offset(4),
+      flip({ padding: 8 }),
       size({
-        apply({ rects, elements }) {
+        apply({ rects, elements, availableHeight }) {
           Object.assign(elements.floating.style, {
-            width: `${rects.reference.width}px`,
+            maxHeight: `${availableHeight}px`,
+            minWidth: `${rects.reference.width}px`,
           });
         },
+        padding: 8,
       }),
     ],
     whileElementsMounted: autoUpdate,
@@ -173,7 +179,7 @@ export default function Select<O extends Option>({
           <div
             ref={refs.setFloating}
             style={floatingStyles}
-            className="max-h-64 overflow-y-auto rounded-lg shadow mt-2 text-black bg-white z-10"
+            className="max-h-64 overflow-y-auto rounded-lg shadow text-black bg-white z-10"
           >
             {filteredOptions.length === 0 || isLoading ? (
               <div className="text-gray-500 text-center w-full py-3">
