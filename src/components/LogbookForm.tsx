@@ -330,7 +330,8 @@ export default function LogbookForm({ logbook, onSave }: Props) {
           />
           <button
             type="submit"
-            className="absolute right-0 top-0 bottom-0 flex items-center justify-center bg-blue-500 rounded-r-lg text-white p-2.5"
+            className="absolute right-0 top-0 bottom-0 flex items-center justify-center bg-blue-500 rounded-r-lg text-white p-2.5 disabled:bg-blue-300 disabled:text-gray-100"
+            disabled={Boolean(form.tags.find(({ name }) => name === newTag))}
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
