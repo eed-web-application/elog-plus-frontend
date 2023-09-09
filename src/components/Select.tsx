@@ -1,4 +1,4 @@
-import { ComponentProps, useCallback, useEffect, useState } from "react";
+import { ComponentProps, FormEvent, useCallback, useState } from "react";
 import { twMerge } from "tailwind-merge";
 import { Input, InputDisabled, InputInvalid } from "./base";
 import {
@@ -7,10 +7,15 @@ import {
   flip,
   offset,
   size,
+  useClick,
+  useDismiss,
   useFloating,
+  useInteractions,
+  useRole,
 } from "@floating-ui/react";
-import Spinner from "./Spinner";
-import useSelectCursor from "../hooks/useSelectCursor";
+import useSelectList from "../hooks/useSelectList";
+import SelectList from "./SelectList";
+import SelectOption from "./SelectOption";
 
 export type Option = string | { label: string; value: string };
 
@@ -23,7 +28,7 @@ interface Props<O extends Option>
   containerClassName?: string;
   invalid?: boolean;
   nonsearchable?: boolean;
-  noOptionsLabel?: string;
+  emptyLabel?: string;
   onSearchChange?: (search: string) => void;
 }
 
@@ -37,14 +42,13 @@ export default function Select<O extends Option>({
   placeholder,
   invalid,
   nonsearchable,
-  noOptionsLabel,
+  emptyLabel,
   onSearchChange,
-  onBlur,
   disabled,
   ...rest
 }: Props<O>) {
   const [search, setSearch] = useState("");
-  const [isOpen, setIsOpen] = useState(false);
+  const [open, setOpen] = useState(false);
 
   const updateSearch = useCallback(
     (search: string) => {
@@ -70,9 +74,15 @@ export default function Select<O extends Option>({
     valuesLabel = typeof option === "string" ? option : option?.label;
   }
 
-  const { refs, floatingStyles } = useFloating({
-    open: isOpen,
-    onOpenChange: setIsOpen,
+  const { refs, floatingStyles, context } = useFloating({
+    open: open,
+    onOpenChange: (open) => {
+      if (value && !open) {
+        updateSearch("");
+      }
+
+      setOpen(open);
+    },
     placement: "bottom-start",
     middleware: [
       offset(4),
@@ -90,61 +100,68 @@ export default function Select<O extends Option>({
     whileElementsMounted: autoUpdate,
   });
 
-  useEffect(() => {
-    if (value && !isOpen) {
-      updateSearch("");
-    }
-  }, [value, isOpen]);
+  const role = useRole(context, { role: "listbox" });
+  const click = useClick(context);
+  const dismiss = useDismiss(context);
+  const { getReferenceProps, getFloatingProps } = useInteractions([
+    role,
+    click,
+    dismiss,
+  ]);
 
   const {
-    cursor,
-    setCursor,
-    optionRefs,
-    onInputKeyDown: inputKeyDownCursorHandler,
-  } = useSelectCursor(filteredOptions.length);
+    getFloatingProps: getListFloatingProps,
+    getReferenceProps: getInputProps,
+    getItemProps,
+    activeIndex,
+    listRef,
+  } = useSelectList({ context, open });
+
+  const select = useCallback(
+    (option: O) => {
+      setValue(typeof option == "string" ? option : option.value);
+      updateSearch("");
+      setOpen(false);
+    },
+    [setValue, updateSearch]
+  );
 
   function onInputKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
-    if (isOpen) {
-      inputKeyDownCursorHandler(e);
-    } else if (e.code === "ArrowDown" || e.code === "ArrowUp") {
-      setIsOpen(true);
-    }
-
     if (e.code === "Enter") {
       e.preventDefault();
 
-      if (isOpen) {
-        const option = filteredOptions[cursor];
-        setValue(typeof option == "string" ? option : option.value);
-        updateSearch("");
-        setIsOpen(false);
+      if (open && activeIndex !== null) {
+        select(filteredOptions[activeIndex]);
       }
     }
   }
 
   return (
     // Flex is to fix weird layout issues when the input is a button
-    <div className={twMerge("relative flex", containerClassName)}>
+    <div
+      {...getReferenceProps({
+        className: twMerge("relative flex", containerClassName),
+      })}
+    >
       <input
-        {...rest}
-        type={nonsearchable ? "button" : "text"}
-        className={twMerge(Input, invalid && InputInvalid, className)}
-        placeholder={value || !placeholder ? "" : placeholder}
-        value={search}
-        onChange={(e) => {
-          updateSearch(e.target.value);
-          if (!isOpen) {
-            setIsOpen(true);
-          }
-        }}
-        ref={refs.setReference}
-        onFocus={() => setIsOpen(true)}
-        onBlur={(e) => {
-          onBlur?.(e);
-          setIsOpen(false);
-        }}
-        onKeyDown={onInputKeyDown}
-        disabled={disabled}
+        {...getInputProps({
+          type: nonsearchable ? "button" : "text",
+          className: twMerge(Input, invalid && InputInvalid, className),
+          placeholder: value || !placeholder ? "" : placeholder,
+          value: search,
+          onChange: (e: FormEvent<HTMLInputElement>) => {
+            updateSearch(e.currentTarget.value);
+
+            if (!open) {
+              setOpen(true);
+            }
+          },
+          ref: refs.setReference,
+          onKeyDown: onInputKeyDown,
+          disabled: disabled,
+
+          ...rest,
+        })}
       />
 
       <div
@@ -174,54 +191,39 @@ export default function Select<O extends Option>({
         </svg>
       </div>
 
-      {isOpen && (
+      {open && (
         <FloatingPortal>
-          <div
-            ref={refs.setFloating}
-            style={floatingStyles}
-            className="max-h-64 overflow-y-auto rounded-lg shadow text-black bg-white z-10"
-          >
-            {filteredOptions.length === 0 || isLoading ? (
-              <div className="text-gray-500 text-center w-full py-3">
-                {isLoading ? (
-                  <Spinner className="m-auto" />
-                ) : (
-                  noOptionsLabel || "No options"
-                )}
-              </div>
-            ) : (
-              filteredOptions.map((option, index) => {
-                const selected =
-                  value ===
-                  (typeof option === "string" ? option : option.value);
-                const focused = cursor === index;
-
-                return (
-                  <div
-                    tabIndex={0}
-                    key={typeof option === "string" ? option : option.value}
-                    ref={(el) => (optionRefs.current[index] = el)}
-                    className={twMerge(
-                      "px-2 p-1 cursor-pointer hover:bg-gray-100",
-                      focused && "bg-gray-100",
-                      selected && "bg-blue-100 hover:bg-blue-200",
-                      selected && focused && "bg-blue-200"
-                    )}
-                    onMouseDown={() => {
-                      setValue(
-                        typeof option === "string" ? option : option.value
-                      );
-                    }}
-                    onMouseEnter={() => {
-                      setCursor(index);
-                    }}
-                  >
-                    {typeof option === "string" ? option : option.label}
-                  </div>
-                );
+          <SelectList
+            isLoading={isLoading}
+            isEmpty={filteredOptions.length === 0}
+            emptyLabel={emptyLabel}
+            {...getFloatingProps(
+              getListFloatingProps({
+                ref: refs.setFloating,
+                style: floatingStyles,
+                className:
+                  "max-h-64 overflow-y-auto rounded-lg shadow text-black bg-white z-10",
               })
             )}
-          </div>
+          >
+            {filteredOptions.map((option, index) => (
+              <SelectOption
+                isActive={activeIndex === index}
+                isSelected={
+                  value === (typeof option === "string" ? option : option.value)
+                }
+                {...getItemProps({
+                  key: typeof option === "string" ? option : option.value,
+                  ref: (el) => (listRef.current[index] = el),
+                  onMouseDown: () => {
+                    select(option);
+                  },
+                })}
+              >
+                {typeof option === "string" ? option : option.label}
+              </SelectOption>
+            ))}
+          </SelectList>
         </FloatingPortal>
       )}
     </div>

@@ -110,7 +110,6 @@ export default function TagForm({
               )
             );
           }}
-          allowCustomOptions
         />
       </label>
       {LogbookSelectorDialog}

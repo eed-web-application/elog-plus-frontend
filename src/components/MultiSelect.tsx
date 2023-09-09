@@ -1,16 +1,21 @@
-import { ComponentProps, useState } from "react";
-import { twJoin, twMerge } from "tailwind-merge";
+import { ComponentProps, FocusEvent, FormEvent, useState } from "react";
+import { twMerge } from "tailwind-merge";
 import { Input, InputDisabled, InputInvalid } from "./base";
 import {
   autoUpdate,
   flip,
   offset,
   size,
+  useClick,
+  useDismiss,
   useFloating,
+  useInteractions,
+  useRole,
 } from "@floating-ui/react";
-import Spinner from "./Spinner";
 import Chip from "./Chip";
-import useSelectCursor from "../hooks/useSelectCursor";
+import SelectOption from "./SelectOption";
+import SelectList from "./SelectList";
+import useSelectList from "../hooks/useSelectList";
 
 type Option = { label: string; value: string };
 
@@ -22,7 +27,6 @@ type Props<C extends { custom: string }> = {
   disabled?: boolean;
   value: (string | C)[];
   setValue: (value: (string | C)[]) => void;
-  allowCustomOptions?: boolean;
   canCreate?: (query: string) => boolean;
   onCreate?: (name: string) => void;
 } & Omit<ComponentProps<"input">, "value">;
@@ -57,7 +61,6 @@ export default function MultiSelect<C extends { custom: string }>({
   placeholder,
   invalid,
   disabled,
-  allowCustomOptions,
   canCreate,
   onCreate,
   onBlur,
@@ -65,6 +68,7 @@ export default function MultiSelect<C extends { custom: string }>({
   ...rest
 }: Props<C>) {
   const [untrimedSearch, setSearch] = useState("");
+  const [open, setOpen] = useState(false);
   const [focused, setFocused] = useState(false);
 
   const search = untrimedSearch.trim();
@@ -110,8 +114,9 @@ export default function MultiSelect<C extends { custom: string }>({
   const showCreateButton =
     search && !exactMatch && (canCreate ? canCreate(search) : true);
 
-  const { refs, floatingStyles } = useFloating({
-    open: focused,
+  const { refs, floatingStyles, context } = useFloating({
+    open,
+    onOpenChange: setOpen,
     placement: "bottom-start",
     middleware: [
       offset(4),
@@ -129,12 +134,22 @@ export default function MultiSelect<C extends { custom: string }>({
     whileElementsMounted: autoUpdate,
   });
 
+  const role = useRole(context, { role: "listbox" });
+  const click = useClick(context, { toggle: false });
+  const dismiss = useDismiss(context);
+  const { getReferenceProps, getFloatingProps } = useInteractions([
+    role,
+    click,
+    dismiss,
+  ]);
+
   const {
-    cursor,
-    optionRefs,
-    setCursor,
-    onInputKeyDown: inputKeyDownCursorHandler,
-  } = useSelectCursor(filteredOptions.length + (showCreateButton ? 1 : 0));
+    getFloatingProps: getListFloatingProps,
+    getReferenceProps: getInputProps,
+    getItemProps,
+    activeIndex,
+    listRef,
+  } = useSelectList({ context, open });
 
   function createCustomOption() {
     if (!search) {
@@ -148,6 +163,7 @@ export default function MultiSelect<C extends { custom: string }>({
 
   function toggleSelection(option: string) {
     setSearch("");
+
     if (value.includes(option)) {
       setValue(value.filter((otherOption) => otherOption !== option));
     } else {
@@ -157,14 +173,13 @@ export default function MultiSelect<C extends { custom: string }>({
   }
 
   function onInputKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
-    inputKeyDownCursorHandler(e);
-
-    if (e.code === "Enter") {
+    if (e.code === "Enter" && activeIndex !== null) {
       e.preventDefault();
-      if (cursor >= filteredOptions.length && showCreateButton) {
+
+      if (activeIndex >= filteredOptions.length && showCreateButton) {
         createCustomOption();
-      } else if (cursor >= 0 && filteredOptions.length > 0) {
-        const option = filteredOptions[cursor];
+      } else if (filteredOptions.length > 0) {
+        const option = filteredOptions[activeIndex];
 
         toggleSelection(getValue(option));
         setSearch("");
@@ -176,6 +191,7 @@ export default function MultiSelect<C extends { custom: string }>({
 
   return (
     <div
+      ref={refs.setReference}
       className={twMerge(
         Input,
         invalid && InputInvalid,
@@ -184,7 +200,13 @@ export default function MultiSelect<C extends { custom: string }>({
         focused && "outline-none ring-1 ring-blue-500 border-blue-500",
         className
       )}
-      ref={refs.setReference}
+      {...getReferenceProps({
+        onMouseDown: (e) => {
+          if (!(e.target instanceof HTMLInputElement)) {
+            e.preventDefault();
+          }
+        },
+      })}
     >
       <div className="flex flex-wrap flex-1 items-center">
         {selected.map((option) => (
@@ -192,9 +214,6 @@ export default function MultiSelect<C extends { custom: string }>({
             delectable
             className="mr-2"
             key={"custom" in option ? option.custom : option.value}
-            onMouseDown={(e) => {
-              e.preventDefault();
-            }}
             onDelete={() =>
               setValue(
                 value.filter(
@@ -207,23 +226,25 @@ export default function MultiSelect<C extends { custom: string }>({
           </Chip>
         ))}
         <input
-          {...rest}
-          type="text"
-          placeholder={value && !placeholder ? "" : placeholder}
-          value={untrimedSearch}
-          className="flex-1 outline-none bg-transparent w-fit"
-          onChange={(e) => setSearch(e.target.value)}
-          onFocus={(e) => {
-            onFocus?.(e);
-            setFocused(true);
-          }}
-          onBlur={(e) => {
-            onBlur?.(e);
-            setFocused(false);
-          }}
-          onKeyDown={onInputKeyDown}
-          size={untrimedSearch.length + 1}
-          disabled={disabled}
+          {...getInputProps({
+            type: "text",
+            placeholder: value && !placeholder ? "" : placeholder,
+            value: untrimedSearch,
+            className: "flex-1 outline-none bg-transparent w-fit",
+            onChange: (e: FormEvent<HTMLInputElement>) =>
+              setSearch(e.currentTarget.value),
+            onKeyDown: onInputKeyDown,
+            size: untrimedSearch.length + 1,
+            disabled,
+            onFocus: (e: FocusEvent<HTMLInputElement>) => {
+              onFocus?.(e);
+              setFocused(true);
+            },
+            onBlur: (e: FocusEvent<HTMLInputElement>) => {
+              onBlur?.(e);
+              setFocused(false);
+            },
+          })}
         />
       </div>
 
@@ -241,63 +262,56 @@ export default function MultiSelect<C extends { custom: string }>({
           d="M19.5 8.25l-7.5 7.5-7.5-7.5"
         />
       </svg>
-      {focused && (
-        <div
-          ref={refs.setFloating}
-          style={floatingStyles}
-          className="max-h-64 overflow-y-auto rounded-lg shadow text-black bg-white z-10"
+      {open && (
+        <SelectList
+          isLoading={isLoading}
+          {...getFloatingProps(
+            getListFloatingProps({
+              ref: refs.setFloating,
+              style: floatingStyles,
+              className:
+                "max-h-64 overflow-y-auto rounded-lg shadow text-black bg-white z-10",
+            })
+          )}
         >
-          {isLoading ? (
-            <div className="text-center w-full py-3">
-              <Spinner className="m-auto" />
-            </div>
-          ) : (
-            <>
-              {filteredOptions.map((option, index) => {
-                return (
-                  <div
-                    tabIndex={0}
-                    key={getValue(option)}
-                    className={twJoin(
-                      "px-2 p-1 cursor-pointer hover:bg-gray-100",
-                      cursor === index && "bg-gray-100"
-                    )}
-                    onMouseDown={(e) => {
-                      e.preventDefault();
-                      toggleSelection(getValue(option));
-                    }}
-                    onMouseEnter={() => setCursor(index)}
-                    ref={(el) => (optionRefs.current[index] = el)}
-                  >
-                    {getLabel(option)}
-                  </div>
-                );
-              })}
-              {showCreateButton && (
-                <div
-                  className={twJoin(
-                    "px-2 p-1 cursor-pointer hover:bg-gray-100",
-                    cursor === filteredOptions.length && "bg-gray-100"
-                  )}
-                  onMouseDown={(e) => {
+          <>
+            {filteredOptions.map((option, index) => (
+              <SelectOption
+                isActive={activeIndex === index}
+                {...getItemProps({
+                  key: getValue(option),
+                  tabIndex: 0,
+                  onMouseDown: (e) => {
+                    e.preventDefault();
+                    toggleSelection(getValue(option));
+                  },
+                  ref: (el) => (listRef.current[index] = el),
+                  ...rest,
+                })}
+              >
+                {getLabel(option)}
+              </SelectOption>
+            ))}
+            {showCreateButton && (
+              <SelectOption
+                isActive={activeIndex === filteredOptions.length}
+                {...getItemProps({
+                  ref: (el) => (listRef.current[filteredOptions.length] = el),
+                  onMouseDown: (e) => {
                     // In the TagForm, when the create button is clicked,
                     // a dialog is opened, so we have this here to ensure
                     // that the dialog doesn't immediately close by this click.
                     e.stopPropagation();
 
                     createCustomOption();
-                  }}
-                  onMouseEnter={() => setCursor(filteredOptions.length)}
-                  ref={(el) =>
-                    (optionRefs.current[filteredOptions.length] = el)
-                  }
-                >
-                  <span className="text-gray-500">Create</span> {search}
-                </div>
-              )}
-            </>
-          )}
-        </div>
+                  },
+                })}
+              >
+                <span className="text-gray-500">Create</span> {search}
+              </SelectOption>
+            )}
+          </>
+        </SelectList>
       )}
     </div>
   );
