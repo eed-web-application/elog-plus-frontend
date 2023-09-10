@@ -1,15 +1,15 @@
 import { useCallback } from "react";
 import { EntryQuery } from "../hooks/useEntries";
 import FilterChip from "./FilterChip.tsx";
-import MultiSelectMenu from "./MultiSelectMenu.tsx";
 import { Input } from "./base.ts";
 import Chip from "./Chip.tsx";
-import FilterChipWithMenu from "./FilterChipWithMenu.tsx";
 import useLogbooks from "../hooks/useLogbooks.ts";
 import useTags from "../hooks/useTags.ts";
 import { yyyymmddToDate, dateToYYYYMMDD } from "../utils/datetimeConversion.ts";
 import { Tag } from "../api/tags.ts";
 import { Logbook } from "../api/logbooks.ts";
+import FilterChipMultiSelect from "./FilterChipMultiSelect.tsx";
+import FilterChipInput from "./FilterChipInput.tsx";
 
 export type Filters = Pick<
   EntryQuery,
@@ -146,59 +146,53 @@ export default function Filters({ filters, setFilters }: Props) {
 
   return (
     <div className="flex flex-wrap">
-      <FilterChipWithMenu
+      <FilterChipMultiSelect
         className="mr-3 mt-2"
         label={logbookFilterLabel()}
         disabled={filters.onlyFavorites}
         active={filters.logbooks.length !== 0 && Boolean(logbooks)}
         onDisable={() => setFilters({ ...filters, logbooks: [] })}
-      >
-        <MultiSelectMenu
-          selected={filters.logbooks}
-          setSelected={(selected) =>
-            setFilters({
-              ...filters,
-              logbooks: selected,
-            })
-          }
-          isLoading={logbooks === null}
-          options={logbooks || []}
-          extractLabel={extractLogbookLabel}
-          extractKey={extractKey}
-        />
-      </FilterChipWithMenu>
-      <FilterChipWithMenu
+        selected={filters.logbooks}
+        setSelected={(selected) =>
+          setFilters({
+            ...filters,
+            logbooks: selected,
+          })
+        }
+        isLoading={logbooks === null}
+        options={logbooks || []}
+        extractLabel={extractLogbookLabel}
+        extractKey={extractKey}
+      />
+      <FilterChipMultiSelect
         className="mr-3 mt-2"
         label={tagFilterLabel()}
         disabled={filters.onlyFavorites}
         active={filters.tags.length !== 0 && !isTagsLoading}
         onDisable={() => setFilters({ ...filters, tags: [] })}
-      >
-        <MultiSelectMenu
-          selected={filters.tags}
-          setSelected={(selected) => setFilters({ ...filters, tags: selected })}
-          onOptionSelected={bumpTag}
-          isLoading={isTagsLoading}
-          options={tags}
-          extractLabel={extractTagLabel}
-          extractKey={extractKey}
-          searchButton={
-            <button
-              type="button"
-              className="bg-gray-100 rounded-tr border border-l-transparent border-gray-300 hover:bg-gray-200 flex justify-center items-center px-2 w-12"
-              onClick={() =>
-                setFilters({
-                  ...filters,
-                  requireAllTags: !filters.requireAllTags,
-                })
-              }
-            >
-              {filters.requireAllTags ? "All" : "Any"}
-            </button>
-          }
-        />
-      </FilterChipWithMenu>
-      <FilterChipWithMenu
+        selected={filters.tags}
+        setSelected={(selected) => setFilters({ ...filters, tags: selected })}
+        onOptionSelected={bumpTag}
+        isLoading={isTagsLoading}
+        options={tags}
+        extractLabel={extractTagLabel}
+        extractKey={extractKey}
+        searchButton={
+          <button
+            type="button"
+            className="bg-gray-100 rounded-tr border border-l-transparent border-gray-300 hover:bg-gray-200 flex justify-center items-center px-2 w-12"
+            onClick={() =>
+              setFilters({
+                ...filters,
+                requireAllTags: !filters.requireAllTags,
+              })
+            }
+          >
+            {filters.requireAllTags ? "All" : "Any"}
+          </button>
+        }
+      />
+      <FilterChipInput
         className="mr-3 mt-2"
         label={
           filters.startDate && !filters.onlyFavorites
@@ -213,7 +207,6 @@ export default function Filters({ filters, setFilters }: Props) {
         disabled={filters.onlyFavorites}
         active={Boolean(filters.startDate)}
         onDisable={() => setFilters({ ...filters, startDate: null })}
-        inline
       >
         <input
           className={Input}
@@ -227,8 +220,8 @@ export default function Filters({ filters, setFilters }: Props) {
             })
           }
         />
-      </FilterChipWithMenu>
-      <FilterChipWithMenu
+      </FilterChipInput>
+      <FilterChipInput
         className="mr-3 mt-2"
         label={
           filters.endDate && !filters.onlyFavorites
@@ -243,7 +236,6 @@ export default function Filters({ filters, setFilters }: Props) {
         disabled={filters.onlyFavorites}
         active={Boolean(filters.endDate)}
         onDisable={() => setFilters({ ...filters, endDate: null })}
-        inline
       >
         <input
           className={Input}
@@ -254,7 +246,7 @@ export default function Filters({ filters, setFilters }: Props) {
             setFilters({ ...filters, endDate: yyyymmddToDate(e.target.value) })
           }
         />
-      </FilterChipWithMenu>
+      </FilterChipInput>
       <FilterChip
         className="mr-3 mt-2"
         label="Sort by log date"

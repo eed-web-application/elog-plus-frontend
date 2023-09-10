@@ -14,7 +14,7 @@ export interface Props
   disabled?: boolean;
   showCheck?: boolean;
   showDownArrow?: boolean;
-  onDisable?: (e: MouseEvent<SVGSVGElement>) => void;
+  onDisable?: () => void;
   className?: string;
 }
 
@@ -38,7 +38,7 @@ const FilterChip = forwardRef<HTMLButtonElement, PropsWithChildren<Props>>(
   ) => {
     function disable(e: MouseEvent<SVGSVGElement>) {
       e.stopPropagation();
-      onDisable?.(e);
+      onDisable?.();
     }
 
     const active = shouldBeActive && !disabled;

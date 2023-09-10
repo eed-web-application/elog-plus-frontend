@@ -228,6 +228,7 @@ export default function MultiSelect<C extends { custom: string }>({
         <input
           {...getInputProps({
             type: "text",
+            role: "combobox",
             placeholder: value && !placeholder ? "" : placeholder,
             value: untrimedSearch,
             className: "flex-1 outline-none bg-transparent w-fit",
@@ -280,7 +281,6 @@ export default function MultiSelect<C extends { custom: string }>({
                 isActive={activeIndex === index}
                 {...getItemProps({
                   key: getValue(option),
-                  tabIndex: 0,
                   onMouseDown: (e) => {
                     e.preventDefault();
                     toggleSelection(getValue(option));
