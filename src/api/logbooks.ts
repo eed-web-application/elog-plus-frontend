@@ -52,10 +52,7 @@ export async function fetchLogbooks<A extends boolean | undefined>({
     params.includeAuthorizations = "true";
   }
 
-  params.filterForAuthorizationTypes = requireWrite
-    ? ""
-    : // FIXME:
-      "Read,Write,Admin";
+  params.filterForAuthorizationTypes = requireWrite ? "Write" : "Read";
 
   return await fetch("v1/logbooks", {
     params,
