@@ -4,6 +4,7 @@ import { Button, Input } from "./base";
 import { ComponentProps, useEffect, useMemo, useState } from "react";
 import { useDraftsStore } from "../draftsStore";
 import Logo from "./Logo";
+import DevSelectUser from "./DevSelectUser";
 
 interface Props extends ComponentProps<"div"> {
   search: string;
@@ -51,7 +52,7 @@ export default function Navbar({
 
   return (
     <div className={twMerge("flex flex-wrap", className)} {...rest}>
-      <Link to="/" className="text-center mb-3 w-full md:mb-0 md:w-auto">
+      <Link to="/" className="mb-3 w-full text-center md:mb-0 md:w-auto">
         <Logo className="inline" />
       </Link>
       <form
@@ -71,7 +72,7 @@ export default function Navbar({
           />
           <button
             type="submit"
-            className="absolute top-0 right-0 p-1.5 text-sm font-medium text-white bg-blue-500 rounded-r-lg border border-blue-500 hover:bg-blue-600 focus:ring-2 focus:outline-none focus:ring-blue-300"
+            className="absolute top-0 right-0 p-1.5 text-sm font-medium text-white bg-blue-500 rounded-r-lg border border-blue-500 hover:bg-blue-600 focus:ring-2 focus:ring-blue-300 focus:outline-none"
           >
             <svg
               aria-hidden="true"
@@ -91,6 +92,11 @@ export default function Navbar({
           </button>
         </div>
       </form>
+
+      {import.meta.env.MODE === "development" && (
+        <DevSelectUser className="mr-2" />
+      )}
+
       <Link
         to={{ pathname: "/admin" }}
         className={twJoin(Button, "mr-2 text-sm flex items-center")}
@@ -103,7 +109,7 @@ export default function Navbar({
       >
         New Entry
         {hasNewEntryDraft && (
-          <div className="w-4 h-4 translate-x-1.5 -translate-y-1.5 p-[3px] shadow-xl bg-gray-200 rounded-full absolute top-0 right-0 text-black"></div>
+          <div className="absolute top-0 right-0 w-4 h-4 text-black bg-gray-200 rounded-full shadow-xl translate-x-1.5 -translate-y-1.5 p-[3px]"></div>
         )}
       </Link>
     </div>

@@ -1,5 +1,8 @@
 FROM node:16-alpine as builder
 
+ARG MODE=production
+ENV MODE $MODE
+
 ARG API_ENDPOINT
 ENV API_ENDPOINT $API_ENDPOINT
 
@@ -13,7 +16,7 @@ WORKDIR /app
 
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
 
-RUN pnpm vite build
+RUN pnpm vite build --mode $MODE
 
 FROM nginx:alpine
 
