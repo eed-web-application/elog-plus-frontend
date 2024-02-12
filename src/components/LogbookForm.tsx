@@ -132,7 +132,8 @@ export default function LogbookForm({ logbook, onSave }: Props) {
     });
 
     const logbookUpdation: LogbookUpdation = {
-      ...form,
+      id: form.id,
+      name: form.name,
       tags: resolvedTags,
       authorization: resolvedAuthorization,
       // Remove temp ids
@@ -219,6 +220,7 @@ export default function LogbookForm({ logbook, onSave }: Props) {
         {
           owner: newUserAuthorization,
           authorizationType: DEFAULT_AUTHORIZATION,
+          ownerType: "User",
         },
       ],
     });
@@ -266,7 +268,7 @@ export default function LogbookForm({ logbook, onSave }: Props) {
 
   return (
     <div className="px-3 pb-3">
-      <label className="text-gray-500 block mb-2">
+      <label className="block mb-2 text-gray-500">
         Name
         <input
           required
@@ -297,7 +299,7 @@ export default function LogbookForm({ logbook, onSave }: Props) {
               {form.tags.map((tag, index) => (
                 <div
                   key={tag.id || tag.name}
-                  className="flex justify-between px-2 items-center"
+                  className="flex justify-between items-center px-2"
                 >
                   {tag.name}
                   <svg
@@ -330,7 +332,7 @@ export default function LogbookForm({ logbook, onSave }: Props) {
           />
           <button
             type="submit"
-            className="absolute right-0 top-0 bottom-0 flex items-center justify-center bg-blue-500 rounded-r-lg text-white p-2.5 disabled:bg-blue-300 disabled:text-gray-100"
+            className="flex absolute top-0 right-0 bottom-0 justify-center items-center p-2.5 text-white bg-blue-500 rounded-r-lg disabled:text-gray-100 disabled:bg-blue-300"
             disabled={Boolean(form.tags.find(({ name }) => name === newTag))}
           >
             <svg
@@ -366,7 +368,7 @@ export default function LogbookForm({ logbook, onSave }: Props) {
               {form.shifts.map((shift, index) => (
                 <div
                   key={shift.id}
-                  className="flex justify-between py-2 items-center gap-1"
+                  className="flex gap-1 justify-between items-center py-2"
                 >
                   <input
                     type="text"
@@ -386,7 +388,7 @@ export default function LogbookForm({ logbook, onSave }: Props) {
                       )
                     }
                   />
-                  <div className="gap-2 self-end flex items-center">
+                  <div className="flex gap-2 items-center self-end">
                     <input
                       className={twMerge(
                         Input,
@@ -482,7 +484,7 @@ export default function LogbookForm({ logbook, onSave }: Props) {
           />
           <button
             type="submit"
-            className="absolute right-0 top-0 bottom-0 flex items-center justify-center bg-blue-500 rounded-r-lg text-white p-2.5"
+            className="flex absolute top-0 right-0 bottom-0 justify-center items-center p-2.5 text-white bg-blue-500 rounded-r-lg"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -518,7 +520,7 @@ export default function LogbookForm({ logbook, onSave }: Props) {
               {groupAuthorizations.map((authorization) => (
                 <div
                   key={authorization.group}
-                  className="flex justify-between px-2 py-1 items-center"
+                  className="flex justify-between items-center py-1 px-2"
                 >
                   <div className="flex-grow">{authorization.group}</div>
 
@@ -584,7 +586,7 @@ export default function LogbookForm({ logbook, onSave }: Props) {
           onSubmit={createGroupAuthorization}
         >
           <Select
-            className="w-full pr-12"
+            className="pr-12 w-full"
             value={newGroupAuthorization}
             onSearchChange={setGroupSearch}
             isLoading={isGroupsLoading}
@@ -600,7 +602,7 @@ export default function LogbookForm({ logbook, onSave }: Props) {
           />
           <button
             type="submit"
-            className="absolute right-0 top-0 bottom-0 flex items-center justify-center bg-blue-500 rounded-r-lg text-white p-2.5 disabled:bg-blue-300 disabled:text-gray-100"
+            className="flex absolute top-0 right-0 bottom-0 justify-center items-center p-2.5 text-white bg-blue-500 rounded-r-lg disabled:text-gray-100 disabled:bg-blue-300"
             disabled={!newGroupAuthorization}
           >
             <svg
@@ -636,7 +638,7 @@ export default function LogbookForm({ logbook, onSave }: Props) {
               {userAuthorizations.map((authorization) => (
                 <div
                   key={authorization.owner}
-                  className="flex justify-between px-2 py-1 items-center"
+                  className="flex justify-between items-center py-1 px-2"
                 >
                   <div className="flex-grow">{authorization.owner}</div>
 
@@ -704,7 +706,7 @@ export default function LogbookForm({ logbook, onSave }: Props) {
           onSubmit={createUserAuthorization}
         >
           <Select
-            className="w-full pr-12"
+            className="pr-12 w-full"
             value={newUserAuthorization}
             onSearchChange={setUserSearch}
             isLoading={isUsersLoading}
@@ -720,7 +722,7 @@ export default function LogbookForm({ logbook, onSave }: Props) {
           />
           <button
             type="submit"
-            className="absolute right-0 top-0 bottom-0 flex items-center justify-center bg-blue-500 rounded-r-lg text-white p-2.5 disabled:bg-blue-300 disabled:text-gray-100"
+            className="flex absolute top-0 right-0 bottom-0 justify-center items-center p-2.5 text-white bg-blue-500 rounded-r-lg disabled:text-gray-100 disabled:bg-blue-300"
             disabled={!newUserAuthorization}
           >
             <svg
