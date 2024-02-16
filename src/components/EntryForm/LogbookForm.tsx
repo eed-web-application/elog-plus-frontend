@@ -31,6 +31,7 @@ export default function LogbookForm({
           value: id,
         }))}
         isLoading={isLoading}
+        formName="LogbookForm"
         value={value}
         setValue={(logbooks) =>
           onChange(

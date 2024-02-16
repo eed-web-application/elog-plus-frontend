@@ -23,6 +23,7 @@ type Props<C extends { custom: string }> = {
   options: Option[];
   onOptionSelected?: (option: string) => void;
   isLoading?: boolean;
+  formName?: string;
   invalid?: boolean;
   disabled?: boolean;
   value: (string | C)[];
@@ -57,6 +58,7 @@ export default function MultiSelect<C extends { custom: string }>({
   onOptionSelected,
   options,
   isLoading,
+  formName,
   className,
   placeholder,
   invalid,
@@ -307,7 +309,9 @@ export default function MultiSelect<C extends { custom: string }>({
                   },
                 })}
               >
-                <span className="text-gray-500">Create</span> {search}
+                {formName !== "LogbookForm" && 
+                <span className="text-gray-500">Create </span> }
+                {formName !== "LogbookForm" && search}
               </SelectOption>
             )}
           </>
