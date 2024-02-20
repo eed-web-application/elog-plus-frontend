@@ -31,8 +31,8 @@ export default function LogbookForm({
           value: id,
         }))}
         isLoading={isLoading}
-        formName="LogbookForm"
         value={value}
+        canCreate={()=>false}
         setValue={(logbooks) =>
           onChange(
             logbooks.filter(

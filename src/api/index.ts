@@ -97,7 +97,6 @@ export async function fetch(
     if (res.status === 404) {
       throw new NotFoundError(res, responseData);
     } else {
-      console.log(res.status);
       throw new InternalServerError(res, responseData);
     }
   }
