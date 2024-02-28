@@ -32,7 +32,7 @@ export default function LogbookForm({
         }))}
         isLoading={isLoading}
         value={value}
-        canCreate={()=>false}
+        canCreate={() => false}
         setValue={(logbooks) =>
           onChange(
             logbooks.filter(
