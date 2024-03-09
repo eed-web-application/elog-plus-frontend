@@ -6,6 +6,7 @@ import {
   useSearchParams,
 } from "react-router-dom";
 import { twJoin } from "tailwind-merge";
+import { parse } from "date-fns";
 import Filters, { Filters as FiltersObject } from "../components/Filters";
 import Navbar from "../components/Navbar";
 import useEntries from "../hooks/useEntries";
@@ -35,8 +36,12 @@ function deserializeQuery(params: URLSearchParams): EntryQuery {
     logbooks: params.get("logbooks")?.split(",") ?? DEFAULT_QUERY.logbooks,
     tags: params.get("tags")?.split(",") ?? DEFAULT_QUERY.tags,
     requireAllTags: params.has("requireAllTags"),
-    startDate: startDate ? new Date(startDate) : DEFAULT_QUERY.startDate,
-    endDate: endDate ? new Date(endDate) : DEFAULT_QUERY.endDate,
+    startDate: startDate
+      ? parse(startDate, "yyyy-MM-dd", new Date())
+      : DEFAULT_QUERY.startDate,
+    endDate: endDate
+      ? parse(endDate, "yyyy-MM-dd", new Date())
+      : DEFAULT_QUERY.endDate,
     search: params.get("search") ?? DEFAULT_QUERY.search,
     sortByLogDate: params.has("sortByLogDate"),
     onlyFavorites: params.has("onlyFavorites"),
@@ -117,7 +122,7 @@ export default function Home() {
   const outlet = useOutlet();
 
   return (
-    <div className="h-screen flex flex-col">
+    <div className="flex flex-col h-screen">
       <div
         className={twJoin(
           "p-3 shadow z-10 relative",

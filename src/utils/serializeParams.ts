@@ -1,3 +1,5 @@
+import { format } from "date-fns";
+
 export type ParamsObject = Record<
   string,
   null | boolean | number | string | string[] | Date
@@ -16,6 +18,9 @@ export default function serializeParams(
     ).map(([key, value]) => {
       if (Array.isArray(value)) {
         return [key, value.join(",")];
+      }
+      if (value instanceof Date) {
+        return [key, format(value, "yyyy-MM-dd")];
       }
 
       return [key, value.toString()];

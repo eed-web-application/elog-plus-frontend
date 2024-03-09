@@ -19,6 +19,8 @@ export default function EntryBodyText({
 }: Props) {
   const navigate = useNavigate();
 
+  // This is here, because if a user clicks on a link in the body, we want to
+  // intercept it and use the router to navigate instead of a full page load
   function clickHandler(e: React.MouseEvent<HTMLDivElement>) {
     if (!e.target) {
       return;

@@ -1,4 +1,5 @@
 import { useCallback } from "react";
+import { parse, format } from "date-fns";
 import { EntryQuery } from "../hooks/useEntries";
 import FilterChip from "./FilterChip.tsx";
 import { Input } from "./base.ts";
@@ -97,7 +98,7 @@ export default function Filters({ filters, setFilters }: Props) {
                 key={tag.id}
                 className={
                   (index !== 1 && index !== filters.tags.length - 1) ||
-                  andOtherText
+                    andOtherText
                     ? "mr-1"
                     : ""
                 }
@@ -147,7 +148,7 @@ export default function Filters({ filters, setFilters }: Props) {
   return (
     <div className="flex flex-wrap">
       <FilterChipMultiSelect
-        className="mr-3 mt-2"
+        className="mt-2 mr-3"
         label={logbookFilterLabel()}
         disabled={filters.onlyFavorites}
         active={filters.logbooks.length !== 0 && Boolean(logbooks)}
@@ -165,7 +166,7 @@ export default function Filters({ filters, setFilters }: Props) {
         extractKey={extractKey}
       />
       <FilterChipMultiSelect
-        className="mr-3 mt-2"
+        className="mt-2 mr-3"
         label={tagFilterLabel()}
         disabled={filters.onlyFavorites}
         active={filters.tags.length !== 0 && !isTagsLoading}
@@ -180,7 +181,7 @@ export default function Filters({ filters, setFilters }: Props) {
         searchButton={
           <button
             type="button"
-            className="bg-gray-100 rounded-tr border border-l-transparent border-gray-300 hover:bg-gray-200 flex justify-center items-center px-2 w-12"
+            className="flex justify-center items-center px-2 w-12 bg-gray-100 rounded-tr border border-gray-300 hover:bg-gray-200 border-l-transparent"
             onClick={() =>
               setFilters({
                 ...filters,
@@ -193,15 +194,15 @@ export default function Filters({ filters, setFilters }: Props) {
         }
       />
       <FilterChipInput
-        className="mr-3 mt-2"
+        className="mt-2 mr-3"
         label={
           filters.startDate && !filters.onlyFavorites
             ? filters.startDate.toLocaleDateString("en-us", {
-                timeZone: "UTC",
-                year: "numeric",
-                month: "long",
-                day: "numeric",
-              })
+              timeZone: "UTC",
+              year: "numeric",
+              month: "long",
+              day: "numeric",
+            })
             : "From"
         }
         disabled={filters.onlyFavorites}
@@ -212,25 +213,31 @@ export default function Filters({ filters, setFilters }: Props) {
           className={Input}
           type="date"
           autoFocus
-          value={filters.startDate ? dateToYYYYMMDD(filters.startDate) : ""}
-          onChange={(e) =>
-            setFilters({
-              ...filters,
-              startDate: yyyymmddToDate(e.target.value),
-            })
+          value={
+            filters.startDate ? format(filters.startDate, "yyyy-MM-dd") : ""
           }
+          onChange={(e) => {
+            const startDate = parse(e.target.value, "yyyy-MM-dd", new Date());
+
+            if (!isNaN(startDate.getTime())) {
+              setFilters({
+                ...filters,
+                startDate,
+              });
+            }
+          }}
         />
       </FilterChipInput>
       <FilterChipInput
-        className="mr-3 mt-2"
+        className="mt-2 mr-3"
         label={
           filters.endDate && !filters.onlyFavorites
             ? filters.endDate.toLocaleDateString("en-us", {
-                timeZone: "UTC",
-                year: "numeric",
-                month: "long",
-                day: "numeric",
-              })
+              timeZone: "UTC",
+              year: "numeric",
+              month: "long",
+              day: "numeric",
+            })
             : "To"
         }
         disabled={filters.onlyFavorites}
@@ -241,14 +248,21 @@ export default function Filters({ filters, setFilters }: Props) {
           className={Input}
           type="date"
           autoFocus
-          value={filters.endDate ? dateToYYYYMMDD(filters.endDate) : ""}
-          onChange={(e) =>
-            setFilters({ ...filters, endDate: yyyymmddToDate(e.target.value) })
-          }
+          value={filters.endDate ? format(filters.endDate, "yyyy-MM-dd") : ""}
+          onChange={(e) => {
+            const endDate = parse(e.target.value, "yyyy-MM-dd", new Date());
+
+            if (!isNaN(endDate.getTime())) {
+              setFilters({
+                ...filters,
+                endDate,
+              });
+            }
+          }}
         />
       </FilterChipInput>
       <FilterChip
-        className="mr-3 mt-2"
+        className="mt-2 mr-3"
         label="Sort by log date"
         active={filters.sortByLogDate}
         showCheck
@@ -257,7 +271,7 @@ export default function Filters({ filters, setFilters }: Props) {
         }
       />
       <FilterChip
-        className="mr-3 mt-2"
+        className="mt-2 mr-3"
         label={favoritesLabel()}
         active={filters.onlyFavorites}
         onClick={() =>

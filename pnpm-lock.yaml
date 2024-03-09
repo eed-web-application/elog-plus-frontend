@@ -44,6 +44,9 @@ dependencies:
   '@tiptap/starter-kit':
     specifier: ^2.0.3
     version: 2.0.3(@tiptap/pm@2.0.3)
+  date-fns:
+    specifier: ^3.3.1
+    version: 3.3.1
   dompurify:
     specifier: ^3.0.5
     version: 3.0.5
@@ -1631,6 +1634,10 @@ packages:
 
   /dash-get@1.0.2:
     resolution: {integrity: sha512-4FbVrHDwfOASx7uQVxeiCTo7ggSdYZbqs8lH+WU6ViypPlDbe9y6IP5VVUDQBv9DcnyaiPT5XT0UWHgJ64zLeQ==}
+    dev: false
+
+  /date-fns@3.3.1:
+    resolution: {integrity: sha512-y8e109LYGgoQDveiEBD3DYXKba1jWf5BA8YU1FL5Tvm0BTdEfy54WLCwnuYWZNnzzvALy/QQ4Hov+Q9RVRv+Zw==}
     dev: false
 
   /debug@4.3.4:
