@@ -25,7 +25,7 @@ interface EntrySummary {
 
 export interface EntryFull
   extends Omit<EntrySummary, "followingUp" | "referencedBy"> {
-  supersedeBy: string;
+  supersedeBy?: string;
   text: string;
   followUps: Entry[];
   history?: Entry[];

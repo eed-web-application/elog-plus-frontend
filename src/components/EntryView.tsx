@@ -33,26 +33,28 @@ export default function EntryView({ entry }: Props) {
 
   return (
     <>
-      <Link
-        {...spotlightProps}
-        className={twJoin(IconButton, "my-1 float-right")}
-      >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 20 20"
-          fill="currentColor"
-          className="w-5 h-5"
+      {!entry.supersedeBy && (
+        <Link
+          {...spotlightProps}
+          className={twJoin(IconButton, "my-1 float-right")}
         >
-          <path
-            fillRule="evenodd"
-            d="M9 3.5a5.5 5.5 0 100 11 5.5 5.5 0 000-11zM2 9a7 7 0 1112.452 4.391l3.328 3.329a.75.75 0 11-1.06 1.06l-3.329-3.328A7 7 0 012 9z"
-            clipRule="evenodd"
-          />
-        </svg>
-      </Link>
-      <FavoriteButton className="my-1 float-right" entryId={entry.id} />
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 20 20"
+            fill="currentColor"
+            className="w-5 h-5"
+          >
+            <path
+              fillRule="evenodd"
+              d="M9 3.5a5.5 5.5 0 100 11 5.5 5.5 0 000-11zM2 9a7 7 0 1112.452 4.391l3.328 3.329a.75.75 0 11-1.06 1.06l-3.329-3.328A7 7 0 012 9z"
+              clipRule="evenodd"
+            />
+          </svg>
+        </Link>
+      )}
+      <FavoriteButton className="float-right my-1" entryId={entry.id} />
       <div className={twJoin("px-3 pt-2", !entry.followingUp && "pb-2")}>
-        <div className="text-lg -mb-1">{entry.title}</div>
+        <div className="-mb-1 text-lg">{entry.title}</div>
         <div className="text-sm text-gray-500 uppercase">
           {entry.logbooks.map(({ name }) => name).join(", ")}
         </div>
@@ -68,7 +70,7 @@ export default function EntryView({ entry }: Props) {
           />
         </>
       )}
-      <div className="flex flex-col gap-1 px-3 py-2 border-t">
+      <div className="flex flex-col gap-1 py-2 px-3 border-t">
         <div>
           <div className="text-gray-500">Logged by </div>
           {entry.loggedBy}
@@ -118,7 +120,7 @@ export default function EntryView({ entry }: Props) {
             <div className="text-gray-500">Tags</div>
             <div className="flex flex-wrap">
               {tagNames.map((tag) => (
-                <Chip key={tag} className="mr-1.5 mt-0.5">
+                <Chip key={tag} className="mt-0.5 mr-1.5">
                   {tag}
                 </Chip>
               ))}
@@ -127,13 +129,13 @@ export default function EntryView({ entry }: Props) {
         )}
       </div>
       {(entry.text || entry.attachments.length > 0) && (
-        <div className="px-3 py-2 border-t">
+        <div className="py-2 px-3 border-t">
           <EntryBodyText body={entry.text} />
           <EntryFigureList attachments={entry.attachments} />
           {attachments.length > 0 && (
             <>
               <div className="mt-1 mb-1 text-gray-500">Attachments</div>
-              <div className="w-full overflow-hidden flex flex-wrap m-auto pb-1 gap-3">
+              <div className="flex overflow-hidden flex-wrap gap-3 pb-1 m-auto w-full">
                 {attachments.map((attachment) => (
                   <AttachmentCard
                     key={attachment.id}
@@ -146,7 +148,7 @@ export default function EntryView({ entry }: Props) {
           )}
         </div>
       )}
-      <div className="text-right px-3 pt-3 pb-2 border-t">
+      <div className="px-3 pt-3 pb-2 text-right border-t">
         <Link
           to={{
             pathname: `/${entry.id}/supersede`,
@@ -169,7 +171,7 @@ export default function EntryView({ entry }: Props) {
       {entry.history && entry.history.length > 0 && (
         <>
           <TextDivider>History</TextDivider>
-          <div className="mt-3 px-3 pb-3">
+          <div className="px-3 pb-3 mt-3">
             <EntryList entries={entry.history} showDate />
           </div>
         </>
@@ -177,7 +179,7 @@ export default function EntryView({ entry }: Props) {
       {entry.followUps.length > 0 && (
         <>
           <TextDivider>Follow Ups</TextDivider>
-          <div className="mt-3 px-3 pb-3">
+          <div className="px-3 pb-3 mt-3">
             <EntryList
               entries={entry.followUps}
               showDate
@@ -190,7 +192,7 @@ export default function EntryView({ entry }: Props) {
       {references && references.length > 0 && (
         <>
           <TextDivider>References</TextDivider>
-          <div className="mt-3 px-3 pb-3">
+          <div className="px-3 pb-3 mt-3">
             <EntryList
               entries={references}
               showDate
@@ -203,7 +205,7 @@ export default function EntryView({ entry }: Props) {
       {entry.referencedBy && entry.referencedBy.length > 0 && (
         <>
           <TextDivider>Referenced By</TextDivider>
-          <div className="mt-3 px-3 pb-3">
+          <div className="px-3 pb-3 mt-3">
             <EntryList
               entries={entry.referencedBy}
               showDate
