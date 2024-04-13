@@ -9,11 +9,10 @@ export default defineConfig({
   server: {
     proxy: {
       "/api/elog": {
-        target: "http://localhost:8080",
+        target: "http://localhost",
         changeOrigin: true,
         secure: false,
         ws: true,
-        rewrite: (path) => path.replace(/^\/api\/elog/, ""),
       },
     },
   },
