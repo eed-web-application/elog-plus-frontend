@@ -9,11 +9,11 @@ export default defineConfig({
   server: {
     proxy: {
       "/api/elog": {
-        target: "http://localhost:8080",
+        target: "http://localhost",
         changeOrigin: true,
         secure: false,
         ws: true,
-        rewrite: (path) => path.replace(/^\/api\/elog/, ""),
+        //rewrite: (path) => path.replace(/^\/api\/elog/, ""),
       },
     },
   },
@@ -21,6 +21,7 @@ export default defineConfig({
   define: {
     "import.meta.env.API_ENDPOINT": JSON.stringify(process.env.API_ENDPOINT),
     "import.meta.env.APP_VERSION": JSON.stringify(version),
+    global: {},
   },
   plugins: [react()],
 });

@@ -5,6 +5,7 @@ import {
   Params,
   RouterProvider,
   ShouldRevalidateFunction,
+  Outlet
 } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -17,6 +18,12 @@ import NewEntry from "./routes/NewEntry.tsx";
 import ViewEntry from "./routes/ViewEntry.tsx";
 import ErrorBoundary from "./routes/ErrorBoundary";
 import Admin from "./routes/Admin.tsx";
+import AdminNavbar from "./components/AdminNavbar.tsx";
+import AdminLogbooks from "./routes/AdminDashboard/AdminLogbooks.tsx";
+import AdminGroups from "./routes/AdminDashboard/AdminGroups.tsx";
+import AdminUsers from "./routes/AdminDashboard/AdminUsers.tsx";
+import AdminApplications from "./routes/AdminDashboard/AdminApplications.tsx";
+import UserForm from "./components/UserForm.tsx";
 import { fetchEntry, ServerError } from "./api";
 import "./index.css";
 import reportServerError from "./reportServerError.tsx";
@@ -51,12 +58,44 @@ const router = createBrowserRouter(
       children: [
         {
           path: "/admin",
-          element: <Admin />,
+          element: (<AdminNavbar />),
+          children: [
+            {
+              index: true,
+              path: "logbooks",
+              element: <AdminLogbooks/>
+            },
+            {
+              path: "/admin/logbooks/:logbookId",
+              element: <AdminLogbooks />,
+            },
+            {
+              path: "users",
+              element: <AdminUsers/>,
+              children: [
+                {
+                  path: "/admin/users/:userID",
+                  element: <UserForm/>
+                }
+              ]
+              
+            },
+
+            {
+              path: "groups",
+              element: (<AdminGroups/>)
+            },
+            {
+              path: "/admin/groups/:selectedGroup",
+              element: <AdminGroups/>
+            },
+            {
+              path: "applications",
+              element: <AdminApplications/>
+            }
+          ]
         },
-        {
-          path: "/admin/:logbookId",
-          element: <Admin />,
-        },
+        
         {
           path: "/",
           element: <Home />,
