@@ -1,10 +1,130 @@
+import {
+    useCallback,
+    useState,
+  } from "react";
+  import { toast } from "react-toastify";
+  import { Link, useNavigate, useParams, Outlet, useOutlet } from "react-router-dom";
+  import { twJoin, twMerge } from "tailwind-merge";
+  import Spinner from "../../components/Spinner";
+  
+  import UserForm from "../../components/UserForm";
+  import SideSheet from "../../components/SideSheet";
+  import Dialog from "../../components/Dialog";
+  import { Button, Input, TextButton } from "../../components/base";
+  import { useQueryClient } from "@tanstack/react-query";
+  import useApplications from "../../hooks/useApplications";
+  
+  export default function AdminApplications(){
+    
+    const {applications, appMap, isLoading} = useApplications({});
+    const { appId: selectedAppId } = useParams();
+    const [newAppName, setNewAppName] = useState<string | null>(null);
+    
+    const selectedApp = selectedAppId
+    ? appMap[selectedAppId]
+    : undefined;
+  
+    const onSave = useCallback(() => {
+      toast.success("Saved logbook");
+    }, []);
+  
+    const navigate = useNavigate();
+    const queryClient = useQueryClient()
+    
+    const outlet = useOutlet();
 
-
-
-
-export default function AdminApplications(){
-
+    console.log(applications);
+  
     return (
-        <div>Applications</div>
-    )
-}
+      <Dialog controlled isOpen={newAppName !== null}>
+      <div className="flex flex-col h-screen">
+        
+        <div className="flex-1 flex overflow-hidden">
+          <SideSheet
+            home="/admin/users"
+            sheetBody={
+              selectedApp &&
+              (<UserForm/>) 
+            }
+          >
+            <div
+              className={twMerge(
+                "min-w-[384px] flex-1 flex flex-col justify-stretch p-3 overflow-y-auto",
+                // Don't want to have border when loading
+                applications ? "divide-y" : "justify-center w-full"
+              )}
+            >
+  
+              {isLoading ? (
+                <Spinner className="self-center" />
+              ) : (
+                <>
+                  {applications.map((app) => (
+                    <Link
+                      key={app.id}
+                      to={`/admin/users/${app.id}`}
+                      tabIndex={0}
+                      className={twJoin(
+                        "p-2 cursor-pointer uppercase focus:outline focus:z-0 outline-2 outline-blue-500",
+                        selectedApp?.id !== app.id
+                          ? "hover:bg-gray-100"
+                          : "bg-blue-100 hover:bg-blue-200"
+                      )}
+                    >
+                      {app.name}
+                      <span className="text-gray-500">
+                        {true && "*"}
+                      </span>
+                    </Link>
+                  ))}
+  
+                  <button
+                    className="p-2 cursor-pointer bg-gray-100 focus:outline focus:z-0 outline-2 outline-blue-500 text-center hover:bg-gray-200"
+                    
+                  >
+                    Create App
+                  </button>
+                </>
+              )}
+            </div>
+          </SideSheet>
+        </div>
+      </div>
+      <Dialog.Content
+        as="form"
+        className="max-w-sm w-full"
+        
+      >
+        <Dialog.Section>
+          <h1 className="text-lg">New App</h1>
+        </Dialog.Section>
+        <Dialog.Section>
+          <label className="text-gray-500 block mb-2">
+            Name
+            <input
+              required
+              value={newAppName || ""}
+              className={twJoin(Input, "w-full block")}
+              onChange={(e) => setNewAppName(e.target.value)}
+            />
+          </label>
+        </Dialog.Section>
+        <Dialog.Section className="flex gap-3 justify-end">
+          <button
+            type="button"
+            className={TextButton}
+            onClick={() => setNewAppName(null)}
+          >
+            Cancel
+          </button>
+          <input
+            value="Save"
+            type="submit"
+            className={Button}
+            disabled={!newAppName}
+          />
+        </Dialog.Section>
+      </Dialog.Content>
+    </Dialog>
+      )
+  }

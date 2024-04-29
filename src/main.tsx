@@ -4,8 +4,7 @@ import {
   createBrowserRouter,
   Params,
   RouterProvider,
-  ShouldRevalidateFunction,
-  Outlet
+  ShouldRevalidateFunction
 } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -17,13 +16,11 @@ import FollowUp from "./routes/FollowUp.tsx";
 import NewEntry from "./routes/NewEntry.tsx";
 import ViewEntry from "./routes/ViewEntry.tsx";
 import ErrorBoundary from "./routes/ErrorBoundary";
-import Admin from "./routes/Admin.tsx";
 import AdminNavbar from "./components/AdminNavbar.tsx";
 import AdminLogbooks from "./routes/AdminDashboard/AdminLogbooks.tsx";
 import AdminGroups from "./routes/AdminDashboard/AdminGroups.tsx";
 import AdminUsers from "./routes/AdminDashboard/AdminUsers.tsx";
 import AdminApplications from "./routes/AdminDashboard/AdminApplications.tsx";
-import UserForm from "./components/UserForm.tsx";
 import { fetchEntry, ServerError } from "./api";
 import "./index.css";
 import reportServerError from "./reportServerError.tsx";
@@ -71,14 +68,11 @@ const router = createBrowserRouter(
             },
             {
               path: "users",
-              element: <AdminUsers/>,
-              children: [
-                {
-                  path: "/admin/users/:userID",
-                  element: <UserForm/>
-                }
-              ]
-              
+              element: <AdminUsers/>
+            },
+            {
+              path: "/admin/users/:userID",
+              element: <AdminUsers/>
             },
 
             {
@@ -91,6 +85,10 @@ const router = createBrowserRouter(
             },
             {
               path: "applications",
+              element: <AdminApplications/>
+            },
+            {
+              path: "applications/:appID",
               element: <AdminApplications/>
             }
           ]

@@ -1,7 +1,5 @@
 import {
   useCallback,
-  useEffect,
-  useRef,
   useState,
   useSyncExternalStore,
 } from "react";
@@ -10,22 +8,13 @@ import { Link, useNavigate, useParams, Outlet, useOutlet } from "react-router-do
 import { twJoin, twMerge } from "tailwind-merge";
 import Spinner from "../../components/Spinner";
 
-import LogbookForm from "../../components/LogbookForm";
 import UserForm from "../../components/UserForm";
-import { useLogbookFormsStore } from "../../logbookFormsStore";
-import useLogbooks from "../../hooks/useLogbooks";
-import elogLogo from "../assets/temp_elog_logo.png";
 import SideSheet from "../../components/SideSheet";
 import Dialog from "../../components/Dialog";
-import AdminNavbar from "../../components/AdminNavbar";
-import { createLogbook } from "../../api";
 import { Button, Input, TextButton } from "../../components/base";
 import { useQueryClient } from "@tanstack/react-query";
 //useUsers hook?
 import useUsers from "../../hooks/useUsers";
-import { fetch } from "../../api";
-
-
 
 export default function AdminUsers(){
   
@@ -54,7 +43,8 @@ export default function AdminUsers(){
         <SideSheet
           home="/admin/users"
           sheetBody={
-            <UserForm/> 
+            selectedUser &&
+            (<UserForm/>) 
           }
         >
           <div
