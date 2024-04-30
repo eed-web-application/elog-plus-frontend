@@ -24,7 +24,7 @@ import {
   export default function AdminGroups(){
 
     const {groups , isLoading} = useGroups({search : ""});
-    const { group: selectedGroup } = useParams();
+    const { groupID: selectedGroup } = useParams();
       // null means dialog not open
     const [newGroupName, setNewGroupName] = useState<string | null>(null);
 

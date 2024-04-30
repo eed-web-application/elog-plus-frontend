@@ -19,7 +19,7 @@ import useUsers from "../../hooks/useUsers";
 export default function AdminUsers(){
   
   const {users, userMap, isLoading} = useUsers({search : ""});
-  const { userId: selectedUserId } = useParams();
+  const { userID: selectedUserId } = useParams();
   const [newUserName, setNewUserName] = useState<string | null>(null);
   
   const selectedUser = selectedUserId

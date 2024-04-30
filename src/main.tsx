@@ -80,7 +80,7 @@ const router = createBrowserRouter(
               element: (<AdminGroups/>)
             },
             {
-              path: "/admin/groups/:selectedGroup",
+              path: "/admin/groups/:groupID",
               element: <AdminGroups/>
             },
             {

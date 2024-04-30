@@ -40,7 +40,7 @@ export default function EntryBodyText({
 
     const targetPath = targetLink.pathname;
   
-    //
+
     const alteredPath = targetPath.replace("elog/", "");
 
     navigate(alteredPath);
