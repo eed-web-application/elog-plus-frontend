@@ -15,7 +15,7 @@ import { localToUtc, utcToLocal } from "../utils/datetimeConversion";
 import reportServerError from "../reportServerError";
 import Select from "./Select";
 import useGroups from "../hooks/useGroups";
-
+import useLogbooks from "../hooks/useLogbooks";
 
 interface Props {
   user: LogbookWithAuth;
@@ -40,6 +40,13 @@ export default function GroupForm() {
      search: groupSearch,
    });
 
+   const {
+    logbookMap,
+    logbooks,
+    isLoading: isLogbooksLoading,
+  } = useLogbooks({ requireWrite: true, includeAuth: false });
+
+  let stringArray: string[] = logbooks.map(num => num.name.toString());
 
 
   // FIXME
@@ -61,7 +68,7 @@ export default function GroupForm() {
         )}
       >
         
-          <div className="my-3">No user authorizations. Create one below.</div>
+          <div className="my-3">No group authorizations. Create one below.</div>
         
         
         <form
@@ -74,7 +81,7 @@ export default function GroupForm() {
             value={newUserAuthorization}
             onSearchChange={setGroupSearch}
             isLoading={isGroupsLoading}
-            options = {[]}
+            options = {stringArray || []}
             setValue={setNewUserAuthorizations}
           />
           <button

@@ -18,9 +18,14 @@ import useUsers from "../../hooks/useUsers";
 
 export default function AdminUsers(){
   
-  const {users, userMap, isLoading} = useUsers({search : ""});
+
+  const [userSearch, setUserSearch] = useState("");
+
+  const {users, userMap, isLoading} = useUsers({search : userSearch});
   const { userID: selectedUserId } = useParams();
-  const [newUserName, setNewUserName] = useState<string | null>(null);
+  const [newUserName, setNewUserName] = useState<
+    string | null
+  >(null);
   
   const selectedUser = selectedUserId
   ? userMap[selectedUserId]
@@ -35,16 +40,60 @@ export default function AdminUsers(){
   
   const outlet = useOutlet();
 
+  
+  function searchFor(value: string) {
+    setUserSearch(value);
+
+  }
+
   return (
+    <>
+    <form
+        className="flex-1 mt-2 mr-2 md:mx-2"
+        onSubmit={(e) => {
+          e.preventDefault();
+          
+        }}
+      >
+        <div className="relative w-full">
+          <input
+            type="search"
+            className={twJoin(Input, "block w-full")}
+            placeholder="Search..."
+            onChange={(e) => searchFor(e.target.value)}
+            
+          />
+          <button
+            type="submit"
+            className="absolute top-0 right-0 p-1.5 text-sm font-medium text-white bg-blue-500 rounded-r-lg border border-blue-500 hover:bg-blue-600 focus:ring-2 focus:ring-blue-300 focus:outline-none"
+          >
+            <svg
+              aria-hidden="true"
+              className="w-5 h-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+              ></path>
+            </svg>
+          </button>
+        </div>
+      </form>
     <Dialog controlled isOpen={newUserName !== null}>
     <div className="flex flex-col h-screen">
-      
+
       <div className="flex-1 flex overflow-hidden">
         <SideSheet
           home="/admin/users"
           sheetBody={
             selectedUser &&
-            (<UserForm/>) 
+            (<UserForm user={selectedUser} onSave={onSave} />) 
           }
         >
           <div
@@ -73,17 +122,11 @@ export default function AdminUsers(){
                   >
                     {user.surname}
                     <span className="text-gray-500">
-                      {true && "*"}
+                      {}
                     </span>
                   </Link>
                 ))}
 
-                <button
-                  className="p-2 cursor-pointer bg-gray-100 focus:outline focus:z-0 outline-2 outline-blue-500 text-center hover:bg-gray-200"
-                  
-                >
-                  Create User
-                </button>
               </>
             )}
           </div>
@@ -126,5 +169,6 @@ export default function AdminUsers(){
       </Dialog.Section>
     </Dialog.Content>
   </Dialog>
+  </>
     )
 }

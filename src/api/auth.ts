@@ -24,3 +24,8 @@ export function fetchUsers(search: string): Promise<User[]> {
 export function fetchMe(): Promise<User> {
   return fetch("v1/auth/me");
 }
+
+export function logbookAuth(){
+  return fetch("/v1/logbook/auth");
+}
+

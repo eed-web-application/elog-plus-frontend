@@ -19,13 +19,14 @@ import {
     const {applications, appMap, isLoading} = useApplications({});
     const { appId: selectedAppId } = useParams();
     const [newAppName, setNewAppName] = useState<string | null>(null);
+    const [newDate, setNewDate] = useState<string | null>(null);
     
     const selectedApp = selectedAppId
     ? appMap[selectedAppId]
     : undefined;
   
     const onSave = useCallback(() => {
-      toast.success("Saved logbook");
+      toast.success("Saved token");
     }, []);
   
     const navigate = useNavigate();
@@ -41,7 +42,7 @@ import {
         
         <div className="flex-1 flex overflow-hidden">
           <SideSheet
-            home="/admin/users"
+            home="/admin/applications"
             sheetBody={
               selectedApp &&
               (<UserForm/>) 
@@ -62,7 +63,7 @@ import {
                   {applications.map((app) => (
                     <Link
                       key={app.id}
-                      to={`/admin/users/${app.id}`}
+                      to={`/admin/applications/${app.id}`}
                       tabIndex={0}
                       className={twJoin(
                         "p-2 cursor-pointer uppercase focus:outline focus:z-0 outline-2 outline-blue-500",
@@ -80,9 +81,9 @@ import {
   
                   <button
                     className="p-2 cursor-pointer bg-gray-100 focus:outline focus:z-0 outline-2 outline-blue-500 text-center hover:bg-gray-200"
-                    
+                    onClick={() => setNewAppName("")}
                   >
-                    Create App
+                    Create Application Token
                   </button>
                 </>
               )}
@@ -96,7 +97,7 @@ import {
         
       >
         <Dialog.Section>
-          <h1 className="text-lg">New App</h1>
+          <h1 className="text-lg">New Application Token</h1>
         </Dialog.Section>
         <Dialog.Section>
           <label className="text-gray-500 block mb-2">
@@ -106,6 +107,16 @@ import {
               value={newAppName || ""}
               className={twJoin(Input, "w-full block")}
               onChange={(e) => setNewAppName(e.target.value)}
+            />
+          </label>
+
+          <label className="text-gray-500 block mb-2">
+            Expiration Date
+            <input
+              required
+              value={newDate || ""}
+              className={twJoin(Input, "w-full block")}
+              onChange={(e) => setNewDate(e.target.value)}
             />
           </label>
         </Dialog.Section>
