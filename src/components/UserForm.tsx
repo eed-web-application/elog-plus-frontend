@@ -33,9 +33,9 @@ let idCounter = 0;
 export default function UserForm({user}: Props) {
 
 
-   const [form, setForm, removeForm] = useLogbookFormsStore((state) =>
-     state.startEditing(selectedLogbook)
-   );
+  //  const [form, setForm, removeForm] = useLogbookFormsStore((state) =>
+  //    state.startEditing(selectedLogbook)
+  //  );
   let userAuthorizations: string[]= [];
 
   const logbookAuthorizations: string [] = [];
@@ -45,7 +45,7 @@ export default function UserForm({user}: Props) {
     string | null
   >(null);
 
-  const [selectedLogbook, setSelectedLogbook] = useState<LogbookWithAuth>(null);
+  // const [selectedLogbook, setSelectedLogbook] = useState<LogbookWithAuth>(null);
 
 
   const [userSearch, setUserSearch] = useState("");
@@ -57,8 +57,6 @@ export default function UserForm({user}: Props) {
     isLoading: isLogbooksLoading,
   } = useLogbooks({ requireWrite: true, includeAuth: false });
  
-
-  let logbookArray: string[] = logbooks.map(num => num.name);
 
   return (
     <div className="px-3 pb-3">
@@ -153,7 +151,7 @@ export default function UserForm({user}: Props) {
             value={newUserAuthorization}
             onSearchChange={setUserSearch}
             isLoading={isLogbooksLoading}
-            options={logbookArray || []}
+            options={logbooks.map(logbook => logbook.name) || []}
             // options={(users || [])
             //   .filter(
             //     (user) =>
