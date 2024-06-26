@@ -41,7 +41,7 @@ export default function UserForm({user}: Props) {
   const logbookAuthorizations: string [] = [];
   const queryClient = useQueryClient();
 
-  const [newUserAuthorization, setNewUserAuthorizations] = useState<
+  const [newLogbookAuthorization, setNewLogbookAuthorizations] = useState<
     string | null
   >(null);
 
@@ -55,7 +55,19 @@ export default function UserForm({user}: Props) {
     logbookMap,
     logbooks,
     isLoading: isLogbooksLoading,
-  } = useLogbooks({ requireWrite: true, includeAuth: false });
+  } = useLogbooks({ requireWrite: true, includeAuth: true });
+
+  function createLogbookAuthorization(e: FormEvent<HTMLFormElement>){
+    e.preventDefault();
+
+    if (!newLogbookAuthorization) {
+      return;
+    }
+
+    
+  }
+
+  
  
 
   return (
@@ -148,10 +160,10 @@ export default function UserForm({user}: Props) {
         >
           <Select
             className="pr-12 w-full"
-            value={newUserAuthorization}
+            value={newLogbookAuthorization}
             onSearchChange={setUserSearch}
             isLoading={isLogbooksLoading}
-            options={logbooks.map(logbook => logbook.name) || []}
+            options={logbooks.map(logbook => ({label: logbook.name, value:logbook.id})) || []}
             // options={(users || [])
             //   .filter(
             //     (user) =>
@@ -160,12 +172,12 @@ export default function UserForm({user}: Props) {
             //       )
             //   )
             //   .map((user) => ({ label: user.gecos, value: user.mail }))}
-            setValue={setNewUserAuthorizations}
+            setValue={setNewLogbookAuthorizations}
           />
           <button
             type="submit"
             className="flex absolute top-0 right-0 bottom-0 justify-center items-center p-2.5 text-white bg-blue-500 rounded-r-lg disabled:text-gray-100 disabled:bg-blue-300"
-            disabled={!newUserAuthorization}
+            disabled={!newLogbookAuthorization}
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
