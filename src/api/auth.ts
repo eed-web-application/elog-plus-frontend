@@ -1,8 +1,8 @@
 import { fetch } from ".";
 
 export interface Group {
-  uid: string;
-  commonName: string;
+  id: string;
+  name: string;
 }
 
 export interface User {

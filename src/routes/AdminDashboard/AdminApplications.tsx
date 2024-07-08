@@ -1,51 +1,58 @@
 import {
-    useCallback,
-    useState,
-  } from "react";
-  import { toast } from "react-toastify";
-  import { Link, useNavigate, useParams, Outlet, useOutlet } from "react-router-dom";
-  import { twJoin, twMerge } from "tailwind-merge";
-  import Spinner from "../../components/Spinner";
-  
-  import UserForm from "../../components/UserForm";
-  import SideSheet from "../../components/SideSheet";
-  import Dialog from "../../components/Dialog";
-  import { Button, Input, TextButton } from "../../components/base";
-  import { useQueryClient } from "@tanstack/react-query";
-  import useApplications from "../../hooks/useApplications";
-  
-  export default function AdminApplications(){
-    
-    const {applications, appMap, isLoading} = useApplications({});
-    const { appId: selectedAppId } = useParams();
-    const [newAppName, setNewAppName] = useState<string | null>(null);
-    const [newDate, setNewDate] = useState<string | null>(null);
-    
-    const selectedApp = selectedAppId
+  useCallback,
+  useState,
+} from "react";
+import { toast } from "react-toastify";
+import { Link, useNavigate, useParams, Outlet, useOutlet } from "react-router-dom";
+import { twJoin, twMerge } from "tailwind-merge";
+import Spinner from "../../components/Spinner";
+import ApplicationForm from "../../components/ApplicationForm";
+import SideSheet from "../../components/SideSheet";
+import Dialog from "../../components/Dialog";
+import { Button, Input, TextButton } from "../../components/base";
+import { useQueryClient } from "@tanstack/react-query";
+import useApplications from "../../hooks/useApplications";
+import { createApp } from "../../api";
+
+export default function AdminApplications() {
+  const { applications, appMap, isLoading } = useApplications({});
+  const { appId: selectedAppId } = useParams();
+  const [newAppName, setNewAppName] = useState<string | null>(null);
+  const [newDate, setNewDate] = useState<string | null>(null);
+  const queryClient = useQueryClient();
+
+
+  const selectedApp = selectedAppId
     ? appMap[selectedAppId]
     : undefined;
-  
-    const onSave = useCallback(() => {
-      toast.success("Saved token");
-    }, []);
-  
-    const navigate = useNavigate();
-    const queryClient = useQueryClient()
-    
-    const outlet = useOutlet();
 
-    console.log(applications);
-  
-    return (
-      <Dialog controlled isOpen={newAppName !== null}>
+  const onSave = useCallback(() => {
+    toast.success("Saved token");
+  }, []);
+
+  const handleCreateApplication = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      await createApp(newAppName!, newDate!); // Assuming newAppName and newDate are not null here
+      setNewAppName(null);
+      setNewDate(null);
+      queryClient.invalidateQueries(["applications"]); // Invalidate applications query to refresh data
+      toast.success("Application token created successfully");
+    } catch (error) {
+      toast.error("Failed to create application token");
+    }
+  };
+
+  return (
+    <Dialog controlled isOpen={newAppName !== null}>
       <div className="flex flex-col h-screen">
-        
+
         <div className="flex-1 flex overflow-hidden">
           <SideSheet
             home="/admin/applications"
             sheetBody={
               selectedApp &&
-              (<UserForm/>) 
+              (<ApplicationForm />)
             }
           >
             <div
@@ -55,7 +62,7 @@ import {
                 applications ? "divide-y" : "justify-center w-full"
               )}
             >
-  
+
               {isLoading ? (
                 <Spinner className="self-center" />
               ) : (
@@ -78,7 +85,7 @@ import {
                       </span>
                     </Link>
                   ))}
-  
+
                   <button
                     className="p-2 cursor-pointer bg-gray-100 focus:outline focus:z-0 outline-2 outline-blue-500 text-center hover:bg-gray-200"
                     onClick={() => setNewAppName("")}
@@ -94,7 +101,7 @@ import {
       <Dialog.Content
         as="form"
         className="max-w-sm w-full"
-        
+        onSubmit={handleCreateApplication}
       >
         <Dialog.Section>
           <h1 className="text-lg">New Application Token</h1>
@@ -113,6 +120,7 @@ import {
           <label className="text-gray-500 block mb-2">
             Expiration Date
             <input
+              type="datetime-local"
               required
               value={newDate || ""}
               className={twJoin(Input, "w-full block")}
@@ -137,5 +145,5 @@ import {
         </Dialog.Section>
       </Dialog.Content>
     </Dialog>
-      )
-  }
+  )
+}
