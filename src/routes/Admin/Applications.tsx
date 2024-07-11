@@ -18,6 +18,7 @@ import useApplications from "../../hooks/useApplications";
 import { createApp } from "../../api";
 
 export default function AdminApplications() {
+  return "Applications";
   const { applications, appMap, isLoading } = useApplications({});
   const { appId: selectedAppId } = useParams();
   const [newAppName, setNewAppName] = useState<string | null>(null);

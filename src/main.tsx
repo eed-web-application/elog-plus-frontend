@@ -16,11 +16,11 @@ import FollowUp from "./routes/FollowUp.tsx";
 import NewEntry from "./routes/NewEntry.tsx";
 import ViewEntry from "./routes/ViewEntry.tsx";
 import ErrorBoundary from "./routes/ErrorBoundary";
-import AdminNavbar from "./components/AdminNavbar.tsx";
-import AdminLogbooks from "./routes/AdminDashboard/AdminLogbooks.tsx";
-import AdminGroups from "./routes/AdminDashboard/AdminGroups.tsx";
-import AdminUsers from "./routes/AdminDashboard/AdminUsers.tsx";
-import AdminApplications from "./routes/AdminDashboard/AdminApplications.tsx";
+import Admin from "./routes/Admin";
+import AdminLogbooks from "./routes/Admin/Logbooks.tsx";
+import AdminGroups from "./routes/Admin/Groups.tsx";
+import AdminUsers from "./routes/Admin/Users.tsx";
+import AdminApplications from "./routes/Admin/Applications.tsx";
 import { fetchEntry, ServerError } from "./api";
 import "./index.css";
 import reportServerError from "./reportServerError.tsx";
@@ -55,15 +55,14 @@ const router = createBrowserRouter(
       children: [
         {
           path: "/admin",
-          element: <AdminNavbar />,
+          element: <Admin />,
           children: [
             {
-              index: true,
               path: "logbooks",
               element: <AdminLogbooks />,
             },
             {
-              path: "/admin/logbooks/:logbookId",
+              path: "logbooks/:logbookId",
               element: <AdminLogbooks />,
             },
             {
@@ -71,7 +70,7 @@ const router = createBrowserRouter(
               element: <AdminUsers />,
             },
             {
-              path: "/admin/users/:userID",
+              path: "users/:userId",
               element: <AdminUsers />,
             },
 
@@ -80,7 +79,7 @@ const router = createBrowserRouter(
               element: <AdminGroups />,
             },
             {
-              path: "/admin/groups/:groupID",
+              path: "groups/:groupId",
               element: <AdminGroups />,
             },
             {
@@ -88,16 +87,14 @@ const router = createBrowserRouter(
               element: <AdminApplications />,
             },
             {
-              path: "applications/:appID",
+              path: "applications/:appId",
               element: <AdminApplications />,
             },
           ],
         },
-
         {
           path: "/",
           element: <Home />,
-          errorElement: <ErrorBoundary />,
           children: [
             {
               path: ":entryId/supersede",

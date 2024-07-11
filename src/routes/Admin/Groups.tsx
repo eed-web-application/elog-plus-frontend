@@ -15,6 +15,7 @@ import GroupForm from "../../components/GroupForm.tsx";
 import { GroupWithAuth } from "../../api/groups.ts";
 
 export default function AdminGroups() {
+  return "Groups";
   const [groupSearch, setGroupSearch] = useState("");
   const [groups, setGroups] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);

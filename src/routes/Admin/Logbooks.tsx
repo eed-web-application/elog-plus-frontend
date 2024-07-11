@@ -15,6 +15,7 @@ import { Button, Input, TextButton } from "../../components/base";
 import { useQueryClient } from "@tanstack/react-query";
 
 export default function AdminLogbooks() {
+  return "Logbooks";
   const {
     logbookMap,
     logbooks,

@@ -19,6 +19,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import useUsers from "../../hooks/useUsers";
 
 export default function AdminUsers() {
+  return "Users";
   const [userSearch, setUserSearch] = useState("");
 
   const { users, userMap, isLoading } = useUsers({ search: userSearch });
