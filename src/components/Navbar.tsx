@@ -98,7 +98,7 @@ export default function Navbar({
       )}
 
       <Link
-        to={{ pathname: "/admin" }}
+        to={{ pathname: "/admin/logbooks" }}
         className={twJoin(Button, "mr-2 text-sm flex items-center")}
       >
         Admin Dashboard

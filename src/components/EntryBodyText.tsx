@@ -1,7 +1,7 @@
 import { twMerge } from "tailwind-merge";
 import DOMPurify from "dompurify";
 import { ComponentProps } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useHref, Link, redirect } from "react-router-dom";
 
 interface Props extends ComponentProps<"div"> {
   body: string;
@@ -37,7 +37,14 @@ export default function EntryBodyText({
 
     e.preventDefault();
 
-    navigate(targetLink.pathname);
+
+    const targetPath = targetLink.pathname;
+
+    //Fix path elog/elog/
+    const alteredPath = targetPath.replace("elog/", "");
+
+    navigate(alteredPath);
+
   }
 
   return (

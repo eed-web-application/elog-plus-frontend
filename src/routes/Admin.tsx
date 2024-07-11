@@ -1,6 +1,6 @@
 import { useCallback, useState } from "react";
 import { toast } from "react-toastify";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams, Outlet } from "react-router-dom";
 import { twJoin, twMerge } from "tailwind-merge";
 import Spinner from "../components/Spinner";
 import LogbookForm from "../components/LogbookForm";
@@ -9,6 +9,7 @@ import useLogbooks from "../hooks/useLogbooks";
 import elogLogo from "../assets/temp_elog_logo.png";
 import SideSheet from "../components/SideSheet";
 import Dialog from "../components/Dialog";
+import AdminNavbar from "../components/AdminNavbar";
 import { createLogbook } from "../api";
 import { Button, Input, TextButton } from "../components/base";
 import { useQueryClient } from "@tanstack/react-query";
@@ -44,7 +45,7 @@ export default function Admin() {
     }
 
     const logbookId = await createLogbook(newLogbookName);
-    navigate(`/admin/${logbookId}`);
+    navigate(`/admin/logbooks/${logbookId}`);
     setNewLogbookName(null);
     queryClient.invalidateQueries({ queryKey: ["logbooks"] });
   }, [newLogbookName, navigate, queryClient]);
@@ -57,11 +58,14 @@ export default function Admin() {
             <Link to="/" className="text-center mb-3 w-full md:mb-0 md:w-auto">
               <img src={elogLogo} className="inline" alt="SLAC E-LOG logo" />
             </Link>
+            <AdminNavbar>
+
+            </AdminNavbar>
           </div>
         </div>
         <div className="flex-1 flex overflow-hidden">
           <SideSheet
-            home="/admin"
+            home="/admin/logbooks"
             sheetBody={
               selectedLogbook && (
                 <LogbookForm logbook={selectedLogbook} onSave={onSave} />
@@ -74,7 +78,7 @@ export default function Admin() {
                 // Don't want to have border when loading
                 logbooks ? "divide-y" : "justify-center w-full"
               )}
-            >
+            >    
               <div className="text-xl mb-2 font-normal text-gray-500">
                 Logbooks
               </div>
@@ -85,7 +89,7 @@ export default function Admin() {
                   {logbooks.map((logbook) => (
                     <Link
                       key={logbook.id}
-                      to={`/admin/${logbook.id}`}
+                      to={`/admin/logbooks/${logbook.id}`}
                       tabIndex={0}
                       className={twJoin(
                         "p-2 cursor-pointer uppercase focus:outline focus:z-0 outline-2 outline-blue-500",

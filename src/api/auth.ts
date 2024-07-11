@@ -1,8 +1,8 @@
 import { fetch } from ".";
 
 export interface Group {
-  uid: string;
-  commonName: string;
+  id: string;
+  name: string;
 }
 
 export interface User {
@@ -24,3 +24,8 @@ export function fetchUsers(search: string): Promise<User[]> {
 export function fetchMe(): Promise<User> {
   return fetch("v1/auth/me");
 }
+
+export function logbookAuth(){
+  return fetch("/v1/logbook/auth");
+}
+

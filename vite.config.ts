@@ -20,6 +20,7 @@ export default defineConfig({
   define: {
     "import.meta.env.API_ENDPOINT": JSON.stringify(process.env.API_ENDPOINT),
     "import.meta.env.APP_VERSION": JSON.stringify(version),
+    global: {},
   },
   plugins: [react()],
 });
