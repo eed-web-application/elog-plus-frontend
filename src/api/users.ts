@@ -2,7 +2,7 @@ import { create } from "zustand";
 import { fetch } from ".";
 import { AuthorizationType } from "./logbooks";
 
-interface User {
+export interface User {
   id: string;
   name: string;
   email: string;
@@ -33,6 +33,14 @@ export async function updateUser(user: UserWithAuth) {
     method: "PUT",
     body: user,
   });
+}
+
+export function fetchUsers(search: string): Promise<User[]> {
+  return fetch("v1/auth/users", { params: { search } });
+}
+
+export function fetchMe(): Promise<User> {
+  return fetch("v1/auth/me");
 }
 
 export const useUsersStore = create<UsersState>((set) => ({

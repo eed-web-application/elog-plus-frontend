@@ -1,4 +1,4 @@
-import React, { useState, FormEvent, useEffect } from "react";
+import { useState, FormEvent, useEffect } from "react";
 import { twJoin } from "tailwind-merge";
 import { useQueryClient } from "@tanstack/react-query";
 import {
@@ -12,11 +12,11 @@ import Select from "./Select";
 import { useGroupFormsStore } from "../groupFormsStore";
 import reportServerError from "../reportServerError";
 import useUsers from "../hooks/useUsers";
-import {
-  updateGroup,
-  deleteGroup,
-  getGroup,
-} from "../../node_modules/ui/lib/services/GroupService"; // Updated import path
+// import {
+//   updateGroup,
+//   deleteGroup,
+//   getGroup,
+// } from "../../node_modules/ui/lib/services/GroupService"; // Updated import path
 
 interface Props {
   group: GroupWithAuth;
@@ -168,7 +168,7 @@ export default function GroupForm({ group, onSave, onDelete }: Props) {
         className={twJoin(
           "border rounded-lg bg-gray-50 w-full flex flex-col p-2",
           userAuthorizations.length === 0 &&
-            "items-center justify-center text-lg text-gray-500",
+          "items-center justify-center text-lg text-gray-500",
         )}
       >
         {userAuthorizations.length === 0 ? (

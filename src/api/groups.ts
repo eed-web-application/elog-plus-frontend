@@ -1,6 +1,11 @@
 import { create } from "zustand";
+import { fetch } from ".";
 import { AuthorizationType } from "./logbooks";
-import { Group } from "./auth";
+
+export interface Group {
+  id: string;
+  name: string;
+}
 
 // export interface Group {
 //     id: string;
@@ -64,13 +69,6 @@ export const useGroupsStore = create<GroupsState>((set) => ({
   },
 }));
 
-// Example function to update group details (replace with your actual implementation)
-export async function updateGroup(group: Group) {
-  return await fetch(`v1/groups/${group.id}`, {
-    method: "PUT",
-    body: JSON.stringify(group),
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
+export function fetchGroups(search: string): Promise<Group[]> {
+  return fetch("v1/auth/groups", { params: { search } });
 }

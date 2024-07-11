@@ -80,8 +80,7 @@ export async function fetch(
   };
 
   const res = await window.fetch(
-    `${ENDPOINT}/${url}?${
-      params ? new URLSearchParams(params).toString() : ""
+    `${ENDPOINT}/${url}?${params ? new URLSearchParams(params).toString() : ""
     }`,
     options,
   );
@@ -117,7 +116,6 @@ export * from "./attachments";
 export * from "./entries";
 export * from "./logbooks";
 export * from "./tags";
-export * from "./auth";
 export * from "./applications";
 export * from "./users";
 export * from "./groups";

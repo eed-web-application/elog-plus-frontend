@@ -18,7 +18,7 @@ import serializeParams, { ParamsObject } from "../utils/serializeParams";
 import SideSheet from "../components/SideSheet";
 
 // Import Sidebar from your local UI library
-import Sidebar from "../../node_modules/ui/lib/Sidebar"; // Adjust the path as per your project structure
+// import Sidebar from "../../node_modules/ui/lib/Sidebar"; // Adjust the path as per your project structure
 
 const DEFAULT_QUERY: EntryQuery = {
   logbooks: [],
@@ -129,7 +129,7 @@ export default function Home() {
           <Filters filters={query} setFilters={onFiltersChange} />
         </div>
       </div>
-      <Sidebar /> {/* Integrate Sidebar component here */}
+      {/* <Sidebar />  */}
       <SideSheet sheetBody={outlet}>
         <EntryListGrouped
           containerClassName="min-w-[384px] flex-1"

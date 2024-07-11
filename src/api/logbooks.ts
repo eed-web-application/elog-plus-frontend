@@ -59,15 +59,15 @@ export async function fetchLogbooks<A extends boolean | undefined>({
   });
 }
 
-export async function updateLogbook(logbook: LogbookUpdation) {
-  return await fetch(`v1/logbooks/${logbook.id}`, {
+export function updateLogbook(logbook: LogbookUpdation) {
+  return fetch(`v1/logbooks/${logbook.id}`, {
     method: "PUT",
     body: logbook,
   });
 }
 
-export async function createLogbook(name: string) {
-  return await fetch(`v1/logbooks`, {
+export function createLogbook(name: string) {
+  return fetch(`v1/logbooks`, {
     method: "POST",
     body: { name },
   });
