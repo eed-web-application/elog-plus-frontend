@@ -8,7 +8,6 @@ import {
   updateLogbook,
   AuthorizationType,
   LogbookWithAuth,
-  
 } from "../api";
 import { Button, IconButton, Input, InputInvalid } from "./base";
 import { useLogbookFormsStore } from "../logbookFormsStore";
@@ -30,24 +29,33 @@ let idCounter = 0;
 
 export default function LogbookForm({ logbook, onSave }: Props) {
   const [form, setForm, removeForm] = useLogbookFormsStore((state) =>
-    state.startEditing(logbook)
+    state.startEditing(logbook),
   );
   const queryClient = useQueryClient();
 
   const [newTag, setNewTag] = useState<string>("");
   const [newShift, setNewShift] = useState<string>("");
 
-  const [newUserAuthorization, setNewUserAuthorizations] = useState<string | null>(null);
-  const [newGroupAuthorization, setNewGroupAuthorization] = useState<string | null>(null);
-  const [newApplicationAuthorization, setNewApplicationAuthorizations] = useState<string | null>(null);
+  const [newUserAuthorization, setNewUserAuthorizations] = useState<
+    string | null
+  >(null);
+  const [newGroupAuthorization, setNewGroupAuthorization] = useState<
+    string | null
+  >(null);
+  const [newApplicationAuthorization, setNewApplicationAuthorizations] =
+    useState<string | null>(null);
 
   const [userSearch, setUserSearch] = useState("");
   const [groupSearch, setGroupSearch] = useState("");
   const [applicationSearch, setApplicationSearch] = useState("");
 
   const { users, isLoading: isUsersLoading } = useUsers({ search: userSearch });
-  const { groups, isLoading: isGroupsLoading } = useGroups({search: groupSearch,});
-  const { applications, isLoading: isApplicationsLoading } = useApplications({ search: applicationSearch });
+  const { groups, isLoading: isGroupsLoading } = useGroups({
+    search: groupSearch,
+  });
+  const { applications, isLoading: isApplicationsLoading } = useApplications({
+    search: applicationSearch,
+  });
 
   const validators = {
     name: () => Boolean(form.name),
@@ -71,7 +79,7 @@ export default function LogbookForm({ logbook, onSave }: Props) {
   function onValidate(valid: boolean, field: Ident): boolean {
     if (valid) {
       setInvalid((invalid) =>
-        invalid.filter((invalidField) => invalidField !== field)
+        invalid.filter((invalidField) => invalidField !== field),
       );
       return true;
     }
@@ -88,7 +96,7 @@ export default function LogbookForm({ logbook, onSave }: Props) {
       if (
         !onValidate(
           validators[field as keyof typeof validators](),
-          field as Ident
+          field as Ident,
         )
       ) {
         invalid = true;
@@ -99,7 +107,7 @@ export default function LogbookForm({ logbook, onSave }: Props) {
         if (
           !onValidate(
             shiftValidators[field as keyof typeof shiftValidators](shift.id),
-            `${field}/${shift.id}` as Ident
+            `${field}/${shift.id}` as Ident,
           )
         ) {
           invalid = true;
@@ -127,7 +135,7 @@ export default function LogbookForm({ logbook, onSave }: Props) {
 
       return (
         logbook.authorizations.find(
-          ({ owner }) => owner === authorization.owner
+          ({ owner }) => owner === authorization.owner,
         ) || authorization
       );
     });
@@ -219,8 +227,11 @@ export default function LogbookForm({ logbook, onSave }: Props) {
       ...form,
       authorizations: [
         ...form.authorizations,
-        { owner: newGroupAuthorization, authorizationType: DEFAULT_AUTHORIZATION,
-          ownerType: "Group", },
+        {
+          owner: newGroupAuthorization,
+          authorizationType: DEFAULT_AUTHORIZATION,
+          ownerType: "Group",
+        },
       ],
     });
   }
@@ -280,15 +291,15 @@ export default function LogbookForm({ logbook, onSave }: Props) {
   // const userAuthorizations = form.authorizations;
 
   const userAuthorizations = form.authorizations.filter(
-    (authorization) => authorization.ownerType === "User"
+    (authorization) => authorization.ownerType === "User",
   );
 
   const groupAuthorizations = form.authorizations.filter(
-    (authorization) => authorization.ownerType === "Group"
+    (authorization) => authorization.ownerType === "Group",
   );
 
-    const applicationAuthorizations = form.authorizations.filter(
-    (authorization) => authorization.ownerType === "Token"
+  const applicationAuthorizations = form.authorizations.filter(
+    (authorization) => authorization.ownerType === "Token",
   );
 
   const updated = JSON.stringify(form) === JSON.stringify(logbook);
@@ -303,7 +314,7 @@ export default function LogbookForm({ logbook, onSave }: Props) {
           className={twMerge(
             Input,
             invalid.includes("name") && InputInvalid,
-            "block w-full"
+            "block w-full",
           )}
           value={form.name}
           onChange={(e) => setForm({ ...form, name: e.target.value })}
@@ -315,7 +326,7 @@ export default function LogbookForm({ logbook, onSave }: Props) {
         className={twJoin(
           "mb-2 border rounded-lg bg-gray-50 w-full flex flex-col p-2",
           form.tags.length === 0 &&
-            "items-center justify-center text-lg text-gray-500"
+            "items-center justify-center text-lg text-gray-500",
         )}
       >
         {form.tags.length === 0 ? (
@@ -384,7 +395,7 @@ export default function LogbookForm({ logbook, onSave }: Props) {
         className={twJoin(
           "border mb-2 rounded-lg bg-gray-50 w-full flex flex-col p-2",
           form.shifts.length === 0 &&
-            "items-center justify-center text-lg text-gray-500"
+            "items-center justify-center text-lg text-gray-500",
         )}
       >
         {form.shifts.length === 0 ? (
@@ -402,7 +413,7 @@ export default function LogbookForm({ logbook, onSave }: Props) {
                     className={twMerge(
                       Input,
                       invalid.includes(`shiftName/${shift.id}`) && InputInvalid,
-                      "flex-1 min-w-0"
+                      "flex-1 min-w-0",
                     )}
                     value={shift.name}
                     onChange={(e) =>
@@ -411,7 +422,7 @@ export default function LogbookForm({ logbook, onSave }: Props) {
                     onBlur={() =>
                       onValidate(
                         shiftValidators.shiftName(shift.id),
-                        `shiftName/${shift.id}`
+                        `shiftName/${shift.id}`,
                       )
                     }
                   />
@@ -421,7 +432,7 @@ export default function LogbookForm({ logbook, onSave }: Props) {
                         Input,
                         invalid.includes(`shiftFrom/${shift.id}`) &&
                           InputInvalid,
-                        "w-32"
+                        "w-32",
                       )}
                       type="time"
                       value={
@@ -442,7 +453,7 @@ export default function LogbookForm({ logbook, onSave }: Props) {
                       onBlur={() =>
                         onValidate(
                           shiftValidators.shiftFrom(shift.id),
-                          `shiftFrom/${shift.id}`
+                          `shiftFrom/${shift.id}`,
                         )
                       }
                     />
@@ -451,7 +462,7 @@ export default function LogbookForm({ logbook, onSave }: Props) {
                       className={twMerge(
                         Input,
                         invalid.includes(`shiftTo/${shift.id}`) && InputInvalid,
-                        "w-32"
+                        "w-32",
                       )}
                       type="time"
                       value={
@@ -472,7 +483,7 @@ export default function LogbookForm({ logbook, onSave }: Props) {
                       onBlur={() =>
                         onValidate(
                           shiftValidators.shiftTo(shift.id),
-                          `shiftTo/${shift.id}`
+                          `shiftTo/${shift.id}`,
                         )
                       }
                     />
@@ -530,13 +541,13 @@ export default function LogbookForm({ logbook, onSave }: Props) {
           </button>
         </form>
       </div>
-      
+
       <div className="text-gray-500">User Authorizations</div>
       <div
         className={twJoin(
           "border rounded-lg bg-gray-50 w-full flex flex-col p-2",
           userAuthorizations.length === 0 &&
-            "items-center justify-center text-lg text-gray-500"
+            "items-center justify-center text-lg text-gray-500",
         )}
       >
         {userAuthorizations.length === 0 ? (
@@ -559,7 +570,7 @@ export default function LogbookForm({ logbook, onSave }: Props) {
                       const updatedAuthorizations = [...form.authorizations];
                       const index = form.authorizations.findIndex(
                         (otherAuthorization) =>
-                          otherAuthorization === authorization
+                          otherAuthorization === authorization,
                       );
 
                       if (
@@ -593,8 +604,8 @@ export default function LogbookForm({ logbook, onSave }: Props) {
                       removeAuthorization(
                         form.authorizations.findIndex(
                           (otherAuthorization) =>
-                            otherAuthorization === authorization
-                        )
+                            otherAuthorization === authorization,
+                        ),
                       )
                     }
                   >
@@ -623,8 +634,8 @@ export default function LogbookForm({ logbook, onSave }: Props) {
               .filter(
                 (user) =>
                   !userAuthorizations.some(
-                    (authorization) => authorization.owner === user.mail
-                  )
+                    (authorization) => authorization.owner === user.mail,
+                  ),
               )
               .map((user) => ({ label: user.gecos, value: user.mail }))}
             setValue={setNewUserAuthorizations}
@@ -657,7 +668,7 @@ export default function LogbookForm({ logbook, onSave }: Props) {
         className={twJoin(
           "border rounded-lg bg-gray-50 w-full flex flex-col p-2 mb-2",
           groupAuthorizations.length === 0 &&
-            "items-center justify-center text-lg text-gray-500"
+            "items-center justify-center text-lg text-gray-500",
         )}
       >
         {groupAuthorizations.length === 0 ? (
@@ -680,7 +691,7 @@ export default function LogbookForm({ logbook, onSave }: Props) {
                       const updatedAuthorizations = [...form.authorizations];
                       const index = form.authorizations.findIndex(
                         (otherAuthorization) =>
-                          otherAuthorization === authorization
+                          otherAuthorization === authorization,
                       );
 
                       if (
@@ -714,8 +725,8 @@ export default function LogbookForm({ logbook, onSave }: Props) {
                       removeAuthorization(
                         form.authorizations.findIndex(
                           (otherAuthorization) =>
-                            otherAuthorization === authorization
-                        )
+                            otherAuthorization === authorization,
+                        ),
                       )
                     }
                   >
@@ -744,8 +755,8 @@ export default function LogbookForm({ logbook, onSave }: Props) {
               .filter(
                 (group) =>
                   !groupAuthorizations.some(
-                    (authorization) => authorization.owner === group.commonName
-                  )
+                    (authorization) => authorization.owner === group.commonName,
+                  ),
               )
               .map((group) => group.commonName)}
             setValue={setNewGroupAuthorization}
@@ -779,7 +790,7 @@ export default function LogbookForm({ logbook, onSave }: Props) {
         className={twJoin(
           "border rounded-lg bg-gray-50 w-full flex flex-col p-2",
           applicationAuthorizations.length === 0 &&
-            "items-center justify-center text-lg text-gray-500"
+            "items-center justify-center text-lg text-gray-500",
         )}
       >
         {applicationAuthorizations.length === 0 ? (
@@ -802,7 +813,7 @@ export default function LogbookForm({ logbook, onSave }: Props) {
                       const updatedAuthorizations = [...form.authorizations];
                       const index = form.authorizations.findIndex(
                         (otherAuthorization) =>
-                          otherAuthorization === authorization
+                          otherAuthorization === authorization,
                       );
 
                       if (
@@ -836,8 +847,8 @@ export default function LogbookForm({ logbook, onSave }: Props) {
                       removeAuthorization(
                         form.authorizations.findIndex(
                           (otherAuthorization) =>
-                            otherAuthorization === authorization
-                        )
+                            otherAuthorization === authorization,
+                        ),
                       )
                     }
                   >
@@ -866,10 +877,13 @@ export default function LogbookForm({ logbook, onSave }: Props) {
               .filter(
                 (application) =>
                   !applicationAuthorizations.some(
-                    (authorization) => authorization.owner === application.name
-                  )
+                    (authorization) => authorization.owner === application.name,
+                  ),
               )
-              .map((application) => ({ label: application.name, value: application.id }))}
+              .map((application) => ({
+                label: application.name,
+                value: application.id,
+              }))}
             setValue={setNewApplicationAuthorizations}
           />
           <button

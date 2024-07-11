@@ -8,7 +8,7 @@ const QUERY = `(min-width: ${MD}px)`;
 
 export default function useIsSmallScreen() {
   const [isSmallScreen, setIsSmallScreen] = useState(
-    !window.matchMedia(QUERY).matches
+    !window.matchMedia(QUERY).matches,
   );
 
   useEffect(() => {

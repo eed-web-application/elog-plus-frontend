@@ -16,7 +16,7 @@ export default function useTags({
 } = {}) {
   const bumpTag = useTagUsageStore((state) => state.bump);
   const sortTagsByMostRecent = useTagUsageStore(
-    (state) => state.sortByMostRecent
+    (state) => state.sortByMostRecent,
   );
 
   const { data, isLoading } = useQuery({

@@ -30,7 +30,7 @@ export default function ShiftSummaryForm({
       <label
         className={twMerge(
           "text-gray-500 mb-1 flex items-center w-fit",
-          disabled && "text-gray-400"
+          disabled && "text-gray-400",
         )}
       >
         <input
@@ -65,7 +65,7 @@ export default function ShiftSummaryForm({
           className={twMerge(
             Input,
             invalidDate && InputInvalid,
-            "block w-full"
+            "block w-full",
           )}
           onBlur={onDateBlur}
           disabled={disabled || !value.checked}

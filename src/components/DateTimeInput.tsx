@@ -22,7 +22,7 @@ export default function DateTimeInput({
       className={twMerge(
         disabled && "disabled",
         invalid && "invalid",
-        className
+        className,
       )}
       clearIcon={
         <svg

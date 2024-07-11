@@ -7,7 +7,7 @@ export default function useEntry(
   {
     critical = true,
     onError,
-  }: { critical?: boolean; onError?: () => void } = {}
+  }: { critical?: boolean; onError?: () => void } = {},
 ) {
   const { data } = useQuery({
     queryKey: ["entry", entryId],

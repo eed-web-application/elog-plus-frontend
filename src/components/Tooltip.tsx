@@ -86,12 +86,12 @@ export default function Tooltip({
         child,
         getReferenceProps({
           ref: refs.setReference,
-        })
+        }),
       )}
       {isOpen && (
         <FloatingPortal>
           <div
-            className="px-3 py-2 text-sm font-medium text-white transition-opacity duration-300 bg-gray-900 rounded-lg shadow-sm z-10"
+            className="z-10 py-2 px-3 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-sm transition-opacity duration-300"
             ref={refs.setFloating}
             style={floatingStyles}
             id={id}

@@ -37,14 +37,12 @@ export default function EntryBodyText({
 
     e.preventDefault();
 
-
     const targetPath = targetLink.pathname;
 
     //Fix path elog/elog/
     const alteredPath = targetPath.replace("elog/", "");
 
     navigate(alteredPath);
-
   }
 
   return (
@@ -53,7 +51,7 @@ export default function EntryBodyText({
       className={twMerge(
         "prose max-w-none overflow-x-auto",
         !body && "text-gray-500",
-        className
+        className,
       )}
       dangerouslySetInnerHTML={
         !body.trim() && showEmptyLabel

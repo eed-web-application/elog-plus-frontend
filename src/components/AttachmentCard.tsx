@@ -36,10 +36,10 @@ export default function AttachmentCard({
       {...rest}
       className={twMerge(
         "relative w-20 overflow-hidden text-gray-500",
-        className
+        className,
       )}
     >
-      <div className="relative p-4 h-20 bg-gray-200 shadow flex flex-col justify-center items-center rounded-lg overflow-hidden">
+      <div className="flex overflow-hidden relative flex-col justify-center items-center p-4 h-20 bg-gray-200 rounded-lg shadow">
         {isLoading ? (
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -63,7 +63,7 @@ export default function AttachmentCard({
             />
             {downloadable && (
               <a
-                className="cursor-pointer absolute flex hover:opacity-100 opacity-0 left-0 right-0 top-0 bottom-0 justify-center items-center bg-black bg-opacity-50 text-white"
+                className="flex absolute top-0 right-0 bottom-0 left-0 justify-center items-center text-white bg-black bg-opacity-50 opacity-0 cursor-pointer hover:opacity-100"
                 download={attachment.fileName}
                 href={getAttachmentDownloadURL(attachment.id)}
               >
@@ -96,7 +96,7 @@ export default function AttachmentCard({
           viewBox="0 0 24 24"
           strokeWidth={1.5}
           stroke="currentColor"
-          className="w-6 h-6 absolute top-0 right-0 p-0.5 hover:bg-gray-300 rounded-full cursor-pointer"
+          className="absolute top-0 right-0 p-0.5 w-6 h-6 rounded-full cursor-pointer hover:bg-gray-300"
           onClick={remove}
         >
           <path

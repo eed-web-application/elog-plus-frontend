@@ -1,6 +1,6 @@
 import { fetch } from ".";
 
-export interface Application{
+export interface Application {
   id: string;
   name: string;
   email: string;
@@ -9,7 +9,7 @@ export interface Application{
   applicationManaged: boolean;
 }
 
-export async function fetchApplications(): Promise<Application[]>{
+export async function fetchApplications(): Promise<Application[]> {
   return fetch("v1/auth/application-token");
 }
 
@@ -20,8 +20,8 @@ export async function createApp(name: string, expiration: string) {
   });
 }
 
-export async function deleteApp(){
-  return await fetch(`v1/auth/application-token/{id}`,{
+export async function deleteApp() {
+  return await fetch(`v1/auth/application-token/{id}`, {
     method: "DELETE",
-  })
+  });
 }

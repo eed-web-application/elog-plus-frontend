@@ -1,6 +1,5 @@
-import { create } from 'zustand';
-import { UserAuthorization } from './api';
-
+import { create } from "zustand";
+import { UserAuthorization } from "./api";
 
 interface UserForm {
   mail: string;
@@ -10,10 +9,10 @@ interface UserForm {
 interface UserFormsState {
   forms: Record<string, UserForm>;
   startEditing: (
-    mail: string
+    mail: string,
   ) => [UserForm, (newValue: UserForm) => void, () => void];
-  removeForm: (mail: string) => void; 
-  upsertForm: (newValue: UserForm) => void; 
+  removeForm: (mail: string) => void;
+  upsertForm: (newValue: UserForm) => void;
 }
 
 export const useUserFormsStore = create<UserFormsState>((set, get) => ({
@@ -44,7 +43,7 @@ export const useUserFormsStore = create<UserFormsState>((set, get) => ({
   },
   removeForm(mail) {
     set(({ forms }) => {
-      const { [mail]: removed, ...rest } = forms; 
+      const { [mail]: removed, ...rest } = forms;
 
       return { forms: rest };
     });

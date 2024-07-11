@@ -25,7 +25,6 @@ export function fetchMe(): Promise<User> {
   return fetch("v1/auth/me");
 }
 
-export function logbookAuth(){
+export function logbookAuth() {
   return fetch("/v1/logbook/auth");
 }
-

@@ -14,12 +14,11 @@ export default function DevSelectUser({ className }: { className?: string }) {
   const callbackRef = useRef<(() => void) | null>(null);
 
   const setAccessCode = useCallback(function setAccessCode(
-    accessCode: string | null
+    accessCode: string | null,
   ) {
     __SET_DEV_ACCESS_CODE(accessCode);
     callbackRef.current?.();
-  },
-  []);
+  }, []);
 
   const wrapper = () => {
     return __GET_DEV_ACCESS_CODE();

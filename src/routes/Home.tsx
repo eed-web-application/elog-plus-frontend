@@ -55,7 +55,7 @@ export default function Home() {
   const isSmallScreen = useIsSmallScreen();
   const [searchParams, setSearchParams] = useSearchParams();
   const [spotlightSearch, setSpotlightSearch] = useState<string | undefined>(
-    undefined
+    undefined,
   );
   const query = useMemo(() => deserializeQuery(searchParams), [searchParams]);
   const location = useLocation();
@@ -68,7 +68,7 @@ export default function Home() {
         state: preserveState ? location.state : undefined,
       });
     },
-    [location.state, setSearchParams]
+    [location.state, setSearchParams],
   );
 
   const { isLoading, entries, getMoreEntries, reachedBottom } = useEntries({
@@ -116,7 +116,7 @@ export default function Home() {
       <div
         className={twJoin(
           "p-3 shadow z-10 relative",
-          !isSmallScreen && "px-12"
+          !isSmallScreen && "px-12",
         )}
       >
         <div className="container m-auto">
@@ -129,9 +129,7 @@ export default function Home() {
           <Filters filters={query} setFilters={onFiltersChange} />
         </div>
       </div>
-
       <Sidebar /> {/* Integrate Sidebar component here */}
-
       <SideSheet sheetBody={outlet}>
         <EntryListGrouped
           containerClassName="min-w-[384px] flex-1"

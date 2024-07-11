@@ -19,7 +19,7 @@ const SelectOption = forwardRef<
         isActive && "bg-gray-100",
         isSelected && "bg-blue-100 hover:bg-blue-200",
         isSelected && isActive && "bg-blue-200",
-        className
+        className,
       )}
       {...rest}
     />

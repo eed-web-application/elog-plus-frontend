@@ -25,14 +25,18 @@ let idCounter = 0;
 
 export default function UserForm({ user, onSave }: Props) {
   const [form, setForm, removeForm] = useUserFormsStore((state) =>
-    state.startEditing(user)
+    state.startEditing(user),
   );
   const queryClient = useQueryClient();
 
-  const [newLogbookAuthorization, setNewLogbookAuthorization] = useState<string | null>(null);
+  const [newLogbookAuthorization, setNewLogbookAuthorization] = useState<
+    string | null
+  >(null);
   const [logbookSearch, setLogbookSearch] = useState("");
 
-  const { logbooks, isLoading: isLogbooksLoading } = useLogbooks({ search: logbookSearch });
+  const { logbooks, isLoading: isLogbooksLoading } = useLogbooks({
+    search: logbookSearch,
+  });
 
   const validators = {
     name: () => Boolean(form.name),
@@ -43,7 +47,7 @@ export default function UserForm({ user, onSave }: Props) {
   function onValidate(valid: boolean, field: string): boolean {
     if (valid) {
       setInvalid((invalid) =>
-        invalid.filter((invalidField) => invalidField !== field)
+        invalid.filter((invalidField) => invalidField !== field),
       );
       return true;
     }
@@ -60,7 +64,7 @@ export default function UserForm({ user, onSave }: Props) {
       if (
         !onValidate(
           validators[field as keyof typeof validators](),
-          field as string
+          field as string,
         )
       ) {
         invalid = true;
@@ -77,7 +81,7 @@ export default function UserForm({ user, onSave }: Props) {
 
       return (
         user.authorizations.find(
-          ({ logbook }) => logbook === authorization.logbook
+          ({ logbook }) => logbook === authorization.logbook,
         ) || authorization
       );
     });
@@ -141,11 +145,13 @@ export default function UserForm({ user, onSave }: Props) {
         className={twJoin(
           "border rounded-lg bg-gray-50 w-full flex flex-col p-2",
           logbookAuthorizations.length === 0 &&
-            "items-center justify-center text-lg text-gray-500"
+            "items-center justify-center text-lg text-gray-500",
         )}
       >
         {logbookAuthorizations.length === 0 ? (
-          <div className="my-3">No logbook authorizations. Create one below.</div>
+          <div className="my-3">
+            No logbook authorizations. Create one below.
+          </div>
         ) : (
           <>
             <div className="divide-y">
@@ -164,7 +170,7 @@ export default function UserForm({ user, onSave }: Props) {
                       const updatedAuthorizations = [...form.authorizations];
                       const index = form.authorizations.findIndex(
                         (otherAuthorization) =>
-                          otherAuthorization === authorization
+                          otherAuthorization === authorization,
                       );
 
                       if (
@@ -198,8 +204,8 @@ export default function UserForm({ user, onSave }: Props) {
                       removeAuthorization(
                         form.authorizations.findIndex(
                           (otherAuthorization) =>
-                            otherAuthorization === authorization
-                        )
+                            otherAuthorization === authorization,
+                        ),
                       )
                     }
                   >
@@ -228,8 +234,8 @@ export default function UserForm({ user, onSave }: Props) {
               .filter(
                 (logbook) =>
                   !logbookAuthorizations.some(
-                    (authorization) => authorization.logbook === logbook.name
-                  )
+                    (authorization) => authorization.logbook === logbook.name,
+                  ),
               )
               .map((logbook) => ({ label: logbook.name, value: logbook.name }))}
             setValue={setNewLogbookAuthorization}

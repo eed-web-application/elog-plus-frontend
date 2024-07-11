@@ -1,9 +1,12 @@
-import {
-  useCallback,
-  useState,
-} from "react";
+import { useCallback, useState } from "react";
 import { toast } from "react-toastify";
-import { Link, useNavigate, useParams, Outlet, useOutlet } from "react-router-dom";
+import {
+  Link,
+  useNavigate,
+  useParams,
+  Outlet,
+  useOutlet,
+} from "react-router-dom";
 import { twJoin, twMerge } from "tailwind-merge";
 import Spinner from "../../components/Spinner";
 import ApplicationForm from "../../components/ApplicationForm";
@@ -21,10 +24,7 @@ export default function AdminApplications() {
   const [newDate, setNewDate] = useState<string | null>(null);
   const queryClient = useQueryClient();
 
-
-  const selectedApp = selectedAppId
-    ? appMap[selectedAppId]
-    : undefined;
+  const selectedApp = selectedAppId ? appMap[selectedAppId] : undefined;
 
   const onSave = useCallback(() => {
     toast.success("Saved token");
@@ -46,23 +46,18 @@ export default function AdminApplications() {
   return (
     <Dialog controlled isOpen={newAppName !== null}>
       <div className="flex flex-col h-screen">
-
-        <div className="flex-1 flex overflow-hidden">
+        <div className="flex overflow-hidden flex-1">
           <SideSheet
             home="/admin/applications"
-            sheetBody={
-              selectedApp &&
-              (<ApplicationForm />)
-            }
+            sheetBody={selectedApp && <ApplicationForm />}
           >
             <div
               className={twMerge(
                 "min-w-[384px] flex-1 flex flex-col justify-stretch p-3 overflow-y-auto",
                 // Don't want to have border when loading
-                applications ? "divide-y" : "justify-center w-full"
+                applications ? "divide-y" : "justify-center w-full",
               )}
             >
-
               {isLoading ? (
                 <Spinner className="self-center" />
               ) : (
@@ -76,18 +71,16 @@ export default function AdminApplications() {
                         "p-2 cursor-pointer uppercase focus:outline focus:z-0 outline-2 outline-blue-500",
                         selectedApp?.id !== app.id
                           ? "hover:bg-gray-100"
-                          : "bg-blue-100 hover:bg-blue-200"
+                          : "bg-blue-100 hover:bg-blue-200",
                       )}
                     >
                       {app.name}
-                      <span className="text-gray-500">
-                        {true && "*"}
-                      </span>
+                      <span className="text-gray-500">{true && "*"}</span>
                     </Link>
                   ))}
 
                   <button
-                    className="p-2 cursor-pointer bg-gray-100 focus:outline focus:z-0 outline-2 outline-blue-500 text-center hover:bg-gray-200"
+                    className="p-2 text-center bg-gray-100 cursor-pointer hover:bg-gray-200 focus:z-0 outline-2 outline-blue-500 focus:outline"
                     onClick={() => setNewAppName("")}
                   >
                     Create Application Token
@@ -100,14 +93,14 @@ export default function AdminApplications() {
       </div>
       <Dialog.Content
         as="form"
-        className="max-w-sm w-full"
+        className="w-full max-w-sm"
         onSubmit={handleCreateApplication}
       >
         <Dialog.Section>
           <h1 className="text-lg">New Application Token</h1>
         </Dialog.Section>
         <Dialog.Section>
-          <label className="text-gray-500 block mb-2">
+          <label className="block mb-2 text-gray-500">
             Name
             <input
               required
@@ -117,7 +110,7 @@ export default function AdminApplications() {
             />
           </label>
 
-          <label className="text-gray-500 block mb-2">
+          <label className="block mb-2 text-gray-500">
             Expiration Date
             <input
               type="datetime-local"
@@ -145,5 +138,5 @@ export default function AdminApplications() {
         </Dialog.Section>
       </Dialog.Content>
     </Dialog>
-  )
+  );
 }

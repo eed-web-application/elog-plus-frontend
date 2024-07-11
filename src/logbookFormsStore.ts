@@ -32,7 +32,7 @@ interface LogbookForm extends Pick<LogbookWithAuth, "id" | "name"> {
 interface LogbookFormsState {
   forms: Record<string, LogbookForm>;
   startEditing: (
-    logbook: LogbookWithAuth
+    logbook: LogbookWithAuth,
   ) => [LogbookForm, (newValue: LogbookForm) => void, () => void];
   removeForm: (logbookId: string) => void;
   upsertForm: (newValue: LogbookForm) => void;

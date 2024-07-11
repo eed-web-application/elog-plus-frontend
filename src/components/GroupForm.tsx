@@ -1,13 +1,22 @@
 import React, { useState, FormEvent, useEffect } from "react";
 import { twJoin } from "tailwind-merge";
 import { useQueryClient } from "@tanstack/react-query";
-import { GroupAuthorization, ServerError, GroupWithAuth, AuthorizationType } from "../api";
+import {
+  GroupAuthorization,
+  ServerError,
+  GroupWithAuth,
+  AuthorizationType,
+} from "../api";
 import { Button, IconButton } from "./base";
 import Select from "./Select";
 import { useGroupFormsStore } from "../groupFormsStore";
 import reportServerError from "../reportServerError";
 import useUsers from "../hooks/useUsers";
-import { updateGroup, deleteGroup, getGroup } from "../../node_modules/ui/lib/services/GroupService"; // Updated import path
+import {
+  updateGroup,
+  deleteGroup,
+  getGroup,
+} from "../../node_modules/ui/lib/services/GroupService"; // Updated import path
 
 interface Props {
   group: GroupWithAuth;
@@ -19,11 +28,13 @@ const DEFAULT_AUTHORIZATION: AuthorizationType = "Read";
 
 export default function GroupForm({ group, onSave, onDelete }: Props) {
   const [form, setForm, removeForm] = useGroupFormsStore((state) =>
-    state.startEditing(group)
+    state.startEditing(group),
   );
   const queryClient = useQueryClient();
 
-  const [newUserAuthorization, setNewUserAuthorization] = useState<string | null>(null);
+  const [newUserAuthorization, setNewUserAuthorization] = useState<
+    string | null
+  >(null);
   const [userSearch, setUserSearch] = useState("");
   const { users, isLoading: isUsersLoading } = useUsers({ search: userSearch });
 
@@ -52,10 +63,11 @@ export default function GroupForm({ group, onSave, onDelete }: Props) {
     fetchGroupDetails();
   }, [group.id]);
 
-
   function onValidate(valid: boolean, field: string): boolean {
     if (valid) {
-      setInvalid((invalid) => invalid.filter((invalidField) => invalidField !== field));
+      setInvalid((invalid) =>
+        invalid.filter((invalidField) => invalidField !== field),
+      );
       return true;
     }
     if (!invalid.includes(field)) {
@@ -67,10 +79,17 @@ export default function GroupForm({ group, onSave, onDelete }: Props) {
   async function save() {
     console.log("Save button clicked");
     try {
-      console.log("Calling updateGroup with:", form.id, form.authorizations.map((auth: GroupAuthorization) => auth.owner));
-      await updateGroup(form.id, { name: form.name,
+      console.log(
+        "Calling updateGroup with:",
+        form.id,
+        form.authorizations.map((auth: GroupAuthorization) => auth.owner),
+      );
+      await updateGroup(form.id, {
+        name: form.name,
         description: "description",
-        members: form.authorizations.map((auth: GroupAuthorization) => auth.owner)
+        members: form.authorizations.map(
+          (auth: GroupAuthorization) => auth.owner,
+        ),
       }); // Update the group with the new form data
       queryClient.invalidateQueries(["groups"]); // Invalidate groups query to refresh data
       removeForm();
@@ -84,7 +103,6 @@ export default function GroupForm({ group, onSave, onDelete }: Props) {
       reportServerError("Could not save group", e);
     }
   }
-
 
   async function handleDeleteGroup() {
     if (!window.confirm("Are you sure you want to delete this group?")) {
@@ -105,7 +123,6 @@ export default function GroupForm({ group, onSave, onDelete }: Props) {
       reportServerError("Could not delete group", e);
     }
   }
-
 
   function createUserAuthorization(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -130,7 +147,7 @@ export default function GroupForm({ group, onSave, onDelete }: Props) {
 
   function removeAuthorization(index: number) {
     const updatedAuthorizations = (form?.authorizations || []).filter(
-      (_, i) => i !== index
+      (_, i) => i !== index,
     );
     setForm({
       ...form,
@@ -139,7 +156,7 @@ export default function GroupForm({ group, onSave, onDelete }: Props) {
   }
 
   const userAuthorizations = (form?.authorizations || []).filter(
-    (auth) => auth.ownerType === "User"
+    (auth) => auth.ownerType === "User",
   );
 
   const updated = JSON.stringify(form) === JSON.stringify(group);
@@ -151,7 +168,7 @@ export default function GroupForm({ group, onSave, onDelete }: Props) {
         className={twJoin(
           "border rounded-lg bg-gray-50 w-full flex flex-col p-2",
           userAuthorizations.length === 0 &&
-            "items-center justify-center text-lg text-gray-500"
+            "items-center justify-center text-lg text-gray-500",
         )}
       >
         {userAuthorizations.length === 0 ? (
@@ -165,7 +182,6 @@ export default function GroupForm({ group, onSave, onDelete }: Props) {
                   className="flex justify-between items-center py-1 px-2"
                 >
                   <div className="flex-grow">{authorization.owner}</div>
-
 
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -204,8 +220,8 @@ export default function GroupForm({ group, onSave, onDelete }: Props) {
             .filter(
               (user) =>
                 !userAuthorizations.some(
-                  (authorization) => authorization.owner === user.mail
-                )
+                  (authorization) => authorization.owner === user.mail,
+                ),
             )
             .map((user) => ({ label: user.gecos, value: user.mail }))}
           setValue={setNewUserAuthorization}

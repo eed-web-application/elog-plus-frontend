@@ -11,7 +11,7 @@ export type LocalAttachment = Omit<LocalUploadedAttachment, "id"> &
 
 export default function useAttachmentUploader() {
   const [uploading, setUploading] = useState<Record<string, LocalAttachment>>(
-    {}
+    {},
   );
 
   const upload = useCallback(
@@ -34,23 +34,23 @@ export default function useAttachmentUploader() {
 
       setUploading(
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        ({ [file.name]: _removed, ...uploading }) => uploading
+        ({ [file.name]: _removed, ...uploading }) => uploading,
       );
       if (id) {
         return { fileName: file.name, contentType: file.type, id };
       }
     },
-    [setUploading]
+    [setUploading],
   );
 
   const cancel = useCallback(
     (filename: string) => {
       setUploading(
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        ({ [filename]: _removed, ...uploading }) => uploading
+        ({ [filename]: _removed, ...uploading }) => uploading,
       );
     },
-    [setUploading]
+    [setUploading],
   );
 
   return { uploading: Object.values(uploading), upload, cancel };

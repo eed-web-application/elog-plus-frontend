@@ -62,7 +62,7 @@ export async function fetch(
     formData,
     payloadKey = "payload",
     ...restOptions
-  }: FetchOptions = {}
+  }: FetchOptions = {},
 ) {
   if (body) {
     headers["content-type"] = "application/json";
@@ -83,7 +83,7 @@ export async function fetch(
     `${ENDPOINT}/${url}?${
       params ? new URLSearchParams(params).toString() : ""
     }`,
-    options
+    options,
   );
 
   let responseData;
@@ -120,4 +120,4 @@ export * from "./tags";
 export * from "./auth";
 export * from "./applications";
 export * from "./users";
-export * from './groups';
+export * from "./groups";

@@ -14,7 +14,7 @@ export default function FavoriteButton({
   favoriteIconClassName?: string;
 } & ComponentProps<"svg">) {
   const isFavorited = useFavoritesStore((state) =>
-    state.favorites.has(entryId)
+    state.favorites.has(entryId),
   );
   const toggleFavorite = useFavoritesStore((state) => state.toggleFavorite);
 

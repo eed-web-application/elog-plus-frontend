@@ -7,7 +7,10 @@ import SideSheet from "../../components/SideSheet";
 import Dialog from "../../components/Dialog";
 import { Button, Input, TextButton } from "../../components/base";
 import { useQueryClient } from "@tanstack/react-query";
-import { getGroups, createGroup } from "../../../node_modules/ui/lib/services/GroupService";
+import {
+  getGroups,
+  createGroup,
+} from "../../../node_modules/ui/lib/services/GroupService";
 import GroupForm from "../../components/GroupForm.tsx";
 import { GroupWithAuth } from "../../api/groups.ts";
 
@@ -15,7 +18,9 @@ export default function AdminGroups() {
   const [groupSearch, setGroupSearch] = useState("");
   const [groups, setGroups] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [selectedGroup, setSelectedGroup] = useState<GroupWithAuth | null>(null);
+  const [selectedGroup, setSelectedGroup] = useState<GroupWithAuth | null>(
+    null,
+  );
   const { groupID } = useParams<{ groupID: string }>();
   const [newGroupName, setNewGroupName] = useState<string | null>(null);
   const navigate = useNavigate();
@@ -47,11 +52,10 @@ export default function AdminGroups() {
     fetchGroups();
   }, []);
 
-
   const fetchGroups = async () => {
     setIsLoading(true);
     try {
-      const data = await getGroups(); 
+      const data = await getGroups();
       setGroups(data);
     } catch (error) {
       toast.error("Failed to fetch groups");
@@ -114,17 +118,23 @@ export default function AdminGroups() {
       </form>
       <Dialog controlled isOpen={newGroupName !== null}>
         <div className="flex flex-col h-screen">
-          <div className="flex-1 flex overflow-hidden">
+          <div className="flex overflow-hidden flex-1">
             <SideSheet
               home="/admin/groups"
-              sheetBody={selectedGroup && (
-                <GroupForm group={selectedGroup} onSave={onSave} onDelete={onDelete} />
-              )}
+              sheetBody={
+                selectedGroup && (
+                  <GroupForm
+                    group={selectedGroup}
+                    onSave={onSave}
+                    onDelete={onDelete}
+                  />
+                )
+              }
             >
               <div
                 className={twMerge(
                   "min-w-[384px] flex-1 flex flex-col justify-stretch p-3 overflow-y-auto",
-                  groups ? "divide-y" : "justify-center w-full"
+                  groups ? "divide-y" : "justify-center w-full",
                 )}
               >
                 {isLoading ? (
@@ -140,7 +150,7 @@ export default function AdminGroups() {
                           "p-2 cursor-pointer uppercase focus:outline focus:z-0 outline-2 outline-blue-500",
                           selectedGroup !== group.id
                             ? "hover:bg-gray-100"
-                            : "bg-blue-100 hover:bg-blue-200"
+                            : "bg-blue-100 hover:bg-blue-200",
                         )}
                       >
                         {group.name}
@@ -148,7 +158,7 @@ export default function AdminGroups() {
                       </Link>
                     ))}
                     <button
-                      className="p-2 cursor-pointer bg-gray-100 focus:outline focus:z-0 outline-2 outline-blue-500 text-center hover:bg-gray-200"
+                      className="p-2 text-center bg-gray-100 cursor-pointer hover:bg-gray-200 focus:z-0 outline-2 outline-blue-500 focus:outline"
                       onClick={() => setNewGroupName("")}
                     >
                       Create Group
@@ -161,14 +171,14 @@ export default function AdminGroups() {
         </div>
         <Dialog.Content
           as="form"
-          className="max-w-sm w-full"
+          className="w-full max-w-sm"
           onSubmit={handleCreateGroup}
         >
           <Dialog.Section>
             <h1 className="text-lg">New Group</h1>
           </Dialog.Section>
           <Dialog.Section>
-            <label className="text-gray-500 block mb-2">
+            <label className="block mb-2 text-gray-500">
               Name
               <input
                 required

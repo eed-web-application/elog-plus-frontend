@@ -23,7 +23,7 @@ interface GroupForm {
 interface GroupFormsState {
   forms: Record<string, GroupForm>; // Dictionary to store group forms by ID
   startEditing: (
-    group: GroupForm
+    group: GroupForm,
   ) => [GroupForm, (newValue: GroupForm) => void, () => void]; // Function to start editing a group form
   removeForm: (groupId: string) => void; // Function to remove a group form
   upsertForm: (newValue: GroupForm) => void; // Function to add or update a group form

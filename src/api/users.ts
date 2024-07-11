@@ -1,7 +1,6 @@
-import { create } from 'zustand';
-import { fetch } from "."; 
-import { AuthorizationType } from './logbooks';
-
+import { create } from "zustand";
+import { fetch } from ".";
+import { AuthorizationType } from "./logbooks";
 
 interface User {
   id: string;
@@ -11,10 +10,13 @@ interface User {
 }
 
 interface UsersState {
-  users: Record<string, User>; 
-  addUser: (user: User) => void; 
-  removeUser: (userId: string) => void; 
-  updateUserPermissions: (userId: string, permissions: AuthorizationType[]) => void;
+  users: Record<string, User>;
+  addUser: (user: User) => void;
+  removeUser: (userId: string) => void;
+  updateUserPermissions: (
+    userId: string,
+    permissions: AuthorizationType[],
+  ) => void;
 }
 
 export interface UserAuthorization {
@@ -27,16 +29,16 @@ export interface UserWithAuth extends User {
 }
 
 export async function updateUser(user: UserWithAuth) {
-    return await fetch(`v1/users/${user.id}`, {
-      method: "PUT",
-      body: user,
-    });
-  }
+  return await fetch(`v1/users/${user.id}`, {
+    method: "PUT",
+    body: user,
+  });
+}
 
 export const useUsersStore = create<UsersState>((set) => ({
   users: {},
   addUser(user) {
-    set(state => ({
+    set((state) => ({
       users: {
         ...state.users,
         [user.id]: user,
@@ -44,13 +46,13 @@ export const useUsersStore = create<UsersState>((set) => ({
     }));
   },
   removeUser(userId) {
-    set(state => {
+    set((state) => {
       const { [userId]: removedUser, ...restUsers } = state.users;
       return { users: restUsers };
     });
   },
   updateUserPermissions(userId, permissions) {
-    set(state => {
+    set((state) => {
       if (!state.users[userId]) return state;
 
       const updatedUser = {

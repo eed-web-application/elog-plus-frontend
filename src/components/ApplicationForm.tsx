@@ -17,7 +17,6 @@ import Select from "./Select";
 import useGroups from "../hooks/useGroups";
 import useApplications from "../hooks/useApplications";
 
-
 interface Props {
   user: LogbookWithAuth;
   onSave: () => void;
@@ -28,44 +27,34 @@ const DEFAULT_AUTHORIZATION: AuthorizationType = "Read";
 let idCounter = 0;
 
 export default function ApplicationForm() {
-
   const queryClient = useQueryClient();
 
   const [newUserAuthorization, setNewUserAuthorizations] = useState<
     string | null
   >(null);
-   const [appSearch, setAppSearch] = useState("");
+  const [appSearch, setAppSearch] = useState("");
 
-
-   const { applications, appMap, isLoading } = useApplications({});
-
+  const { applications, appMap, isLoading } = useApplications({});
 
   return (
     <div className="px-3 pb-3">
-
       <div className="text-gray-500">App Authorizations</div>
       <div
         className={twJoin(
           "border rounded-lg bg-gray-50 w-full flex flex-col p-2",
-    
-            "items-center justify-center text-lg text-gray-500"
+
+          "items-center justify-center text-lg text-gray-500",
         )}
       >
-        
-          <div className="my-3">No user authorizations. Create one below.</div>
-        
-        
-        <form
-          noValidate
-          className="relative mt-2 w-full"
-          
-        >
+        <div className="my-3">No user authorizations. Create one below.</div>
+
+        <form noValidate className="relative mt-2 w-full">
           <Select
             className="pr-12 w-full"
             value={newUserAuthorization}
             onSearchChange={setAppSearch}
             isLoading={isLoading}
-            options = {[]}
+            options={[]}
             setValue={setNewUserAuthorizations}
           />
           <button
@@ -90,13 +79,7 @@ export default function ApplicationForm() {
           </button>
         </form>
       </div>
-      <button
-        
-        className={twJoin(Button, "block ml-auto mt-3")}
-        
-      >
-        Save
-      </button>
+      <button className={twJoin(Button, "block ml-auto mt-3")}>Save</button>
     </div>
   );
 }

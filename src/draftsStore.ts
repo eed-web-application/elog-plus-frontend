@@ -44,7 +44,7 @@ export type DraftFactory =
 interface DraftsState {
   drafts: Partial<Record<DraftId, Draft>>;
   startDrafting: (
-    factory: DraftFactory
+    factory: DraftFactory,
   ) => [Draft, (draft: Draft) => void, () => void];
   upsertDraft: (draftId: DraftId, draft: Partial<Draft>) => void;
   removeDraft: (draftId: DraftId) => void;
@@ -145,7 +145,7 @@ export const useDraftsStore = create(
               Omit<Draft, "eventAt"> & {
                 eventAt?: string | null | Date;
               }
-            >
+            >,
           )) {
             draft.eventAt = draft.eventAt
               ? new Date(draft.eventAt)
@@ -155,6 +155,6 @@ export const useDraftsStore = create(
           return value;
         },
       }),
-    }
-  )
+    },
+  ),
 );

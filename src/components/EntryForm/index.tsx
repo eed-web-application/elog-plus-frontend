@@ -55,7 +55,7 @@ export default function EntryForm({ onEntrySaved, kind = "newEntry" }: Props) {
   });
 
   const attachments = (draft.attachments as LocalAttachment[]).concat(
-    attachmentsUploading
+    attachmentsUploading,
   );
 
   return (
@@ -82,13 +82,13 @@ export default function EntryForm({ onEntrySaved, kind = "newEntry" }: Props) {
       </Link>
       <div className="pb-2">
         {kind === "newEntry" ? (
-          <div className="text-lg pl-3 py-2 mb-2 border-b">New entry</div>
+          <div className="py-2 pl-3 mb-2 text-lg border-b">New entry</div>
         ) : (
           <>
             <TextDivider className="w-full">
               {kind[0] === "followingUp" ? "Following up" : "Superseding"}
             </TextDivider>
-            <div className="border-b pt-1.5 pb-2 px-3 mb-3">
+            <div className="px-3 pt-1.5 pb-2 mb-3 border-b">
               <EntryRow
                 containerClassName="rounded-lg border mb-2 overflow-hidden"
                 entry={kind[1]}
@@ -107,7 +107,7 @@ export default function EntryForm({ onEntrySaved, kind = "newEntry" }: Props) {
           }}
           className="px-3"
         >
-          <label className="text-gray-500 block mb-2">
+          <label className="block mb-2 text-gray-500">
             Title
             <input
               required
@@ -115,7 +115,7 @@ export default function EntryForm({ onEntrySaved, kind = "newEntry" }: Props) {
               className={twMerge(
                 Input,
                 invalidFields.includes("title") && InputInvalid,
-                "block w-full"
+                "block w-full",
               )}
               value={draft.title}
               onChange={(e) => updateDraft({ ...draft, title: e.target.value })}
@@ -130,7 +130,7 @@ export default function EntryForm({ onEntrySaved, kind = "newEntry" }: Props) {
               const updatedTags = draft.tags.filter((tag) =>
                 typeof tag === "string"
                   ? logbooks.includes(tagMap[tag].logbook.id)
-                  : logbooks.includes(tag.logbook)
+                  : logbooks.includes(tag.logbook),
               );
 
               updateDraft({
@@ -158,7 +158,7 @@ export default function EntryForm({ onEntrySaved, kind = "newEntry" }: Props) {
               })
             }
           />
-          <label className="text-gray-500 mb-1 flex items-center">
+          <label className="flex items-center mb-1 text-gray-500">
             <input
               type="checkbox"
               className={twMerge(Checkbox, "mr-2")}
@@ -182,7 +182,7 @@ export default function EntryForm({ onEntrySaved, kind = "newEntry" }: Props) {
                 eventAt: date,
               })
             }
-            className="block w-full mb-2"
+            className="block mb-2 w-full"
           />
           {kind === "newEntry" && (
             <ShiftSummaryForm
@@ -199,21 +199,21 @@ export default function EntryForm({ onEntrySaved, kind = "newEntry" }: Props) {
 
           {/* Not using a label here, because there are some weird */}
           {/* interactions with having multiple inputs under the same label */}
-          <div className="text-gray-500 block mb-2">
+          <div className="block mb-2 text-gray-500">
             Text
             <EntryBodyTextEditor
               value={draft.text}
               onChange={(text) => updateDraft({ ...draft, text })}
             />
           </div>
-          <label className="text-gray-500 block mb-2">
+          <label className="block mb-2 text-gray-500">
             Attachments
             <div
               className={twJoin(
                 "relative cursor-pointer border rounded-lg bg-gray-50 w-full overflow-hidden flex flex-wrap m-auto",
                 attachments.length === 0
                   ? "items-center justify-center text-xl h-24"
-                  : "px-3 pt-3"
+                  : "px-3 pt-3",
               )}
               {...getRootProps()}
             >
@@ -229,7 +229,7 @@ export default function EntryForm({ onEntrySaved, kind = "newEntry" }: Props) {
                     />
                   ))}
               {isDragActive && (
-                <div className="absolute left-0 right-0 top-0 bottom-0 bg-opacity-20 bg-gray-500" />
+                <div className="absolute top-0 right-0 bottom-0 left-0 bg-gray-500 bg-opacity-20" />
               )}
             </div>
             <input {...getInputProps()} />

@@ -4,7 +4,7 @@ import {
   createBrowserRouter,
   Params,
   RouterProvider,
-  ShouldRevalidateFunction
+  ShouldRevalidateFunction,
 } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -55,12 +55,12 @@ const router = createBrowserRouter(
       children: [
         {
           path: "/admin",
-          element: (<AdminNavbar />),
+          element: <AdminNavbar />,
           children: [
             {
               index: true,
               path: "logbooks",
-              element: <AdminLogbooks/>
+              element: <AdminLogbooks />,
             },
             {
               path: "/admin/logbooks/:logbookId",
@@ -68,32 +68,32 @@ const router = createBrowserRouter(
             },
             {
               path: "users",
-              element: <AdminUsers/>
+              element: <AdminUsers />,
             },
             {
               path: "/admin/users/:userID",
-              element: <AdminUsers/>
+              element: <AdminUsers />,
             },
 
             {
               path: "groups",
-              element: (<AdminGroups/>)
+              element: <AdminGroups />,
             },
             {
               path: "/admin/groups/:groupID",
-              element: <AdminGroups/>
+              element: <AdminGroups />,
             },
             {
               path: "applications",
-              element: <AdminApplications/>
+              element: <AdminApplications />,
             },
             {
               path: "applications/:appID",
-              element: <AdminApplications/>
-            }
-          ]
+              element: <AdminApplications />,
+            },
+          ],
         },
-        
+
         {
           path: "/",
           element: <Home />,
@@ -126,7 +126,7 @@ const router = createBrowserRouter(
       ],
     },
   ],
-  { basename: "/elog" }
+  { basename: "/elog" },
 );
 
 window.addEventListener("unhandledrejection", (e) => {
@@ -141,5 +141,5 @@ ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
       <RouterProvider router={router} />
       <ToastContainer hideProgressBar={true} />
     </QueryClientProvider>
-  </React.StrictMode>
+  </React.StrictMode>,
 );

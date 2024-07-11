@@ -36,17 +36,17 @@ export default function TagLogbookSelectorDialog({
         }
       }}
     >
-      <Dialog.Content className="max-w-md w-full">
+      <Dialog.Content className="w-full max-w-md">
         <Dialog.Section className="text-xl">
           Save tag <span className="text-gray-500">{tag}</span> in
         </Dialog.Section>
-        <Dialog.Section className="max-h-48 overflow-y-auto gap-2 flex flex-col">
+        <Dialog.Section className="flex overflow-y-auto flex-col gap-2 max-h-48">
           {logbooks.map((logbook) => (
             <label
               key={logbook.id}
               className={twJoin(
                 CheckboxLabel,
-                "flex items-center uppercase text-gray-500"
+                "flex items-center uppercase text-gray-500",
               )}
             >
               <input
@@ -57,7 +57,7 @@ export default function TagLogbookSelectorDialog({
                   setSelected((selected) =>
                     selected.includes(logbook.id)
                       ? selected.filter((id) => id !== logbook.id)
-                      : [...selected, logbook.id]
+                      : [...selected, logbook.id],
                   )
                 }
               />

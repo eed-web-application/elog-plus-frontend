@@ -90,7 +90,7 @@ export type EntriesQuery = {
 };
 
 export async function fetchEntries(
-  query: EntriesQuery
+  query: EntriesQuery,
 ): Promise<EntrySummary[]> {
   const params: ParamsObject = Object.assign(
     {
@@ -98,7 +98,7 @@ export async function fetchEntries(
       logbooks: [],
       tags: [],
     },
-    query
+    query,
   );
 
   // Remove Z (see normalizeEntry function)
@@ -135,7 +135,7 @@ export async function fetchReferences(id: string): Promise<EntrySummary[]> {
 
 export function fetchShiftSummary(
   shiftId: string,
-  date: string
+  date: string,
 ): Promise<string | undefined> {
   return fetch(`v1/entries/${shiftId}/summaries/${date}`).catch((e) => {
     if (e instanceof NotFoundError) {
@@ -156,7 +156,7 @@ export function createEntry(entry: EntryNew): Promise<string> {
 
 export function followUp(
   followingUp: string,
-  entry: EntryNew
+  entry: EntryNew,
 ): Promise<string> {
   return fetch(`v1/entries/${followingUp}/follow-ups`, {
     method: "POST",
@@ -166,7 +166,7 @@ export function followUp(
 
 export function supersede(
   superseding: string,
-  entry: EntryNew
+  entry: EntryNew,
 ): Promise<string> {
   return fetch(`v1/entries/${superseding}/supersede`, {
     method: "POST",

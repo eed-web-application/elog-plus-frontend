@@ -91,7 +91,7 @@ export default function MultiSelect<C extends { custom: string }>({
     .map((selectedOption) =>
       typeof selectedOption === "string"
         ? optionsMap[selectedOption]
-        : selectedOption
+        : selectedOption,
     )
     .filter((x) => x) as (Option | { custom: string })[];
 
@@ -99,7 +99,7 @@ export default function MultiSelect<C extends { custom: string }>({
     (option) =>
       (!search || option.label.toLowerCase().includes(search.toLowerCase())) &&
       // Exclude selected options
-      !value.includes(option.value)
+      !value.includes(option.value),
   );
 
   const customOptions = (
@@ -198,7 +198,7 @@ export default function MultiSelect<C extends { custom: string }>({
         disabled && InputDisabled,
         "flex",
         focused && "outline-none ring-1 ring-blue-500 border-blue-500",
-        className
+        className,
       )}
       {...getReferenceProps({
         onMouseDown: (e) => {
@@ -217,8 +217,8 @@ export default function MultiSelect<C extends { custom: string }>({
             onDelete={() =>
               setValue(
                 value.filter(
-                  (otherOption) => getValue(otherOption) !== getValue(option)
-                )
+                  (otherOption) => getValue(otherOption) !== getValue(option),
+                ),
               )
             }
           >
@@ -272,7 +272,7 @@ export default function MultiSelect<C extends { custom: string }>({
               style: floatingStyles,
               className:
                 "max-h-64 overflow-y-auto rounded-lg shadow text-black bg-white z-10",
-            })
+            }),
           )}
         >
           <>

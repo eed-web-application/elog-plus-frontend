@@ -32,7 +32,7 @@ const Pane = forwardRef<HTMLDivElement, Props>(function Pane(
     className,
     ...rest
   },
-  ref
+  ref,
 ) {
   const [explicitFullscreen, setExplicitFullscreen] =
     useState(fullscreenByDefault);
@@ -77,12 +77,12 @@ const Pane = forwardRef<HTMLDivElement, Props>(function Pane(
       className={twJoin(
         "mx-auto container",
         fullscreen && [Modal, "mt-6"],
-        className
+        className,
       )}
       {...(fullscreen ? getFloatingProps() : {})}
       {...rest}
     >
-      <div className="flex items-center pr-1 py-1 float-right">
+      <div className="flex float-right items-center py-1 pr-1">
         {fullscreen || (
           <svg
             xmlns="http://www.w3.org/2000/svg"

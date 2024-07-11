@@ -40,7 +40,7 @@ type DialogOptions = {
 
 export function useDialog({ onOpenChange, ...rest }: DialogOptions) {
   const [uncontrolledOpen, setUncontrolledOpen] = useState(
-    "initialOpen" in rest ? rest.initialOpen : false
+    "initialOpen" in rest ? rest.initialOpen : false,
   );
 
   const open = rest.controlled ? rest.isOpen : uncontrolledOpen;
@@ -51,7 +51,7 @@ export function useDialog({ onOpenChange, ...rest }: DialogOptions) {
         setUncontrolledOpen(isOpen);
       }
     },
-    [rest.controlled]
+    [rest.controlled],
   );
 
   const data = useFloating({
@@ -76,7 +76,7 @@ export function useDialog({ onOpenChange, ...rest }: DialogOptions) {
       ...interactions,
       ...data,
     }),
-    [open, setOpen, interactions, data]
+    [open, setOpen, interactions, data],
   );
 }
 
@@ -123,9 +123,9 @@ export const DialogTrigger = forwardRef<HTMLElement, PropsWithChildren<{}>>(
         ref,
         ...props,
         ...children.props,
-      })
+      }),
     );
-  }
+  },
 );
 
 export type ContentProps<T extends ElementType> = {
@@ -159,7 +159,7 @@ function DialogContent<T extends ElementType = "div">({
             ref={context.refs.setFloating}
             className={twMerge(
               "relative bg-white rounded-lg shadow-lg outline-none divide-y py-2",
-              className
+              className,
             )}
             {...context.getFloatingProps(rest)}
           >

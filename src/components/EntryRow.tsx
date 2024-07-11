@@ -65,7 +65,7 @@ function RowButton({
           IconButton,
           "z-0 relative",
           entrySelected && "hover:bg-blue-200",
-          entryHighlighted && "hover:bg-yellow-300"
+          entryHighlighted && "hover:bg-yellow-300",
         )}
         tabIndex={0}
         onClick={(e) => {
@@ -126,7 +126,7 @@ function TagList({ tags, entryId }: { tags: string[]; entryId: string }) {
 
   return (
     <div
-      className="flex flex-1 overflow-hidden relative w-full pointer-events-none"
+      className="flex overflow-hidden relative flex-1 w-full pointer-events-none"
       ref={(el) => (containerRef.current = el)}
     >
       {tags.map((tag, index) => (
@@ -134,7 +134,7 @@ function TagList({ tags, entryId }: { tags: string[]; entryId: string }) {
           key={tag}
           className={twJoin(
             "ml-1.5",
-            overflowIndex !== null && index >= overflowIndex && "invisible"
+            overflowIndex !== null && index >= overflowIndex && "invisible",
           )}
           ref={(el) => (tagsRef.current[index] = el)}
         >
@@ -146,7 +146,7 @@ function TagList({ tags, entryId }: { tags: string[]; entryId: string }) {
         {...getReferenceProps()}
         className={twJoin(
           "ml-1.5 absolute pointer-events-auto",
-          overflowIndex === null && "invisible"
+          overflowIndex === null && "invisible",
         )}
         style={{ left: `${drawerOffset}px` }}
         clickable
@@ -156,7 +156,7 @@ function TagList({ tags, entryId }: { tags: string[]; entryId: string }) {
       {isDrawerOpen && overflowIndex !== null && (
         <FloatingPortal>
           <div
-            className="shadow rounded-lg bg-white p-1.5 pb-0 mt-1 z-10"
+            className="z-10 p-1.5 pb-0 mt-1 bg-white rounded-lg shadow"
             style={floatingStyles}
             ref={refs.setFloating}
             {...getFloatingProps()}
@@ -188,7 +188,7 @@ function AttachmentList({
   figuresFirst.sort(
     (a, b) =>
       (b.previewState === "Completed" ? 1 : 0) -
-      (a.previewState === "Completed" ? 1 : 0)
+      (a.previewState === "Completed" ? 1 : 0),
   );
 
   const { updateTruncation, overflowIndex, width } = useTruncate({
@@ -211,7 +211,7 @@ function AttachmentList({
     <div
       className={twMerge(
         "flex relative items-center overflow-hidden w-fit justify-end pointer-events-none",
-        className
+        className,
       )}
       style={{ width: `${width}px` }}
       ref={containerRef}
@@ -225,23 +225,23 @@ function AttachmentList({
               key={attachment.id}
               src={`data:image/png;base64,${attachment.miniPreview}`}
               className={twJoin(
-                "flex-shrink-0 w-8 h-8 ml-2 rounded-md object-cover"
+                "flex-shrink-0 w-8 h-8 ml-2 rounded-md object-cover",
               )}
             />
           ) : (
             <AttachmentIcon
               key={attachment.id}
               className={twJoin(
-                "flex-shrink-0 w-8 h-8 ml-2 text-gray-500 bg-gray-200 p-1 rounded-md"
+                "flex-shrink-0 w-8 h-8 ml-2 text-gray-500 bg-gray-200 p-1 rounded-md",
               )}
               mimeType={attachment.contentType}
             />
-          )
+          ),
         )}
       {overflowIndex !== null && (
         <div
           className={twJoin(
-            "text-gray-500 text-xs text-right w-6 flex-shrink-0"
+            "text-gray-500 text-xs text-right w-6 flex-shrink-0",
           )}
         >
           +{attachments.length - end}
@@ -293,7 +293,7 @@ const EntryRow = memo(
       allowSpotlightForFollowUps,
       ...rest
     },
-    ref
+    ref,
   ) {
     const rowRef = useRef<HTMLDivElement>(null);
     const [expanded, setExpanded] = useState(Boolean(expandedByDefault));
@@ -303,10 +303,10 @@ const EntryRow = memo(
     });
 
     const hasFollowUpDraft = useDraftsStore((state) =>
-      Boolean(state.drafts[`followUp/${entry.id}`])
+      Boolean(state.drafts[`followUp/${entry.id}`]),
     );
     const hasSupersedingDraft = useDraftsStore((state) =>
-      Boolean(state.drafts[`supersede/${entry.id}`])
+      Boolean(state.drafts[`supersede/${entry.id}`]),
     );
 
     const spotlightProps = useSpotlightProps(entry.id);
@@ -329,7 +329,7 @@ const EntryRow = memo(
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 24 24"
             fill="currentColor"
-            className="w-4 h-4 inline text-gray-500 mr-1 relative z-10"
+            className="inline relative z-10 mr-1 w-4 h-4 text-gray-500"
           >
             <path d="M16.0503 12.0498L21 16.9996L16.0503 21.9493L14.636 20.5351L17.172 17.9988L4 17.9996V15.9996L17.172 15.9988L14.636 13.464L16.0503 12.0498ZM7.94975 2.0498L9.36396 3.46402L6.828 5.9988L20 5.99955V7.99955L6.828 7.9988L9.36396 10.5351L7.94975 11.9493L3 6.99955L7.94975 2.0498Z" />
           </svg>
@@ -343,7 +343,7 @@ const EntryRow = memo(
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 24 24"
             fill="currentColor"
-            className="w-4 h-4 inline text-gray-500 mr-1 relative z-10"
+            className="inline relative z-10 mr-1 w-4 h-4 text-gray-500"
           >
             <path d="M10.0003 5.00014L19.0002 5L19.0002 7L12.0003 7.00011L12.0002 17.1719L15.9499 13.2222L17.3642 14.6364L11.0002 21.0004L4.63623 14.6364L6.05044 13.2222L10.0002 17.172L10.0003 5.00014Z" />
           </svg>
@@ -357,7 +357,7 @@ const EntryRow = memo(
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 24 24"
             fill="currentColor"
-            className="w-4 h-4 inline text-gray-500 mr-1 relative z-10"
+            className="inline relative z-10 mr-1 w-4 h-4 text-gray-500"
           >
             <path d="M19.0003 10.0003L19.0004 19.0002L17.0004 19.0002L17.0003 12.0003L6.82845 12.0002L10.7782 15.9499L9.36396 17.3642L3 11.0002L9.36396 4.63623L10.7782 6.05044L6.8284 10.0002L19.0003 10.0003Z" />
           </svg>
@@ -370,7 +370,7 @@ const EntryRow = memo(
         ref={ref}
         className={twMerge(
           containerClassName,
-          expanded && fullEntry && "border-b"
+          expanded && fullEntry && "border-b",
         )}
         {...rest}
       >
@@ -384,10 +384,10 @@ const EntryRow = memo(
             selected && "hover:bg-blue-100",
             highlighted && "bg-yellow-100",
             highlighted && "hover:bg-yellow-200",
-            className
+            className,
           )}
         >
-          <div className="px-2 flex flex-col justify-center items-center w-16">
+          <div className="flex flex-col justify-center items-center px-2 w-16">
             {showDate && (
               <div className="text-sm">
                 {date.toLocaleDateString("en-us", {
@@ -404,7 +404,7 @@ const EntryRow = memo(
               })}
             </div>
           </div>
-          <div className="flex-1 flex flex-col py-1 overflow-hidden">
+          <div className="flex overflow-hidden flex-col flex-1 py-1">
             <Link
               to={{
                 pathname: `/${entry.id}`,
@@ -419,7 +419,7 @@ const EntryRow = memo(
                   xmlns="http://www.w3.org/2000/svg"
                   viewBox="0 0 20 20"
                   fill="currentColor"
-                  className="w-4 h-4 inline text-gray-500 mr-1"
+                  className="inline mr-1 w-4 h-4 text-gray-500"
                 >
                   <path d="M3.505 2.365A41.369 41.369 0 019 2c1.863 0 3.697.124 5.495.365 1.247.167 2.18 1.108 2.435 2.268a4.45 4.45 0 00-.577-.069 43.141 43.141 0 00-4.706 0C9.229 4.696 7.5 6.727 7.5 8.998v2.24c0 1.413.67 2.735 1.76 3.562l-2.98 2.98A.75.75 0 015 17.25v-3.443c-.501-.048-1-.106-1.495-.172C2.033 13.438 1 12.162 1 10.72V5.28c0-1.441 1.033-2.717 2.505-2.914z" />
                   <path d="M14 6c-.762 0-1.52.02-2.271.062C10.157 6.148 9 7.472 9 8.998v2.24c0 1.519 1.147 2.839 2.71 2.935.214.013.428.024.642.034.2.009.385.09.518.224l2.35 2.35a.75.75 0 001.28-.531v-2.07c1.453-.195 2.5-1.463 2.5-2.915V8.998c0-1.526-1.157-2.85-2.729-2.936A41.645 41.645 0 0014 6z" />
@@ -428,7 +428,7 @@ const EntryRow = memo(
               {entry.title}
             </Link>
             <div className="flex items-center h-5">
-              <div className="text-sm text-gray-500 leading-none whitespace-nowrap truncate">
+              <div className="text-sm leading-none text-gray-500 whitespace-nowrap truncate">
                 {`${entry.logbooks
                   .map(({ name }) => name.toUpperCase())
                   .join(", ")} • ${entry.loggedBy}`}
@@ -438,7 +438,7 @@ const EntryRow = memo(
           </div>
           <AttachmentList attachments={entry.attachments} parentRef={rowRef} />
           <FloatingDelayGroup delay={200}>
-            <div className="pl-3 hidden group-hover:flex">
+            <div className="hidden pl-3 group-hover:flex">
               {allowSpotlight && (
                 <RowButton
                   tooltip="Spotlight"
@@ -483,7 +483,7 @@ const EntryRow = memo(
                       strokeLinecap="round"
                       strokeLinejoin="round"
                       d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L6.832 19.82a4.5 4.5 0 01-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 011.13-1.897L16.863 4.487zm0 0L19.5 7.125"
-                      className="absolute "
+                      className="absolute"
                     />
                   </svg>
                 </RowButton>
@@ -522,7 +522,7 @@ const EntryRow = memo(
                 className={twMerge(
                   "z-0",
                   selected && "hover:bg-blue-200",
-                  highlighted && "hover:bg-yellow-300"
+                  highlighted && "hover:bg-yellow-300",
                 )}
                 favoriteIconClassName="hidden group-hover:block"
               />
@@ -540,7 +540,7 @@ const EntryRow = memo(
               "z-0",
               expanded && "rotate-180",
               selected && "hover:bg-blue-200",
-              highlighted && "hover:bg-yellow-300"
+              highlighted && "hover:bg-yellow-300",
             )}
             onClick={() => setExpanded((expanded) => !expanded)}
           >
@@ -556,7 +556,7 @@ const EntryRow = memo(
             <div
               className={twJoin(
                 "p-2 pb-1 bg-gray-100",
-                !fullEntry.text && "text-gray-500"
+                !fullEntry.text && "text-gray-500",
               )}
             >
               <EntryBodyText body={fullEntry.text} showEmptyLabel />
@@ -564,7 +564,7 @@ const EntryRow = memo(
             </div>
             {showFollowUps && fullEntry.followUps.length > 0 && (
               <>
-                <div className="ml-6 pt-2 pr-2">
+                <div className="pt-2 pr-2 ml-6">
                   <EntryList
                     entries={fullEntry.followUps}
                     showDate
@@ -582,7 +582,7 @@ const EntryRow = memo(
               fullEntry.referencedBy.length > 0 && (
                 <>
                   <TextDivider>Referenced By</TextDivider>
-                  <div className="ml-6 pt-2 pr-2">
+                  <div className="pt-2 pr-2 ml-6">
                     <EntryList
                       entries={fullEntry.referencedBy}
                       showDate
@@ -599,7 +599,7 @@ const EntryRow = memo(
         )}
       </div>
     );
-  })
+  }),
 );
 
 export default EntryRow;

@@ -2,7 +2,6 @@ import { ServerError, fetchApplications, Application } from "../api";
 import reportServerError from "../reportServerError";
 import { useQuery } from "@tanstack/react-query";
 
-
 export default function useApplications({
   enabled = true,
   critical = true,
@@ -24,10 +23,13 @@ export default function useApplications({
       reportServerError("Could not retrieve applications", e);
     },
     select: (applications) => {
-      const appMap = applications.reduce<Record<string, Application>>((acc, app) => {
-        acc[app.id] = app;
-        return acc;
-      }, {});
+      const appMap = applications.reduce<Record<string, Application>>(
+        (acc, app) => {
+          acc[app.id] = app;
+          return acc;
+        },
+        {},
+      );
 
       return { applications, appMap };
     },
