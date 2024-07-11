@@ -6,7 +6,7 @@ import {
   useSyncExternalStore,
 } from "react";
 import Select from "./Select";
-import { fetch } from "../api";
+import { InternalServerError, fetch } from "../api";
 import { __SET_DEV_ACCESS_CODE, __GET_DEV_ACCESS_CODE } from "../api";
 import { twMerge } from "tailwind-merge";
 
@@ -30,11 +30,26 @@ export default function DevSelectUser({ className }: { className?: string }) {
     return () => (callbackRef.current = null);
   }, wrapper);
 
+  async function fetchUsers() {
+    let users;
+
+    // GET /v1/mock/users-auth will return 401 if the access code is invalid.
+    // So if we get a 401, we clear the access code and try again.
+    try {
+      users = await fetch("v1/mock/users-auth");
+    } catch (err) {
+      if (err instanceof InternalServerError && err.res.status === 401) {
+        __SET_DEV_ACCESS_CODE(null);
+        users = await fetchUsers();
+      }
+    }
+
+    setUsers(users);
+  }
+
   useEffect(() => {
-    fetch("v1/mock/users-auth").then((users) => {
-      setUsers(users);
-    });
-  }, []);
+    fetchUsers();
+  });
 
   if (!users) {
     return;
