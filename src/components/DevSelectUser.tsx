@@ -48,7 +48,7 @@ export default function DevSelectUser({ className }: { className?: string }) {
 
   useEffect(() => {
     fetchUsers();
-  });
+  }, []);
 
   if (!users) {
     return;
