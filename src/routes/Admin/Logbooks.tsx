@@ -1,21 +1,17 @@
 import { useCallback, useState } from "react";
 import { toast } from "react-toastify";
-import { Link, useNavigate, useParams, Outlet } from "react-router-dom";
-import { twJoin, twMerge } from "tailwind-merge";
-import Spinner from "../../components/Spinner";
+import { useNavigate, useParams } from "react-router-dom";
+import { twJoin } from "tailwind-merge";
 import LogbookForm from "../../components/LogbookForm";
 import { useLogbookFormsStore } from "../../logbookFormsStore";
 import useLogbooks from "../../hooks/useLogbooks";
-import elogLogo from "../assets/temp_elog_logo.png";
-import SideSheet from "../../components/SideSheet";
 import Dialog from "../../components/Dialog";
-import AdminNavbar from "../../components/AdminNavbar";
 import { createLogbook } from "../../api";
 import { Button, Input, TextButton } from "../../components/base";
 import { useQueryClient } from "@tanstack/react-query";
+import AdminResource from "../../components/AdminResource";
 
 export default function AdminLogbooks() {
-  return "Logbooks";
   const {
     logbookMap,
     logbooks,
@@ -53,63 +49,21 @@ export default function AdminLogbooks() {
 
   return (
     <Dialog controlled isOpen={newLogbookName !== null}>
-      <div className="flex flex-col h-screen">
-        <div className="flex overflow-hidden flex-1">
-          <SideSheet
-            home="/admin/logbooks"
-            sheetBody={
-              selectedLogbook && (
-                <LogbookForm logbook={selectedLogbook} onSave={onSave} />
-              )
-            }
-          >
-            <div
-              className={twMerge(
-                "min-w-[384px] flex-1 flex flex-col justify-stretch p-3 overflow-y-auto",
-                // Don't want to have border when loading
-                logbooks ? "divide-y" : "justify-center w-full",
-              )}
-            >
-              {/*
-                <div className="mb-2 text-xl font-normal text-gray-500">
-                  Logbooks
-                </div>
-                */}
-              {isLogbooksLoading ? (
-                <Spinner className="self-center" />
-              ) : (
-                <>
-                  {logbooks.map((logbook) => (
-                    <Link
-                      key={logbook.id}
-                      to={`/admin/logbooks/${logbook.id}`}
-                      tabIndex={0}
-                      className={twJoin(
-                        "p-2 cursor-pointer uppercase focus:outline focus:z-0 outline-2 outline-blue-500",
-                        selectedLogbook?.id !== logbook.id
-                          ? "hover:bg-gray-100"
-                          : "bg-blue-100 hover:bg-blue-200",
-                      )}
-                    >
-                      {logbook.name}
-                      <span className="text-gray-500">
-                        {logbooksEdited.includes(logbook.id) && "*"}
-                      </span>
-                    </Link>
-                  ))}
-
-                  <button
-                    className="p-2 text-center bg-gray-100 cursor-pointer hover:bg-gray-200 focus:z-0 outline-2 outline-blue-500 focus:outline"
-                    onClick={() => setNewLogbookName("")}
-                  >
-                    Create logbook
-                  </button>
-                </>
-              )}
-            </div>
-          </SideSheet>
-        </div>
-      </div>
+      <AdminResource
+        home="/admin/logbooks"
+        items={logbooks.map((logbook) => ({
+          label: logbook.name,
+          link: `/admin/logbooks/${logbook.id}`,
+          edited: logbooksEdited.includes(logbook.id),
+        }))}
+        isLoading={isLogbooksLoading}
+        createLabel="Create logbook"
+        onCreate={() => setNewLogbookName("")}
+      >
+        {selectedLogbook && (
+          <LogbookForm logbook={selectedLogbook} onSave={onSave} />
+        )}
+      </AdminResource>
       <Dialog.Content
         as="form"
         className="w-full max-w-sm"
