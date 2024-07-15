@@ -1,12 +1,11 @@
 import { create } from "zustand";
 import { fetch } from ".";
-import { AuthorizationType } from "./logbooks";
+import { AuthorizationPermission } from "./logbooks";
 
 export interface User {
   id: string;
   name: string;
   email: string;
-  permissions: AuthorizationType[];
 }
 
 interface UsersState {
@@ -15,13 +14,13 @@ interface UsersState {
   removeUser: (userId: string) => void;
   updateUserPermissions: (
     userId: string,
-    permissions: AuthorizationType[],
+    permissions: AuthorizationPermission[],
   ) => void;
 }
 
 export interface UserAuthorization {
   logbook: string;
-  authorizationType: AuthorizationType;
+  authorizationType: AuthorizationPermission;
 }
 
 export interface UserWithAuth extends User {
@@ -35,8 +34,15 @@ export async function updateUser(user: UserWithAuth) {
   });
 }
 
-export function fetchUsers(search: string): Promise<User[]> {
-  return fetch("v1/auth/users", { params: { search } });
+export async function fetchUsers(search: string): Promise<User[]> {
+  const users = (await fetch("v1/auth/users", { params: { search } })) as any[];
+
+  // FIXME: Remove this when the proper API is implemented
+  return users.map((user) => ({
+    id: user.uid,
+    name: user.gecos,
+    email: user.mail,
+  }));
 }
 
 export function fetchMe(): Promise<User> {

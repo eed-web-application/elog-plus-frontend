@@ -5,7 +5,7 @@ import {
   GroupAuthorization,
   ServerError,
   GroupWithAuth,
-  AuthorizationType,
+  AuthorizationPermission,
 } from "../api";
 import { Button, IconButton } from "./base";
 import Select from "./Select";
@@ -24,7 +24,7 @@ interface Props {
   onDelete: () => void;
 }
 
-const DEFAULT_AUTHORIZATION: AuthorizationType = "Read";
+const DEFAULT_AUTHORIZATION: AuthorizationPermission = "Read";
 
 export default function GroupForm({ group, onSave, onDelete }: Props) {
   const [form, setForm, removeForm] = useGroupFormsStore((state) =>

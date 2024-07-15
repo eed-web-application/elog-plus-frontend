@@ -5,7 +5,7 @@ import {
   UserAuthorization,
   ServerError,
   updateUser,
-  AuthorizationType,
+  AuthorizationPermission,
   UserWithAuth,
 } from "../api";
 import { Button, IconButton } from "./base";
@@ -19,7 +19,7 @@ interface Props {
   onSave: () => void;
 }
 
-const DEFAULT_AUTHORIZATION: AuthorizationType = "Read";
+const DEFAULT_AUTHORIZATION: AuthorizationPermission = "Read";
 
 let idCounter = 0;
 

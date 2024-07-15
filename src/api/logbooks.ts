@@ -14,13 +14,13 @@ export interface LogbookSummary {
   name: string;
 }
 
-export type AuthorizationType = "Read" | "Write" | "Admin";
+export type AuthorizationPermission = "Read" | "Write" | "Admin";
 
-export interface Authorization {
+export interface LogbookAuthorization {
   id: string;
-  authorizationType: AuthorizationType;
+  permission: AuthorizationPermission;
   owner: string;
-  resource: string;
+  ownerType: "User" | "Group" | "Application";
 }
 
 export interface Logbook extends LogbookSummary {
@@ -29,14 +29,17 @@ export interface Logbook extends LogbookSummary {
 }
 
 export interface LogbookWithAuth extends Logbook {
-  authorizations: Authorization[];
+  authorizations: LogbookAuthorization[];
 }
 
 export interface LogbookUpdation extends Omit<Logbook, "tags" | "shifts"> {
   tags: (Pick<Tag, "name"> & Partial<Pick<Tag, "id">>)[];
   shifts: (Pick<Shift, "name" | "from" | "to"> & Partial<Pick<Shift, "id">>)[];
-  authorization: (Pick<Authorization, "owner" | "authorizationType"> &
-    Partial<Pick<Authorization, "id">>)[];
+  authorization: (Pick<
+    LogbookAuthorization,
+    "owner" | "ownerType" | "permission"
+  > &
+    Partial<Pick<LogbookAuthorization, "id">>)[];
 }
 
 export async function fetchLogbooks<A extends boolean | undefined>({

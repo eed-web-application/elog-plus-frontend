@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { Authorization, LogbookWithAuth, Shift, Tag } from "./api";
+import { LogbookAuthorization, LogbookWithAuth, Shift, Tag } from "./api";
 
 /**
  * Shift that has not been uploaded to the server yet. `id`s starting with an
@@ -18,8 +18,8 @@ interface LocalTag extends Pick<Tag, "name"> {
   id?: Tag["id"];
 }
 
-interface LocalAuthorization
-  extends Pick<Authorization, "authorizationType" | "owner"> {
+export interface LocalAuthorization
+  extends Pick<LogbookAuthorization, "permission" | "ownerType" | "owner"> {
   id?: string;
 }
 

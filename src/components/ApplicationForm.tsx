@@ -6,7 +6,7 @@ import {
   ServerError,
   Shift,
   updateLogbook,
-  AuthorizationType,
+  AuthorizationPermission,
   LogbookWithAuth,
 } from "../api";
 import { Button, IconButton, Input, InputInvalid } from "./base";
@@ -22,7 +22,7 @@ interface Props {
   onSave: () => void;
 }
 
-const DEFAULT_AUTHORIZATION: AuthorizationType = "Read";
+const DEFAULT_AUTHORIZATION: AuthorizationPermission = "Read";
 
 let idCounter = 0;
 

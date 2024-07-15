@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { fetch } from ".";
-import { AuthorizationType } from "./logbooks";
+import { AuthorizationPermission } from "./logbooks";
 
 export interface Group {
   id: string;
@@ -24,7 +24,7 @@ export interface GroupsState {
 
 export interface GroupAuthorization {
   logbook: string;
-  authorizationType: AuthorizationType; // Define your AuthorizationType here
+  authorizationType: AuthorizationPermission; // Define your AuthorizationType here
 }
 
 export interface GroupWithAuth extends Group {

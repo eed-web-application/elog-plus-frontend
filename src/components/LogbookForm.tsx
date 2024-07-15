@@ -6,24 +6,25 @@ import {
   ServerError,
   Shift,
   updateLogbook,
-  AuthorizationType,
+  AuthorizationPermission,
   LogbookWithAuth,
 } from "../api";
 import { Button, IconButton, Input, InputInvalid } from "./base";
-import { useLogbookFormsStore } from "../logbookFormsStore";
+import { LocalAuthorization, useLogbookFormsStore } from "../logbookFormsStore";
 import { localToUtc, utcToLocal } from "../utils/datetimeConversion";
 import reportServerError from "../reportServerError";
 import Select from "./Select";
 import useUsers from "../hooks/useUsers";
 import useGroups from "../hooks/useGroups";
 import useApplications from "../hooks/useApplications";
+import AdminAuthorizationForm from "./AdminAuthorizationForm";
 
 interface Props {
   logbook: LogbookWithAuth;
   onSave: () => void;
 }
 
-const DEFAULT_AUTHORIZATION: AuthorizationType = "Read";
+const DEFAULT_PERMISSION: AuthorizationPermission = "Read";
 
 let idCounter = 0;
 
@@ -36,26 +37,17 @@ export default function LogbookForm({ logbook, onSave }: Props) {
   const [newTag, setNewTag] = useState<string>("");
   const [newShift, setNewShift] = useState<string>("");
 
-  const [newUserAuthorization, setNewUserAuthorizations] = useState<
-    string | null
-  >(null);
-  const [newGroupAuthorization, setNewGroupAuthorization] = useState<
-    string | null
-  >(null);
-  const [newApplicationAuthorization, setNewApplicationAuthorizations] =
-    useState<string | null>(null);
-
   const [userSearch, setUserSearch] = useState("");
-  const [groupSearch, setGroupSearch] = useState("");
-  const [applicationSearch, setApplicationSearch] = useState("");
+  // const [groupSearch, setGroupSearch] = useState("");
+  // const [applicationSearch, setApplicationSearch] = useState("");
 
   const { users, isLoading: isUsersLoading } = useUsers({ search: userSearch });
-  const { groups, isLoading: isGroupsLoading } = useGroups({
-    search: groupSearch,
-  });
-  const { applications, isLoading: isApplicationsLoading } = useApplications({
-    search: applicationSearch,
-  });
+  // const { groups, isLoading: isGroupsLoading } = useGroups({
+  //   search: groupSearch,
+  // });
+  // const { applications, isLoading: isApplicationsLoading } = useApplications({
+  //   search: applicationSearch,
+  // });
 
   const validators = {
     name: () => Boolean(form.name),
@@ -118,7 +110,7 @@ export default function LogbookForm({ logbook, onSave }: Props) {
       return;
     }
 
-    // Covers the case whree a user deletes a tag and creates a new one with
+    // Covers the case where a user deletes a tag and creates a new one with
     // the same name
     const resolvedTags = form.tags.map((tag) => {
       if (tag.id) {
@@ -128,6 +120,7 @@ export default function LogbookForm({ logbook, onSave }: Props) {
       return logbook.tags.find(({ name }) => name === tag.name) || tag;
     });
 
+    // Same as above, but for authorizations
     const resolvedAuthorization = form.authorizations.map((authorization) => {
       if (authorization.id) {
         return authorization;
@@ -196,66 +189,45 @@ export default function LogbookForm({ logbook, onSave }: Props) {
     });
   }
 
-  function createUserAuthorization(e: FormEvent<HTMLFormElement>) {
-    e.preventDefault();
+  // function createGroupAuthorization(e: FormEvent<HTMLFormElement>) {
+  //   e.preventDefault();
+  //   if (!newGroupAuthorization) {
+  //     return;
+  //   }
+  //   setNewGroupAuthorization(null);
+  //   setForm({
+  //     ...form,
+  //     authorizations: [
+  //       ...form.authorizations,
+  //       {
+  //         owner: newGroupAuthorization,
+  //         authorizationType: DEFAULT_PERMISSION,
+  //         ownerType: "Group",
+  //       },
+  //     ],
+  //   });
+  // }
 
-    if (!newUserAuthorization) {
-      return;
-    }
-
-    setNewUserAuthorizations(null);
-    setForm({
-      ...form,
-      authorizations: [
-        ...form.authorizations,
-        {
-          owner: newUserAuthorization,
-          authorizationType: DEFAULT_AUTHORIZATION,
-          ownerType: "User",
-        },
-      ],
-    });
-  }
-
-  function createGroupAuthorization(e: FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    if (!newGroupAuthorization) {
-      return;
-    }
-    setNewGroupAuthorization(null);
-    setForm({
-      ...form,
-      authorizations: [
-        ...form.authorizations,
-        {
-          owner: newGroupAuthorization,
-          authorizationType: DEFAULT_AUTHORIZATION,
-          ownerType: "Group",
-        },
-      ],
-    });
-  }
-
-  function createApplicationAuthorization(e: FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-
-    if (!newApplicationAuthorization) {
-      return;
-    }
-
-    setNewApplicationAuthorizations(null);
-    setForm({
-      ...form,
-      authorizations: [
-        ...form.authorizations,
-        {
-          owner: newApplicationAuthorization,
-          authorizationType: DEFAULT_AUTHORIZATION,
-          ownerType: "Token",
-        },
-      ],
-    });
-  }
+  // function createApplicationAuthorization(e: FormEvent<HTMLFormElement>) {
+  //   e.preventDefault();
+  //
+  //   if (!newApplicationAuthorization) {
+  //     return;
+  //   }
+  //
+  //   setNewApplicationAuthorizations(null);
+  //   setForm({
+  //     ...form,
+  //     authorizations: [
+  //       ...form.authorizations,
+  //       {
+  //         owner: newApplicationAuthorization,
+  //         authorizationType: DEFAULT_PERMISSION,
+  //         ownerType: "Token",
+  //       },
+  //     ],
+  //   });
+  // }
 
   function removeTag(index: number) {
     const newTags = [...form.tags];
@@ -271,11 +243,44 @@ export default function LogbookForm({ logbook, onSave }: Props) {
     setForm({ ...form, shifts: newShifts });
   }
 
-  function removeAuthorization(index: number) {
-    const newAuthorizations = [...form.authorizations];
-    newAuthorizations.splice(index, 1);
+  function updatePermission(
+    authorization: string,
+    permission: AuthorizationPermission,
+  ) {
+    setForm({
+      ...form,
+      authorizations: form.authorizations.map((otherAuthorization) =>
+        otherAuthorization.owner === authorization
+          ? { ...otherAuthorization, permission }
+          : otherAuthorization,
+      ),
+    });
+  }
 
-    setForm({ ...form, authorizations: newAuthorizations });
+  function removeAuthorization(authorization: string) {
+    setForm({
+      ...form,
+      authorizations: form.authorizations.filter(
+        (otherAuthorization) => otherAuthorization.owner !== authorization,
+      ),
+    });
+  }
+
+  function createAuthorization(
+    ownerType: LocalAuthorization["ownerType"],
+    owner: string,
+  ) {
+    setForm({
+      ...form,
+      authorizations: [
+        ...form.authorizations,
+        {
+          owner,
+          permission: DEFAULT_PERMISSION,
+          ownerType,
+        },
+      ],
+    });
   }
 
   function changeShiftName(index: number, name: string) {
@@ -288,19 +293,13 @@ export default function LogbookForm({ logbook, onSave }: Props) {
     });
   }
 
-  // const userAuthorizations = form.authorizations;
-
-  const userAuthorizations = form.authorizations.filter(
-    (authorization) => authorization.ownerType === "User",
-  );
-
-  const groupAuthorizations = form.authorizations.filter(
-    (authorization) => authorization.ownerType === "Group",
-  );
-
-  const applicationAuthorizations = form.authorizations.filter(
-    (authorization) => authorization.ownerType === "Token",
-  );
+  // const groupAuthorizations = form.authorizations.filter(
+  //   (authorization) => authorization.ownerType === "Group",
+  // );
+  //
+  // const applicationAuthorizations = form.authorizations.filter(
+  //   (authorization) => authorization.ownerType === "Token",
+  // );
 
   const updated = JSON.stringify(form) === JSON.stringify(logbook);
 
@@ -326,7 +325,7 @@ export default function LogbookForm({ logbook, onSave }: Props) {
         className={twJoin(
           "mb-2 border rounded-lg bg-gray-50 w-full flex flex-col p-2",
           form.tags.length === 0 &&
-            "items-center justify-center text-lg text-gray-500",
+          "items-center justify-center text-lg text-gray-500",
         )}
       >
         {form.tags.length === 0 ? (
@@ -395,7 +394,7 @@ export default function LogbookForm({ logbook, onSave }: Props) {
         className={twJoin(
           "border mb-2 rounded-lg bg-gray-50 w-full flex flex-col p-2",
           form.shifts.length === 0 &&
-            "items-center justify-center text-lg text-gray-500",
+          "items-center justify-center text-lg text-gray-500",
         )}
       >
         {form.shifts.length === 0 ? (
@@ -431,7 +430,7 @@ export default function LogbookForm({ logbook, onSave }: Props) {
                       className={twMerge(
                         Input,
                         invalid.includes(`shiftFrom/${shift.id}`) &&
-                          InputInvalid,
+                        InputInvalid,
                         "w-32",
                       )}
                       type="time"
@@ -543,371 +542,277 @@ export default function LogbookForm({ logbook, onSave }: Props) {
       </div>
 
       <div className="text-gray-500">User Authorizations</div>
-      <div
-        className={twJoin(
-          "border rounded-lg bg-gray-50 w-full flex flex-col p-2",
-          userAuthorizations.length === 0 &&
-            "items-center justify-center text-lg text-gray-500",
-        )}
-      >
-        {userAuthorizations.length === 0 ? (
-          <div className="my-3">No user authorizations. Create one below.</div>
-        ) : (
-          <>
-            <div className="divide-y">
-              {userAuthorizations.map((authorization) => (
-                <div
-                  key={authorization.owner}
-                  className="flex justify-between items-center py-1 px-2"
-                >
-                  <div className="flex-grow">{authorization.owner}</div>
+      <AdminAuthorizationForm
+        authorizations={form.authorizations
+          .filter((authorization) => authorization.ownerType === "User")
+          .map((authorization) => ({
+            label: authorization.owner,
+            value: authorization.owner,
+            permission: authorization.permission,
+          }))}
+        emptyLabel="No user authorizations. Create one below."
+        options={(users || [])
+          .filter(
+            (user) =>
+              !form.authorizations.some(
+                (authorization) =>
+                  authorization.ownerType === "User" &&
+                  authorization.owner === user.email,
+              ),
+          )
+          .map((user) => ({ label: user.name, value: user.email }))}
+        isOptionsLoading={isUsersLoading}
+        setOptionsSearch={setUserSearch}
+        updatePermission={updatePermission}
+        removeAuthorization={removeAuthorization}
+        createAuthorization={(owner) => createAuthorization("User", owner)}
+      />
 
-                  <Select
-                    className="w-32"
-                    value={authorization.authorizationType}
-                    options={["Write", "Read"]}
-                    setValue={(updatedAuthorization) => {
-                      const updatedAuthorizations = [...form.authorizations];
-                      const index = form.authorizations.findIndex(
-                        (otherAuthorization) =>
-                          otherAuthorization === authorization,
-                      );
-
-                      if (
-                        updatedAuthorization !== "Read" &&
-                        updatedAuthorization !== "Write"
-                      ) {
-                        return;
-                      }
-
-                      updatedAuthorizations[index] = {
-                        ...updatedAuthorizations[index],
-                        authorizationType: updatedAuthorization,
-                      };
-                      setForm({
-                        ...form,
-                        authorizations: updatedAuthorizations,
-                      });
-                    }}
-                    nonsearchable
-                  />
-
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    strokeWidth="1.5"
-                    stroke="currentColor"
-                    tabIndex={0}
-                    className={twJoin(IconButton, "text-gray-500")}
-                    onClick={() =>
-                      removeAuthorization(
-                        form.authorizations.findIndex(
-                          (otherAuthorization) =>
-                            otherAuthorization === authorization,
-                        ),
-                      )
-                    }
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M6 18L18 6M6 6l12 12"
-                    />
-                  </svg>
-                </div>
-              ))}
-            </div>
-          </>
-        )}
-        <form
-          noValidate
-          className="relative mt-2 w-full"
-          onSubmit={createUserAuthorization}
-        >
-          <Select
-            className="pr-12 w-full"
-            value={newUserAuthorization}
-            onSearchChange={setUserSearch}
-            isLoading={isUsersLoading}
-            options={(users || [])
-              .filter(
-                (user) =>
-                  !userAuthorizations.some(
-                    (authorization) => authorization.owner === user.mail,
-                  ),
-              )
-              .map((user) => ({ label: user.gecos, value: user.mail }))}
-            setValue={setNewUserAuthorizations}
-          />
-          <button
-            type="submit"
-            className="flex absolute top-0 right-0 bottom-0 justify-center items-center p-2.5 text-white bg-blue-500 rounded-r-lg disabled:text-gray-100 disabled:bg-blue-300"
-            disabled={!newUserAuthorization}
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={1.5}
-              stroke="currentColor"
-              className="w-5 h-5"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M12 4.5v15m7.5-7.5h-15"
-              />
-            </svg>
-          </button>
-        </form>
-      </div>
-
-      <div className="text-gray-500">Group Authorizations</div>
-      <div
-        className={twJoin(
-          "border rounded-lg bg-gray-50 w-full flex flex-col p-2 mb-2",
-          groupAuthorizations.length === 0 &&
-            "items-center justify-center text-lg text-gray-500",
-        )}
-      >
-        {groupAuthorizations.length === 0 ? (
-          <div className="my-3">No group authorizations. Create one below.</div>
-        ) : (
-          <>
-            <div className="divide-y">
-              {groupAuthorizations.map((authorization) => (
-                <div
-                  key={authorization.owner}
-                  className="flex justify-between items-center py-1 px-2"
-                >
-                  <div className="flex-grow">{authorization.owner}</div>
-
-                  <Select
-                    className="w-32"
-                    value={authorization.authorizationType}
-                    options={["Write", "Read"]}
-                    setValue={(updatedAuthorization) => {
-                      const updatedAuthorizations = [...form.authorizations];
-                      const index = form.authorizations.findIndex(
-                        (otherAuthorization) =>
-                          otherAuthorization === authorization,
-                      );
-
-                      if (
-                        updatedAuthorization !== "Read" &&
-                        updatedAuthorization !== "Write"
-                      ) {
-                        return;
-                      }
-
-                      updatedAuthorizations[index] = {
-                        ...updatedAuthorizations[index],
-                        authorizationType: updatedAuthorization,
-                      };
-                      setForm({
-                        ...form,
-                        authorizations: updatedAuthorizations,
-                      });
-                    }}
-                    nonsearchable
-                  />
-
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    strokeWidth="1.5"
-                    stroke="currentColor"
-                    tabIndex={0}
-                    className={twJoin(IconButton, "text-gray-500")}
-                    onClick={() =>
-                      removeAuthorization(
-                        form.authorizations.findIndex(
-                          (otherAuthorization) =>
-                            otherAuthorization === authorization,
-                        ),
-                      )
-                    }
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M6 18L18 6M6 6l12 12"
-                    />
-                  </svg>
-                </div>
-              ))}
-            </div>
-          </>
-        )}
-        <form
-          noValidate
-          className="relative mt-2 w-full"
-          onSubmit={createGroupAuthorization}
-        >
-          <Select
-            className="pr-12 w-full"
-            value={newGroupAuthorization}
-            onSearchChange={setGroupSearch}
-            isLoading={isGroupsLoading}
-            options={(groups || [])
-              .filter(
-                (group) =>
-                  !groupAuthorizations.some(
-                    (authorization) => authorization.owner === group.commonName,
-                  ),
-              )
-              .map((group) => group.commonName)}
-            setValue={setNewGroupAuthorization}
-          />
-
-          <button
-            type="submit"
-            className="flex absolute top-0 right-0 bottom-0 justify-center items-center p-2.5 text-white bg-blue-500 rounded-r-lg disabled:text-gray-100 disabled:bg-blue-300"
-            disabled={!newGroupAuthorization}
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={1.5}
-              stroke="currentColor"
-              className="w-5 h-5"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M12 4.5v15m7.5-7.5h-15"
-              />
-            </svg>
-          </button>
-        </form>
-      </div>
-
-      <div className="text-gray-500">Token Authorizations</div>
-      <div
-        className={twJoin(
-          "border rounded-lg bg-gray-50 w-full flex flex-col p-2",
-          applicationAuthorizations.length === 0 &&
-            "items-center justify-center text-lg text-gray-500",
-        )}
-      >
-        {applicationAuthorizations.length === 0 ? (
-          <div className="my-3">No token authorizations. Create one below.</div>
-        ) : (
-          <>
-            <div className="divide-y">
-              {applicationAuthorizations.map((authorization) => (
-                <div
-                  key={authorization.owner}
-                  className="flex justify-between items-center py-1 px-2"
-                >
-                  <div className="flex-grow">{authorization.owner}</div>
-
-                  <Select
-                    className="w-32"
-                    value={authorization.authorizationType}
-                    options={["Write", "Read"]}
-                    setValue={(updatedAuthorization) => {
-                      const updatedAuthorizations = [...form.authorizations];
-                      const index = form.authorizations.findIndex(
-                        (otherAuthorization) =>
-                          otherAuthorization === authorization,
-                      );
-
-                      if (
-                        updatedAuthorization !== "Read" &&
-                        updatedAuthorization !== "Write"
-                      ) {
-                        return;
-                      }
-
-                      updatedAuthorizations[index] = {
-                        ...updatedAuthorizations[index],
-                        authorizationType: updatedAuthorization,
-                      };
-                      setForm({
-                        ...form,
-                        authorizations: updatedAuthorizations,
-                      });
-                    }}
-                    nonsearchable
-                  />
-
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    strokeWidth="1.5"
-                    stroke="currentColor"
-                    tabIndex={0}
-                    className={twJoin(IconButton, "text-gray-500")}
-                    onClick={() =>
-                      removeAuthorization(
-                        form.authorizations.findIndex(
-                          (otherAuthorization) =>
-                            otherAuthorization === authorization,
-                        ),
-                      )
-                    }
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M6 18L18 6M6 6l12 12"
-                    />
-                  </svg>
-                </div>
-              ))}
-            </div>
-          </>
-        )}
-        <form
-          noValidate
-          className="relative mt-2 w-full"
-          onSubmit={createApplicationAuthorization}
-        >
-          <Select
-            className="pr-12 w-full"
-            value={newApplicationAuthorization}
-            onSearchChange={setApplicationSearch}
-            isLoading={isApplicationsLoading}
-            options={(applications || [])
-              .filter(
-                (application) =>
-                  !applicationAuthorizations.some(
-                    (authorization) => authorization.owner === application.name,
-                  ),
-              )
-              .map((application) => ({
-                label: application.name,
-                value: application.id,
-              }))}
-            setValue={setNewApplicationAuthorizations}
-          />
-          <button
-            type="submit"
-            className="flex absolute top-0 right-0 bottom-0 justify-center items-center p-2.5 text-white bg-blue-500 rounded-r-lg disabled:text-gray-100 disabled:bg-blue-300"
-            disabled={!newApplicationAuthorization}
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={1.5}
-              stroke="currentColor"
-              className="w-5 h-5"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M12 4.5v15m7.5-7.5h-15"
-              />
-            </svg>
-          </button>
-        </form>
-      </div>
+      {/* <div className="text-gray-500">Group Authorizations</div> */}
+      {/* <div */}
+      {/*   className={twJoin( */}
+      {/*     "border rounded-lg bg-gray-50 w-full flex flex-col p-2 mb-2", */}
+      {/*     groupAuthorizations.length === 0 && */}
+      {/*     "items-center justify-center text-lg text-gray-500", */}
+      {/*   )} */}
+      {/* > */}
+      {/*   {groupAuthorizations.length === 0 ? ( */}
+      {/*     <div className="my-3">No group authorizations. Create one below.</div> */}
+      {/*   ) : ( */}
+      {/*     <> */}
+      {/*       <div className="divide-y"> */}
+      {/*         {groupAuthorizations.map((authorization) => ( */}
+      {/*           <div */}
+      {/*             key={authorization.owner} */}
+      {/*             className="flex justify-between items-center py-1 px-2" */}
+      {/*           > */}
+      {/*             <div className="flex-grow">{authorization.owner}</div> */}
+      {/**/}
+      {/*             <Select */}
+      {/*               className="w-32" */}
+      {/*               value={authorization.authorizationType} */}
+      {/*               options={["Write", "Read"]} */}
+      {/*               setValue={(updatedAuthorization) => { */}
+      {/*                 const updatedAuthorizations = [...form.authorizations]; */}
+      {/*                 const index = form.authorizations.findIndex( */}
+      {/*                   (otherAuthorization) => */}
+      {/*                     otherAuthorization === authorization, */}
+      {/*                 ); */}
+      {/**/}
+      {/*                 if ( */}
+      {/*                   updatedAuthorization !== "Read" && */}
+      {/*                   updatedAuthorization !== "Write" */}
+      {/*                 ) { */}
+      {/*                   return; */}
+      {/*                 } */}
+      {/**/}
+      {/*                 updatedAuthorizations[index] = { */}
+      {/*                   ...updatedAuthorizations[index], */}
+      {/*                   authorizationType: updatedAuthorization, */}
+      {/*                 }; */}
+      {/*                 setForm({ */}
+      {/*                   ...form, */}
+      {/*                   authorizations: updatedAuthorizations, */}
+      {/*                 }); */}
+      {/*               }} */}
+      {/*               nonsearchable */}
+      {/*             /> */}
+      {/**/}
+      {/*             <svg */}
+      {/*               xmlns="http://www.w3.org/2000/svg" */}
+      {/*               fill="none" */}
+      {/*               viewBox="0 0 24 24" */}
+      {/*               strokeWidth="1.5" */}
+      {/*               stroke="currentColor" */}
+      {/*               tabIndex={0} */}
+      {/*               className={twJoin(IconButton, "text-gray-500")} */}
+      {/*               onClick={() => */}
+      {/*                 removeAuthorization( */}
+      {/*                   form.authorizations.findIndex( */}
+      {/*                     (otherAuthorization) => */}
+      {/*                       otherAuthorization === authorization, */}
+      {/*                   ), */}
+      {/*                 ) */}
+      {/*               } */}
+      {/*             > */}
+      {/*               <path */}
+      {/*                 strokeLinecap="round" */}
+      {/*                 strokeLinejoin="round" */}
+      {/*                 d="M6 18L18 6M6 6l12 12" */}
+      {/*               /> */}
+      {/*             </svg> */}
+      {/*           </div> */}
+      {/*         ))} */}
+      {/*       </div> */}
+      {/*     </> */}
+      {/*   )} */}
+      {/*   <form */}
+      {/*     noValidate */}
+      {/*     className="relative mt-2 w-full" */}
+      {/*     onSubmit={createGroupAuthorization} */}
+      {/*   > */}
+      {/*     <Select */}
+      {/*       className="pr-12 w-full" */}
+      {/*       value={newGroupAuthorization} */}
+      {/*       onSearchChange={setGroupSearch} */}
+      {/*       isLoading={isGroupsLoading} */}
+      {/*       options={(groups || []) */}
+      {/*         .filter( */}
+      {/*           (group) => */}
+      {/*             !groupAuthorizations.some( */}
+      {/*               (authorization) => authorization.owner === group.commonName, */}
+      {/*             ), */}
+      {/*         ) */}
+      {/*         .map((group) => group.commonName)} */}
+      {/*       setValue={setNewGroupAuthorization} */}
+      {/*     /> */}
+      {/**/}
+      {/*     <button */}
+      {/*       type="submit" */}
+      {/*       className="flex absolute top-0 right-0 bottom-0 justify-center items-center p-2.5 text-white bg-blue-500 rounded-r-lg disabled:text-gray-100 disabled:bg-blue-300" */}
+      {/*       disabled={!newGroupAuthorization} */}
+      {/*     > */}
+      {/*       <svg */}
+      {/*         xmlns="http://www.w3.org/2000/svg" */}
+      {/*         fill="none" */}
+      {/*         viewBox="0 0 24 24" */}
+      {/*         strokeWidth={1.5} */}
+      {/*         stroke="currentColor" */}
+      {/*         className="w-5 h-5" */}
+      {/*       > */}
+      {/*         <path */}
+      {/*           strokeLinecap="round" */}
+      {/*           strokeLinejoin="round" */}
+      {/*           d="M12 4.5v15m7.5-7.5h-15" */}
+      {/*         /> */}
+      {/*       </svg> */}
+      {/*     </button> */}
+      {/*   </form> */}
+      {/* </div> */}
+      {/**/}
+      {/* <div className="text-gray-500">Token Authorizations</div> */}
+      {/* <div */}
+      {/*   className={twJoin( */}
+      {/*     "border rounded-lg bg-gray-50 w-full flex flex-col p-2", */}
+      {/*     applicationAuthorizations.length === 0 && */}
+      {/*     "items-center justify-center text-lg text-gray-500", */}
+      {/*   )} */}
+      {/* > */}
+      {/*   {applicationAuthorizations.length === 0 ? ( */}
+      {/*     <div className="my-3">No token authorizations. Create one below.</div> */}
+      {/*   ) : ( */}
+      {/*     <> */}
+      {/*       <div className="divide-y"> */}
+      {/*         {applicationAuthorizations.map((authorization) => ( */}
+      {/*           <div */}
+      {/*             key={authorization.owner} */}
+      {/*             className="flex justify-between items-center py-1 px-2" */}
+      {/*           > */}
+      {/*             <div className="flex-grow">{authorization.owner}</div> */}
+      {/**/}
+      {/*             <Select */}
+      {/*               className="w-32" */}
+      {/*               value={authorization.authorizationType} */}
+      {/*               options={["Write", "Read"]} */}
+      {/*               setValue={(updatedAuthorization) => { */}
+      {/*                 const updatedAuthorizations = [...form.authorizations]; */}
+      {/*                 const index = form.authorizations.findIndex( */}
+      {/*                   (otherAuthorization) => */}
+      {/*                     otherAuthorization === authorization, */}
+      {/*                 ); */}
+      {/**/}
+      {/*                 if ( */}
+      {/*                   updatedAuthorization !== "Read" && */}
+      {/*                   updatedAuthorization !== "Write" */}
+      {/*                 ) { */}
+      {/*                   return; */}
+      {/*                 } */}
+      {/**/}
+      {/*                 updatedAuthorizations[index] = { */}
+      {/*                   ...updatedAuthorizations[index], */}
+      {/*                   authorizationType: updatedAuthorization, */}
+      {/*                 }; */}
+      {/*                 setForm({ */}
+      {/*                   ...form, */}
+      {/*                   authorizations: updatedAuthorizations, */}
+      {/*                 }); */}
+      {/*               }} */}
+      {/*               nonsearchable */}
+      {/*             /> */}
+      {/**/}
+      {/*             <svg */}
+      {/*               xmlns="http://www.w3.org/2000/svg" */}
+      {/*               fill="none" */}
+      {/*               viewBox="0 0 24 24" */}
+      {/*               strokeWidth="1.5" */}
+      {/*               stroke="currentColor" */}
+      {/*               tabIndex={0} */}
+      {/*               className={twJoin(IconButton, "text-gray-500")} */}
+      {/*               onClick={() => */}
+      {/*                 removeAuthorization( */}
+      {/*                   form.authorizations.findIndex( */}
+      {/*                     (otherAuthorization) => */}
+      {/*                       otherAuthorization === authorization, */}
+      {/*                   ), */}
+      {/*                 ) */}
+      {/*               } */}
+      {/*             > */}
+      {/*               <path */}
+      {/*                 strokeLinecap="round" */}
+      {/*                 strokeLinejoin="round" */}
+      {/*                 d="M6 18L18 6M6 6l12 12" */}
+      {/*               /> */}
+      {/*             </svg> */}
+      {/*           </div> */}
+      {/*         ))} */}
+      {/*       </div> */}
+      {/*     </> */}
+      {/*   )} */}
+      {/*   <form */}
+      {/*     noValidate */}
+      {/*     className="relative mt-2 w-full" */}
+      {/*     onSubmit={createApplicationAuthorization} */}
+      {/*   > */}
+      {/*     <Select */}
+      {/*       className="pr-12 w-full" */}
+      {/*       value={newApplicationAuthorization} */}
+      {/*       onSearchChange={setApplicationSearch} */}
+      {/*       isLoading={isApplicationsLoading} */}
+      {/*       options={(applications || []) */}
+      {/*         .filter( */}
+      {/*           (application) => */}
+      {/*             !applicationAuthorizations.some( */}
+      {/*               (authorization) => authorization.owner === application.name, */}
+      {/*             ), */}
+      {/*         ) */}
+      {/*         .map((application) => ({ */}
+      {/*           label: application.name, */}
+      {/*           value: application.id, */}
+      {/*         }))} */}
+      {/*       setValue={setNewApplicationAuthorizations} */}
+      {/*     /> */}
+      {/*     <button */}
+      {/*       type="submit" */}
+      {/*       className="flex absolute top-0 right-0 bottom-0 justify-center items-center p-2.5 text-white bg-blue-500 rounded-r-lg disabled:text-gray-100 disabled:bg-blue-300" */}
+      {/*       disabled={!newApplicationAuthorization} */}
+      {/*     > */}
+      {/*       <svg */}
+      {/*         xmlns="http://www.w3.org/2000/svg" */}
+      {/*         fill="none" */}
+      {/*         viewBox="0 0 24 24" */}
+      {/*         strokeWidth={1.5} */}
+      {/*         stroke="currentColor" */}
+      {/*         className="w-5 h-5" */}
+      {/*       > */}
+      {/*         <path */}
+      {/*           strokeLinecap="round" */}
+      {/*           strokeLinejoin="round" */}
+      {/*           d="M12 4.5v15m7.5-7.5h-15" */}
+      {/*         /> */}
+      {/*       </svg> */}
+      {/*     </button> */}
+      {/*   </form> */}
+      {/* </div> */}
 
       <button
         disabled={updated}

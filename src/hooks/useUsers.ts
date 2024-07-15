@@ -26,7 +26,7 @@ export default function useUsers({
     },
     select: (users) => {
       const userMap = users.reduce<Record<string, User>>((acc, user) => {
-        acc[user.uid] = user;
+        acc[user.id] = user;
         return acc;
       }, {});
 
