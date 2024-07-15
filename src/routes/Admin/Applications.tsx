@@ -15,7 +15,7 @@ import Dialog from "../../components/Dialog";
 import { Button, Input, TextButton } from "../../components/base";
 import { useQueryClient } from "@tanstack/react-query";
 import useApplications from "../../hooks/useApplications";
-import { createApp } from "../../api";
+// import { createApp } from "../../api";
 
 export default function AdminApplications() {
   return "Applications";

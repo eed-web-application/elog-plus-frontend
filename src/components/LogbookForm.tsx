@@ -38,15 +38,15 @@ export default function LogbookForm({ logbook, onSave }: Props) {
 
   const [userSearch, setUserSearch] = useState("");
   const [groupSearch, setGroupSearch] = useState("");
-  // const [applicationSearch, setApplicationSearch] = useState("");
+  const [applicationSearch, setApplicationSearch] = useState("");
 
   const { users, isLoading: isUsersLoading } = useUsers({ search: userSearch });
   const { groups, isLoading: isGroupsLoading } = useGroups({
     search: groupSearch,
   });
-  // const { applications, isLoading: isApplicationsLoading } = useApplications({
-  //   search: applicationSearch,
-  // });
+  const { applications, isLoading: isApplicationsLoading } = useApplications({
+    search: applicationSearch,
+  });
 
   const validators = {
     name: () => Boolean(form.name),
@@ -546,37 +546,37 @@ export default function LogbookForm({ logbook, onSave }: Props) {
         createAuthorization={(owner) => createAuthorization("Group", owner)}
       />
 
-      {/* <div className="mt-2 text-gray-500">Applications</div> */}
-      {/* <AdminAuthorizationForm */}
-      {/*   authorizations={form.authorizations */}
-      {/*     .filter((authorization) => authorization.ownerType === "Application") */}
-      {/*     .map((authorization) => ({ */}
-      {/*       label: authorization.owner, */}
-      {/*       value: authorization.owner, */}
-      {/*       permission: authorization.permission, */}
-      {/*     }))} */}
-      {/*   emptyLabel="No application authorizations. Create one below." */}
-      {/*   options={(applications || []) */}
-      {/*     .filter( */}
-      {/*       (application) => */}
-      {/*         !form.authorizations.some( */}
-      {/*           (authorization) => */}
-      {/*             authorization.ownerType === "Application" && */}
-      {/*             authorization.owner === application.id, */}
-      {/*         ), */}
-      {/*     ) */}
-      {/*     .map((application) => ({ */}
-      {/*       label: application.name, */}
-      {/*       value: application.id, */}
-      {/*     }))} */}
-      {/*   isOptionsLoading={isApplicationsLoading} */}
-      {/*   setOptionsSearch={setApplicationSearch} */}
-      {/*   updatePermission={updateAuthorizationPermission} */}
-      {/*   removeAuthorization={removeAuthorization} */}
-      {/*   createAuthorization={(owner) => */}
-      {/*     createAuthorization("Application", owner) */}
-      {/*   } */}
-      {/* /> */}
+      <div className="mt-2 text-gray-500">Applications</div>
+      <AdminAuthorizationForm
+        authorizations={form.authorizations
+          .filter((authorization) => authorization.ownerType === "Application")
+          .map((authorization) => ({
+            label: authorization.owner,
+            value: authorization.owner,
+            permission: authorization.permission,
+          }))}
+        emptyLabel="No application authorizations. Create one below."
+        options={(applications || [])
+          .filter(
+            (application) =>
+              !form.authorizations.some(
+                (authorization) =>
+                  authorization.ownerType === "Application" &&
+                  authorization.owner === application.id,
+              ),
+          )
+          .map((application) => ({
+            label: application.name,
+            value: application.id,
+          }))}
+        isOptionsLoading={isApplicationsLoading}
+        setOptionsSearch={setApplicationSearch}
+        updatePermission={updateAuthorizationPermission}
+        removeAuthorization={removeAuthorization}
+        createAuthorization={(owner) =>
+          createAuthorization("Application", owner)
+        }
+      />
 
       <button
         disabled={updated}

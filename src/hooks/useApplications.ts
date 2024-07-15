@@ -3,15 +3,17 @@ import reportServerError from "../reportServerError";
 import { useQuery } from "@tanstack/react-query";
 
 export default function useApplications({
+  search,
   enabled = true,
   critical = true,
 }: {
+  search: string;
   enabled?: boolean;
   critical?: boolean;
 }) {
   const { data, isLoading } = useQuery({
-    queryKey: ["applications"],
-    queryFn: () => fetchApplications(),
+    queryKey: ["applications", search],
+    queryFn: () => fetchApplications(search),
     enabled,
     useErrorBoundary: critical,
     staleTime: 5 * 60 * 1000,
