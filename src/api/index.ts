@@ -113,9 +113,10 @@ export async function fetchVersion(): Promise<ServerVersion | undefined> {
 }
 
 export * from "./attachments";
+export * from "./applications";
+export * from "./authorizations";
 export * from "./entries";
+export * from "./groups";
 export * from "./logbooks";
 export * from "./tags";
-export * from "./applications";
 export * from "./users";
-export * from "./groups";

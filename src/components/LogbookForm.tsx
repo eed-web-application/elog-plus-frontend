@@ -6,24 +6,25 @@ import {
   ServerError,
   Shift,
   updateLogbook,
-  AuthorizationPermission,
   LogbookWithAuth,
+  Permission,
 } from "../api";
 import { Button, IconButton, Input, InputInvalid } from "./base";
-import { LocalAuthorization, useLogbookFormsStore } from "../logbookFormsStore";
+import { useLogbookFormsStore } from "../logbookFormsStore";
 import { localToUtc, utcToLocal } from "../utils/datetimeConversion";
 import reportServerError from "../reportServerError";
 import useUsers from "../hooks/useUsers";
 import useGroups from "../hooks/useGroups";
 import useApplications from "../hooks/useApplications";
 import AdminAuthorizationForm from "./AdminAuthorizationForm";
+import { saveAuthorizations } from "../authorizationDiffing";
 
 interface Props {
   logbook: LogbookWithAuth;
   onSave: () => void;
 }
 
-const DEFAULT_PERMISSION: AuthorizationPermission = "Read";
+const DEFAULT_PERMISSION: Permission = "Read";
 
 let idCounter = 0;
 
@@ -81,7 +82,7 @@ export default function LogbookForm({ logbook, onSave }: Props) {
     return false;
   }
 
-  async function save() {
+  async function saveLogbook() {
     let invalid = false;
     for (const field in validators) {
       if (
@@ -119,24 +120,10 @@ export default function LogbookForm({ logbook, onSave }: Props) {
       return logbook.tags.find(({ name }) => name === tag.name) || tag;
     });
 
-    // Same as above, but for authorizations
-    const resolvedAuthorization = form.authorizations.map((authorization) => {
-      if (authorization.id) {
-        return authorization;
-      }
-
-      return (
-        logbook.authorizations.find(
-          ({ owner }) => owner === authorization.owner,
-        ) || authorization
-      );
-    });
-
     const logbookUpdation: LogbookUpdation = {
       id: form.id,
       name: form.name,
       tags: resolvedTags,
-      authorization: resolvedAuthorization,
       // Remove temp ids
       shifts: form.shifts.map(({ id, ...shift }) => ({
         ...(shift as Shift),
@@ -153,17 +140,24 @@ export default function LogbookForm({ logbook, onSave }: Props) {
           Array.isArray(queryKey[1]) &&
           (queryKey[1].includes(logbook.name) || queryKey[1].length === 0),
       });
-
-      await queryClient.invalidateQueries({ queryKey: ["logbooks"] });
-
-      removeForm();
-      onSave();
     } catch (e) {
       if (!(e instanceof ServerError)) {
         throw e;
       }
       reportServerError("Could not save logbook", e);
     }
+  }
+
+  async function save() {
+    await Promise.all([
+      saveLogbook(),
+      saveAuthorizations(logbook.authorizations, form.authorizations),
+    ]);
+
+    await queryClient.invalidateQueries({ queryKey: ["logbooks"] });
+
+    removeForm();
+    onSave();
   }
 
   function createTag(e: FormEvent<HTMLFormElement>) {
@@ -203,40 +197,69 @@ export default function LogbookForm({ logbook, onSave }: Props) {
   }
 
   function updateAuthorizationPermission(
-    authorization: string,
-    permission: AuthorizationPermission,
+    ownerId: string,
+    permission: Permission,
   ) {
     setForm({
       ...form,
       authorizations: form.authorizations.map((otherAuthorization) =>
-        otherAuthorization.owner === authorization
+        otherAuthorization.ownerId === ownerId
           ? { ...otherAuthorization, permission }
           : otherAuthorization,
       ),
     });
   }
 
-  function removeAuthorization(authorization: string) {
+  function removeAuthorization(ownerId: string) {
     setForm({
       ...form,
       authorizations: form.authorizations.filter(
-        (otherAuthorization) => otherAuthorization.owner !== authorization,
+        (otherAuthorization) => otherAuthorization.ownerId !== ownerId,
       ),
     });
   }
 
   function createAuthorization(
-    ownerType: LocalAuthorization["ownerType"],
-    owner: string,
+    ownerType: "User" | "Group" | "Application",
+    ownerId: string,
   ) {
+    let ownerLabel: string | undefined;
+
+    if (ownerType === "User") {
+      ownerLabel = users?.find((user) => user.email === ownerId)?.name;
+    } else if (ownerType === "Group") {
+      ownerLabel = groups?.find((group) => group.id === ownerId)?.name;
+    } else {
+      ownerLabel = applications?.find(
+        (application) => application.id === ownerId,
+      )?.name;
+    }
+
+    // Should probably never happen, but we still want to catch it, because
+    // if this throws something else is wrong.
+    if (!ownerLabel) {
+      throw "Could not find label for new authorization";
+    }
+
+    // If the user deletes an authorization and then creates a new one with the
+    // same owner, we want to keep the ID so we don't create a new one.
+    const existingAuthorization = logbook.authorizations.find(
+      (authorization) => authorization.ownerId === ownerId,
+    );
+
     setForm({
       ...form,
       authorizations: [
         ...form.authorizations,
         {
-          owner,
+          id: existingAuthorization?.id,
           permission: DEFAULT_PERMISSION,
+          ownerId,
           ownerType,
+          ownerLabel,
+          resourceId: form.id,
+          resourceType: "Logbook",
+          resouceLabel: form.name,
         },
       ],
     });
@@ -252,7 +275,7 @@ export default function LogbookForm({ logbook, onSave }: Props) {
     });
   }
 
-  const updated = JSON.stringify(form) === JSON.stringify(logbook);
+  const updated = JSON.stringify(form) !== JSON.stringify(logbook);
 
   return (
     <div className="px-3 pb-3">
@@ -497,8 +520,8 @@ export default function LogbookForm({ logbook, onSave }: Props) {
         authorizations={form.authorizations
           .filter((authorization) => authorization.ownerType === "User")
           .map((authorization) => ({
-            label: authorization.owner,
-            value: authorization.owner,
+            label: authorization.ownerLabel,
+            value: authorization.ownerId,
             permission: authorization.permission,
           }))}
         emptyLabel="No user authorizations. Create one below."
@@ -508,7 +531,7 @@ export default function LogbookForm({ logbook, onSave }: Props) {
               !form.authorizations.some(
                 (authorization) =>
                   authorization.ownerType === "User" &&
-                  authorization.owner === user.email,
+                  authorization.ownerId === user.email,
               ),
           )
           .map((user) => ({ label: user.name, value: user.email }))}
@@ -516,7 +539,7 @@ export default function LogbookForm({ logbook, onSave }: Props) {
         setOptionsSearch={setUserSearch}
         updatePermission={updateAuthorizationPermission}
         removeAuthorization={removeAuthorization}
-        createAuthorization={(owner) => createAuthorization("User", owner)}
+        createAuthorization={(ownerId) => createAuthorization("User", ownerId)}
       />
 
       <div className="mt-2 text-gray-500">Group Authorizations</div>
@@ -524,8 +547,8 @@ export default function LogbookForm({ logbook, onSave }: Props) {
         authorizations={form.authorizations
           .filter((authorization) => authorization.ownerType === "Group")
           .map((authorization) => ({
-            label: authorization.owner,
-            value: authorization.owner,
+            label: authorization.ownerLabel,
+            value: authorization.ownerId,
             permission: authorization.permission,
           }))}
         emptyLabel="No group authorizations. Create one below."
@@ -535,7 +558,7 @@ export default function LogbookForm({ logbook, onSave }: Props) {
               !form.authorizations.some(
                 (authorization) =>
                   authorization.ownerType === "Group" &&
-                  authorization.owner === group.id,
+                  authorization.ownerId === group.id,
               ),
           )
           .map((group) => ({ label: group.name, value: group.id }))}
@@ -543,7 +566,7 @@ export default function LogbookForm({ logbook, onSave }: Props) {
         setOptionsSearch={setGroupSearch}
         updatePermission={updateAuthorizationPermission}
         removeAuthorization={removeAuthorization}
-        createAuthorization={(owner) => createAuthorization("Group", owner)}
+        createAuthorization={(ownerId) => createAuthorization("Group", ownerId)}
       />
 
       <div className="mt-2 text-gray-500">Applications</div>
@@ -551,8 +574,8 @@ export default function LogbookForm({ logbook, onSave }: Props) {
         authorizations={form.authorizations
           .filter((authorization) => authorization.ownerType === "Application")
           .map((authorization) => ({
-            label: authorization.owner,
-            value: authorization.owner,
+            label: authorization.ownerId,
+            value: authorization.ownerId,
             permission: authorization.permission,
           }))}
         emptyLabel="No application authorizations. Create one below."
@@ -562,7 +585,7 @@ export default function LogbookForm({ logbook, onSave }: Props) {
               !form.authorizations.some(
                 (authorization) =>
                   authorization.ownerType === "Application" &&
-                  authorization.owner === application.id,
+                  authorization.ownerId === application.id,
               ),
           )
           .map((application) => ({
@@ -573,13 +596,13 @@ export default function LogbookForm({ logbook, onSave }: Props) {
         setOptionsSearch={setApplicationSearch}
         updatePermission={updateAuthorizationPermission}
         removeAuthorization={removeAuthorization}
-        createAuthorization={(owner) =>
-          createAuthorization("Application", owner)
+        createAuthorization={(ownerId) =>
+          createAuthorization("Application", ownerId)
         }
       />
 
       <button
-        disabled={updated}
+        disabled={!updated}
         className={twJoin(Button, "block ml-auto mt-3")}
         onClick={save}
       >
