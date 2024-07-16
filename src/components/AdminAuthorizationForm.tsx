@@ -1,5 +1,5 @@
 import { twJoin } from "tailwind-merge";
-import { AuthorizationPermission } from "../api";
+import { Permission } from "../api";
 import Select, { Option as SearchOpiton } from "./Select";
 import { IconButton } from "./base";
 import { FormEvent, useCallback, useState } from "react";
@@ -7,7 +7,7 @@ import { FormEvent, useCallback, useState } from "react";
 export interface Authorization {
   value: string;
   label: string;
-  permission: AuthorizationPermission;
+  permission: Permission;
 }
 
 export interface Props {
@@ -16,10 +16,7 @@ export interface Props {
   options: SearchOpiton[];
   isOptionsLoading: boolean;
   setOptionsSearch: (search: string) => void;
-  updatePermission: (
-    authorization: string,
-    permission: AuthorizationPermission,
-  ) => void;
+  updatePermission: (authorization: string, permission: Permission) => void;
   removeAuthorization: (authorization: string) => void;
   createAuthorization: (owner: string) => void;
 }
