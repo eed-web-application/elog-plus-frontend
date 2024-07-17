@@ -1,5 +1,7 @@
-import { Authorization, LogbookWithAuth, Shift, Tag } from "./api";
-import createAdminFormsStore from "./createAdminFormsStore";
+import { LogbookWithAuth, Shift, Tag } from "./api";
+import createAdminFormsStore, {
+  LocalAuthorization,
+} from "./createAdminFormsStore";
 
 /**
  * Shift that has not been uploaded to the server yet. `id`s starting with an
@@ -17,13 +19,6 @@ interface LocalShift extends Pick<Shift, "name" | "from" | "to"> {
 interface LocalTag extends Pick<Tag, "name"> {
   id?: Tag["id"];
 }
-
-/**
- * Authorization that has not been uploaded to the server yet. If `id` is
- * undefined, then the authorization has not been uploaded to the server
- */
-export type LocalAuthorization = Omit<Authorization, "id"> &
-  Partial<Pick<Authorization, "id">>;
 
 interface LogbookForm extends Pick<LogbookWithAuth, "id" | "name"> {
   tags: LocalTag[];

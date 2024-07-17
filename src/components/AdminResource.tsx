@@ -15,7 +15,7 @@ export interface Props extends ComponentProps<"div"> {
   isLoading?: boolean;
   home: string;
   createLabel: string;
-  onCreate: () => void;
+  onCreate?: () => void;
 }
 
 export default function AdminResource({
@@ -57,12 +57,14 @@ export default function AdminResource({
               </NavLink>
             ))}
 
-            <button
-              className="p-2 text-center bg-gray-100 cursor-pointer hover:bg-gray-200 focus:z-0 outline-2 outline-blue-500 focus:outline"
-              onClick={onCreate}
-            >
-              {createLabel}
-            </button>
+            {onCreate && (
+              <button
+                className="p-2 text-center bg-gray-100 cursor-pointer hover:bg-gray-200 focus:z-0 outline-2 outline-blue-500 focus:outline"
+                onClick={onCreate}
+              >
+                {createLabel}
+              </button>
+            )}
           </>
         )}
       </div>

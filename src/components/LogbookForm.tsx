@@ -32,7 +32,7 @@ const DEFAULT_PERMISSION: Permission = "Read";
 let idCounter = 0;
 
 export default function LogbookForm({ logbook, onSave }: Props) {
-  const [form, setForm, removeForm] = useLogbookFormsStore((state) =>
+  const { form, setForm, finishEditing } = useLogbookFormsStore((state) =>
     state.startEditing(logbook),
   );
   const queryClient = useQueryClient();
@@ -105,7 +105,7 @@ export default function LogbookForm({ logbook, onSave }: Props) {
 
     await queryClient.invalidateQueries({ queryKey: ["logbooks"] });
 
-    removeForm();
+    finishEditing();
     onSave();
   }
 
@@ -187,7 +187,7 @@ export default function LogbookForm({ logbook, onSave }: Props) {
     // Should probably never happen, but we still want to catch it, because
     // if this throws something else is wrong.
     if (!ownerLabel) {
-      throw "Could not find label for new authorization";
+      throw new Error("Could not find label for new authorization");
     }
 
     // If the user deletes an authorization and then creates a new one with the

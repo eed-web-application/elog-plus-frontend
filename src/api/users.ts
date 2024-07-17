@@ -1,6 +1,4 @@
-import { create } from "zustand";
-import { fetch } from ".";
-import { AuthorizationPermission } from "./logbooks";
+import { Authorization, fetch } from ".";
 
 export interface User {
   id: string;
@@ -8,78 +6,66 @@ export interface User {
   email: string;
 }
 
-interface UsersState {
-  users: Record<string, User>;
-  addUser: (user: User) => void;
-  removeUser: (userId: string) => void;
-  updateUserPermissions: (
-    userId: string,
-    permissions: AuthorizationPermission[],
-  ) => void;
-}
-
-export interface UserAuthorization {
-  logbook: string;
-  authorizationType: AuthorizationPermission;
-}
-
 export interface UserWithAuth extends User {
-  authorizations: UserAuthorization[];
+  authorizations: Authorization[];
 }
 
-export async function updateUser(user: UserWithAuth) {
-  return await fetch(`v1/users/${user.id}`, {
+export function updateUser(user: UserWithAuth) {
+  return fetch(`v1/users/${user.id}`, {
     method: "PUT",
     body: user,
   });
 }
 
-export async function fetchUsers(search: string): Promise<User[]> {
-  const users = (await fetch("v1/auth/users", { params: { search } })) as any[];
+export async function fetchUsers<A extends boolean | undefined>({
+  search,
+  includeAuthorizations,
+}: {
+  search: string;
+  includeAuthorizations?: A;
+}): Promise<(A extends true ? UserWithAuth : User)[]> {
+  const params: Record<string, string> = { search };
+
+  if (includeAuthorizations) {
+    params.includeAuthorizations = "true";
+  }
+
+  const users = (await fetch("v1/auth/users", {
+    params,
+  })) as any[];
 
   // FIXME: Remove this when the proper API is implemented
   return users.map((user) => ({
     id: user.uid,
     name: user.gecos,
     email: user.mail,
+    authorizations: !includeAuthorizations
+      ? []
+      : [
+        {
+          id: "1",
+          permission: "Write",
+          ownerId: user.uid,
+          ownerType: "User",
+          ownerLabel: user.gecos,
+          resourceId: "66958c2ee81b14088ef1228f",
+          resourceType: "Logbook",
+          resouceLabel: "ACCEL",
+        },
+        {
+          id: "2",
+          permission: "Read",
+          ownerType: "User",
+          ownerId: user.uid,
+          ownerLabel: user.gecos,
+          resourceId: "66958c2ee81b14088ef12290",
+          resourceType: "Logbook",
+          resouceLabel: "PEP",
+        },
+      ],
   }));
 }
 
 export function fetchMe(): Promise<User> {
   return fetch("v1/auth/me");
 }
-
-export const useUsersStore = create<UsersState>((set) => ({
-  users: {},
-  addUser(user) {
-    set((state) => ({
-      users: {
-        ...state.users,
-        [user.id]: user,
-      },
-    }));
-  },
-  removeUser(userId) {
-    set((state) => {
-      const { [userId]: removedUser, ...restUsers } = state.users;
-      return { users: restUsers };
-    });
-  },
-  updateUserPermissions(userId, permissions) {
-    set((state) => {
-      if (!state.users[userId]) return state;
-
-      const updatedUser = {
-        ...state.users[userId],
-        permissions: [...permissions],
-      };
-
-      return {
-        users: {
-          ...state.users,
-          [userId]: updatedUser,
-        },
-      };
-    });
-  },
-}));

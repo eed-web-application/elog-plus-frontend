@@ -4,16 +4,18 @@ import { useQuery } from "@tanstack/react-query";
 
 export default function useUsers({
   search,
+  includeAuthorizations = false,
   enabled = true,
   critical = true,
 }: {
   search: string;
+  includeAuthorizations?: boolean;
   enabled?: boolean;
   critical?: boolean;
 }) {
   const { data, isLoading } = useQuery({
     queryKey: ["users", search],
-    queryFn: () => fetchUsers(search),
+    queryFn: () => fetchUsers({ search, includeAuthorizations }),
     enabled,
     useErrorBoundary: critical,
     staleTime: 5 * 60 * 1000,

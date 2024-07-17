@@ -1,4 +1,12 @@
 import { create } from "zustand";
+import { Authorization } from "./api";
+
+/**
+ * Authorization that has not been uploaded to the server yet. If `id` is
+ * undefined, then the authorization has not been uploaded to the server
+ */
+export type LocalAuthorization = Omit<Authorization, "id"> &
+  Partial<Pick<Authorization, "id">>;
 
 export interface AdminResource {
   id: string;
@@ -6,7 +14,11 @@ export interface AdminResource {
 
 export type AdminFormsState<T extends AdminResource> = {
   forms: Record<string, T>;
-  startEditing: (startingForm: T) => [T, (newValue: T) => void, () => void];
+  startEditing: (startingForm: T) => {
+    form: T;
+    setForm: (newValue: T) => void;
+    finishEditing: () => void;
+  };
   removeForm: (id: string) => void;
   upsertForm: (newValue: T) => void;
 };
@@ -18,17 +30,17 @@ export default function createAdminFormsStore<T extends AdminResource>() {
       const state = get();
       const form = state.forms[startingForm.id] || startingForm;
 
-      return [
+      return {
         form,
-        (newValue) => {
+        setForm: (newValue) => {
           if (JSON.stringify(newValue) === JSON.stringify(startingForm)) {
             state.removeForm(startingForm.id);
           } else {
             state.upsertForm(newValue);
           }
         },
-        () => state.removeForm(form.id),
-      ];
+        finishEditing: () => state.removeForm(form.id),
+      };
     },
     upsertForm(newValue: T) {
       set(({ forms }) => ({
