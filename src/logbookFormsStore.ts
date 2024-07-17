@@ -31,4 +31,30 @@ interface LogbookForm extends Pick<LogbookWithAuth, "id" | "name"> {
   authorizations: LocalAuthorization[];
 }
 
+export function validateLogbookForm(form: LogbookForm) {
+  const invalid: Set<
+    "name" | `shiftName/${string}` | `shiftFrom/${string}` | `shiftTo/${string}`
+  > = new Set();
+
+  if (!form.name) {
+    invalid.add("name");
+  }
+
+  form.shifts.forEach((shift) => {
+    if (!shift.name) {
+      invalid.add(`shiftName/${shift.id}`);
+    }
+
+    if (!shift.from) {
+      invalid.add(`shiftFrom/${shift.id}`);
+    }
+
+    if (!shift.to) {
+      invalid.add(`shiftTo/${shift.id}`);
+    }
+  });
+
+  return invalid;
+}
+
 export const useLogbookFormsStore = createAdminFormsStore<LogbookForm>();

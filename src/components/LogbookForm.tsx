@@ -10,7 +10,10 @@ import {
   Permission,
 } from "../api";
 import { Button, IconButton, Input, InputInvalid } from "./base";
-import { useLogbookFormsStore } from "../logbookFormsStore";
+import {
+  useLogbookFormsStore,
+  validateLogbookForm,
+} from "../logbookFormsStore";
 import { localToUtc, utcToLocal } from "../utils/datetimeConversion";
 import reportServerError from "../reportServerError";
 import useUsers from "../hooks/useUsers";
@@ -49,64 +52,10 @@ export default function LogbookForm({ logbook, onSave }: Props) {
     search: applicationSearch,
   });
 
-  const validators = {
-    name: () => Boolean(form.name),
-  };
-
-  const shiftValidators = {
-    shiftName: (id: string) =>
-      Boolean(form.shifts.find((shift) => shift.id === id)?.name),
-    shiftFrom: (id: string) =>
-      Boolean(form.shifts.find((shift) => shift.id === id)?.from),
-    shiftTo: (id: string) =>
-      Boolean(form.shifts.find((shift) => shift.id === id)?.to),
-  };
-
-  type Ident =
-    | keyof typeof validators
-    | `${keyof typeof shiftValidators}/${string}`;
-
-  const [invalid, setInvalid] = useState<Ident[]>([]);
-
-  function onValidate(valid: boolean, field: Ident): boolean {
-    if (valid) {
-      setInvalid((invalid) =>
-        invalid.filter((invalidField) => invalidField !== field),
-      );
-      return true;
-    }
-
-    if (!invalid.includes(field)) {
-      setInvalid((invalid) => [...invalid, field]);
-    }
-    return false;
-  }
+  const invalid = validateLogbookForm(form);
 
   async function saveLogbook() {
-    let invalid = false;
-    for (const field in validators) {
-      if (
-        !onValidate(
-          validators[field as keyof typeof validators](),
-          field as Ident,
-        )
-      ) {
-        invalid = true;
-      }
-    }
-    for (const shift of form.shifts) {
-      for (const field in shiftValidators) {
-        if (
-          !onValidate(
-            shiftValidators[field as keyof typeof shiftValidators](shift.id),
-            `${field}/${shift.id}` as Ident,
-          )
-        ) {
-          invalid = true;
-        }
-      }
-    }
-    if (invalid) {
+    if (invalid.size > 0) {
       return;
     }
 
@@ -286,12 +235,11 @@ export default function LogbookForm({ logbook, onSave }: Props) {
           type="text"
           className={twMerge(
             Input,
-            invalid.includes("name") && InputInvalid,
+            invalid.has("name") && InputInvalid,
             "block w-full",
           )}
           value={form.name}
           onChange={(e) => setForm({ ...form, name: e.target.value })}
-          onBlur={() => onValidate(validators.name(), "name")}
         />
       </label>
       <div className="text-gray-500">Tags</div>
@@ -385,26 +333,19 @@ export default function LogbookForm({ logbook, onSave }: Props) {
                     type="text"
                     className={twMerge(
                       Input,
-                      invalid.includes(`shiftName/${shift.id}`) && InputInvalid,
+                      invalid.has(`shiftName/${shift.id}`) && InputInvalid,
                       "flex-1 min-w-0",
                     )}
                     value={shift.name}
                     onChange={(e) =>
                       changeShiftName(index, e.currentTarget.value)
                     }
-                    onBlur={() =>
-                      onValidate(
-                        shiftValidators.shiftName(shift.id),
-                        `shiftName/${shift.id}`,
-                      )
-                    }
                   />
                   <div className="flex gap-2 items-center self-end">
                     <input
                       className={twMerge(
                         Input,
-                        invalid.includes(`shiftFrom/${shift.id}`) &&
-                        InputInvalid,
+                        invalid.has(`shiftFrom/${shift.id}`) && InputInvalid,
                         "w-32",
                       )}
                       type="time"
@@ -423,18 +364,12 @@ export default function LogbookForm({ logbook, onSave }: Props) {
                         };
                         setForm({ ...form, shifts: updatedShifts });
                       }}
-                      onBlur={() =>
-                        onValidate(
-                          shiftValidators.shiftFrom(shift.id),
-                          `shiftFrom/${shift.id}`,
-                        )
-                      }
                     />
                     <div className="text-gray-500">to</div>
                     <input
                       className={twMerge(
                         Input,
-                        invalid.includes(`shiftTo/${shift.id}`) && InputInvalid,
+                        invalid.has(`shiftTo/${shift.id}`) && InputInvalid,
                         "w-32",
                       )}
                       type="time"
@@ -453,12 +388,6 @@ export default function LogbookForm({ logbook, onSave }: Props) {
                         };
                         setForm({ ...form, shifts: updatedShifts });
                       }}
-                      onBlur={() =>
-                        onValidate(
-                          shiftValidators.shiftTo(shift.id),
-                          `shiftTo/${shift.id}`,
-                        )
-                      }
                     />
                   </div>
                   <svg
