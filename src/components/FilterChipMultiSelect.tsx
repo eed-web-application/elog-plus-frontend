@@ -85,8 +85,8 @@ export default function FilterChipMultiSelect<O>({
 
   const filteredOptions = search
     ? options.filter((option) =>
-        extractLabel(option).toLowerCase().includes(search),
-      )
+      extractLabel(option).toLowerCase().includes(search.toLowerCase()),
+    )
     : options;
 
   function disable() {
