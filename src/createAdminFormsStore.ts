@@ -21,7 +21,7 @@ export default function createAdminFormsStore<T extends AdminResource>() {
       return [
         form,
         (newValue) => {
-          if (JSON.stringify(newValue) === JSON.stringify(form)) {
+          if (JSON.stringify(newValue) === JSON.stringify(startingForm)) {
             state.removeForm(startingForm.id);
           } else {
             state.upsertForm(newValue);
