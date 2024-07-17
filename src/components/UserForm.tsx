@@ -93,7 +93,7 @@ export default function UserForm({ user, onSave }: Props) {
   );
 
   return (
-    <div className="px-3 pb-3">
+    <div className="p-3">
       <div className="text-gray-500">Logbook Authorizations</div>
       <AdminAuthorizationForm
         emptyLabel="No logbook authorizations. Create one below."
