@@ -12,6 +12,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import AdminResource from "../../components/AdminResource";
 
 export default function AdminLogbooks() {
+  const [logbookSearch, setLogbookSearch] = useState("");
   const {
     logbookMap,
     logbooks,
@@ -47,11 +48,15 @@ export default function AdminLogbooks() {
     queryClient.invalidateQueries({ queryKey: ["logbooks"] });
   }, [newLogbookName, navigate, queryClient]);
 
+  const logbooksSearched = logbooks.filter((logbook) =>
+    logbook.name.toLowerCase().includes(logbookSearch.toLowerCase()),
+  );
+
   return (
     <Dialog controlled isOpen={newLogbookName !== null}>
       <AdminResource
         home="/admin/logbooks"
-        items={logbooks.map((logbook) => ({
+        items={logbooksSearched.map((logbook) => ({
           label: logbook.name,
           link: `/admin/logbooks/${logbook.id}`,
           edited: logbooksEdited.includes(logbook.id),
@@ -59,6 +64,7 @@ export default function AdminLogbooks() {
         isLoading={isLogbooksLoading}
         createLabel="Create logbook"
         onCreate={() => setNewLogbookName("")}
+        onSearchChange={setLogbookSearch}
       >
         {selectedLogbook && (
           <LogbookForm logbook={selectedLogbook} onSave={onSave} />

@@ -3,6 +3,7 @@ import SideSheet from "./SideSheet";
 import { NavLink } from "react-router-dom";
 import { twJoin, twMerge } from "tailwind-merge";
 import Spinner from "./Spinner";
+import { Input } from "./base";
 
 export interface Item {
   label: string;
@@ -16,6 +17,7 @@ export interface Props extends ComponentProps<"div"> {
   home: string;
   createLabel: string;
   onCreate?: () => void;
+  onSearchChange: (search: string) => void;
 }
 
 export default function AdminResource({
@@ -25,6 +27,7 @@ export default function AdminResource({
   isLoading,
   createLabel,
   onCreate,
+  onSearchChange,
 }: Props) {
   return (
     <SideSheet home={home} sheetBody={children}>
@@ -35,6 +38,43 @@ export default function AdminResource({
           isLoading ? "divide-y" : "w-full",
         )}
       >
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+          }}
+        >
+          <div className="relative w-full">
+            <input
+              type="search"
+              className={twJoin(Input, "block w-full")}
+              placeholder="Search..."
+              onChange={(e) => {
+                onSearchChange(e.target.value);
+                console.log(e.target.value);
+              }}
+            />
+            <button
+              type="submit"
+              className="absolute top-0 right-0 p-1.5 text-sm font-medium text-white bg-blue-500 rounded-r-lg border border-blue-500 hover:bg-blue-600 focus:ring-2 focus:ring-blue-300 focus:outline-none"
+            >
+              <svg
+                aria-hidden="true"
+                className="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                ></path>
+              </svg>
+            </button>
+          </div>
+        </form>
         {isLoading ? (
           <Spinner className="self-center" />
         ) : (

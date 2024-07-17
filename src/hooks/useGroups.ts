@@ -13,7 +13,7 @@ export default function useGroups({
 }) {
   const { data, isLoading } = useQuery({
     queryKey: ["groups", search],
-    queryFn: () => fetchGroups(search),
+    queryFn: () => fetchGroups({ search }),
     enabled,
     useErrorBoundary: critical,
     staleTime: 5 * 60 * 1000,
