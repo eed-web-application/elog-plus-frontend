@@ -34,7 +34,7 @@ export default function AdminGroups() {
           edited: groupsEdited.includes(group.id),
         }))}
         isLoading={isLoading}
-        createLabel="Create logbook"
+        createLabel="Create group"
         onSearchChange={setGroupSearch}
       >
         {selectedGroup && <GroupForm group={selectedGroup} onSave={onSave} />}

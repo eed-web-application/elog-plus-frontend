@@ -87,7 +87,7 @@ const router = createBrowserRouter(
               element: <AdminApplications />,
             },
             {
-              path: "applications/:appId",
+              path: "applications/:applicationId",
               element: <AdminApplications />,
             },
           ],

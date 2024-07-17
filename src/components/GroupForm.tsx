@@ -86,8 +86,6 @@ export default function GroupForm({ group, onSave }: Props) {
     });
   }
 
-  console.log(form, group);
-
   const updated = JSON.stringify(form) === JSON.stringify(group);
 
   const logbooksSearched = logbooks.filter((logbook) =>

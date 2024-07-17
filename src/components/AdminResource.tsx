@@ -48,10 +48,7 @@ export default function AdminResource({
               type="search"
               className={twJoin(Input, "block w-full")}
               placeholder="Search..."
-              onChange={(e) => {
-                onSearchChange(e.target.value);
-                console.log(e.target.value);
-              }}
+              onChange={(e) => onSearchChange(e.target.value)}
             />
             <button
               type="submit"
@@ -76,7 +73,7 @@ export default function AdminResource({
           </div>
         </form>
         {isLoading ? (
-          <Spinner className="self-center" />
+          <Spinner className="self-center mt-3" />
         ) : (
           <>
             {items.map((item) => (
