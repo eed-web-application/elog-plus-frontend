@@ -88,16 +88,21 @@ export default function GroupForm({ group, onSave }: Props) {
 
   const updated = JSON.stringify(form) === JSON.stringify(group);
 
-  const logbooksSearched = logbooks.filter((logbook) =>
-    logbook.name.toLowerCase().includes(logbookSearch.toLowerCase()),
-  );
+  const logbooksFiltered = logbooks
+    .filter((logbook) =>
+      logbook.name.toLowerCase().includes(logbookSearch.toLowerCase()),
+    )
+    .filter(
+      (logbook) =>
+        !form.authorizations.some((auth) => auth.resourceId === logbook.id),
+    );
 
   return (
     <div className="p-3">
       <div className="text-gray-500">Logbook Authorizations</div>
       <AdminAuthorizationForm
         emptyLabel="No logbook authorizations. Create one below."
-        options={logbooksSearched.map((logbook) => ({
+        options={logbooksFiltered.map((logbook) => ({
           label: logbook.name,
           value: logbook.id,
         }))}
