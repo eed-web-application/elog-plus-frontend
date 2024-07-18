@@ -15,13 +15,13 @@ export default function ErrorBoundary() {
   }
 
   return (
-    <div className="h-screen w-screen flex flex-col items-center justify-center">
+    <div className="flex flex-col justify-center items-center w-screen h-screen">
       <div className="text-4xl">{is404 ? "404" : "Uh oh 😕"}</div>
       <div className="text-xl">
         {is404 ? "Page not found" : "Something went wrong"}
       </div>
       {!is404 && (
-        <div className="text-lg mt-3 text-center text-gray-500 max-w-sm">
+        <div className="mt-3 max-w-sm text-lg text-center text-gray-500">
           There was an unrecoverable error. Please try refreshing the page. If
           the issue persists, feel free to contact{" "}
           <a href="mailto:boogie@slac.stanford.edu">boogie@slac.stanford.edu</a>

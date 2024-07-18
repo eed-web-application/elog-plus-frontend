@@ -98,7 +98,7 @@ export default function Filters({ filters, setFilters }: Props) {
                 key={tag.id}
                 className={
                   (index !== 1 && index !== filters.tags.length - 1) ||
-                    andOtherText
+                  andOtherText
                     ? "mr-1"
                     : ""
                 }
@@ -198,11 +198,11 @@ export default function Filters({ filters, setFilters }: Props) {
         label={
           filters.startDate && !filters.onlyFavorites
             ? filters.startDate.toLocaleDateString("en-us", {
-              timeZone: "UTC",
-              year: "numeric",
-              month: "long",
-              day: "numeric",
-            })
+                timeZone: "UTC",
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+              })
             : "From"
         }
         disabled={filters.onlyFavorites}
@@ -233,11 +233,11 @@ export default function Filters({ filters, setFilters }: Props) {
         label={
           filters.endDate && !filters.onlyFavorites
             ? filters.endDate.toLocaleDateString("en-us", {
-              timeZone: "UTC",
-              year: "numeric",
-              month: "long",
-              day: "numeric",
-            })
+                timeZone: "UTC",
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+              })
             : "To"
         }
         disabled={filters.onlyFavorites}

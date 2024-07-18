@@ -34,7 +34,7 @@ const FilterChip = forwardRef<HTMLButtonElement, PropsWithChildren<Props>>(
       className,
       ...rest
     },
-    ref
+    ref,
   ) => {
     function disable(e: MouseEvent<SVGSVGElement>) {
       e.stopPropagation();
@@ -56,7 +56,7 @@ const FilterChip = forwardRef<HTMLButtonElement, PropsWithChildren<Props>>(
           active &&
             "bg-blue-100 border-blue-100 hover:bg-blue-200 hover:border-blue-200",
           disabled && "text-gray-400 bg-white border-gray-200",
-          className
+          className,
         )}
         {...rest}
       >
@@ -67,7 +67,7 @@ const FilterChip = forwardRef<HTMLButtonElement, PropsWithChildren<Props>>(
             viewBox="0 0 24 24"
             strokeWidth={1.5}
             stroke="currentColor"
-            className="w-6 h-6 mr-1"
+            className="mr-1 w-6 h-6"
           >
             <path
               strokeLinecap="round"
@@ -84,7 +84,7 @@ const FilterChip = forwardRef<HTMLButtonElement, PropsWithChildren<Props>>(
             viewBox="0 0 24 24"
             strokeWidth={1.5}
             stroke="currentColor"
-            className="ml-1 w-8 h-8 p-1 hover:bg-blue-300 rounded-full"
+            className="p-1 ml-1 w-8 h-8 rounded-full hover:bg-blue-300"
             onClick={disable}
           >
             <path
@@ -112,7 +112,7 @@ const FilterChip = forwardRef<HTMLButtonElement, PropsWithChildren<Props>>(
         )}
       </button>
     );
-  }
+  },
 );
 
 export default FilterChip;

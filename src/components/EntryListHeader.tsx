@@ -28,7 +28,7 @@ interface HeaderInfo {
 function getHeaderInfo(
   logbooksIncluded: string[],
   entry: Entry,
-  dateBasedOn: Props["dateBasedOn"] = "eventAt"
+  dateBasedOn: Props["dateBasedOn"] = "eventAt",
 ) {
   const date = dateBasedOn === "loggedAt" ? entry.loggedAt : entry.eventAt;
 
@@ -67,7 +67,7 @@ function getHeaderInfo(
 function getHeaderKey(
   logbooksIncluded: string[],
   entry: Entry,
-  dateBasedOn: Props["dateBasedOn"] = "eventAt"
+  dateBasedOn: Props["dateBasedOn"] = "eventAt",
 ): string {
   return JSON.stringify(getHeaderInfo(logbooksIncluded, entry, dateBasedOn));
 }
@@ -76,12 +76,12 @@ function getHeaderKey(
 const EntryListHeader = forwardRef<HTMLDivElement, Props>(
   (
     { logbooksIncluded, representative, dateBasedOn, className, ...rest },
-    ref
+    ref,
   ) => {
     const date = dateToYYYYMMDD(
       dateBasedOn === "loggedAt"
         ? representative.loggedAt
-        : representative.eventAt
+        : representative.eventAt,
     );
 
     let summaryButton;
@@ -101,14 +101,14 @@ const EntryListHeader = forwardRef<HTMLDivElement, Props>(
     const { date: dateText, shifts } = getHeaderInfo(
       logbooksIncluded,
       representative,
-      dateBasedOn
+      dateBasedOn,
     );
 
     return (
       <div
         className={twMerge(
           "border-b gap-3 px-3 pt-1.5 pb-1 bg-gray-100 whitespace-nowrap",
-          className
+          className,
         )}
         ref={ref}
         {...rest}
@@ -145,7 +145,7 @@ const EntryListHeader = forwardRef<HTMLDivElement, Props>(
                             viewBox="0 0 24 24"
                             strokeWidth={1.5}
                             stroke="currentColor"
-                            className="w-4 h-4 ml-1.5 mr-0.5"
+                            className="mr-0.5 ml-1.5 w-4 h-4"
                           >
                             <path
                               strokeLinecap="round"
@@ -191,7 +191,7 @@ const EntryListHeader = forwardRef<HTMLDivElement, Props>(
                             viewBox="0 0 24 24"
                             strokeWidth={1.5}
                             stroke="currentColor"
-                            className="w-4 h-4 ml-1.5 mr-0.5"
+                            className="mr-0.5 ml-1.5 w-4 h-4"
                           >
                             <path
                               strokeLinecap="round"
@@ -211,7 +211,7 @@ const EntryListHeader = forwardRef<HTMLDivElement, Props>(
         </div>
       </div>
     );
-  }
+  },
 );
 
 (

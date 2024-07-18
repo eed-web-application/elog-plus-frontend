@@ -34,7 +34,7 @@ export default function TagForm({
       acc[logbook.id] = logbook;
       return acc;
     },
-    {}
+    {},
   );
 
   isLoading = isLoading || isTagsLoading;
@@ -65,7 +65,7 @@ export default function TagForm({
                         custom: `${logbookMap[
                           tag.logbook
                         ].name.toUpperCase()}:${tag.name}`,
-                      }
+                      },
                 )
           }
           setValue={(tags) => onChange(tags)}
@@ -78,8 +78,8 @@ export default function TagForm({
                   (tag) =>
                     typeof tag !== "string" &&
                     tag.logbook === logbook.id &&
-                    tag.name === query
-                )
+                    tag.name === query,
+                ),
             )
           }
           onCreate={async (name) => {
@@ -91,13 +91,13 @@ export default function TagForm({
                   (tag) =>
                     typeof tag !== "string" &&
                     tag.logbook === logbook.id &&
-                    tag.name === name
-                )
+                    tag.name === name,
+                ),
             );
 
             const selectedLogbooks = await selectLogbooks(
               name,
-              logbooksWithoutTag
+              logbooksWithoutTag,
             );
 
             if (!selectedLogbooks) {
@@ -106,8 +106,8 @@ export default function TagForm({
 
             onChange(
               value.concat(
-                selectedLogbooks.map((logbook) => ({ logbook, name }))
-              )
+                selectedLogbooks.map((logbook) => ({ logbook, name })),
+              ),
             );
           }}
         />

@@ -8,7 +8,7 @@ import { Tag } from "../api";
  */
 export default function useDisplayTags(
   tags: Tag[],
-  logbookCount: number
+  logbookCount: number,
 ): string[] {
   if (logbookCount === 1) {
     return tags.map((tag) => tag.name);

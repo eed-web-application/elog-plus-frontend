@@ -54,6 +54,6 @@ export const useFavoritesStore = create(
           return new Set(value as unknown[]);
         },
       }),
-    }
-  )
+    },
+  ),
 );

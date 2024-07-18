@@ -40,7 +40,7 @@ export default function InfoDialogButton({
           stroke="currentColor"
           className={twMerge(
             "absolute m-3 top-0.5 right-0 w-8 h-8 p-1 text-gray-800 hover:bg-gray-200 rounded-full cursor-pointer",
-            className
+            className,
           )}
           {...rest}
         >
@@ -53,11 +53,11 @@ export default function InfoDialogButton({
       </Dialog.Trigger>
       <Dialog.Content
         showCloseButton
-        className="w-full max-w-sm flex flex-col items-center"
+        className="flex flex-col items-center w-full max-w-sm"
       >
         <Dialog.Section>
           <Logo className="mb-8" />
-          <div className="flex items-center justify-center gap-2">
+          <div className="flex gap-2 justify-center items-center">
             <div className="flex flex-col text-gray-500">
               <div>Version:</div>
               <div>Server Version:</div>

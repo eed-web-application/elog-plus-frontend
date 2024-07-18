@@ -30,7 +30,7 @@ export interface Props {
 export default function useEntryBuilder({ kind, onEntrySaved }: Props) {
   const queryClient = useQueryClient();
   const [draft, updateDraft, removeDraft] = useDraftsStore((state) =>
-    state.startDrafting(kind)
+    state.startDrafting(kind),
   );
 
   const [invalidFields, setInvalidFields] = useState<Field[]>([]);
@@ -64,7 +64,7 @@ export default function useEntryBuilder({ kind, onEntrySaved }: Props) {
   function validateField(field: Field): boolean {
     if (validators[field]()) {
       setInvalidFields((invalid) =>
-        invalid.filter((invalidField) => invalidField !== field)
+        invalid.filter((invalidField) => invalidField !== field),
       );
       return true;
     }
@@ -93,7 +93,7 @@ export default function useEntryBuilder({ kind, onEntrySaved }: Props) {
         reportServerError("Could not save entry", e);
       }
     },
-    [kind]
+    [kind],
   );
 
   async function submitEntry() {
@@ -125,7 +125,7 @@ export default function useEntryBuilder({ kind, onEntrySaved }: Props) {
       attachments: draft.attachments.map(
         // We have already verified that all the ids are non null in the
         // attachment validator, so this is fine
-        (attachment) => attachment.id as string
+        (attachment) => attachment.id as string,
       ),
       summarizes: draft.summarizes.checked ? draft.summarizes : undefined,
       tags: tagIds,
@@ -148,7 +148,7 @@ export default function useEntryBuilder({ kind, onEntrySaved }: Props) {
             newEntry.summarizes.shiftId,
             newEntry.summarizes.date,
           ],
-          id
+          id,
         );
       }
 
@@ -167,7 +167,7 @@ export default function useEntryBuilder({ kind, onEntrySaved }: Props) {
         attachments: draft.attachments.concat(attachments),
       });
     },
-    [draft, updateDraft, uploadAttachment]
+    [draft, updateDraft, uploadAttachment],
   );
 
   const removeAttachment = useCallback(
@@ -176,7 +176,7 @@ export default function useEntryBuilder({ kind, onEntrySaved }: Props) {
         updateDraft({
           ...draft,
           attachments: draft.attachments.filter(
-            ({ id }) => id !== attachment.id
+            ({ id }) => id !== attachment.id,
           ),
         });
         return;
@@ -184,7 +184,7 @@ export default function useEntryBuilder({ kind, onEntrySaved }: Props) {
 
       cancelUploadingAttachment(attachment.fileName);
     },
-    [cancelUploadingAttachment, draft, updateDraft]
+    [cancelUploadingAttachment, draft, updateDraft],
   );
 
   return {

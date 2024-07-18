@@ -50,7 +50,7 @@ export interface Props extends Omit<FaIconProps, "icon"> {
  */
 export default function AttachmentIcon({ mimeType, ...rest }: Props) {
   const candidate = Object.entries(iconClasses).find(([k]) =>
-    mimeType.startsWith(k)
+    mimeType.startsWith(k),
   );
 
   const icon = candidate ? candidate[1] : faFile;

@@ -9,12 +9,12 @@ export interface Props extends ComponentPropsWithoutRef<"div"> {
 
 const SelectList = forwardRef<HTMLDivElement, Props>(function SelectList(
   { isLoading, isEmpty, emptyLabel, children, ...rest },
-  ref
+  ref,
 ) {
   return (
     <div ref={ref} {...rest}>
       {isEmpty || isLoading ? (
-        <div className="text-gray-500 text-center w-full py-3">
+        <div className="py-3 w-full text-center text-gray-500">
           {isLoading ? (
             <Spinner className="m-auto" />
           ) : (

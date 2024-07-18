@@ -12,7 +12,7 @@ export default function Spinner({ className, large = false, ...rest }: Props) {
       className={twMerge(
         "w-8 h-8 text-gray-200 animate-spin fill-blue-600",
         large && "w-10 h-10",
-        className
+        className,
       )}
       viewBox="0 0 100 101"
       fill="none"

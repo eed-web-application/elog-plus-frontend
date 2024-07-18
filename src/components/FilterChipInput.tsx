@@ -50,7 +50,7 @@ export default function FilterChipInput({
           // It looks weird to have an inline element on top of the button
           // and see the button creep through the side, so we make it invisible.
           open && "invisible",
-          className
+          className,
         )}
         showDownArrow
         {...rest}

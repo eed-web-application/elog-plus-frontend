@@ -85,8 +85,8 @@ export default function FilterChipMultiSelect<O>({
 
   const filteredOptions = search
     ? options.filter((option) =>
-        extractLabel(option).toLowerCase().includes(search)
-      )
+      extractLabel(option).toLowerCase().includes(search.toLowerCase()),
+    )
     : options;
 
   function disable() {
@@ -119,7 +119,7 @@ export default function FilterChipMultiSelect<O>({
       className={twMerge(
         Input,
         "block w-64 rounded-b-none",
-        searchButton && "rounded-r-none"
+        searchButton && "rounded-r-none",
       )}
       placeholder="Search..."
       autoFocus
@@ -146,7 +146,7 @@ export default function FilterChipMultiSelect<O>({
         <FloatingPortal>
           <FloatingFocusManager context={context} modal={false}>
             <div
-              className="shadow bg-white rounded-lg z-20 overflow-hidden"
+              className="overflow-hidden z-20 bg-white rounded-lg shadow"
               style={floatingStyles}
               ref={refs.setFloating}
               {...getFloatingProps(getListFloatingProps())}
@@ -161,7 +161,7 @@ export default function FilterChipMultiSelect<O>({
               <SelectList
                 isLoading={isLoading}
                 isEmpty={filteredOptions.length === 0}
-                className="max-h-64 overflow-y-auto"
+                className="overflow-y-auto max-h-64"
               >
                 {filteredOptions.map((option, index) => {
                   const key = extractKey(option);

@@ -62,7 +62,7 @@ export async function fetch(
     formData,
     payloadKey = "payload",
     ...restOptions
-  }: FetchOptions = {}
+  }: FetchOptions = {},
 ) {
   if (body) {
     headers["content-type"] = "application/json";
@@ -80,10 +80,9 @@ export async function fetch(
   };
 
   const res = await window.fetch(
-    `${ENDPOINT}/${url}?${
-      params ? new URLSearchParams(params).toString() : ""
+    `${ENDPOINT}/${url}?${params ? new URLSearchParams(params).toString() : ""
     }`,
-    options
+    options,
   );
 
   let responseData;
@@ -114,7 +113,10 @@ export async function fetchVersion(): Promise<ServerVersion | undefined> {
 }
 
 export * from "./attachments";
+export * from "./applications";
+export * from "./authorizations";
 export * from "./entries";
+export * from "./groups";
 export * from "./logbooks";
 export * from "./tags";
-export * from "./auth";
+export * from "./users";

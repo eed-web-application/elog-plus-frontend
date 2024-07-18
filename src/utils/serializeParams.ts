@@ -6,14 +6,14 @@ export type ParamsObject = Record<
 >;
 
 export default function serializeParams(
-  params: ParamsObject
+  params: ParamsObject,
 ): [string, string][] {
   return (
     (
       Object.entries(params)
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         .filter(([_, value]) =>
-          Array.isArray(value) ? value.length > 0 : Boolean(value)
+          Array.isArray(value) ? value.length > 0 : Boolean(value),
         ) as [string, NonNullable<ParamsObject[string]>][]
     ).map(([key, value]) => {
       if (Array.isArray(value)) {

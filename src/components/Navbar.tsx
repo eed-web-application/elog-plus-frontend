@@ -13,7 +13,7 @@ interface Props extends ComponentProps<"div"> {
 
 function debounce<A extends unknown[]>(
   func: (...args: A) => void,
-  timeout: number
+  timeout: number,
 ): (...args: A) => void {
   let timer: number;
 
@@ -33,12 +33,12 @@ export default function Navbar({
 }: Props) {
   const [stagedSearch, setStagedSearch] = useState(search);
   const hasNewEntryDraft = useDraftsStore(({ drafts }) =>
-    Boolean(drafts["newEntry"])
+    Boolean(drafts["newEntry"]),
   );
 
   const debouncedOnSearchChange = useMemo(
     () => debounce(onSearchChange, 500),
-    [onSearchChange]
+    [onSearchChange],
   );
 
   function searchFor(value: string) {
@@ -98,7 +98,7 @@ export default function Navbar({
       )}
 
       <Link
-        to={{ pathname: "/admin" }}
+        to={{ pathname: "/admin/logbooks" }}
         className={twJoin(Button, "mr-2 text-sm flex items-center")}
       >
         Admin Dashboard

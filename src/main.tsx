@@ -16,7 +16,11 @@ import FollowUp from "./routes/FollowUp.tsx";
 import NewEntry from "./routes/NewEntry.tsx";
 import ViewEntry from "./routes/ViewEntry.tsx";
 import ErrorBoundary from "./routes/ErrorBoundary";
-import Admin from "./routes/Admin.tsx";
+import Admin from "./routes/Admin";
+import AdminLogbooks from "./routes/Admin/Logbooks.tsx";
+import AdminGroups from "./routes/Admin/Groups.tsx";
+import AdminUsers from "./routes/Admin/Users.tsx";
+import AdminApplications from "./routes/Admin/Applications.tsx";
 import { fetchEntry, ServerError } from "./api";
 import "./index.css";
 import reportServerError from "./reportServerError.tsx";
@@ -52,15 +56,45 @@ const router = createBrowserRouter(
         {
           path: "/admin",
           element: <Admin />,
-        },
-        {
-          path: "/admin/:logbookId",
-          element: <Admin />,
+          children: [
+            {
+              path: "logbooks",
+              element: <AdminLogbooks />,
+            },
+            {
+              path: "logbooks/:logbookId",
+              element: <AdminLogbooks />,
+            },
+            {
+              path: "users",
+              element: <AdminUsers />,
+            },
+            {
+              path: "users/:userId",
+              element: <AdminUsers />,
+            },
+
+            {
+              path: "groups",
+              element: <AdminGroups />,
+            },
+            {
+              path: "groups/:groupId",
+              element: <AdminGroups />,
+            },
+            {
+              path: "applications",
+              element: <AdminApplications />,
+            },
+            {
+              path: "applications/:applicationId",
+              element: <AdminApplications />,
+            },
+          ],
         },
         {
           path: "/",
           element: <Home />,
-          errorElement: <ErrorBoundary />,
           children: [
             {
               path: ":entryId/supersede",
@@ -89,7 +123,7 @@ const router = createBrowserRouter(
       ],
     },
   ],
-  { basename: "/elog" }
+  { basename: "/elog" },
 );
 
 window.addEventListener("unhandledrejection", (e) => {
@@ -104,5 +138,5 @@ ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
       <RouterProvider router={router} />
       <ToastContainer hideProgressBar={true} />
     </QueryClientProvider>
-  </React.StrictMode>
+  </React.StrictMode>,
 );

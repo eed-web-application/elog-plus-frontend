@@ -17,6 +17,9 @@ import EntryListGrouped from "../components/EntryListGrouped";
 import serializeParams, { ParamsObject } from "../utils/serializeParams";
 import SideSheet from "../components/SideSheet";
 
+// Import Sidebar from your local UI library
+// import Sidebar from "../../node_modules/ui/lib/Sidebar"; // Adjust the path as per your project structure
+
 const DEFAULT_QUERY: EntryQuery = {
   logbooks: [],
   tags: [],
@@ -51,11 +54,8 @@ function deserializeQuery(params: URLSearchParams): EntryQuery {
 export default function Home() {
   const isSmallScreen = useIsSmallScreen();
   const [searchParams, setSearchParams] = useSearchParams();
-  // Although the spotlight state in stored in the location state,
-  // this is used if the spotlighted entry is not loaded and thus needs to be
-  // fetched.
   const [spotlightSearch, setSpotlightSearch] = useState<string | undefined>(
-    undefined
+    undefined,
   );
   const query = useMemo(() => deserializeQuery(searchParams), [searchParams]);
   const location = useLocation();
@@ -68,7 +68,7 @@ export default function Home() {
         state: preserveState ? location.state : undefined,
       });
     },
-    [location.state, setSearchParams]
+    [location.state, setSearchParams],
   );
 
   const { isLoading, entries, getMoreEntries, reachedBottom } = useEntries({
@@ -78,26 +78,16 @@ export default function Home() {
 
   const spotlight = location.state?.spotlight;
 
-  // This is used when the user uses spotlight but the spotlighted entry is not
-  // already loaded. When this happens, we go into a state of "spotlight search"
-  // where this function is then used to back into the normal state.
   const backToTop = useCallback(() => {
     setSpotlightSearch(undefined);
-    // Delete state
     navigate({ search: window.location.search }, { replace: true });
   }, [navigate]);
 
-  // Ensure the spotlighted element is loaded and if not set, setSpotlightSearch
-  // to spotlight
   useEffect(() => {
     if (
       spotlightSearch !== spotlight &&
       entries !== undefined &&
       !entries.some((entry) => entry.id === spotlight) &&
-      // `spotlight` must truthy because if the user goes into spotlight search,
-      // then clicks the spotlight is removed (either by clicking on an entry
-      // or any other means of navigation), we want to stay in the spotlight
-      // search state.
       spotlight
     ) {
       setSpotlightSearch(spotlight);
@@ -126,8 +116,7 @@ export default function Home() {
       <div
         className={twJoin(
           "p-3 shadow z-10 relative",
-          // Padding for the absolutely positioned info button
-          !isSmallScreen && "px-12"
+          !isSmallScreen && "px-12",
         )}
       >
         <div className="container m-auto">
@@ -136,12 +125,11 @@ export default function Home() {
             search={query.search}
             onSearchChange={onSearchChange}
           />
-
           <InfoDialogButton />
           <Filters filters={query} setFilters={onFiltersChange} />
         </div>
       </div>
-
+      {/* <Sidebar />  */}
       <SideSheet sheetBody={outlet}>
         <EntryListGrouped
           containerClassName="min-w-[384px] flex-1"

@@ -60,7 +60,7 @@ export function useResizeObserver(observe: HTMLElement | null) {
       removeListener: (listener: () => void) => {
         const pair = Object.entries(listenersRef.current).find(
           // eslint-disable-next-line @typescript-eslint/no-unused-vars
-          ([_, otherListener]) => otherListener === listener
+          ([_, otherListener]) => otherListener === listener,
         );
 
         if (pair !== undefined) {
@@ -69,14 +69,14 @@ export function useResizeObserver(observe: HTMLElement | null) {
       },
       triggerResize,
     }),
-    [triggerResize]
+    [triggerResize],
   );
 
   return useCallback(
     (props: PropsWithChildren<unknown>) => (
       <ResizeManagerContext.Provider {...props} value={value} />
     ),
-    [value]
+    [value],
   );
 }
 
@@ -88,7 +88,7 @@ export function useResizeObserver(observe: HTMLElement | null) {
 export function useOnResize(
   listener: () => void,
   observe?: HTMLElement,
-  key?: string
+  key?: string,
 ) {
   const context = useContext(ResizeManagerContext);
 

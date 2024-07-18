@@ -11,7 +11,7 @@ export async function fetchTags(
     logbooks,
   }: {
     logbooks: string[];
-  } = { logbooks: [] }
+  } = { logbooks: [] },
 ): Promise<Tag[]> {
   return fetch("v1/tags", {
     params: {
@@ -22,7 +22,7 @@ export async function fetchTags(
 
 export async function createTag(
   logbookId: string,
-  name: string
+  name: string,
 ): Promise<string> {
   return fetch(`v1/logbooks/${logbookId}/tags`, {
     method: "POST",

@@ -31,7 +31,7 @@ export default function EntryFigureList({
   ...rest
 }: Props) {
   const figures = attachments.filter(
-    (attachment) => attachment.previewState === "Completed"
+    (attachment) => attachment.previewState === "Completed",
   );
   const [viewingFigure, setViewingFigure] = useState<string | null>(null);
 
@@ -92,15 +92,15 @@ export default function EntryFigureList({
             onClick={() => setViewingFigure(figure.id)}
             className={twJoin(
               "cursor-pointer w-full",
-              isLoaded ? "block" : "hidden"
+              isLoaded ? "block" : "hidden",
             )}
             onLoad={() => setIsLoaded(true)}
           />
-          {!isLoaded && <Spinner className="w-full my-3" />}
+          {!isLoaded && <Spinner className="my-3 w-full" />}
         </div>
       );
     },
-    [getReferenceProps]
+    [getReferenceProps],
   );
 
   return (
@@ -109,7 +109,7 @@ export default function EntryFigureList({
         <div
           className={twJoin(
             "flex flex-col",
-            figures.length > 1 ? "basis-1/2" : "flex-1"
+            figures.length > 1 ? "basis-1/2" : "flex-1",
           )}
         >
           {figures
@@ -135,7 +135,7 @@ export default function EntryFigureList({
             lockScroll
             className={twMerge(
               BackDrop,
-              "z-10 flex justify-center items-center"
+              "z-10 flex justify-center items-center",
             )}
           >
             <FloatingFocusManager context={context}>
@@ -148,7 +148,7 @@ export default function EntryFigureList({
                   stroke="currentColor"
                   className={twMerge(
                     IconButton,
-                    "absolute top-0 left-0 m-3 !w-10 !h-10 !p-1 bg-gray-700 hover:bg-gray-600 text-gray-200 ring-blue-50"
+                    "absolute top-0 left-0 m-3 !w-10 !h-10 !p-1 bg-gray-700 hover:bg-gray-600 text-gray-200 ring-blue-50",
                   )}
                   tabIndex={0}
                   onClick={() => setViewingFigure(null)}

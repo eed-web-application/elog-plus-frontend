@@ -7,7 +7,7 @@ export default function useReferences(
   {
     critical = true,
     onError,
-  }: { critical?: boolean; onError?: () => void } = {}
+  }: { critical?: boolean; onError?: () => void } = {},
 ) {
   const { data } = useQuery({
     // Not nesting (e.g., ["entry", "references", ...]) because this data is

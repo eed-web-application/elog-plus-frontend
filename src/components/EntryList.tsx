@@ -1,5 +1,5 @@
 import { useRef } from "react";
-import { Entry} from "../api";
+import { Entry } from "../api";
 import EntryRow, { Props as EntryRowProps } from "./EntryRow";
 import Spinner from "./Spinner";
 import { useResizeObserver } from "../hooks/useOnResize";
@@ -37,7 +37,7 @@ export default function EntryList({
   const Observer = useResizeObserver(ref.current);
 
   if (isLoading) {
-    return <Spinner large className="mx-auto my-4" />;
+    return <Spinner large className="my-4 mx-auto" />;
   }
 
   if (entries.length === 0) {
@@ -46,7 +46,7 @@ export default function EntryList({
 
   return (
     <Observer>
-      <div className="rounded-lg border mb-2 overflow-hidden" ref={ref}>
+      <div className="overflow-hidden mb-2 rounded-lg border" ref={ref}>
         {entries.map((entry, index) => (
           <EntryRow
             key={entry.id}

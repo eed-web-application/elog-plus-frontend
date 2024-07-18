@@ -6,110 +6,60 @@ import {
   ServerError,
   Shift,
   updateLogbook,
-  AuthorizationType,
   LogbookWithAuth,
+  Permission,
 } from "../api";
 import { Button, IconButton, Input, InputInvalid } from "./base";
-import { useLogbookFormsStore } from "../logbookFormsStore";
+import {
+  useLogbookFormsStore,
+  validateLogbookForm,
+} from "../logbookFormsStore";
 import { localToUtc, utcToLocal } from "../utils/datetimeConversion";
 import reportServerError from "../reportServerError";
-import Select from "./Select";
-// import useGroups from "../hooks/useGroups";
 import useUsers from "../hooks/useUsers";
+import useGroups from "../hooks/useGroups";
+import useApplications from "../hooks/useApplications";
+import AdminAuthorizationForm from "./AdminAuthorizationForm";
+import { saveAuthorizations } from "../authorizationDiffing";
 
 interface Props {
   logbook: LogbookWithAuth;
   onSave: () => void;
 }
 
-const DEFAULT_AUTHORIZATION: AuthorizationType = "Read";
+const DEFAULT_PERMISSION: Permission = "Read";
 
 let idCounter = 0;
 
 export default function LogbookForm({ logbook, onSave }: Props) {
-  const [form, setForm, removeForm] = useLogbookFormsStore((state) =>
-    state.startEditing(logbook)
+  const { form, setForm, finishEditing } = useLogbookFormsStore((state) =>
+    state.startEditing(logbook),
   );
   const queryClient = useQueryClient();
 
   const [newTag, setNewTag] = useState<string>("");
   const [newShift, setNewShift] = useState<string>("");
-  // const [newGroupAuthorization, setNewGroupAuthorization] = useState<
-  //   string | null
-  // >(null);
-  const [newUserAuthorization, setNewUserAuthorizations] = useState<
-    string | null
-  >(null);
-  // const [groupSearch, setGroupSearch] = useState("");
+
   const [userSearch, setUserSearch] = useState("");
+  const [groupSearch, setGroupSearch] = useState("");
+  const [applicationSearch, setApplicationSearch] = useState("");
 
-  // const { groups, isLoading: isGroupsLoading } = useGroups({
-  //   search: groupSearch,
-  // });
   const { users, isLoading: isUsersLoading } = useUsers({ search: userSearch });
+  const { groups, isLoading: isGroupsLoading } = useGroups({
+    search: groupSearch,
+  });
+  const { applications, isLoading: isApplicationsLoading } = useApplications({
+    search: applicationSearch,
+  });
 
-  const validators = {
-    name: () => Boolean(form.name),
-  };
+  const invalid = validateLogbookForm(form);
 
-  const shiftValidators = {
-    shiftName: (id: string) =>
-      Boolean(form.shifts.find((shift) => shift.id === id)?.name),
-    shiftFrom: (id: string) =>
-      Boolean(form.shifts.find((shift) => shift.id === id)?.from),
-    shiftTo: (id: string) =>
-      Boolean(form.shifts.find((shift) => shift.id === id)?.to),
-  };
-
-  type Ident =
-    | keyof typeof validators
-    | `${keyof typeof shiftValidators}/${string}`;
-
-  const [invalid, setInvalid] = useState<Ident[]>([]);
-
-  function onValidate(valid: boolean, field: Ident): boolean {
-    if (valid) {
-      setInvalid((invalid) =>
-        invalid.filter((invalidField) => invalidField !== field)
-      );
-      return true;
-    }
-
-    if (!invalid.includes(field)) {
-      setInvalid((invalid) => [...invalid, field]);
-    }
-    return false;
-  }
-
-  async function save() {
-    let invalid = false;
-    for (const field in validators) {
-      if (
-        !onValidate(
-          validators[field as keyof typeof validators](),
-          field as Ident
-        )
-      ) {
-        invalid = true;
-      }
-    }
-    for (const shift of form.shifts) {
-      for (const field in shiftValidators) {
-        if (
-          !onValidate(
-            shiftValidators[field as keyof typeof shiftValidators](shift.id),
-            `${field}/${shift.id}` as Ident
-          )
-        ) {
-          invalid = true;
-        }
-      }
-    }
-    if (invalid) {
+  async function saveLogbook() {
+    if (invalid.size > 0) {
       return;
     }
 
-    // Covers the case whree a user deletes a tag and creates a new one with
+    // Covers the case where a user deletes a tag and creates a new one with
     // the same name
     const resolvedTags = form.tags.map((tag) => {
       if (tag.id) {
@@ -119,23 +69,10 @@ export default function LogbookForm({ logbook, onSave }: Props) {
       return logbook.tags.find(({ name }) => name === tag.name) || tag;
     });
 
-    const resolvedAuthorization = form.authorizations.map((authorization) => {
-      if (authorization.id) {
-        return authorization;
-      }
-
-      return (
-        logbook.authorizations.find(
-          ({ owner }) => owner === authorization.owner
-        ) || authorization
-      );
-    });
-
     const logbookUpdation: LogbookUpdation = {
       id: form.id,
       name: form.name,
       tags: resolvedTags,
-      authorization: resolvedAuthorization,
       // Remove temp ids
       shifts: form.shifts.map(({ id, ...shift }) => ({
         ...(shift as Shift),
@@ -152,17 +89,24 @@ export default function LogbookForm({ logbook, onSave }: Props) {
           Array.isArray(queryKey[1]) &&
           (queryKey[1].includes(logbook.name) || queryKey[1].length === 0),
       });
-
-      await queryClient.invalidateQueries({ queryKey: ["logbooks"] });
-
-      removeForm();
-      onSave();
     } catch (e) {
       if (!(e instanceof ServerError)) {
         throw e;
       }
       reportServerError("Could not save logbook", e);
     }
+  }
+
+  async function save() {
+    await Promise.all([
+      saveLogbook(),
+      saveAuthorizations(logbook.authorizations, form.authorizations),
+    ]);
+
+    await queryClient.invalidateQueries({ queryKey: ["logbooks"] });
+
+    finishEditing();
+    onSave();
   }
 
   function createTag(e: FormEvent<HTMLFormElement>) {
@@ -187,45 +131,6 @@ export default function LogbookForm({ logbook, onSave }: Props) {
     });
   }
 
-  // function createGroupAuthorization(e: FormEvent<HTMLFormElement>) {
-  //   e.preventDefault();
-  //
-  //   if (!newGroupAuthorization) {
-  //     return;
-  //   }
-  //
-  //   setNewGroupAuthorization(null);
-  //   setForm({
-  //     ...form,
-  //     authorizations: [
-  //       ...form.authorizations,
-  //       // FIXME
-  //       // { group: newGroupAuthorization, authorizations: DEFAULT_authorizations },
-  //     ],
-  //   });
-  // }
-
-  function createUserAuthorization(e: FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-
-    if (!newUserAuthorization) {
-      return;
-    }
-
-    setNewUserAuthorizations(null);
-    setForm({
-      ...form,
-      authorizations: [
-        ...form.authorizations,
-        {
-          owner: newUserAuthorization,
-          authorizationType: DEFAULT_AUTHORIZATION,
-          ownerType: "User",
-        },
-      ],
-    });
-  }
-
   function removeTag(index: number) {
     const newTags = [...form.tags];
     newTags.splice(index, 1);
@@ -240,11 +145,73 @@ export default function LogbookForm({ logbook, onSave }: Props) {
     setForm({ ...form, shifts: newShifts });
   }
 
-  function removeAuthorization(index: number) {
-    const newAuthorizations = [...form.authorizations];
-    newAuthorizations.splice(index, 1);
+  function updateAuthorizationPermission(
+    ownerId: string,
+    permission: Permission,
+  ) {
+    setForm({
+      ...form,
+      authorizations: form.authorizations.map((otherAuthorization) =>
+        otherAuthorization.ownerId === ownerId
+          ? { ...otherAuthorization, permission }
+          : otherAuthorization,
+      ),
+    });
+  }
 
-    setForm({ ...form, authorizations: newAuthorizations });
+  function removeAuthorization(ownerId: string) {
+    setForm({
+      ...form,
+      authorizations: form.authorizations.filter(
+        (otherAuthorization) => otherAuthorization.ownerId !== ownerId,
+      ),
+    });
+  }
+
+  function createAuthorization(
+    ownerType: "User" | "Group" | "Application",
+    ownerId: string,
+  ) {
+    let ownerLabel: string | undefined;
+
+    if (ownerType === "User") {
+      ownerLabel = users?.find((user) => user.email === ownerId)?.name;
+    } else if (ownerType === "Group") {
+      ownerLabel = groups?.find((group) => group.id === ownerId)?.name;
+    } else {
+      ownerLabel = applications?.find(
+        (application) => application.id === ownerId,
+      )?.name;
+    }
+
+    // Should probably never happen, but we still want to catch it, because
+    // if this throws something else is wrong.
+    if (!ownerLabel) {
+      throw new Error("Could not find label for new authorization");
+    }
+
+    // If the user deletes an authorization and then creates a new one with the
+    // same owner, we want to keep the ID so we don't create a new one.
+    const existingAuthorization = logbook.authorizations.find(
+      (authorization) => authorization.ownerId === ownerId,
+    );
+
+    setForm({
+      ...form,
+      authorizations: [
+        ...form.authorizations,
+        {
+          id: existingAuthorization?.id,
+          permission: DEFAULT_PERMISSION,
+          ownerId,
+          ownerType,
+          ownerLabel,
+          resourceId: form.id,
+          resourceType: "Logbook",
+          resouceLabel: form.name,
+        },
+      ],
+    });
   }
 
   function changeShiftName(index: number, name: string) {
@@ -257,17 +224,10 @@ export default function LogbookForm({ logbook, onSave }: Props) {
     });
   }
 
-  const userAuthorizations = form.authorizations;
-  // FIXME
-  // const groupAuthorizations = [];
-  // const groupAuthorizations = form.authorizations.filter(
-  //   (authorization) => "group" in authorization
-  // ) as GroupAuthorization[];
-
-  const updated = JSON.stringify(form) === JSON.stringify(logbook);
+  const updated = JSON.stringify(form) !== JSON.stringify(logbook);
 
   return (
-    <div className="px-3 pb-3">
+    <div className="p-3">
       <label className="block mb-2 text-gray-500">
         Name
         <input
@@ -275,12 +235,11 @@ export default function LogbookForm({ logbook, onSave }: Props) {
           type="text"
           className={twMerge(
             Input,
-            invalid.includes("name") && InputInvalid,
-            "block w-full"
+            invalid.has("name") && InputInvalid,
+            "block w-full",
           )}
           value={form.name}
           onChange={(e) => setForm({ ...form, name: e.target.value })}
-          onBlur={() => onValidate(validators.name(), "name")}
         />
       </label>
       <div className="text-gray-500">Tags</div>
@@ -288,7 +247,7 @@ export default function LogbookForm({ logbook, onSave }: Props) {
         className={twJoin(
           "mb-2 border rounded-lg bg-gray-50 w-full flex flex-col p-2",
           form.tags.length === 0 &&
-            "items-center justify-center text-lg text-gray-500"
+          "items-center justify-center text-lg text-gray-500",
         )}
       >
         {form.tags.length === 0 ? (
@@ -357,7 +316,7 @@ export default function LogbookForm({ logbook, onSave }: Props) {
         className={twJoin(
           "border mb-2 rounded-lg bg-gray-50 w-full flex flex-col p-2",
           form.shifts.length === 0 &&
-            "items-center justify-center text-lg text-gray-500"
+          "items-center justify-center text-lg text-gray-500",
         )}
       >
         {form.shifts.length === 0 ? (
@@ -374,27 +333,20 @@ export default function LogbookForm({ logbook, onSave }: Props) {
                     type="text"
                     className={twMerge(
                       Input,
-                      invalid.includes(`shiftName/${shift.id}`) && InputInvalid,
-                      "flex-1 min-w-0"
+                      invalid.has(`shiftName/${shift.id}`) && InputInvalid,
+                      "flex-1 min-w-0",
                     )}
                     value={shift.name}
                     onChange={(e) =>
                       changeShiftName(index, e.currentTarget.value)
-                    }
-                    onBlur={() =>
-                      onValidate(
-                        shiftValidators.shiftName(shift.id),
-                        `shiftName/${shift.id}`
-                      )
                     }
                   />
                   <div className="flex gap-2 items-center self-end">
                     <input
                       className={twMerge(
                         Input,
-                        invalid.includes(`shiftFrom/${shift.id}`) &&
-                          InputInvalid,
-                        "w-32"
+                        invalid.has(`shiftFrom/${shift.id}`) && InputInvalid,
+                        "w-32",
                       )}
                       type="time"
                       value={
@@ -412,19 +364,13 @@ export default function LogbookForm({ logbook, onSave }: Props) {
                         };
                         setForm({ ...form, shifts: updatedShifts });
                       }}
-                      onBlur={() =>
-                        onValidate(
-                          shiftValidators.shiftFrom(shift.id),
-                          `shiftFrom/${shift.id}`
-                        )
-                      }
                     />
                     <div className="text-gray-500">to</div>
                     <input
                       className={twMerge(
                         Input,
-                        invalid.includes(`shiftTo/${shift.id}`) && InputInvalid,
-                        "w-32"
+                        invalid.has(`shiftTo/${shift.id}`) && InputInvalid,
+                        "w-32",
                       )}
                       type="time"
                       value={
@@ -442,12 +388,6 @@ export default function LogbookForm({ logbook, onSave }: Props) {
                         };
                         setForm({ ...form, shifts: updatedShifts });
                       }}
-                      onBlur={() =>
-                        onValidate(
-                          shiftValidators.shiftTo(shift.id),
-                          `shiftTo/${shift.id}`
-                        )
-                      }
                     />
                   </div>
                   <svg
@@ -503,247 +443,95 @@ export default function LogbookForm({ logbook, onSave }: Props) {
           </button>
         </form>
       </div>
-      {/*
-      <div className="text-gray-500">Group Authorizations</div>
-      <div
-        className={twJoin(
-          "border rounded-lg bg-gray-50 w-full flex flex-col p-2 mb-2",
-          groupAuthorizations.length === 0 &&
-            "items-center justify-center text-lg text-gray-500"
-        )}
-      >
-        {groupAuthorizations.length === 0 ? (
-          <div className="my-3">No authorizations. Create one below.</div>
-        ) : (
-          <>
-            <div className="divide-y">
-              {groupAuthorizations.map((authorization) => (
-                <div
-                  key={authorization.group}
-                  className="flex justify-between items-center py-1 px-2"
-                >
-                  <div className="flex-grow">{authorization.group}</div>
 
-                  <Select
-                    className="w-32"
-                    value={
-                      authorization.authorizations.write ? "Write" : "Read"
-                    }
-                    options={["Write", "Read"]}
-                    setValue={(updatedAuthorization) => {
-                      const updatedAuthorizations = [...form.authorizations];
-                      const index = form.authorizations.findIndex(
-                        (otherAuthorization) =>
-                          otherAuthorization === authorization
-                      );
-
-                      updatedAuthorizations[index] = {
-                        ...updatedAuthorizations[index],
-                        authorizations:
-                          updatedAuthorization === "Write"
-                            ? { write: true, read: true }
-                            : { write: false, read: true },
-                      };
-                      setForm({
-                        ...form,
-                        authorizations: updatedAuthorizations,
-                      });
-                    }}
-                    nonsearchable
-                  />
-
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    strokeWidth="1.5"
-                    stroke="currentColor"
-                    tabIndex={0}
-                    className={twJoin(IconButton, "text-gray-500")}
-                    onClick={() =>
-                      removeAuthorization(
-                        form.authorizations.findIndex(
-                          (otherAuthorization) =>
-                            otherAuthorization === authorization
-                        )
-                      )
-                    }
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M6 18L18 6M6 6l12 12"
-                    />
-                  </svg>
-                </div>
-              ))}
-            </div>
-          </>
-        )}
-        <form
-          noValidate
-          className="relative mt-2 w-full"
-          onSubmit={createGroupAuthorization}
-        >
-          <Select
-            className="pr-12 w-full"
-            value={newGroupAuthorization}
-            onSearchChange={setGroupSearch}
-            isLoading={isGroupsLoading}
-            options={(groups || [])
-              .filter(
-                (group) =>
-                  !groupAuthorizations.some(
-                    (authorization) => authorization.group === group.commonName
-                  )
-              )
-              .map((group) => group.commonName)}
-            setValue={setNewGroupAuthorization}
-          />
-          <button
-            type="submit"
-            className="flex absolute top-0 right-0 bottom-0 justify-center items-center p-2.5 text-white bg-blue-500 rounded-r-lg disabled:text-gray-100 disabled:bg-blue-300"
-            disabled={!newGroupAuthorization}
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={1.5}
-              stroke="currentColor"
-              className="w-5 h-5"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M12 4.5v15m7.5-7.5h-15"
-              />
-            </svg>
-          </button>
-        </form>
-      </div> */}
       <div className="text-gray-500">User Authorizations</div>
-      <div
-        className={twJoin(
-          "border rounded-lg bg-gray-50 w-full flex flex-col p-2",
-          userAuthorizations.length === 0 &&
-            "items-center justify-center text-lg text-gray-500"
-        )}
-      >
-        {userAuthorizations.length === 0 ? (
-          <div className="my-3">No user authorizations. Create one below.</div>
-        ) : (
-          <>
-            <div className="divide-y">
-              {userAuthorizations.map((authorization) => (
-                <div
-                  key={authorization.owner}
-                  className="flex justify-between items-center py-1 px-2"
-                >
-                  <div className="flex-grow">{authorization.owner}</div>
+      <AdminAuthorizationForm
+        authorizations={form.authorizations
+          .filter((authorization) => authorization.ownerType === "User")
+          .map((authorization) => ({
+            label: authorization.ownerLabel,
+            value: authorization.ownerId,
+            permission: authorization.permission,
+          }))}
+        emptyLabel="No user authorizations. Create one below."
+        options={(users || [])
+          .filter(
+            (user) =>
+              !form.authorizations.some(
+                (authorization) =>
+                  authorization.ownerType === "User" &&
+                  authorization.ownerId === user.email,
+              ),
+          )
+          .map((user) => ({ label: user.name, value: user.email }))}
+        isOptionsLoading={isUsersLoading}
+        setOptionsSearch={setUserSearch}
+        updatePermission={updateAuthorizationPermission}
+        removeAuthorization={removeAuthorization}
+        createAuthorization={(ownerId) => createAuthorization("User", ownerId)}
+      />
 
-                  <Select
-                    className="w-32"
-                    value={authorization.authorizationType}
-                    options={["Write", "Read"]}
-                    setValue={(updatedAuthorization) => {
-                      const updatedAuthorizations = [...form.authorizations];
-                      const index = form.authorizations.findIndex(
-                        (otherAuthorization) =>
-                          otherAuthorization === authorization
-                      );
+      <div className="mt-2 text-gray-500">Group Authorizations</div>
+      <AdminAuthorizationForm
+        authorizations={form.authorizations
+          .filter((authorization) => authorization.ownerType === "Group")
+          .map((authorization) => ({
+            label: authorization.ownerLabel,
+            value: authorization.ownerId,
+            permission: authorization.permission,
+          }))}
+        emptyLabel="No group authorizations. Create one below."
+        options={(groups || [])
+          .filter(
+            (group) =>
+              !form.authorizations.some(
+                (authorization) =>
+                  authorization.ownerType === "Group" &&
+                  authorization.ownerId === group.id,
+              ),
+          )
+          .map((group) => ({ label: group.name, value: group.id }))}
+        isOptionsLoading={isGroupsLoading}
+        setOptionsSearch={setGroupSearch}
+        updatePermission={updateAuthorizationPermission}
+        removeAuthorization={removeAuthorization}
+        createAuthorization={(ownerId) => createAuthorization("Group", ownerId)}
+      />
 
-                      if (
-                        updatedAuthorization !== "Read" &&
-                        updatedAuthorization !== "Write"
-                      ) {
-                        return;
-                      }
+      <div className="mt-2 text-gray-500">Applications</div>
+      <AdminAuthorizationForm
+        authorizations={form.authorizations
+          .filter((authorization) => authorization.ownerType === "Application")
+          .map((authorization) => ({
+            label: authorization.ownerId,
+            value: authorization.ownerId,
+            permission: authorization.permission,
+          }))}
+        emptyLabel="No application authorizations. Create one below."
+        options={(applications || [])
+          .filter(
+            (application) =>
+              !form.authorizations.some(
+                (authorization) =>
+                  authorization.ownerType === "Application" &&
+                  authorization.ownerId === application.id,
+              ),
+          )
+          .map((application) => ({
+            label: application.name,
+            value: application.id,
+          }))}
+        isOptionsLoading={isApplicationsLoading}
+        setOptionsSearch={setApplicationSearch}
+        updatePermission={updateAuthorizationPermission}
+        removeAuthorization={removeAuthorization}
+        createAuthorization={(ownerId) =>
+          createAuthorization("Application", ownerId)
+        }
+      />
 
-                      updatedAuthorizations[index] = {
-                        ...updatedAuthorizations[index],
-                        authorizationType: updatedAuthorization,
-                      };
-                      setForm({
-                        ...form,
-                        authorizations: updatedAuthorizations,
-                      });
-                    }}
-                    nonsearchable
-                  />
-
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    strokeWidth="1.5"
-                    stroke="currentColor"
-                    tabIndex={0}
-                    className={twJoin(IconButton, "text-gray-500")}
-                    onClick={() =>
-                      removeAuthorization(
-                        form.authorizations.findIndex(
-                          (otherAuthorization) =>
-                            otherAuthorization === authorization
-                        )
-                      )
-                    }
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M6 18L18 6M6 6l12 12"
-                    />
-                  </svg>
-                </div>
-              ))}
-            </div>
-          </>
-        )}
-        <form
-          noValidate
-          className="relative mt-2 w-full"
-          onSubmit={createUserAuthorization}
-        >
-          <Select
-            className="pr-12 w-full"
-            value={newUserAuthorization}
-            onSearchChange={setUserSearch}
-            isLoading={isUsersLoading}
-            options={(users || [])
-              .filter(
-                (user) =>
-                  !userAuthorizations.some(
-                    (authorization) => authorization.owner === user.mail
-                  )
-              )
-              .map((user) => ({ label: user.gecos, value: user.mail }))}
-            setValue={setNewUserAuthorizations}
-          />
-          <button
-            type="submit"
-            className="flex absolute top-0 right-0 bottom-0 justify-center items-center p-2.5 text-white bg-blue-500 rounded-r-lg disabled:text-gray-100 disabled:bg-blue-300"
-            disabled={!newUserAuthorization}
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={1.5}
-              stroke="currentColor"
-              className="w-5 h-5"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M12 4.5v15m7.5-7.5h-15"
-              />
-            </svg>
-          </button>
-        </form>
-      </div>
       <button
-        disabled={updated}
+        disabled={!updated}
         className={twJoin(Button, "block ml-auto mt-3")}
         onClick={save}
       >

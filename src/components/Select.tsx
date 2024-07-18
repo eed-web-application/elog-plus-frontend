@@ -55,21 +55,22 @@ export default function Select<O extends Option>({
       setSearch(search);
       onSearchChange?.(search);
     },
-    [setSearch, onSearchChange]
+    [setSearch, onSearchChange],
   );
 
   const filteredOptions = search
     ? options.filter((option) =>
-        (typeof option === "string" ? option : option.label)
-          .toLowerCase()
-          .includes(search)
-      )
+      (typeof option === "string" ? option : option.label)
+        .toLowerCase()
+        .includes(search),
+    )
     : options;
 
   let valuesLabel: string | undefined;
   if (value) {
     const option = options.find(
-      (option) => (typeof option === "string" ? option : option.value) === value
+      (option) =>
+        (typeof option === "string" ? option : option.value) === value,
     );
     valuesLabel = typeof option === "string" ? option : option?.label;
   }
@@ -123,7 +124,7 @@ export default function Select<O extends Option>({
       updateSearch("");
       setOpen(false);
     },
-    [setValue, updateSearch]
+    [setValue, updateSearch],
   );
 
   function onInputKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
@@ -170,7 +171,7 @@ export default function Select<O extends Option>({
           Input,
           disabled && InputDisabled,
           "absolute flex left-0 right-0 bottom-0 top-0 bg-transparent border-transparent pointer-events-none",
-          className
+          className,
         )}
       >
         {value && !search ? valuesLabel : ""}
@@ -181,7 +182,7 @@ export default function Select<O extends Option>({
           viewBox="0 0 24 24"
           strokeWidth="1.5"
           stroke="currentColor"
-          className="cursor-pointer self-end ml-auto w-6 h-6 text-gray-500"
+          className="self-end ml-auto w-6 h-6 text-gray-500 cursor-pointer"
         >
           <path
             strokeLinecap="round"
@@ -203,7 +204,7 @@ export default function Select<O extends Option>({
                 style: floatingStyles,
                 className:
                   "max-h-64 overflow-y-auto rounded-lg shadow text-black bg-white z-10",
-              })
+              }),
             )}
           >
             {filteredOptions.map((option, index) => (

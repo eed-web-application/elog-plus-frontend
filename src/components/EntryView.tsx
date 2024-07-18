@@ -21,14 +21,14 @@ export interface Props {
 // Detailed view of an entry with acitons such as supersede and follow up.
 export default function EntryView({ entry }: Props) {
   const attachments = entry.attachments.filter(
-    (attachment) => attachment.previewState !== "Completed"
+    (attachment) => attachment.previewState !== "Completed",
   );
 
   const spotlightProps = useSpotlightProps(entry.id);
   const tagNames = useDisplayTags(entry.tags, entry.logbooks.length);
 
   const references = useReferences(
-    entry.referencesInBody ? undefined : entry.id
+    entry.referencesInBody ? undefined : entry.id,
   );
 
   return (
@@ -110,7 +110,7 @@ export default function EntryView({ entry }: Props) {
               : entry.shifts
                   .map(
                     ({ name, logbook }) =>
-                      `${logbook.name.toUpperCase()}:${name}`
+                      `${logbook.name.toUpperCase()}:${name}`,
                   )
                   .join(", ")}
           </div>

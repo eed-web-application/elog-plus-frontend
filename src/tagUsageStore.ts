@@ -53,11 +53,11 @@ export const useTagUsageStore = create(
 
           return Object.fromEntries(
             Object.entries(value as Record<string, string>).map(
-              ([tag, lastUsed]) => [tag, new Date(lastUsed)]
-            )
+              ([tag, lastUsed]) => [tag, new Date(lastUsed)],
+            ),
           );
         },
       }),
-    }
-  )
+    },
+  ),
 );

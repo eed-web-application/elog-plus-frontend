@@ -40,17 +40,17 @@ export default function SideSheet({
       document.addEventListener("mousemove", mouseMoveHandler);
       document.addEventListener("mouseup", endDrag);
     },
-    [mouseMoveHandler, endDrag]
+    [mouseMoveHandler, endDrag],
   );
 
   return (
-    <div className="flex-1 flex overflow-hidden" {...rest}>
+    <div className="flex overflow-hidden flex-1" {...rest}>
       {children}
       {sheetBody && (
         <>
           {!isSmallScreen && (
             <div
-              className="relative border-r cursor-col-resize select-text"
+              className="relative border-r select-text cursor-col-resize"
               onMouseDown={startDrag}
             >
               {/* We specifically want the handle/gutter to lean more right 
@@ -62,7 +62,7 @@ export default function SideSheet({
           <Pane
             className={twJoin(
               "overflow-y-auto pb-3 basis-1/2 ",
-              !isSmallScreen && "min-w-[384px]"
+              !isSmallScreen && "min-w-[384px]",
             )}
             home={home}
             ref={sheetRef}

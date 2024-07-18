@@ -36,8 +36,8 @@ export default function LogbookForm({
         setValue={(logbooks) =>
           onChange(
             logbooks.filter(
-              (logbook) => typeof logbook === "string"
-            ) as string[]
+              (logbook) => typeof logbook === "string",
+            ) as string[],
           )
         }
         invalid={invalid}

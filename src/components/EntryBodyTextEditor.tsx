@@ -32,7 +32,7 @@ function MenuButton({
         "rounded text-black p-1 hover:bg-gray-100",
         disabled && "text-gray-400 hover:bg-transparent",
         active && "bg-blue-500 hover:bg-blue-600 text-white",
-        className
+        className,
       )}
       type="button"
       // Don't want to lose focus
@@ -121,7 +121,7 @@ function MenuBar({ editor }: { editor: Editor | null }) {
   }
 
   return (
-    <div className="flex flex-wrap border rounded-t-lg divide-x py-2">
+    <div className="flex flex-wrap py-2 rounded-t-lg border divide-x">
       <MenuButtonGroup>
         <MenuButton
           onClick={() => editor.chain().focus().undo().run()}
@@ -422,7 +422,7 @@ export default function EntryBodyTextEditor({
       attributes: {
         class: twMerge(
           Input,
-          "prose focus:ring-0 rounded-t-none border-t-transparent max-w-none"
+          "prose focus:ring-0 rounded-t-none border-t-transparent max-w-none",
         ),
       },
     },

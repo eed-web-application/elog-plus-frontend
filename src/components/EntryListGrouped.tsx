@@ -50,7 +50,7 @@ const EntryListGrouped = forwardRef<HTMLDivElement, Props>(
       onBackToTop,
       ...rest
     },
-    ref
+    ref,
   ) {
     const [prevSpotlight, setPrevSpotlight] = useState<string | null>(null);
     const parentRef = useRef<HTMLDivElement | null>(null);
@@ -65,7 +65,7 @@ const EntryListGrouped = forwardRef<HTMLDivElement, Props>(
         const header = EntryListHeader.getHeaderKey(
           logbooksIncluded,
           entry,
-          dateBasedOn
+          dateBasedOn,
         );
 
         if (header !== currentHeader) {
@@ -113,7 +113,7 @@ const EntryListGrouped = forwardRef<HTMLDivElement, Props>(
 
           return indices;
         },
-        [headerIndices]
+        [headerIndices],
       ),
       paddingStart: showBackToTopButton ? 50 : 0,
     });
@@ -155,7 +155,7 @@ const EntryListGrouped = forwardRef<HTMLDivElement, Props>(
         <div
           className={twMerge(
             "text-gray-500 text-center pt-6 text-lg",
-            containerClassName
+            containerClassName,
           )}
         >
           {emptyLabel}
@@ -176,10 +176,10 @@ const EntryListGrouped = forwardRef<HTMLDivElement, Props>(
             groups.push(
               <div
                 key={currentGroup[0].key}
-                className="rounded-lg border mx-3 overflow-clip mt-3"
+                className="mx-3 mt-3 rounded-lg border overflow-clip"
               >
                 {currentGroup}
-              </div>
+              </div>,
             );
           }
 
@@ -192,7 +192,7 @@ const EntryListGrouped = forwardRef<HTMLDivElement, Props>(
               className="sticky z-20"
               style={{
                 top: `${Math.floor(
-                  -virtualItems[1].start + virtualItems[0].size
+                  -virtualItems[1].start + virtualItems[0].size,
                 )}px`,
               }}
               logbooksIncluded={logbooksIncluded}
@@ -215,7 +215,7 @@ const EntryListGrouped = forwardRef<HTMLDivElement, Props>(
             selected={entry.id === selected}
             dateBasedOn={dateBasedOn}
             {...rest}
-          />
+          />,
         );
 
         return groups;
@@ -225,10 +225,10 @@ const EntryListGrouped = forwardRef<HTMLDivElement, Props>(
         groups.push(
           <div
             key={currentGroup[0].key}
-            className="rounded-lg border mx-3 overflow-clip mt-3"
+            className="mx-3 mt-3 rounded-lg border overflow-clip"
           >
             {currentGroup}
-          </div>
+          </div>,
         );
       }
     }
@@ -238,7 +238,7 @@ const EntryListGrouped = forwardRef<HTMLDivElement, Props>(
         <div
           className={twMerge(
             "overflow-x-auto h-full relative",
-            containerClassName
+            containerClassName,
           )}
           ref={mergedRef}
         >
@@ -251,7 +251,7 @@ const EntryListGrouped = forwardRef<HTMLDivElement, Props>(
                 {showBackToTopButton && (
                   <div
                     tabIndex={0}
-                    className="w-full h-9 bg-gradient-to-b from-gray-200 block font-medium text-gray-700 hover:underline text-center pt-3 absolute top-0 z-10 cursor-pointer -mt-3"
+                    className="block absolute top-0 z-10 pt-3 -mt-3 w-full h-9 font-medium text-center text-gray-700 bg-gradient-to-b from-gray-200 cursor-pointer hover:underline"
                     onClick={onBackToTop}
                   >
                     Back to top
@@ -277,7 +277,7 @@ const EntryListGrouped = forwardRef<HTMLDivElement, Props>(
         </div>
       </Observer>
     );
-  }
+  },
 );
 
 export default EntryListGrouped;
