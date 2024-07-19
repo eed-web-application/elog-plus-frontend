@@ -18,6 +18,7 @@ export default function DevSelectUser({ className }: { className?: string }) {
   ) {
     __SET_DEV_ACCESS_CODE(accessCode);
     callbackRef.current?.();
+    window.location.reload();
   }, []);
 
   const wrapper = () => {

@@ -1,46 +1,64 @@
 import { Link, useRouteError } from "react-router-dom";
 import { twJoin } from "tailwind-merge";
-import { NotFoundError } from "../api";
+import { NotFoundError, UnauthorizedError } from "../api";
 import { Link as LinkStyle } from "../components/base";
+import DevSelectUser from "../components/DevSelectUser";
+
+function NotFound() {
+  return <>
+    <div className="text-4xl">404</div>
+    <div className="text-xl">
+      {"Page not found"}
+    </div>
+    <Link to="/" className={twJoin(LinkStyle, "mt-4")}>
+      Home
+    </Link>
+  </>
+}
+
+function UnknownError() {
+  return <>
+    <div className="text-4xl">Uh oh 😕</div>
+    <div className="text-xl">
+      Something went wrong
+    </div>
+    <button
+      type="button"
+      className={twJoin(LinkStyle, "mt-4")}
+      onClick={() => window.location.reload()}
+    >
+      Refresh
+    </button>
+  </>
+}
+
+function DevSelect() {
+  return <>
+    <div className="text-4xl">Unauthorized</div>
+    <div className="text-xl mb-3">
+      Select user for use in Development</div>
+    <DevSelectUser />
+  </>;
+}
 
 export default function ErrorBoundary() {
   const routeError = useRouteError();
 
   const error = routeError;
 
-  let is404 = false;
+  let inner;
 
   if (error instanceof NotFoundError) {
-    is404 = true;
+    inner = <NotFound />;
+  } else if (import.meta.env.MODE === "development" && error instanceof UnauthorizedError) {
+    inner = <DevSelect />;
+  } else {
+    inner = <UnknownError />;
   }
 
   return (
     <div className="flex flex-col justify-center items-center w-screen h-screen">
-      <div className="text-4xl">{is404 ? "404" : "Uh oh 😕"}</div>
-      <div className="text-xl">
-        {is404 ? "Page not found" : "Something went wrong"}
-      </div>
-      {!is404 && (
-        <div className="mt-3 max-w-sm text-lg text-center text-gray-500">
-          There was an unrecoverable error. Please try refreshing the page. If
-          the issue persists, feel free to contact{" "}
-          <a href="mailto:boogie@slac.stanford.edu">boogie@slac.stanford.edu</a>
-          .
-        </div>
-      )}
-      {is404 ? (
-        <Link to="/" className={twJoin(LinkStyle, "mt-4")}>
-          Home
-        </Link>
-      ) : (
-        <button
-          type="button"
-          className={twJoin(LinkStyle, "mt-4")}
-          onClick={() => window.location.reload()}
-        >
-          Refresh
-        </button>
-      )}
+      {inner}
     </div>
   );
 }

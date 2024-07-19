@@ -21,11 +21,22 @@ import AdminLogbooks from "./routes/Admin/Logbooks.tsx";
 import AdminGroups from "./routes/Admin/Groups.tsx";
 import AdminUsers from "./routes/Admin/Users.tsx";
 import AdminApplications from "./routes/Admin/Applications.tsx";
-import { fetchEntry, ServerError } from "./api";
+import { fetchEntry, ServerError, UnauthorizedError } from "./api";
 import "./index.css";
 import reportServerError from "./reportServerError.tsx";
 
 const queryClient = new QueryClient();
+
+queryClient.setDefaultOptions({
+  queries: {
+    retry: (failureCount, error) => {
+      if (error instanceof UnauthorizedError) {
+        return false;
+      }
+      return failureCount < 3;
+    }
+  }
+});
 
 function entryLoader({ params }: { params: Params }) {
   if (params.entryId) {

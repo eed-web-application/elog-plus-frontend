@@ -24,6 +24,13 @@ export class InternalServerError extends ServerError {
   }
 }
 
+export class UnauthorizedError extends ServerError {
+  constructor(res: Response, context?: ErrorContext) {
+    super("Unauthorized", res, context);
+    this.name = "UnauthorizedError";
+  }
+}
+
 export class NotFoundError extends ServerError {
   constructor(res: Response, context?: ErrorContext) {
     super("Could not find resource", res, context);
@@ -64,9 +71,7 @@ export async function fetch(
     ...restOptions
   }: FetchOptions = {},
 ) {
-  if (body) {
-    headers["content-type"] = "application/json";
-  }
+  headers["content-type"] = "application/json";
 
   if (import.meta.env.MODE === "development" && __GET_DEV_ACCESS_CODE()) {
     headers["x-vouch-idp-accesstoken"] = __GET_DEV_ACCESS_CODE() || "";
@@ -95,6 +100,8 @@ export async function fetch(
   if (!res.ok) {
     if (res.status === 404) {
       throw new NotFoundError(res, responseData);
+    } else if (res.status === 401) {
+      throw new UnauthorizedError(res, responseData);
     } else {
       throw new InternalServerError(res, responseData);
     }
