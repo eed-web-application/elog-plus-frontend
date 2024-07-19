@@ -1,7 +1,5 @@
-import StarterKit from "@tiptap/starter-kit";
 import {
   EditorContent,
-  useEditor,
   Editor,
   EditorContentProps,
   EditorEvents,
@@ -10,9 +8,8 @@ import {
 import { twJoin, twMerge } from "tailwind-merge";
 import { Input, Modal } from "./base";
 import { ComponentProps, PropsWithChildren, useEffect, useState } from "react";
-import Underline from "@tiptap/extension-underline";
-import Link from "@tiptap/extension-link";
 import Select from "./Select";
+import useEntryEditor from "../hooks/useEntryEditor";
 
 function MenuButton({
   children,
@@ -388,36 +385,7 @@ export default function EntryBodyTextEditor({
   value: string;
   onChange: (value: string) => void;
 }) {
-  const editor = useEditor({
-    extensions: [
-      StarterKit.configure({
-        bulletList: {
-          keepMarks: true,
-          keepAttributes: false, // TODO : Making this as `false` becase marks are not preserved when I try to preserve attrs, awaiting a bit of help
-        },
-        orderedList: {
-          keepMarks: true,
-          keepAttributes: false, // TODO : Making this as `false` becase marks are not preserved when I try to preserve attrs, awaiting a bit of help
-        },
-        // dropcursor: false,
-      }),
-      Underline,
-      Link.extend({
-        // We don't want to keep any attributes (besides href) when drag and
-        // dropping. We, specifically, want to get rid of the class attribute,
-        // because when the user drags and drops an entry, the classes are
-        // kept.
-        addAttributes() {
-          return {
-            href: {
-              default: null,
-            },
-          };
-        },
-      }).configure({
-        openOnClick: false,
-      }),
-    ],
+  const editor = useEntryEditor({
     editorProps: {
       attributes: {
         class: twMerge(
