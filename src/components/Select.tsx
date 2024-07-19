@@ -60,10 +60,10 @@ export default function Select<O extends Option>({
 
   const filteredOptions = search
     ? options.filter((option) =>
-      (typeof option === "string" ? option : option.label)
-        .toLowerCase()
-        .includes(search),
-    )
+        (typeof option === "string" ? option : option.label)
+          .toLowerCase()
+          .includes(search),
+      )
     : options;
 
   let valuesLabel: string | undefined;

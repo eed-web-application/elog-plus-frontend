@@ -85,8 +85,7 @@ export async function fetch(
   };
 
   const res = await window.fetch(
-    `${ENDPOINT}/${url}?${params ? new URLSearchParams(params).toString() : ""
-    }`,
+    `${ENDPOINT}/${url}?${params ? new URLSearchParams(params).toString() : ""}`,
     options,
   );
 

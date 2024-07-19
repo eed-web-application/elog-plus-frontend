@@ -34,8 +34,8 @@ queryClient.setDefaultOptions({
         return false;
       }
       return failureCount < 3;
-    }
-  }
+    },
+  },
 });
 
 function entryLoader({ params }: { params: Params }) {

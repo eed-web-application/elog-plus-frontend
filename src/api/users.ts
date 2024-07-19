@@ -42,27 +42,27 @@ export async function fetchUsers<A extends boolean | undefined>({
     authorizations: !includeAuthorizations
       ? []
       : [
-        {
-          id: "1",
-          permission: "Write",
-          ownerId: user.uid,
-          ownerType: "User",
-          ownerLabel: user.gecos,
-          resourceId: "66958c2ee81b14088ef1228f",
-          resourceType: "Logbook",
-          resouceLabel: "ACCEL",
-        },
-        {
-          id: "2",
-          permission: "Read",
-          ownerType: "User",
-          ownerId: user.uid,
-          ownerLabel: user.gecos,
-          resourceId: "66958c2ee81b14088ef12290",
-          resourceType: "Logbook",
-          resouceLabel: "PEP",
-        },
-      ],
+          {
+            id: "1",
+            permission: "Write",
+            ownerId: user.uid,
+            ownerType: "User",
+            ownerLabel: user.gecos,
+            resourceId: "66958c2ee81b14088ef1228f",
+            resourceType: "Logbook",
+            resouceLabel: "ACCEL",
+          },
+          {
+            id: "2",
+            permission: "Read",
+            ownerType: "User",
+            ownerId: user.uid,
+            ownerLabel: user.gecos,
+            resourceId: "66958c2ee81b14088ef12290",
+            resourceType: "Logbook",
+            resouceLabel: "PEP",
+          },
+        ],
   }));
 }
 

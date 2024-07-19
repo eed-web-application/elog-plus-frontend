@@ -247,7 +247,7 @@ export default function LogbookForm({ logbook, onSave }: Props) {
         className={twJoin(
           "mb-2 border rounded-lg bg-gray-50 w-full flex flex-col p-2",
           form.tags.length === 0 &&
-          "items-center justify-center text-lg text-gray-500",
+            "items-center justify-center text-lg text-gray-500",
         )}
       >
         {form.tags.length === 0 ? (
@@ -316,7 +316,7 @@ export default function LogbookForm({ logbook, onSave }: Props) {
         className={twJoin(
           "border mb-2 rounded-lg bg-gray-50 w-full flex flex-col p-2",
           form.shifts.length === 0 &&
-          "items-center justify-center text-lg text-gray-500",
+            "items-center justify-center text-lg text-gray-500",
         )}
       >
         {form.shifts.length === 0 ? (

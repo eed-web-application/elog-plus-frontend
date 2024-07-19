@@ -51,7 +51,7 @@ export default function AdminAuthorizationForm({
       className={twJoin(
         "border rounded-lg bg-gray-50 w-full flex flex-col p-2",
         authorizations.length === 0 &&
-        "items-center justify-center text-lg text-gray-500",
+          "items-center justify-center text-lg text-gray-500",
       )}
     >
       {authorizations.length === 0 ? (

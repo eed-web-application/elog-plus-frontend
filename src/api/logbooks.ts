@@ -52,30 +52,30 @@ export async function fetchLogbooks<A extends boolean | undefined>({
   return !includeAuth
     ? logbooks
     : logbooks.map((logbook: Logbook) => ({
-      ...logbook,
-      authorizations: [
-        {
-          id: "1",
-          permission: "Write",
-          ownerId: "1",
-          ownerType: "User",
-          ownerLabel: "User 1",
-          resourceId: logbook.id,
-          resourceType: "Logbook",
-          resouceLabel: logbook.name,
-        },
-        {
-          id: "2",
-          permission: "Read",
-          ownerType: "Group",
-          ownerId: "2",
-          ownerLabel: "Group 2",
-          resourceId: logbook.id,
-          resourceType: "Logbook",
-          resouceLabel: logbook.name,
-        },
-      ],
-    }));
+        ...logbook,
+        authorizations: [
+          {
+            id: "1",
+            permission: "Write",
+            ownerId: "1",
+            ownerType: "User",
+            ownerLabel: "User 1",
+            resourceId: logbook.id,
+            resourceType: "Logbook",
+            resouceLabel: logbook.name,
+          },
+          {
+            id: "2",
+            permission: "Read",
+            ownerType: "Group",
+            ownerId: "2",
+            ownerLabel: "Group 2",
+            resourceId: logbook.id,
+            resourceType: "Logbook",
+            resouceLabel: logbook.name,
+          },
+        ],
+      }));
 }
 
 export function updateLogbook(logbook: LogbookUpdation) {

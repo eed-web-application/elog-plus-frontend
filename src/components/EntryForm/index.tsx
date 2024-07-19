@@ -241,8 +241,8 @@ export default function EntryForm({ onEntrySaved, kind = "newEntry" }: Props) {
               kind === "newEntry"
                 ? "Save"
                 : kind[0] === "followingUp"
-                ? "Follow up"
-                : "Supersede"
+                  ? "Follow up"
+                  : "Supersede"
             }
           />
         </form>
