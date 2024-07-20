@@ -61,7 +61,7 @@ export default function EntryBodyText({
   );
 
   return !body.trim() && showEmptyLabel ? (
-    <div className="text-gray-500">"No entry body"</div>
+    <div className="text-gray-500">No entry body</div>
   ) : (
     <EditorContent {...rest} onClick={clickHandler} editor={editor} />
   );
