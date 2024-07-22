@@ -8,19 +8,19 @@ import {
   updateLogbook,
   LogbookWithAuth,
   Permission,
-} from "../api";
-import { Button, IconButton, Input, InputInvalid } from "./base";
+} from "../../api";
+import { Button, IconButton, Input, InputInvalid } from "../base";
 import {
   useLogbookFormsStore,
   validateLogbookForm,
-} from "../logbookFormsStore";
-import { localToUtc, utcToLocal } from "../utils/datetimeConversion";
-import reportServerError from "../reportServerError";
-import useUsers from "../hooks/useUsers";
-import useGroups from "../hooks/useGroups";
-import useApplications from "../hooks/useApplications";
-import AdminAuthorizationForm from "./AdminAuthorizationForm";
-import { saveAuthorizations } from "../authorizationDiffing";
+} from "../../logbookFormsStore";
+import { localToUtc, utcToLocal } from "../../utils/datetimeConversion";
+import reportServerError from "../../reportServerError";
+import useUsers from "../../hooks/useUsers";
+import useGroups from "../../hooks/useGroups";
+import useApplications from "../../hooks/useApplications";
+import AdminAuthorizationForm from "./AuthorizationForm";
+import { saveAuthorizations } from "../../authorizationDiffing";
 
 interface Props {
   logbook: LogbookWithAuth;

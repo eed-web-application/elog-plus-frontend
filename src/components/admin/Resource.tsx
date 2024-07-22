@@ -1,9 +1,9 @@
 import { ComponentProps } from "react";
-import SideSheet from "./SideSheet";
+import SideSheet from "../SideSheet";
 import { NavLink } from "react-router-dom";
 import { twJoin, twMerge } from "tailwind-merge";
-import Spinner from "./Spinner";
-import { Input } from "./base";
+import Spinner from "../Spinner";
+import { Input } from "../base";
 
 export interface Item {
   label: string;

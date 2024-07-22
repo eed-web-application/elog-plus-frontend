@@ -1,6 +1,6 @@
 import { PropsWithChildren, ReactNode } from "react";
-import Dialog from "./Dialog";
-import { Button, TextButton } from "./base";
+import Dialog from "../Dialog";
+import { Button, TextButton } from "../base";
 
 export type Props = PropsWithChildren<{
   isOpen: boolean;

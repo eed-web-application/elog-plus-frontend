@@ -1,11 +1,12 @@
 import { useCallback, useState } from "react";
 import { toast } from "react-toastify";
 import { useParams } from "react-router-dom";
-import LogbookForm from "../../components/LogbookForm";
+
+import LogbookForm from "../../components/admin/LogbookForm";
 import { useLogbookFormsStore } from "../../logbookFormsStore";
 import useLogbooks from "../../hooks/useLogbooks";
-import AdminResource from "../../components/AdminResource";
-import NewLogbookDialog from "../../components/NewLogbookDialog";
+import AdminResource from "../../components/admin/Resource";
+import NewLogbookDialog from "../../components/admin/NewLogbookDialog";
 
 export default function AdminLogbooks() {
   const [logbookSearch, setLogbookSearch] = useState("");

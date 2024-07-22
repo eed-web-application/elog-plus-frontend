@@ -1,28 +1,28 @@
 import { twJoin } from "tailwind-merge";
-import { GroupWithAuth, Permission } from "../api";
-import { Button } from "./base";
-import { useGroupFormsStore } from "../groupFormsStore";
-import useLogbooks from "../hooks/useLogbooks";
-import AdminAuthorizationForm from "./AdminAuthorizationForm";
-import { saveAuthorizations } from "../authorizationDiffing";
+import { ApplicationWithAuth, Permission } from "../../api";
+import { Button } from "../base";
+import { useApplicationFormsStore } from "../../applicationFormsStore";
+import useLogbooks from "../../hooks/useLogbooks";
+import AdminAuthorizationForm from "./AuthorizationForm";
+import { saveAuthorizations } from "../../authorizationDiffing";
 import { useState } from "react";
 
 interface Props {
-  group: GroupWithAuth;
+  application: ApplicationWithAuth;
   onSave: () => void;
 }
 
 const DEFAULT_PERMISSION: Permission = "Read";
 
-export default function GroupForm({ group, onSave }: Props) {
+export default function ApplicationForm({ application, onSave }: Props) {
   const { logbooks, isLoading } = useLogbooks();
   const [logbookSearch, setLogbookSearch] = useState("");
-  const { form, setForm, finishEditing } = useGroupFormsStore((state) =>
-    state.startEditing(group),
+  const { form, setForm, finishEditing } = useApplicationFormsStore((state) =>
+    state.startEditing(application),
   );
 
   async function save() {
-    await saveAuthorizations(group.authorizations, form.authorizations);
+    await saveAuthorizations(application.authorizations, form.authorizations);
 
     finishEditing();
     onSave();
@@ -64,7 +64,7 @@ export default function GroupForm({ group, onSave }: Props) {
 
     // If the user deletes an authorization and then creates a new one with the
     // same owner, we want to keep the ID so we don't create a new one.
-    const existingAuthorization = group.authorizations.find(
+    const existingAuthorization = application.authorizations.find(
       (authorization) => authorization.resourceId === resourceId,
     );
 
@@ -75,9 +75,9 @@ export default function GroupForm({ group, onSave }: Props) {
         {
           id: existingAuthorization?.id,
           permission: DEFAULT_PERMISSION,
-          ownerId: group.id,
-          ownerType: "Group",
-          ownerLabel: group.name,
+          ownerId: application.id,
+          ownerType: "Application",
+          ownerLabel: application.name,
           resourceId,
           resourceType: "Logbook",
           resouceLabel,
@@ -86,7 +86,7 @@ export default function GroupForm({ group, onSave }: Props) {
     });
   }
 
-  const updated = JSON.stringify(form) === JSON.stringify(group);
+  const updated = JSON.stringify(form) === JSON.stringify(application);
 
   const logbooksFiltered = logbooks
     .filter((logbook) =>

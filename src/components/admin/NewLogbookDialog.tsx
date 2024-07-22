@@ -1,10 +1,10 @@
 import { useCallback, useState } from "react";
 import NewAdminResourceDialog, {
   Props as NewAdminResourceDialogProps,
-} from "./NewAdminResourceDialog";
+} from "./NewResourceDialog";
 import { twJoin } from "tailwind-merge";
-import { Input } from "./base";
-import { createLogbook } from "../api";
+import { Input } from "../base";
+import { createLogbook } from "../../api";
 import { useNavigate } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
 

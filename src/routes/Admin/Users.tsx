@@ -2,10 +2,10 @@ import { useCallback, useState } from "react";
 import { toast } from "react-toastify";
 import { useParams } from "react-router-dom";
 
-import UserForm from "../../components/UserForm";
+import UserForm from "../../components/admin/UserForm";
 import useUsers from "../../hooks/useUsers";
 import { useUserFormsStore } from "../../userFormsStore";
-import AdminResource from "../../components/AdminResource";
+import AdminResource from "../../components/admin/Resource";
 
 export default function AdminUsers() {
   const [userSearch, setUserSearch] = useState("");

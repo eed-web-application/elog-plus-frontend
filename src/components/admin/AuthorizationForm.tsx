@@ -1,8 +1,8 @@
 import { twJoin } from "tailwind-merge";
-import { Permission } from "../api";
-import Select, { Option as SearchOpiton } from "./Select";
-import { IconButton } from "./base";
 import { FormEvent, useCallback, useState } from "react";
+import { Permission } from "../../api";
+import Select, { Option as SearchOpiton } from "../Select";
+import { IconButton } from "../base";
 
 export interface Authorization {
   value: string;

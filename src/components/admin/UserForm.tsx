@@ -1,28 +1,28 @@
 import { twJoin } from "tailwind-merge";
-import { ApplicationWithAuth, Permission } from "../api";
-import { Button } from "./base";
-import { useApplicationFormsStore } from "../applicationFormsStore";
-import useLogbooks from "../hooks/useLogbooks";
-import AdminAuthorizationForm from "./AdminAuthorizationForm";
-import { saveAuthorizations } from "../authorizationDiffing";
+import { UserWithAuth, Permission } from "../../api";
+import { Button } from "../base";
+import { useUserFormsStore } from "../../userFormsStore";
+import useLogbooks from "../../hooks/useLogbooks";
+import AdminAuthorizationForm from "./AuthorizationForm";
+import { saveAuthorizations } from "../../authorizationDiffing";
 import { useState } from "react";
 
 interface Props {
-  application: ApplicationWithAuth;
+  user: UserWithAuth;
   onSave: () => void;
 }
 
 const DEFAULT_PERMISSION: Permission = "Read";
 
-export default function ApplicationForm({ application, onSave }: Props) {
+export default function UserForm({ user, onSave }: Props) {
   const { logbooks, isLoading } = useLogbooks();
   const [logbookSearch, setLogbookSearch] = useState("");
-  const { form, setForm, finishEditing } = useApplicationFormsStore((state) =>
-    state.startEditing(application),
+  const { form, setForm, finishEditing } = useUserFormsStore((state) =>
+    state.startEditing(user),
   );
 
   async function save() {
-    await saveAuthorizations(application.authorizations, form.authorizations);
+    await saveAuthorizations(user.authorizations, form.authorizations);
 
     finishEditing();
     onSave();
@@ -64,7 +64,7 @@ export default function ApplicationForm({ application, onSave }: Props) {
 
     // If the user deletes an authorization and then creates a new one with the
     // same owner, we want to keep the ID so we don't create a new one.
-    const existingAuthorization = application.authorizations.find(
+    const existingAuthorization = user.authorizations.find(
       (authorization) => authorization.resourceId === resourceId,
     );
 
@@ -75,9 +75,9 @@ export default function ApplicationForm({ application, onSave }: Props) {
         {
           id: existingAuthorization?.id,
           permission: DEFAULT_PERMISSION,
-          ownerId: application.id,
-          ownerType: "Application",
-          ownerLabel: application.name,
+          ownerId: user.id,
+          ownerType: "User",
+          ownerLabel: user.name,
           resourceId,
           resourceType: "Logbook",
           resouceLabel,
@@ -86,7 +86,7 @@ export default function ApplicationForm({ application, onSave }: Props) {
     });
   }
 
-  const updated = JSON.stringify(form) === JSON.stringify(application);
+  const updated = JSON.stringify(form) === JSON.stringify(user);
 
   const logbooksFiltered = logbooks
     .filter((logbook) =>

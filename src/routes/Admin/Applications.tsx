@@ -2,10 +2,10 @@ import { useCallback, useState } from "react";
 import { toast } from "react-toastify";
 import { useParams } from "react-router-dom";
 
-import ApplicationForm from "../../components/ApplicationForm";
+import ApplicationForm from "../../components/admin/ApplicationForm";
 import useApplications from "../../hooks/useApplications";
 import { useApplicationFormsStore } from "../../applicationFormsStore";
-import AdminResource from "../../components/AdminResource";
+import AdminResource from "../../components/admin/Resource";
 
 export default function AdminApplications() {
   const [applicationSearch, setApplicationSearch] = useState("");

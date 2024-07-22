@@ -2,10 +2,10 @@ import { useCallback, useState } from "react";
 import { toast } from "react-toastify";
 import { useParams } from "react-router-dom";
 
-import GroupForm from "../../components/GroupForm";
+import GroupForm from "../../components/admin/GroupForm";
 import useGroups from "../../hooks/useGroups";
 import { useGroupFormsStore } from "../../groupFormsStore";
-import AdminResource from "../../components/AdminResource";
+import AdminResource from "../../components/admin/Resource";
 
 export default function AdminGroups() {
   const [groupSearch, setGroupSearch] = useState("");
