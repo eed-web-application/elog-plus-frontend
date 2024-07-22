@@ -85,7 +85,7 @@ export type EntriesQuery = {
   logbooks?: string[];
   tags?: string[];
   requireAllTags?: boolean;
-  anchorId?: string;
+  anchor?: string;
   hideSummaries?: boolean;
 };
 

@@ -4,7 +4,7 @@ import { useFavoritesStore } from "../favoritesStore";
 import { useMemo } from "react";
 
 const CONTEXT_SIZE = 6;
-const ENTRIES_PER_PAGE = 25;
+const ENTRIES_PER_PAGE = 10;
 
 export type EntryQuery = {
   search: string;
@@ -98,7 +98,7 @@ export default function useEntries({ spotlight, query }: Params) {
         ...query,
         startDate: query?.startDate || undefined,
         endDate: query?.endDate || undefined,
-        anchorId: pageParam || spotlight,
+        anchor: pageParam || spotlight,
         contextSize: pageParam === undefined && spotlight ? CONTEXT_SIZE : 0,
         limit: ENTRIES_PER_PAGE,
       });
