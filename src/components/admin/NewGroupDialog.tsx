@@ -31,12 +31,12 @@ export default function NewGroupDialog({ onClose, ...rest }: Props) {
       return;
     }
 
-    const groupId = await createGroup({ name });
+    const groupId = await createGroup({ name, description });
     navigate(`/admin/groups/${groupId}`);
     setName("");
     setDescription("");
     queryClient.invalidateQueries({ queryKey: ["groups"] });
-  }, [name, navigate, queryClient]);
+  }, [name, description, navigate, queryClient]);
 
   return (
     <NewAdminResourceDialog
