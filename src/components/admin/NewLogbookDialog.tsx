@@ -13,47 +13,45 @@ export type Props = Omit<
   "title" | "form" | "onSave"
 >;
 
-export default function NewLogbookDialog({ setIsOpen, ...rest }: Props) {
-  const [newLogbookName, setNewLogbookName] = useState<string>("");
+export default function NewLogbookDialog({ onClose, ...rest }: Props) {
+  const [name, setName] = useState("");
 
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
-  function onIsOpenChange(open: boolean) {
-    setIsOpen(open);
-    if (!open) {
-      setNewLogbookName("");
-    }
+  function onClosed() {
+    onClose();
+    setName("");
   }
 
   const saveLogbook = useCallback(async () => {
-    if (!newLogbookName) {
+    if (!name) {
       return;
     }
 
-    const logbookId = await createLogbook(newLogbookName);
+    const logbookId = await createLogbook(name);
     navigate(`/admin/logbooks/${logbookId}`);
-    setNewLogbookName("");
+    setName("");
     queryClient.invalidateQueries({ queryKey: ["logbooks"] });
-  }, [newLogbookName, navigate, queryClient]);
+  }, [name, navigate, queryClient]);
 
   return (
     <NewAdminResourceDialog
       {...rest}
-      setIsOpen={onIsOpenChange}
+      onClose={onClosed}
       title="New logbook"
       form={
         <label className="block mb-2 text-gray-500">
           Name
           <input
             required
-            value={newLogbookName || ""}
+            value={name}
             className={twJoin(Input, "w-full block")}
-            onChange={(e) => setNewLogbookName(e.target.value)}
+            onChange={(e) => setName(e.target.value)}
           />
         </label>
       }
-      onSave={newLogbookName ? saveLogbook : undefined}
+      onSave={name ? saveLogbook : undefined}
     />
   );
 }

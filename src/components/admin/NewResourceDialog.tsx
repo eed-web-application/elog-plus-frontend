@@ -4,18 +4,17 @@ import { Button, TextButton } from "../base";
 
 export type Props = PropsWithChildren<{
   isOpen: boolean;
-  setIsOpen: (open: boolean) => void;
   title: string;
   form: ReactNode;
+  onClose: () => void;
   onSave?: () => void;
-  onCancel?: () => void;
 }>;
 
 export default function NewAdminResourceDialog({
   isOpen,
-  setIsOpen,
   title,
   form,
+  onClose,
   onSave,
   children,
 }: Props) {
@@ -28,7 +27,7 @@ export default function NewAdminResourceDialog({
         onSubmit={(e) => {
           e.preventDefault();
           onSave?.();
-          setIsOpen(false);
+          onClose();
         }}
       >
         <Dialog.Section>
@@ -36,11 +35,7 @@ export default function NewAdminResourceDialog({
         </Dialog.Section>
         <Dialog.Section>{form}</Dialog.Section>
         <Dialog.Section className="flex gap-3 justify-end">
-          <button
-            type="button"
-            className={TextButton}
-            onClick={() => setIsOpen(false)}
-          >
+          <button type="button" className={TextButton} onClick={onClose}>
             Cancel
           </button>
           <input

@@ -6,9 +6,11 @@ import GroupForm from "../../components/admin/GroupForm";
 import useGroups from "../../hooks/useGroups";
 import { useGroupFormsStore } from "../../groupFormsStore";
 import AdminResource from "../../components/admin/Resource";
+import NewGroupDialog from "../../components/admin/NewGroupDialog";
 
 export default function AdminGroups() {
   const [groupSearch, setGroupSearch] = useState("");
+  const [isCreateOpen, setIsCreateOpen] = useState(false);
 
   const { groups, groupMap, isLoading } = useGroups({
     search: groupSearch,
@@ -25,7 +27,10 @@ export default function AdminGroups() {
   }, []);
 
   return (
-    <>
+    <NewGroupDialog
+      isOpen={isCreateOpen}
+      onClose={() => setIsCreateOpen(false)}
+    >
       <AdminResource
         home="/admin/groups"
         items={groups.map((group) => ({
@@ -35,10 +40,11 @@ export default function AdminGroups() {
         }))}
         isLoading={isLoading}
         createLabel="Create group"
+        onCreate={() => setIsCreateOpen(true)}
         onSearchChange={setGroupSearch}
       >
         {selectedGroup && <GroupForm group={selectedGroup} onSave={onSave} />}
       </AdminResource>
-    </>
+    </NewGroupDialog>
   );
 }

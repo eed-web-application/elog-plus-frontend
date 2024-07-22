@@ -35,7 +35,10 @@ export default function AdminLogbooks() {
   );
 
   return (
-    <NewLogbookDialog isOpen={isCreateOpen} setIsOpen={setIsCreateOpen}>
+    <NewLogbookDialog
+      isOpen={isCreateOpen}
+      onClose={() => setIsCreateOpen(false)}
+    >
       <AdminResource
         home="/admin/logbooks"
         items={logbooksSearched.map((logbook) => ({

@@ -1,4 +1,4 @@
-import { Authorization } from ".";
+import { fetch, Authorization } from ".";
 
 export interface Group {
   id: string;
@@ -63,5 +63,17 @@ export async function fetchGroups<A extends boolean | undefined>({
         ),
       1000,
     );
+  });
+}
+
+export interface GroupNew {
+  name: string;
+  description?: string;
+}
+
+export function createGroup(group: GroupNew) {
+  return fetch(`v1/groups`, {
+    method: "POST",
+    body: group,
   });
 }
