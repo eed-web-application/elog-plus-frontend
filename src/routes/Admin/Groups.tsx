@@ -12,13 +12,10 @@ export default function AdminGroups() {
   const [groupSearch, setGroupSearch] = useState("");
   const [isCreateOpen, setIsCreateOpen] = useState(false);
 
-  const { groups, groupMap, isLoading } = useGroups({
+  const { groups, isLoading, getMoreGroups } = useGroups({
     search: groupSearch,
-    includeAuthorizations: true,
   });
   const { groupId: selectedGroupId } = useParams();
-
-  const selectedGroup = selectedGroupId ? groupMap[selectedGroupId] : undefined;
 
   const groupsEdited = useGroupFormsStore((state) => Object.keys(state.forms));
 
@@ -42,8 +39,11 @@ export default function AdminGroups() {
         createLabel="Create group"
         onCreate={() => setIsCreateOpen(true)}
         onSearchChange={setGroupSearch}
+        onBottomVisible={getMoreGroups}
       >
-        {selectedGroup && <GroupForm group={selectedGroup} onSave={onSave} />}
+        {selectedGroupId && (
+          <GroupForm groupId={selectedGroupId} onSave={onSave} />
+        )}
       </AdminResource>
     </NewGroupDialog>
   );

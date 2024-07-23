@@ -1,9 +1,9 @@
-import { ComponentProps } from "react";
+import { ComponentProps, useEffect, useRef } from "react";
 import SideSheet from "../SideSheet";
 import { NavLink } from "react-router-dom";
-import { twJoin, twMerge } from "tailwind-merge";
+import { twJoin } from "tailwind-merge";
 import Spinner from "../Spinner";
-import { Input } from "../base";
+import { Button, Input } from "../base";
 
 export interface Item {
   label: string;
@@ -18,6 +18,7 @@ export interface Props extends ComponentProps<"div"> {
   createLabel: string;
   onCreate?: () => void;
   onSearchChange: (search: string) => void;
+  onBottomVisible?: () => void;
 }
 
 export default function AdminResource({
@@ -28,22 +29,54 @@ export default function AdminResource({
   createLabel,
   onCreate,
   onSearchChange,
+  onBottomVisible,
 }: Props) {
+  const loaderRef = useRef(null);
+
+  const hasItems = items.length > 0;
+
+  useEffect(() => {
+    // We only want to check if bottom is visible when there are items.
+    // Otherwise, when observe the loaderRef, IntersectionObserver's callback
+    // is called immediately without the first load of items being rendered.
+    if (!hasItems) {
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      (entries: IntersectionObserverEntry[]) => {
+        if (entries[0]?.isIntersecting) {
+          onBottomVisible?.();
+        }
+      },
+    );
+
+    if (loaderRef.current) {
+      observer.observe(loaderRef.current);
+    }
+
+    return () => {
+      if (loaderRef.current) {
+        observer.unobserve(loaderRef.current);
+      }
+    };
+  }, [onBottomVisible, hasItems]);
+
   return (
     <SideSheet home={home} sheetBody={children}>
       <div
-        className={twMerge(
+        className={twJoin(
           "min-w-[384px] flex-1 flex flex-col p-3 overflow-y-auto",
-          // Don't want to have border when loading
-          isLoading ? "divide-y" : "w-full",
+          isLoading && "w-full",
         )}
       >
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-          }}
-        >
-          <div className="relative w-full">
+        <div className="flex flex-row justify-center items-center mb-2">
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+            }}
+            className="flex-1 relative w-full"
+          >
             <input
               type="search"
               className={twJoin(Input, "block w-full")}
@@ -70,40 +103,36 @@ export default function AdminResource({
                 ></path>
               </svg>
             </button>
-          </div>
-        </form>
-        {isLoading ? (
-          <Spinner className="self-center mt-3" />
-        ) : (
-          <>
-            {items.map((item) => (
-              <NavLink
-                key={item.link}
-                to={item.link}
-                className={({ isActive }) =>
-                  twJoin(
-                    "p-2 cursor-pointer uppercase focus:outline focus:z-0 outline-2 outline-blue-500",
-                    isActive
-                      ? "bg-blue-100 hover:bg-blue-200"
-                      : "hover:bg-gray-100",
-                  )
-                }
-              >
-                {item.label}
-                <span className="text-gray-500">{item.edited && "*"}</span>
-              </NavLink>
-            ))}
+          </form>
 
-            {onCreate && (
-              <button
-                className="p-2 text-center bg-gray-100 cursor-pointer hover:bg-gray-200 focus:z-0 outline-2 outline-blue-500 focus:outline"
-                onClick={onCreate}
-              >
-                {createLabel}
-              </button>
-            )}
-          </>
-        )}
+          {onCreate && (
+            <button className={twJoin(Button, "ml-2")} onClick={onCreate}>
+              {createLabel}
+            </button>
+          )}
+        </div>
+
+        {items.map((item) => (
+          <NavLink
+            key={item.link}
+            to={item.link}
+            className={({ isActive }) =>
+              twJoin(
+                "p-2 cursor-pointer uppercase focus:outline focus:z-0 outline-2 outline-blue-500",
+                isActive
+                  ? "bg-blue-100 hover:bg-blue-200"
+                  : "hover:bg-gray-100",
+              )
+            }
+          >
+            {item.label}
+            <span className="text-gray-500">{item.edited && "*"}</span>
+          </NavLink>
+        ))}
+
+        <div ref={loaderRef} className="flex justify-center">
+          {isLoading && <Spinner className="self-center mt-3 mx-auto" />}
+        </div>
       </div>
     </SideSheet>
   );

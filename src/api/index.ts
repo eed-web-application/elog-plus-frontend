@@ -118,6 +118,12 @@ export async function fetchVersion(): Promise<ServerVersion | undefined> {
   return await fetch("actuator/info", { payloadKey: "build" });
 }
 
+export type ResourceQuery = {
+  search?: string;
+  anchor?: string;
+  limit?: number;
+};
+
 export * from "./attachments";
 export * from "./applications";
 export * from "./authorizations";

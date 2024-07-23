@@ -1,21 +1,32 @@
 import { twJoin } from "tailwind-merge";
-import { GroupWithAuth, Permission } from "../../api";
+import { GroupWithAuth, Logbook, Permission } from "../../api";
 import { Button } from "../base";
 import { useGroupFormsStore } from "../../groupFormsStore";
 import useLogbooks from "../../hooks/useLogbooks";
 import AdminAuthorizationForm from "./AuthorizationForm";
 import { saveAuthorizations } from "../../authorizationDiffing";
 import { useState } from "react";
+import useGroup from "../../hooks/useGroup";
+import Spinner from "../Spinner";
 
-interface Props {
-  group: GroupWithAuth;
+export type Props = {
   onSave: () => void;
-}
+  groupId: string;
+};
 
 const DEFAULT_PERMISSION: Permission = "Read";
 
-export default function GroupForm({ group, onSave }: Props) {
-  const { logbooks, isLoading } = useLogbooks();
+function GroupFormInner({
+  group,
+  logbooks,
+  isLogbooksLoading,
+  onSave,
+}: {
+  group: GroupWithAuth;
+  logbooks: Logbook[];
+  isLogbooksLoading: boolean;
+  onSave: () => void;
+}) {
   const [logbookSearch, setLogbookSearch] = useState("");
   const { form, setForm, finishEditing } = useGroupFormsStore((state) =>
     state.startEditing(group),
@@ -106,7 +117,7 @@ export default function GroupForm({ group, onSave }: Props) {
           label: logbook.name,
           value: logbook.id,
         }))}
-        isOptionsLoading={isLoading}
+        isOptionsLoading={isLogbooksLoading}
         authorizations={form.authorizations
           .filter((auth) => auth.resourceType === "Logbook")
           .map((auth) => ({
@@ -127,5 +138,23 @@ export default function GroupForm({ group, onSave }: Props) {
         Save
       </button>
     </div>
+  );
+}
+
+export default function GroupForm({ groupId, onSave }: Props) {
+  const { logbooks, isLoading: isLogbooksLoading } = useLogbooks();
+  const group = useGroup(groupId, { includeAuthorizations: true });
+
+  if (!group) {
+    return <Spinner className="mt-3 w-full" />;
+  }
+
+  return (
+    <GroupFormInner
+      group={group}
+      logbooks={logbooks}
+      isLogbooksLoading={isLogbooksLoading}
+      onSave={onSave}
+    />
   );
 }

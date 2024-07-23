@@ -2,6 +2,7 @@ import {
   Attachment,
   LogbookSummary,
   NotFoundError,
+  ResourceQuery,
   Shift,
   Tag,
   fetch,
@@ -75,17 +76,14 @@ function normalizeEntry<E extends Entry>(entry: E): E {
   return entry;
 }
 
-export type EntriesQuery = {
+export type EntriesQuery = ResourceQuery & {
   startDate?: Date;
   endDate?: Date;
-  limit?: number;
   contextSize?: number;
-  search?: string;
   sortByLogDate?: boolean;
   logbooks?: string[];
   tags?: string[];
   requireAllTags?: boolean;
-  anchor?: string;
   hideSummaries?: boolean;
 };
 
