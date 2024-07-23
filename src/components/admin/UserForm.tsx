@@ -6,16 +6,27 @@ import useLogbooks from "../../hooks/useLogbooks";
 import AdminAuthorizationForm from "./AuthorizationForm";
 import { saveAuthorizations } from "../../authorizationDiffing";
 import { useState } from "react";
+import useUser from "../../hooks/useUser";
+import Spinner from "../Spinner";
 
 interface Props {
-  user: UserWithAuth;
+  userId: string;
   onSave: () => void;
 }
 
 const DEFAULT_PERMISSION: Permission = "Read";
 
-export default function UserForm({ user, onSave }: Props) {
-  const { logbooks, isLoading } = useLogbooks();
+function UserFormInner({
+  user,
+  logbooks,
+  isLogbooksLoading,
+  onSave,
+}: {
+  user: UserWithAuth;
+  logbooks: Logbook[];
+  isLogbooksLoading: boolean;
+  onSave: () => void;
+}) {
   const [logbookSearch, setLogbookSearch] = useState("");
   const { form, setForm, finishEditing } = useUserFormsStore((state) =>
     state.startEditing(user),
@@ -106,7 +117,7 @@ export default function UserForm({ user, onSave }: Props) {
           label: logbook.name,
           value: logbook.id,
         }))}
-        isOptionsLoading={isLoading}
+        isOptionsLoading={isLogbooksLoading}
         authorizations={form.authorizations
           .filter((auth) => auth.resourceType === "Logbook")
           .map((auth) => ({
@@ -127,5 +138,23 @@ export default function UserForm({ user, onSave }: Props) {
         Save
       </button>
     </div>
+  );
+}
+
+export default function UserForm({ userId, onSave }: Props) {
+  const { logbooks, isLoading } = useLogbooks();
+  const user = useUser(userId, { includeAuthorizations: true });
+
+  if (!user) {
+    return <Spinner className="mt-3 w-full" />;
+  }
+
+  return (
+    <UserFormInner
+      user={user}
+      logbooks={logbooks}
+      isLogbooksLoading={isLoading}
+      onSave={onSave}
+    />
   );
 }

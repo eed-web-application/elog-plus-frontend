@@ -10,13 +10,10 @@ import AdminResource from "../../components/admin/Resource";
 export default function AdminUsers() {
   const [userSearch, setUserSearch] = useState("");
 
-  const { users, userMap, isLoading } = useUsers({
+  const { users, isLoading } = useUsers({
     search: userSearch,
-    includeAuthorizations: true,
   });
   const { userId: selectedUserId } = useParams();
-
-  const selectedUser = selectedUserId ? userMap[selectedUserId] : undefined;
 
   const usersEdited = useUserFormsStore((state) => Object.keys(state.forms));
 
@@ -37,7 +34,7 @@ export default function AdminUsers() {
         createLabel="Create logbook"
         onSearchChange={setUserSearch}
       >
-        {selectedUser && <UserForm user={selectedUser} onSave={onSave} />}
+        {selectedUserId && <UserForm userId={selectedUserId} onSave={onSave} />}
       </AdminResource>
     </>
   );
