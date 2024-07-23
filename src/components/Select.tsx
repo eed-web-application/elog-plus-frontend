@@ -30,6 +30,7 @@ interface Props<O extends Option>
   nonsearchable?: boolean;
   emptyLabel?: string;
   onSearchChange?: (search: string) => void;
+  onBottomVisible?: () => void;
 }
 
 export default function Select<O extends Option>({
@@ -44,6 +45,7 @@ export default function Select<O extends Option>({
   nonsearchable,
   emptyLabel,
   onSearchChange,
+  onBottomVisible,
   disabled,
   ...rest
 }: Props<O>) {
@@ -198,6 +200,7 @@ export default function Select<O extends Option>({
             isLoading={isLoading}
             isEmpty={filteredOptions.length === 0}
             emptyLabel={emptyLabel}
+            onBottomVisible={onBottomVisible}
             {...getFloatingProps(
               getListFloatingProps({
                 ref: refs.setFloating,

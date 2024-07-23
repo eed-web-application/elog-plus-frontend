@@ -19,6 +19,7 @@ export interface Props {
   updatePermission: (authorization: string, permission: Permission) => void;
   removeAuthorization: (authorization: string) => void;
   createAuthorization: (owner: string) => void;
+  getMoreOptions?: () => void;
 }
 
 export default function AdminAuthorizationForm({
@@ -30,6 +31,7 @@ export default function AdminAuthorizationForm({
   updatePermission,
   removeAuthorization,
   createAuthorization,
+  getMoreOptions,
 }: Props) {
   const [selectedNewOwner, setSelectedNewOwner] = useState<string | null>(null);
 
@@ -117,6 +119,7 @@ export default function AdminAuthorizationForm({
           isLoading={isOptionsLoading}
           options={options || []}
           setValue={setSelectedNewOwner}
+          onBottomVisible={getMoreOptions}
         />
         <button
           type="submit"
