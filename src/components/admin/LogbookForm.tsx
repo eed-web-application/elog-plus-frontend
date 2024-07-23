@@ -44,7 +44,11 @@ export default function LogbookForm({ logbook, onSave }: Props) {
   const [groupSearch, setGroupSearch] = useState("");
   const [applicationSearch, setApplicationSearch] = useState("");
 
-  const { users, isLoading: isUsersLoading } = useUsers({ search: userSearch });
+  const {
+    users,
+    getMoreUsers,
+    isLoading: isUsersLoading,
+  } = useUsers({ search: userSearch });
   const {
     groups,
     getMoreGroups,
@@ -469,6 +473,7 @@ export default function LogbookForm({ logbook, onSave }: Props) {
           )
           .map((user) => ({ label: user.name, value: user.email }))}
         isOptionsLoading={isUsersLoading}
+        getMoreOptions={getMoreUsers}
         setOptionsSearch={setUserSearch}
         updatePermission={updateAuthorizationPermission}
         removeAuthorization={removeAuthorization}
