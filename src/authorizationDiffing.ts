@@ -23,7 +23,7 @@ export async function saveAuthorizations(
           if (
             original.some(
               (otherAuthorization) =>
-                otherAuthorization.ownerId === authorization.ownerId &&
+                otherAuthorization.id === authorization.id &&
                 otherAuthorization.permission === authorization.permission,
             )
           ) {
