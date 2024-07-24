@@ -27,7 +27,7 @@ export default function AdminUsers() {
         home="/admin/users"
         items={users.map((user) => ({
           label: user.name,
-          link: `/admin/users/${user.id}`,
+          link: `/admin/users/${encodeURI(user.id)}/`,
           edited: usersEdited.includes(user.id),
         }))}
         isLoading={isLoading}

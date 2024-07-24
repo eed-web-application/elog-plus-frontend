@@ -183,7 +183,7 @@ export default function LogbookForm({ logbook, onSave }: Props) {
     let ownerLabel: string | undefined;
 
     if (ownerType === "User") {
-      ownerLabel = users?.find((user) => user.email === ownerId)?.name;
+      ownerLabel = users?.find((user) => user.id === ownerId)?.name;
     } else if (ownerType === "Group") {
       ownerLabel = groups?.find((group) => group.id === ownerId)?.name;
     } else {
@@ -213,10 +213,10 @@ export default function LogbookForm({ logbook, onSave }: Props) {
           permission: DEFAULT_PERMISSION,
           ownerId,
           ownerType,
-          ownerLabel,
+          ownerName: ownerLabel,
           resourceId: form.id,
           resourceType: "Logbook",
-          resouceLabel: form.name,
+          resourceName: form.name,
         },
       ],
     });
@@ -457,7 +457,7 @@ export default function LogbookForm({ logbook, onSave }: Props) {
         authorizations={form.authorizations
           .filter((authorization) => authorization.ownerType === "User")
           .map((authorization) => ({
-            label: authorization.ownerLabel,
+            label: authorization.ownerName,
             value: authorization.ownerId,
             permission: authorization.permission,
           }))}
@@ -468,10 +468,10 @@ export default function LogbookForm({ logbook, onSave }: Props) {
               !form.authorizations.some(
                 (authorization) =>
                   authorization.ownerType === "User" &&
-                  authorization.ownerId === user.email,
+                  authorization.ownerId === user.id,
               ),
           )
-          .map((user) => ({ label: user.name, value: user.email }))}
+          .map((user) => ({ label: user.name, value: user.id }))}
         isOptionsLoading={isUsersLoading}
         getMoreOptions={getMoreUsers}
         setOptionsSearch={setUserSearch}
@@ -485,7 +485,7 @@ export default function LogbookForm({ logbook, onSave }: Props) {
         authorizations={form.authorizations
           .filter((authorization) => authorization.ownerType === "Group")
           .map((authorization) => ({
-            label: authorization.ownerLabel,
+            label: authorization.ownerName,
             value: authorization.ownerId,
             permission: authorization.permission,
           }))}

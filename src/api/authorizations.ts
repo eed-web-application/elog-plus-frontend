@@ -7,10 +7,10 @@ export interface Authorization {
   permission: Permission;
   ownerId: string;
   ownerType: "User" | "Group" | "Application";
-  ownerLabel: string;
+  ownerName: string;
   resourceId: string;
   resourceType: "Logbook";
-  resouceLabel: string;
+  resourceName: string;
 }
 
 export function deleteAuthorization(id: string) {

@@ -77,10 +77,10 @@ export default function ApplicationForm({ application, onSave }: Props) {
           permission: DEFAULT_PERMISSION,
           ownerId: application.id,
           ownerType: "Application",
-          ownerLabel: application.name,
+          ownerName: application.name,
           resourceId,
           resourceType: "Logbook",
-          resouceLabel,
+          resourceName: resouceLabel,
         },
       ],
     });
@@ -111,7 +111,7 @@ export default function ApplicationForm({ application, onSave }: Props) {
           .filter((auth) => auth.resourceType === "Logbook")
           .map((auth) => ({
             value: auth.resourceId,
-            label: auth.resouceLabel,
+            label: auth.resourceName,
             permission: auth.permission,
           }))}
         setOptionsSearch={setLogbookSearch}

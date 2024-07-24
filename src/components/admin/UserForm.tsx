@@ -88,10 +88,10 @@ function UserFormInner({
           permission: DEFAULT_PERMISSION,
           ownerId: user.id,
           ownerType: "User",
-          ownerLabel: user.name,
+          ownerName: user.name,
           resourceId,
           resourceType: "Logbook",
-          resouceLabel,
+          resourceName: resouceLabel,
         },
       ],
     });
@@ -122,7 +122,7 @@ function UserFormInner({
           .filter((auth) => auth.resourceType === "Logbook")
           .map((auth) => ({
             value: auth.resourceId,
-            label: auth.resouceLabel,
+            label: auth.resourceName,
             permission: auth.permission,
           }))}
         setOptionsSearch={setLogbookSearch}

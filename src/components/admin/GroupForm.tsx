@@ -88,10 +88,10 @@ function GroupFormInner({
           permission: DEFAULT_PERMISSION,
           ownerId: group.id,
           ownerType: "Group",
-          ownerLabel: group.name,
+          ownerName: group.name,
           resourceId,
           resourceType: "Logbook",
-          resouceLabel,
+          resourceName: resouceLabel,
         },
       ],
     });
@@ -122,7 +122,7 @@ function GroupFormInner({
           .filter((auth) => auth.resourceType === "Logbook")
           .map((auth) => ({
             value: auth.resourceId,
-            label: auth.resouceLabel,
+            label: auth.resourceName,
             permission: auth.permission,
           }))}
         setOptionsSearch={setLogbookSearch}
