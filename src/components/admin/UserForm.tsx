@@ -8,6 +8,7 @@ import { saveAuthorizations } from "../../authorizationDiffing";
 import { useState } from "react";
 import useUser from "../../hooks/useUser";
 import Spinner from "../Spinner";
+import { useQueryClient } from "@tanstack/react-query";
 
 interface Props {
   userId: string;
@@ -31,9 +32,11 @@ function UserFormInner({
   const { form, setForm, finishEditing } = useUserFormsStore((state) =>
     state.startEditing(user),
   );
+  const queryClient = useQueryClient();
 
   async function save() {
     await saveAuthorizations(user.authorizations, form.authorizations);
+    await queryClient.invalidateQueries({ queryKey: ["user", user.id] });
 
     finishEditing();
     onSave();

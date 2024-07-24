@@ -8,6 +8,7 @@ import { saveAuthorizations } from "../../authorizationDiffing";
 import { useState } from "react";
 import useGroup from "../../hooks/useGroup";
 import Spinner from "../Spinner";
+import { useQueryClient } from "@tanstack/react-query";
 
 export type Props = {
   onSave: () => void;
@@ -31,9 +32,11 @@ function GroupFormInner({
   const { form, setForm, finishEditing } = useGroupFormsStore((state) =>
     state.startEditing(group),
   );
+  const queryClient = useQueryClient();
 
   async function save() {
     await saveAuthorizations(group.authorizations, form.authorizations);
+    await queryClient.invalidateQueries({ queryKey: ["group", group.id] });
 
     finishEditing();
     onSave();
