@@ -20,7 +20,7 @@ export function updateUser(user: UserWithAuth) {
 
 export function fetchUser<A extends boolean | undefined>(
   id: string,
-  includeAuthorizations: A,
+  includeAuthorizations?: A,
 ): Promise<A extends true ? UserWithAuth : User> {
   return fetch(`v1/users/${encodeURI(id)}`, {
     params: includeAuthorizations ? { includeAuthorizations: "true" } : {},
@@ -36,7 +36,6 @@ export function fetchUsers<A extends boolean | undefined>(
 ): Promise<(A extends true ? UserWithAuth : User)[]> {
   const params: ParamsObject = Object.assign(
     {
-      limit: 5,
       includeAuthorizations: false,
     },
     query,

@@ -1,5 +1,5 @@
 import { twJoin } from "tailwind-merge";
-import { UserWithAuth, Permission } from "../../api";
+import { UserWithAuth, Permission, Logbook } from "../../api";
 import { Button } from "../base";
 import { useUserFormsStore } from "../../userFormsStore";
 import useLogbooks from "../../hooks/useLogbooks";

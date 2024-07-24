@@ -1,6 +1,9 @@
-import { ServerError, User, UserWithAuth, fetchUsers } from "../api";
+import { useMemo } from "react";
+import { User, UserWithAuth, ServerError, fetchUsers } from "../api";
 import reportServerError from "../reportServerError";
-import { useQuery } from "@tanstack/react-query";
+import { useInfiniteQuery } from "@tanstack/react-query";
+
+const USERS_PER_PAGE = 25;
 
 export default function useUsers<A extends boolean>({
   search,
@@ -12,14 +15,23 @@ export default function useUsers<A extends boolean>({
   includeAuthorizations?: A;
   enabled?: boolean;
   critical?: boolean;
-}): {
-  users: (A extends true ? UserWithAuth : User)[];
-  userMap: Record<string, A extends true ? UserWithAuth : User>;
-  isLoading: boolean;
-} {
-  const { data, isLoading } = useQuery({
+}) {
+  const {
+    data,
+    isLoading,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    isInitialLoading,
+  } = useInfiniteQuery({
     queryKey: ["users", search],
-    queryFn: () => fetchUsers<A>({ search, includeAuthorizations }),
+    queryFn: ({ pageParam, queryKey }) =>
+      fetchUsers<A>({
+        search,
+        includeAuthorizations,
+        anchor: pageParam,
+        limit: USERS_PER_PAGE,
+      }),
     enabled,
     useErrorBoundary: critical,
     staleTime: 5 * 60 * 1000,
@@ -30,21 +42,33 @@ export default function useUsers<A extends boolean>({
 
       reportServerError("Could not retrieve users", e);
     },
-    select: (users) => {
-      const userMap = users.reduce<
-        Record<string, A extends true ? UserWithAuth : User>
-      >((acc, user) => {
-        acc[user.id] = user;
-        return acc;
-      }, {});
+    getNextPageParam: (lastPage) => {
+      if (lastPage.length < USERS_PER_PAGE) {
+        return undefined;
+      }
 
-      return { users, userMap };
+      return lastPage[lastPage.length - 1].id;
     },
   });
 
+  const users = useMemo(() => data?.pages.flat() || [], [data?.pages]);
+  const userMap = useMemo(
+    () =>
+      users.reduce<Record<string, A extends true ? UserWithAuth : User>>(
+        (acc, user) => {
+          acc[user.id] = user;
+          return acc;
+        },
+        {},
+      ),
+    [users],
+  );
+
   return {
-    users: data?.users || [],
-    userMap: data?.userMap || {},
-    isLoading,
+    users,
+    userMap,
+    isLoading: isLoading || isFetchingNextPage,
+    getMoreUsers: fetchNextPage,
+    reachedBottom: !hasNextPage && !isInitialLoading,
   };
 }
