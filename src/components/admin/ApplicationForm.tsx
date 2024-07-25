@@ -1,28 +1,44 @@
 import { twJoin } from "tailwind-merge";
-import { ApplicationWithAuth, Permission } from "../../api";
+import { ApplicationWithAuth, Logbook, Permission } from "../../api";
 import { Button } from "../base";
 import { useApplicationFormsStore } from "../../applicationFormsStore";
 import useLogbooks from "../../hooks/useLogbooks";
 import AdminAuthorizationForm from "./AuthorizationForm";
 import { saveAuthorizations } from "../../authorizationDiffing";
 import { useState } from "react";
+import useApplication from "../../hooks/useApplication";
+import Spinner from "../Spinner";
+import { useQueryClient } from "@tanstack/react-query";
 
 interface Props {
-  application: ApplicationWithAuth;
+  applicationId: string;
   onSave: () => void;
 }
 
 const DEFAULT_PERMISSION: Permission = "Read";
 
-export default function ApplicationForm({ application, onSave }: Props) {
-  const { logbooks, isLoading } = useLogbooks();
+function ApplicationFormInner({
+  application,
+  logbooks,
+  isLogbooksLoading,
+  onSave,
+}: {
+  application: ApplicationWithAuth;
+  logbooks: Logbook[];
+  isLogbooksLoading: boolean;
+  onSave: () => void;
+}) {
   const [logbookSearch, setLogbookSearch] = useState("");
   const { form, setForm, finishEditing } = useApplicationFormsStore((state) =>
     state.startEditing(application),
   );
+  const queryClient = useQueryClient();
 
   async function save() {
     await saveAuthorizations(application.authorizations, form.authorizations);
+    await queryClient.invalidateQueries({
+      queryKey: ["application", application.id],
+    });
 
     finishEditing();
     onSave();
@@ -76,7 +92,7 @@ export default function ApplicationForm({ application, onSave }: Props) {
           id: existingAuthorization?.id,
           permission: DEFAULT_PERMISSION,
           ownerId: application.id,
-          ownerType: "Application",
+          ownerType: "Token",
           ownerName: application.name,
           resourceId,
           resourceType: "Logbook",
@@ -106,7 +122,7 @@ export default function ApplicationForm({ application, onSave }: Props) {
           label: logbook.name,
           value: logbook.id,
         }))}
-        isOptionsLoading={isLoading}
+        isOptionsLoading={isLogbooksLoading}
         authorizations={form.authorizations
           .filter((auth) => auth.resourceType === "Logbook")
           .map((auth) => ({
@@ -127,5 +143,25 @@ export default function ApplicationForm({ application, onSave }: Props) {
         Save
       </button>
     </div>
+  );
+}
+
+export default function ApplicationForm({ applicationId, onSave }: Props) {
+  const { logbooks, isLoading } = useLogbooks();
+  const application = useApplication(applicationId, {
+    includeAuthorizations: true,
+  });
+
+  if (!application) {
+    return <Spinner className="mt-3 w-full" />;
+  }
+
+  return (
+    <ApplicationFormInner
+      application={application}
+      logbooks={logbooks}
+      isLogbooksLoading={isLoading}
+      onSave={onSave}
+    />
   );
 }

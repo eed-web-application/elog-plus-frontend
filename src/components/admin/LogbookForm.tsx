@@ -56,7 +56,11 @@ export default function LogbookForm({ logbook, onSave }: Props) {
   } = useGroups({
     search: groupSearch,
   });
-  const { applications, isLoading: isApplicationsLoading } = useApplications({
+  const {
+    applications,
+    getMoreApplications,
+    isLoading: isApplicationsLoading,
+  } = useApplications({
     search: applicationSearch,
   });
 
@@ -177,7 +181,7 @@ export default function LogbookForm({ logbook, onSave }: Props) {
   }
 
   function createAuthorization(
-    ownerType: "User" | "Group" | "Application",
+    ownerType: "User" | "Group" | "Token",
     ownerId: string,
   ) {
     let ownerLabel: string | undefined;
@@ -511,7 +515,7 @@ export default function LogbookForm({ logbook, onSave }: Props) {
       <div className="mt-2 text-gray-500">Applications</div>
       <AdminAuthorizationForm
         authorizations={form.authorizations
-          .filter((authorization) => authorization.ownerType === "Application")
+          .filter((authorization) => authorization.ownerType === "Token")
           .map((authorization) => ({
             label: authorization.ownerId,
             value: authorization.ownerId,
@@ -523,7 +527,7 @@ export default function LogbookForm({ logbook, onSave }: Props) {
             (application) =>
               !form.authorizations.some(
                 (authorization) =>
-                  authorization.ownerType === "Application" &&
+                  authorization.ownerType === "Token" &&
                   authorization.ownerId === application.id,
               ),
           )
@@ -532,12 +536,11 @@ export default function LogbookForm({ logbook, onSave }: Props) {
             value: application.id,
           }))}
         isOptionsLoading={isApplicationsLoading}
+        getMoreOptions={getMoreApplications}
         setOptionsSearch={setApplicationSearch}
         updatePermission={updateAuthorizationPermission}
         removeAuthorization={removeAuthorization}
-        createAuthorization={(ownerId) =>
-          createAuthorization("Application", ownerId)
-        }
+        createAuthorization={(ownerId) => createAuthorization("Token", ownerId)}
       />
 
       <button

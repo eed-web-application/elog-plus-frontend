@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import {
   Application,
   ApplicationWithAuth,
@@ -5,7 +6,9 @@ import {
   fetchApplications,
 } from "../api";
 import reportServerError from "../reportServerError";
-import { useQuery } from "@tanstack/react-query";
+import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
+
+const APPLICATIONS_PER_PAGE = 25;
 
 export default function useApplications<A extends boolean>({
   search,
@@ -17,17 +20,23 @@ export default function useApplications<A extends boolean>({
   includeAuthorizations?: A;
   enabled?: boolean;
   critical?: boolean;
-}): {
-  applications: (A extends true ? ApplicationWithAuth : Application)[];
-  applicationMap: Record<
-    string,
-    A extends true ? ApplicationWithAuth : Application
-  >;
-  isLoading: boolean;
-} {
-  const { data, isLoading } = useQuery({
+}) {
+  const {
+    data,
+    isLoading,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    isInitialLoading,
+  } = useInfiniteQuery({
     queryKey: ["applications", search],
-    queryFn: () => fetchApplications<A>({ search, includeAuthorizations }),
+    queryFn: ({ pageParam, queryKey }) =>
+      fetchApplications<A>({
+        search,
+        includeAuthorizations,
+        anchor: pageParam,
+        limit: APPLICATIONS_PER_PAGE,
+      }),
     enabled,
     useErrorBoundary: critical,
     staleTime: 5 * 60 * 1000,
@@ -38,21 +47,32 @@ export default function useApplications<A extends boolean>({
 
       reportServerError("Could not retrieve applications", e);
     },
-    select: (applications) => {
-      const applicationMap = applications.reduce<
+    getNextPageParam: (lastPage) => {
+      if (lastPage.length < APPLICATIONS_PER_PAGE) {
+        return undefined;
+      }
+
+      return lastPage[lastPage.length - 1].id;
+    },
+  });
+
+  const applications = useMemo(() => data?.pages.flat() || [], [data?.pages]);
+  const applicationMap = useMemo(
+    () =>
+      applications.reduce<
         Record<string, A extends true ? ApplicationWithAuth : Application>
       >((acc, application) => {
         acc[application.id] = application;
         return acc;
-      }, {});
-
-      return { applications, applicationMap };
-    },
-  });
+      }, {}),
+    [applications],
+  );
 
   return {
-    applications: data?.applications || [],
-    applicationMap: data?.applicationMap || {},
-    isLoading,
+    applications,
+    applicationMap,
+    isLoading: isLoading || isFetchingNextPage,
+    getMoreApplications: fetchNextPage,
+    reachedBottom: !hasNextPage && !isInitialLoading,
   };
 }

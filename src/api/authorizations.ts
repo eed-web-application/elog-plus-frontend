@@ -6,7 +6,7 @@ export interface Authorization {
   id: string;
   permission: Permission;
   ownerId: string;
-  ownerType: "User" | "Group" | "Application";
+  ownerType: "User" | "Group" | "Token";
   ownerName: string;
   resourceId: string;
   resourceType: "Logbook";

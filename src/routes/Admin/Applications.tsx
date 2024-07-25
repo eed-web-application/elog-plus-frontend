@@ -10,15 +10,10 @@ import AdminResource from "../../components/admin/Resource";
 export default function AdminApplications() {
   const [applicationSearch, setApplicationSearch] = useState("");
 
-  const { applications, applicationMap, isLoading } = useApplications({
+  const { applications, isLoading, getMoreApplications } = useApplications({
     search: applicationSearch,
-    includeAuthorizations: true,
   });
   const { applicationId: selectedApplicationId } = useParams();
-
-  const selectedApplication = selectedApplicationId
-    ? applicationMap[selectedApplicationId]
-    : undefined;
 
   const applicationsEdited = useApplicationFormsStore((state) =>
     Object.keys(state.forms),
@@ -41,8 +36,11 @@ export default function AdminApplications() {
         createLabel="Create application"
         onSearchChange={setApplicationSearch}
       >
-        {selectedApplication && (
-          <ApplicationForm application={selectedApplication} onSave={onSave} />
+        {selectedApplicationId && (
+          <ApplicationForm
+            applicationId={selectedApplicationId}
+            onSave={onSave}
+          />
         )}
       </AdminResource>
     </>
