@@ -19,7 +19,15 @@ export default function NewAdminResourceDialog({
   children,
 }: Props) {
   return (
-    <Dialog controlled isOpen={isOpen}>
+    <Dialog
+      controlled
+      isOpen={isOpen}
+      onOpenChange={(isOpen) => {
+        if (!isOpen) {
+          onClose();
+        }
+      }}
+    >
       {children}
       <Dialog.Content
         as="form"
