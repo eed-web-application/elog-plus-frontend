@@ -21,6 +21,7 @@ import useGroups from "../../hooks/useGroups";
 import useApplications from "../../hooks/useApplications";
 import AdminAuthorizationForm from "./AuthorizationForm";
 import { saveAuthorizations } from "../../authorizationDiffing";
+import ResourceListForm from "./ResourceListForm";
 
 interface Props {
   logbook: LogbookWithAuth;
@@ -240,7 +241,7 @@ export default function LogbookForm({ logbook, onSave }: Props) {
 
   return (
     <div className="p-3">
-      <label className="block mb-2 text-gray-500">
+      <label className="block text-gray-500">
         Name
         <input
           required
@@ -254,209 +255,144 @@ export default function LogbookForm({ logbook, onSave }: Props) {
           onChange={(e) => setForm({ ...form, name: e.target.value })}
         />
       </label>
-      <div className="text-gray-500">Tags</div>
-      <div
-        className={twJoin(
-          "mb-2 border rounded-lg bg-gray-50 w-full flex flex-col p-2",
-          form.tags.length === 0 &&
-            "items-center justify-center text-lg text-gray-500",
-        )}
-      >
-        {form.tags.length === 0 ? (
-          <div className="my-3">No tags. Create one below.</div>
-        ) : (
-          <>
-            <div className="divide-y">
-              {form.tags.map((tag, index) => (
-                <div
-                  key={tag.id || tag.name}
-                  className="flex justify-between items-center px-2"
-                >
-                  {tag.name}
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    strokeWidth="1.5"
-                    stroke="currentColor"
-                    tabIndex={0}
-                    className={twJoin(IconButton, "text-gray-500")}
-                    onClick={() => removeTag(index)}
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M6 18L18 6M6 6l12 12"
-                    />
-                  </svg>
-                </div>
-              ))}
-            </div>
-          </>
-        )}
-        <form noValidate className="relative mt-2 w-full" onSubmit={createTag}>
+
+      <div className="text-gray-500 mt-2">Tags</div>
+      <ResourceListForm
+        emptyLabel="No tags. Create one below."
+        disabled={
+          !newTag || Boolean(form.tags.find(({ name }) => name === newTag))
+        }
+        onSubmit={createTag}
+        select={
           <input
-            className={twJoin(Input, "w-full pr-12")}
             type="text"
+            className={twMerge(Input, "w-full pr-12")}
             value={newTag}
             onChange={(e) => setNewTag(e.currentTarget.value)}
           />
-          <button
-            type="submit"
-            className="flex absolute top-0 right-0 bottom-0 justify-center items-center p-2.5 text-white bg-blue-500 rounded-r-lg disabled:text-gray-100 disabled:bg-blue-300"
-            disabled={Boolean(form.tags.find(({ name }) => name === newTag))}
+        }
+        items={form.tags.map((tag, index) => (
+          <div
+            key={tag.id || tag.name}
+            className="flex justify-between items-center px-2"
           >
+            {tag.name}
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
               viewBox="0 0 24 24"
-              strokeWidth={1.5}
+              strokeWidth="1.5"
               stroke="currentColor"
-              className="w-5 h-5"
+              tabIndex={0}
+              className={twJoin(IconButton, "text-gray-500")}
+              onClick={() => removeTag(index)}
             >
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                d="M12 4.5v15m7.5-7.5h-15"
+                d="M6 18L18 6M6 6l12 12"
               />
             </svg>
-          </button>
-        </form>
-      </div>
-      <div className="text-gray-500">Shifts</div>
-      <div
-        className={twJoin(
-          "border mb-2 rounded-lg bg-gray-50 w-full flex flex-col p-2",
-          form.shifts.length === 0 &&
-            "items-center justify-center text-lg text-gray-500",
-        )}
-      >
-        {form.shifts.length === 0 ? (
-          <div className="my-3">No Shifts. Create one below.</div>
-        ) : (
-          <>
-            <div className="divide-y">
-              {form.shifts.map((shift, index) => (
-                <div
-                  key={shift.id}
-                  className="flex gap-1 justify-between items-center py-2"
-                >
-                  <input
-                    type="text"
-                    className={twMerge(
-                      Input,
-                      invalid.has(`shiftName/${shift.id}`) && InputInvalid,
-                      "flex-1 min-w-0",
-                    )}
-                    value={shift.name}
-                    onChange={(e) =>
-                      changeShiftName(index, e.currentTarget.value)
-                    }
-                  />
-                  <div className="flex gap-2 items-center self-end">
-                    <input
-                      className={twMerge(
-                        Input,
-                        invalid.has(`shiftFrom/${shift.id}`) && InputInvalid,
-                        "w-32",
-                      )}
-                      type="time"
-                      value={
-                        form.shifts[index].from
-                          ? utcToLocal(form.shifts[index].from)
-                          : ""
-                      }
-                      onChange={(e) => {
-                        const updatedShifts = [...form.shifts];
-                        updatedShifts[index] = {
-                          ...updatedShifts[index],
-                          from: e.currentTarget.value
-                            ? localToUtc(e.currentTarget.value)
-                            : "",
-                        };
-                        setForm({ ...form, shifts: updatedShifts });
-                      }}
-                    />
-                    <div className="text-gray-500">to</div>
-                    <input
-                      className={twMerge(
-                        Input,
-                        invalid.has(`shiftTo/${shift.id}`) && InputInvalid,
-                        "w-32",
-                      )}
-                      type="time"
-                      value={
-                        form.shifts[index].to
-                          ? utcToLocal(form.shifts[index].to)
-                          : ""
-                      }
-                      onChange={(e) => {
-                        const updatedShifts = [...form.shifts];
-                        updatedShifts[index] = {
-                          ...updatedShifts[index],
-                          to: e.currentTarget.value
-                            ? localToUtc(e.currentTarget.value)
-                            : "",
-                        };
-                        setForm({ ...form, shifts: updatedShifts });
-                      }}
-                    />
-                  </div>
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    strokeWidth="1.5"
-                    stroke="currentColor"
-                    tabIndex={0}
-                    className={twJoin(IconButton, "text-gray-500")}
-                    onClick={() => removeShift(index)}
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M6 18L18 6M6 6l12 12"
-                    />
-                  </svg>
-                </div>
-              ))}
-            </div>
-          </>
-        )}
-        <form
-          noValidate
-          className="relative mt-2 w-full"
-          onSubmit={createShift}
-        >
+          </div>
+        ))}
+      />
+
+      <div className="text-gray-500 mt-2">Shifts</div>
+      <ResourceListForm
+        emptyLabel="No Shifts. Create one below."
+        select={
           <input
-            className={twMerge(Input, "w-full pr-12")}
             type="text"
+            className={twMerge(Input, "w-full pr-12")}
             value={newShift}
             onChange={(e) => setNewShift(e.currentTarget.value)}
           />
-          <button
-            type="submit"
-            className="flex absolute top-0 right-0 bottom-0 justify-center items-center p-2.5 text-white bg-blue-500 rounded-r-lg"
+        }
+        onSubmit={createShift}
+        disabled={!newShift}
+        items={form.shifts.map((shift, index) => (
+          <div
+            key={shift.id}
+            className="flex gap-1 justify-between items-center py-2"
           >
+            <input
+              type="text"
+              className={twMerge(
+                Input,
+                invalid.has(`shiftName/${shift.id}`) && InputInvalid,
+                "flex-1 min-w-0",
+              )}
+              value={shift.name}
+              onChange={(e) => changeShiftName(index, e.currentTarget.value)}
+            />
+            <div className="flex gap-2 items-center self-end">
+              <input
+                className={twMerge(
+                  Input,
+                  invalid.has(`shiftFrom/${shift.id}`) && InputInvalid,
+                  "w-32",
+                )}
+                type="time"
+                value={
+                  form.shifts[index].from
+                    ? utcToLocal(form.shifts[index].from)
+                    : ""
+                }
+                onChange={(e) => {
+                  const updatedShifts = [...form.shifts];
+                  updatedShifts[index] = {
+                    ...updatedShifts[index],
+                    from: e.currentTarget.value
+                      ? localToUtc(e.currentTarget.value)
+                      : "",
+                  };
+                  setForm({ ...form, shifts: updatedShifts });
+                }}
+              />
+              <div className="text-gray-500">to</div>
+              <input
+                className={twMerge(
+                  Input,
+                  invalid.has(`shiftTo/${shift.id}`) && InputInvalid,
+                  "w-32",
+                )}
+                type="time"
+                value={
+                  form.shifts[index].to ? utcToLocal(form.shifts[index].to) : ""
+                }
+                onChange={(e) => {
+                  const updatedShifts = [...form.shifts];
+                  updatedShifts[index] = {
+                    ...updatedShifts[index],
+                    to: e.currentTarget.value
+                      ? localToUtc(e.currentTarget.value)
+                      : "",
+                  };
+                  setForm({ ...form, shifts: updatedShifts });
+                }}
+              />
+            </div>
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
               viewBox="0 0 24 24"
-              strokeWidth={1.5}
+              strokeWidth="1.5"
               stroke="currentColor"
-              className="w-5 h-5"
+              tabIndex={0}
+              className={twJoin(IconButton, "text-gray-500")}
+              onClick={() => removeShift(index)}
             >
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                d="M12 4.5v15m7.5-7.5h-15"
+                d="M6 18L18 6M6 6l12 12"
               />
             </svg>
-          </button>
-        </form>
-      </div>
+          </div>
+        ))}
+      />
 
-      <div className="text-gray-500">User Authorizations</div>
+      <div className="text-gray-500 mt-2">User Authorizations</div>
       <AdminAuthorizationForm
         authorizations={form.authorizations
           .filter((authorization) => authorization.ownerType === "User")
