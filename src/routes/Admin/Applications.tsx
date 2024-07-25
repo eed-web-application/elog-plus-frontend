@@ -6,9 +6,11 @@ import ApplicationForm from "../../components/admin/ApplicationForm";
 import useApplications from "../../hooks/useApplications";
 import { useApplicationFormsStore } from "../../applicationFormsStore";
 import AdminResource from "../../components/admin/Resource";
+import NewApplicationDialog from "../../components/admin/NewApplicationDialog";
 
 export default function AdminApplications() {
   const [applicationSearch, setApplicationSearch] = useState("");
+  const [isCreateOpen, setIsCreateOpen] = useState(false);
 
   const { applications, isLoading, getMoreApplications } = useApplications({
     search: applicationSearch,
@@ -24,7 +26,10 @@ export default function AdminApplications() {
   }, []);
 
   return (
-    <>
+    <NewApplicationDialog
+      isOpen={isCreateOpen}
+      onClose={() => setIsCreateOpen(false)}
+    >
       <AdminResource
         home="/admin/applications"
         items={applications.map((application) => ({
@@ -34,6 +39,7 @@ export default function AdminApplications() {
         }))}
         isLoading={isLoading}
         createLabel="Create application"
+        onCreate={() => setIsCreateOpen(true)}
         onSearchChange={setApplicationSearch}
       >
         {selectedApplicationId && (
@@ -43,6 +49,6 @@ export default function AdminApplications() {
           />
         )}
       </AdminResource>
-    </>
+    </NewApplicationDialog>
   );
 }

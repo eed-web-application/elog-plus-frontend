@@ -67,51 +67,16 @@ export function fetchApplications<A extends boolean | undefined>(
   );
 
   return fetch("v1/applications", { params: serializeParams(params) });
-  // FIXME: Remove this when the proper API is implemented
-
-  const applications = [
-    {
-      id: "1",
-      name: "Application Name 1",
-      token: "jwt",
-      expiration: "2025-02-24",
-    },
-    {
-      id: "2",
-      name: "Application Name 2",
-      token: "jwt",
-      expiration: "2025-02-24",
-    },
-    {
-      id: "3",
-      name: "Application Name 3",
-      token: "jwt",
-      expiration: "2025-02-24",
-    },
-  ].filter((application) => application.name.includes(search));
-
-  return new Promise((resolve) => {
-    setTimeout(
-      () =>
-        resolve(
-          includeAuthorizations
-            ? applications.map(__createMockAuthorizations)
-            : applications,
-        ),
-      1000,
-    );
-  });
 }
 
-// export async function createApp(name: string, expiration: string) {
-//   return await fetch(`v1/auth/application-token`, {
-//     method: "POST",
-//     body: { name, expiration },
-//   });
-// }
-//
-// export async function deleteApp() {
-//   return await fetch(`v1/auth/application-token/{id}`, {
-//     method: "DELETE",
-//   });
-// }
+export interface ApplicationNew {
+  name: string;
+  expiration: string;
+}
+
+export function createApplication(application: ApplicationNew) {
+  return fetch("v1/applications", {
+    method: "POST",
+    body: application,
+  });
+}
