@@ -56,7 +56,7 @@ export default function AdminAuthorizationForm({
           key={authorization.value}
           className="flex justify-between items-center py-1 px-2"
         >
-          <div className="flex-grow">{authorization.label}</div>
+          <div className="flex-1 truncate">{authorization.label}</div>
 
           <Select
             className="w-32"

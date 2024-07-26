@@ -278,7 +278,7 @@ export default function LogbookForm({ logbook, onSave }: Props) {
             key={tag.id || tag.name}
             className="flex justify-between items-center px-2"
           >
-            {tag.name}
+            <div className="truncate flex-1">{tag.name}</div>
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
