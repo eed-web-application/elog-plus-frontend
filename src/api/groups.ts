@@ -47,7 +47,9 @@ export function fetchGroups<A extends boolean, M extends boolean>(
   return fetch("v1/groups", { params: serializeParams(params) });
 }
 
-export type GroupNew = Pick<Group<false, false>, "name" | "description">;
+export type GroupNew = Pick<Group<false, false>, "name" | "description"> & {
+  members: string[];
+};
 
 export function createGroup(group: GroupNew) {
   return fetch(`v1/groups`, {

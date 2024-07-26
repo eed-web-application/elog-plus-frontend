@@ -31,7 +31,7 @@ export default function NewGroupDialog({ onClose, ...rest }: Props) {
       return;
     }
 
-    const groupId = await createGroup({ name, description });
+    const groupId = await createGroup({ name, description, members: [] });
     navigate(`/admin/groups/${groupId}`);
     setName("");
     setDescription("");
