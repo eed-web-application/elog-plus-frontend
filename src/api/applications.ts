@@ -15,37 +15,6 @@ export interface ApplicationWithAuth extends Application {
 export type ApplicationQuery<A extends boolean | undefined> = ResourceQuery & {
   includeAuthorizations?: A;
 };
-//
-// function __createMockAuthorizations(
-//   application: Application,
-// ): ApplicationWithAuth {
-//   return {
-//     ...application,
-//     authorizations: [
-//       {
-//         id: "1",
-//         permission: "Write",
-//         ownerId: application.id,
-//         ownerType: "Group",
-//         ownerName: application.name,
-//         resourceId: "66958c2ee81b14088ef1228f",
-//         resourceType: "Logbook",
-//         resourceName: "ACCEL",
-//       },
-//       {
-//         id: "2",
-//         permission: "Read",
-//         ownerType: "Group",
-//         ownerId: application.id,
-//         ownerName: application.name,
-//         resourceId: "66958c2ee81b14088ef12290",
-//         resourceType: "Logbook",
-//         resourceName: "PEP",
-//       },
-//     ],
-//   };
-// }
-//
 
 export function fetchApplication<A extends boolean | undefined>(
   id: string,
@@ -69,10 +38,7 @@ export function fetchApplications<A extends boolean | undefined>(
   return fetch("v1/applications", { params: serializeParams(params) });
 }
 
-export interface ApplicationNew {
-  name: string;
-  expiration: string;
-}
+export type ApplicationNew = Pick<Application, "name" | "expiration">;
 
 export function createApplication(application: ApplicationNew) {
   return fetch("v1/applications", {

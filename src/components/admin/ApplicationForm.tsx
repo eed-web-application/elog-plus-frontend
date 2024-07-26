@@ -1,6 +1,6 @@
-import { twJoin } from "tailwind-merge";
+import { twJoin, twMerge } from "tailwind-merge";
 import { ApplicationWithAuth, Logbook, Permission } from "../../api";
-import { Button, TextButton } from "../base";
+import { Button, Input, InputInvalid, TextButton } from "../base";
 import { useApplicationFormsStore } from "../../applicationFormsStore";
 import useLogbooks from "../../hooks/useLogbooks";
 import AdminAuthorizationForm from "./AuthorizationForm";
@@ -109,7 +109,37 @@ function ApplicationFormInner({
 
   return (
     <div className="p-3 pt-5">
-      <div className="text-gray-500">Logbook Authorizations</div>
+      <label className="block text-gray-500">
+        Name
+        <input
+          disabled
+          type="text"
+          className={twMerge(Input, "block w-full")}
+          value={form.name}
+        />
+      </label>
+
+      <label className="block text-gray-500 mt-2">
+        Expiration
+        <input
+          disabled
+          type="text"
+          className={twMerge(Input, "block w-full")}
+          value={form.expiration}
+        />
+      </label>
+
+      <label className="block text-gray-500 mt-2">
+        Token
+        <input
+          readOnly
+          type="text"
+          className={twMerge(Input, "block w-full")}
+          value={form.token}
+        />
+      </label>
+
+      <div className="text-gray-500 mt-2">Logbook Authorizations</div>
       <AdminAuthorizationForm
         emptyLabel="No logbook authorizations. Create one below."
         options={logbooksFiltered.map((logbook) => ({
