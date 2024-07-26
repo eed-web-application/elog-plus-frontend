@@ -68,10 +68,6 @@ export default function LogbookForm({ logbook, onSave }: Props) {
   const invalid = validateLogbookForm(form);
 
   async function saveLogbook() {
-    if (invalid.size > 0) {
-      return;
-    }
-
     // Covers the case where a user deletes a tag and creates a new one with
     // the same name
     const resolvedTags = form.tags.map((tag) => {
@@ -111,6 +107,10 @@ export default function LogbookForm({ logbook, onSave }: Props) {
   }
 
   async function save() {
+    if (invalid.size > 0) {
+      return;
+    }
+
     await Promise.all([
       saveLogbook(),
       saveAuthorizations(logbook.authorizations, form.authorizations),
@@ -480,7 +480,7 @@ export default function LogbookForm({ logbook, onSave }: Props) {
       />
 
       <button
-        disabled={!updated}
+        disabled={!updated || invalid.size > 0}
         className={twJoin(Button, "block ml-auto mt-3")}
         onClick={save}
       >
