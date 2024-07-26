@@ -1,6 +1,6 @@
 import { twJoin } from "tailwind-merge";
 import { ApplicationWithAuth, Logbook, Permission } from "../../api";
-import { Button } from "../base";
+import { Button, TextButton } from "../base";
 import { useApplicationFormsStore } from "../../applicationFormsStore";
 import useLogbooks from "../../hooks/useLogbooks";
 import AdminAuthorizationForm from "./AuthorizationForm";
@@ -102,7 +102,7 @@ function ApplicationFormInner({
     });
   }
 
-  const updated = JSON.stringify(form) === JSON.stringify(application);
+  const updated = JSON.stringify(form) !== JSON.stringify(application);
 
   const logbooksFiltered = logbooks
     .filter((logbook) =>
@@ -135,13 +135,22 @@ function ApplicationFormInner({
         removeAuthorization={removeAuthorization}
         createAuthorization={createAuthorization}
       />
-      <button
-        disabled={updated}
-        className={twJoin(Button, "block ml-auto mt-3")}
-        onClick={save}
-      >
-        Save
-      </button>
+      <div className="flex justify-end mt-3 gap-3">
+        <button
+          disabled={!updated}
+          className={twJoin(TextButton, "block")}
+          onClick={finishEditing}
+        >
+          Discard changes
+        </button>
+        <button
+          disabled={!updated}
+          className={twJoin(Button, "block")}
+          onClick={save}
+        >
+          Save
+        </button>
+      </div>
     </div>
   );
 }

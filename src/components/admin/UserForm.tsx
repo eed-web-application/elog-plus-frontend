@@ -1,6 +1,6 @@
 import { twJoin } from "tailwind-merge";
 import { UserWithAuth, Permission, Logbook } from "../../api";
-import { Button } from "../base";
+import { Button, TextButton } from "../base";
 import { useUserFormsStore } from "../../userFormsStore";
 import useLogbooks from "../../hooks/useLogbooks";
 import AdminAuthorizationForm from "./AuthorizationForm";
@@ -100,7 +100,7 @@ function UserFormInner({
     });
   }
 
-  const updated = JSON.stringify(form) === JSON.stringify(user);
+  const updated = JSON.stringify(form) !== JSON.stringify(user);
 
   const logbooksFiltered = logbooks
     .filter((logbook) =>
@@ -133,13 +133,22 @@ function UserFormInner({
         removeAuthorization={removeAuthorization}
         createAuthorization={createAuthorization}
       />
-      <button
-        disabled={updated}
-        className={twJoin(Button, "block ml-auto mt-3")}
-        onClick={save}
-      >
-        Save
-      </button>
+      <div className="flex justify-end mt-3 gap-3">
+        <button
+          disabled={!updated}
+          className={twJoin(TextButton, "block")}
+          onClick={finishEditing}
+        >
+          Discard changes
+        </button>
+        <button
+          disabled={!updated}
+          className={twJoin(Button, "block")}
+          onClick={save}
+        >
+          Save
+        </button>
+      </div>
     </div>
   );
 }

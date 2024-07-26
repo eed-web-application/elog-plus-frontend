@@ -1,6 +1,6 @@
 import { twJoin, twMerge } from "tailwind-merge";
 import { Group, GroupUpdation, Permission, updateGroup } from "../../api";
-import { Button, IconButton, Input, InputInvalid } from "../base";
+import { Button, IconButton, Input, InputInvalid, TextButton } from "../base";
 import { useGroupFormsStore, validateGroupForm } from "../../groupFormsStore";
 import useLogbooks from "../../hooks/useLogbooks";
 import AdminAuthorizationForm from "./AuthorizationForm";
@@ -267,13 +267,23 @@ function GroupFormInner({
         removeAuthorization={removeAuthorization}
         createAuthorization={createAuthorization}
       />
-      <button
-        disabled={!updated || invalid.size > 0}
-        className={twJoin(Button, "block ml-auto mt-3")}
-        onClick={save}
-      >
-        Save
-      </button>
+
+      <div className="flex justify-end mt-3 gap-3">
+        <button
+          disabled={!updated}
+          className={twJoin(TextButton, "block")}
+          onClick={finishEditing}
+        >
+          Discard changes
+        </button>
+        <button
+          disabled={!updated || invalid.size > 0}
+          className={twJoin(Button, "block")}
+          onClick={save}
+        >
+          Save
+        </button>
+      </div>
     </div>
   );
 }

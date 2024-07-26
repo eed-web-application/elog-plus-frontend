@@ -9,7 +9,7 @@ import {
   LogbookWithAuth,
   Permission,
 } from "../../api";
-import { Button, IconButton, Input, InputInvalid } from "../base";
+import { Button, IconButton, Input, InputInvalid, TextButton } from "../base";
 import {
   useLogbookFormsStore,
   validateLogbookForm,
@@ -479,13 +479,22 @@ export default function LogbookForm({ logbook, onSave }: Props) {
         createAuthorization={(ownerId) => createAuthorization("Token", ownerId)}
       />
 
-      <button
-        disabled={!updated || invalid.size > 0}
-        className={twJoin(Button, "block ml-auto mt-3")}
-        onClick={save}
-      >
-        Save
-      </button>
+      <div className="flex justify-end mt-3 gap-3">
+        <button
+          disabled={!updated}
+          className={twJoin(TextButton, "block")}
+          onClick={finishEditing}
+        >
+          Discard changes
+        </button>
+        <button
+          disabled={!updated || invalid.size > 0}
+          className={twJoin(Button, "block")}
+          onClick={save}
+        >
+          Save
+        </button>
+      </div>
     </div>
   );
 }

@@ -10,7 +10,7 @@ export const Button =
   "cursor-pointer py-1 px-2 bg-blue-500 rounded-lg text-white border border-blue-500 hover:bg-blue-600 hover:border-blue-600 outline-2 focus:outline outline-blue-300 outline-offset-0 disabled:cursor-auto disabled:bg-blue-300 disabled:border-blue-300 disabled:hover:bg-blue-300 disabled:text-gray-100";
 
 export const TextButton =
-  "py-1 px-2 rounded-lg font-medium text-blue-500 hover:bg-blue-100 disabled:hover:bg-auto disabled:text-blue-200 disabled:font-normal";
+  "py-1 px-2 rounded-lg font-medium text-blue-500 hover:bg-blue-100 disabled:hover:bg-transparent disabled:text-blue-200";
 
 export const IconButton =
   "w-9 h-9 p-2 hover:bg-gray-200 rounded-full cursor-pointer outline-2 outline-offset-0 outline-blue-500 focus:outline select-none";
