@@ -149,7 +149,14 @@ export default function Select<O extends Option>({
       <input
         {...getInputProps({
           type: nonsearchable ? "button" : "text",
-          className: twMerge(Input, invalid && InputInvalid, className),
+          className: twMerge(
+            Input,
+            invalid && InputInvalid,
+            nonsearchable && "cursor-pointer",
+            className,
+            // 72px is the width of the dropdown icon + add button + padding
+            "pr-[72px]",
+          ),
           placeholder: value || !placeholder ? "" : placeholder,
           value: search,
           onChange: (e: FormEvent<HTMLInputElement>) => {
@@ -172,11 +179,13 @@ export default function Select<O extends Option>({
           // Using styles from Input to ensure padding is correct
           Input,
           disabled && InputDisabled,
-          "absolute flex left-0 right-0 bottom-0 top-0 bg-transparent border-transparent pointer-events-none",
+          "absolute flex left-0 right-0 bottom-0 top-0 bg-transparent border-transparent pointer-events-none overflow-hidden",
           className,
         )}
       >
-        {value && !search ? valuesLabel : ""}
+        <div className="flex-1 overflow-x-auto">
+          {value && !search ? valuesLabel : ""}
+        </div>
 
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -184,7 +193,7 @@ export default function Select<O extends Option>({
           viewBox="0 0 24 24"
           strokeWidth="1.5"
           stroke="currentColor"
-          className="self-end ml-auto w-6 h-6 text-gray-500 cursor-pointer"
+          className="self-center ml-auto w-6 h-6 text-gray-500 cursor-pointer"
         >
           <path
             strokeLinecap="round"
