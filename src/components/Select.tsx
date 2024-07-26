@@ -64,7 +64,7 @@ export default function Select<O extends Option>({
     ? options.filter((option) =>
         (typeof option === "string" ? option : option.label)
           .toLowerCase()
-          .includes(search),
+          .includes(search.toLowerCase()),
       )
     : options;
 

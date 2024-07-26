@@ -42,7 +42,7 @@ export default function AdminLogbooks() {
       <AdminResource
         home="/admin/logbooks"
         items={logbooksSearched.map((logbook) => ({
-          label: logbook.name,
+          label: logbook.name.toUpperCase(),
           link: `/admin/logbooks/${logbook.id}`,
           edited: logbooksEdited.includes(logbook.id),
         }))}

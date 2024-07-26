@@ -251,8 +251,10 @@ export default function LogbookForm({ logbook, onSave }: Props) {
             invalid.has("name") && InputInvalid,
             "block w-full",
           )}
-          value={form.name}
-          onChange={(e) => setForm({ ...form, name: e.target.value })}
+          value={form.name.toUpperCase()}
+          onChange={(e) =>
+            setForm({ ...form, name: e.target.value.toLowerCase() })
+          }
         />
       </label>
 

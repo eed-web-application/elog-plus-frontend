@@ -31,7 +31,6 @@ function GroupFormInner({
     state.startEditing(group),
   );
 
-  const [logbookSearch, setLogbookSearch] = useState("");
   const [memberSearch, setMemberSearch] = useState("");
   const [selectedNewMember, setSelectedNewMember] = useState<string | null>(
     null,
@@ -159,14 +158,10 @@ function GroupFormInner({
 
   const updated = JSON.stringify(form) !== JSON.stringify(group);
 
-  const logbooksFiltered = logbooks
-    .filter((logbook) =>
-      logbook.name.toLowerCase().includes(logbookSearch.toLowerCase()),
-    )
-    .filter(
-      (logbook) =>
-        !form.authorizations.some((auth) => auth.resourceId === logbook.id),
-    );
+  const logbooksFiltered = logbooks.filter(
+    (logbook) =>
+      !form.authorizations.some((auth) => auth.resourceId === logbook.id),
+  );
 
   const newMembers = users.filter(
     (user) => !form.members.some((member) => user.id === member.id),
@@ -251,7 +246,7 @@ function GroupFormInner({
       <AdminAuthorizationForm
         emptyLabel="No logbook authorizations. Create one below."
         options={logbooksFiltered.map((logbook) => ({
-          label: logbook.name,
+          label: logbook.name.toUpperCase(),
           value: logbook.id,
         }))}
         isOptionsLoading={isLogbooksLoading}
@@ -259,10 +254,9 @@ function GroupFormInner({
           .filter((auth) => auth.resourceType === "Logbook")
           .map((auth) => ({
             value: auth.resourceId,
-            label: auth.resourceName,
+            label: auth.resourceName.toUpperCase(),
             permission: auth.permission,
           }))}
-        setOptionsSearch={setLogbookSearch}
         updatePermission={updateAuthorizationPermission}
         removeAuthorization={removeAuthorization}
         createAuthorization={createAuthorization}

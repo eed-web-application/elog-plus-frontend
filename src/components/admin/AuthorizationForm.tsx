@@ -16,7 +16,7 @@ export interface Props {
   emptyLabel: string;
   options: SearchOpiton[];
   isOptionsLoading: boolean;
-  setOptionsSearch: (search: string) => void;
+  setOptionsSearch?: (search: string) => void;
   updatePermission: (authorization: string, permission: Permission) => void;
   removeAuthorization: (authorization: string) => void;
   createAuthorization: (owner: string) => void;

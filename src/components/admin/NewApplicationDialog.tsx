@@ -44,7 +44,6 @@ export default function NewApplicationDialog({ onClose, ...rest }: Props) {
       return;
     }
 
-    console.log("name", name);
     const applicationId = await createApplication({ name, expiration });
     navigate(`/admin/applications/${applicationId}`);
     setName("");

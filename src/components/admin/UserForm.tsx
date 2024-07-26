@@ -5,7 +5,6 @@ import { useUserFormsStore } from "../../userFormsStore";
 import useLogbooks from "../../hooks/useLogbooks";
 import AdminAuthorizationForm from "./AuthorizationForm";
 import { saveAuthorizations } from "../../authorizationDiffing";
-import { useState } from "react";
 import useUser from "../../hooks/useUser";
 import Spinner from "../Spinner";
 import { useQueryClient } from "@tanstack/react-query";
@@ -28,7 +27,6 @@ function UserFormInner({
   isLogbooksLoading: boolean;
   onSave: () => void;
 }) {
-  const [logbookSearch, setLogbookSearch] = useState("");
   const { form, setForm, finishEditing } = useUserFormsStore((state) =>
     state.startEditing(user),
   );
@@ -102,14 +100,10 @@ function UserFormInner({
 
   const updated = JSON.stringify(form) !== JSON.stringify(user);
 
-  const logbooksFiltered = logbooks
-    .filter((logbook) =>
-      logbook.name.toLowerCase().includes(logbookSearch.toLowerCase()),
-    )
-    .filter(
-      (logbook) =>
-        !form.authorizations.some((auth) => auth.resourceId === logbook.id),
-    );
+  const logbooksFiltered = logbooks.filter(
+    (logbook) =>
+      !form.authorizations.some((auth) => auth.resourceId === logbook.id),
+  );
 
   return (
     <div className="p-3 pt-5">
@@ -117,7 +111,7 @@ function UserFormInner({
       <AdminAuthorizationForm
         emptyLabel="No logbook authorizations. Create one below."
         options={logbooksFiltered.map((logbook) => ({
-          label: logbook.name,
+          label: logbook.name.toUpperCase(),
           value: logbook.id,
         }))}
         isOptionsLoading={isLogbooksLoading}
@@ -125,10 +119,9 @@ function UserFormInner({
           .filter((auth) => auth.resourceType === "Logbook")
           .map((auth) => ({
             value: auth.resourceId,
-            label: auth.resourceName,
+            label: auth.resourceName.toUpperCase(),
             permission: auth.permission,
           }))}
-        setOptionsSearch={setLogbookSearch}
         updatePermission={updateAuthorizationPermission}
         removeAuthorization={removeAuthorization}
         createAuthorization={createAuthorization}
