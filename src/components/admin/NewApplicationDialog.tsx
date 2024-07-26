@@ -7,6 +7,7 @@ import { Input } from "../base";
 import { createApplication } from "../../api";
 import { useNavigate } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
+import { yyyymmddToDate } from "../../utils/datetimeConversion";
 
 export type Props = Omit<
   NewAdminResourceDialogProps,
@@ -22,7 +23,7 @@ export default function NewApplicationDialog({ onClose, ...rest }: Props) {
 
   function validateExpiration() {
     try {
-      return expiration && new Date(expiration) > new Date();
+      return expiration && yyyymmddToDate(expiration) > new Date();
     } catch (e) {
       return false;
     }
