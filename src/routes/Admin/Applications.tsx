@@ -41,6 +41,7 @@ export default function AdminApplications() {
         createLabel="Create application"
         onCreate={() => setIsCreateOpen(true)}
         onSearchChange={setApplicationSearch}
+        onBottomVisible={getMoreApplications}
       >
         {selectedApplicationId && (
           <ApplicationForm
