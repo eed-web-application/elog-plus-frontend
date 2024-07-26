@@ -6,21 +6,23 @@ import {
   fetchApplications,
 } from "../api";
 import reportServerError from "../reportServerError";
-import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
+import { useInfiniteQuery } from "@tanstack/react-query";
 
 const APPLICATIONS_PER_PAGE = 25;
 
-export default function useApplications<A extends boolean>({
-  search,
-  includeAuthorizations,
-  enabled = true,
-  critical = true,
-}: {
+export type ApplicationsQuery<A extends boolean> = {
   search: string;
   includeAuthorizations?: A;
+};
+
+export default function useApplications<A extends boolean>({
+  enabled = true,
+  critical = true,
+  ...query
+}: {
   enabled?: boolean;
   critical?: boolean;
-}) {
+} & ApplicationsQuery<A>) {
   const {
     data,
     isLoading,
@@ -29,11 +31,10 @@ export default function useApplications<A extends boolean>({
     isFetchingNextPage,
     isInitialLoading,
   } = useInfiniteQuery({
-    queryKey: ["applications", search],
+    queryKey: ["applications", query],
     queryFn: ({ pageParam, queryKey }) =>
       fetchApplications<A>({
-        search,
-        includeAuthorizations,
+        ...(queryKey[1] as ApplicationsQuery<A>),
         anchor: pageParam,
         limit: APPLICATIONS_PER_PAGE,
       }),

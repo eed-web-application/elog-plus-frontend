@@ -5,17 +5,19 @@ import { useInfiniteQuery } from "@tanstack/react-query";
 
 const USERS_PER_PAGE = 25;
 
-export default function useUsers<A extends boolean>({
-  search,
-  includeAuthorizations,
-  enabled = true,
-  critical = true,
-}: {
+export type UsersQuery<A extends boolean> = {
   search: string;
   includeAuthorizations?: A;
+};
+
+export default function useUsers<A extends boolean>({
+  enabled = true,
+  critical = true,
+  ...query
+}: {
   enabled?: boolean;
   critical?: boolean;
-}) {
+} & UsersQuery<A>) {
   const {
     data,
     isLoading,
@@ -24,11 +26,10 @@ export default function useUsers<A extends boolean>({
     isFetchingNextPage,
     isInitialLoading,
   } = useInfiniteQuery({
-    queryKey: ["users", search],
+    queryKey: ["users", query],
     queryFn: ({ pageParam, queryKey }) =>
       fetchUsers<A>({
-        search,
-        includeAuthorizations,
+        ...(queryKey[1] as UsersQuery<A>),
         anchor: pageParam,
         limit: USERS_PER_PAGE,
       }),
