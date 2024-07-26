@@ -240,7 +240,7 @@ export default function LogbookForm({ logbook, onSave }: Props) {
   const updated = JSON.stringify(form) !== JSON.stringify(logbook);
 
   return (
-    <div className="p-3">
+    <div className="p-3 pt-5">
       <label className="block text-gray-500">
         Name
         <input

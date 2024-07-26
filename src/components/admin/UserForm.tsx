@@ -112,7 +112,7 @@ function UserFormInner({
     );
 
   return (
-    <div className="p-3">
+    <div className="p-3 pt-5">
       <div className="text-gray-500">Logbook Authorizations</div>
       <AdminAuthorizationForm
         emptyLabel="No logbook authorizations. Create one below."
