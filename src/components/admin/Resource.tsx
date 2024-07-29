@@ -118,7 +118,7 @@ export default function AdminResource({
             to={item.link}
             className={({ isActive }) =>
               twJoin(
-                "p-2 cursor-pointer focus:outline focus:z-0 outline-2 outline-blue-500",
+                "p-2 cursor-pointer focus:outline focus:z-0 outline-2 outline-blue-500 overflow-x-clip overflow-y-visible overflow-ellipsis",
                 isActive
                   ? "bg-blue-100 hover:bg-blue-200"
                   : "hover:bg-gray-100",
