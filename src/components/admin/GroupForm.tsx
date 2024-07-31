@@ -116,17 +116,7 @@ function GroupFormInner({
     });
   }
 
-  function createAuthorization(resourceId: string) {
-    const resouceLabel = logbooks.find(
-      (logbook) => logbook.id === resourceId,
-    )?.name;
-
-    // Should probably never happen, but we still want to catch it, because
-    // if this throws something else is wrong.
-    if (!resouceLabel) {
-      throw new Error("Could not find label for new authorization");
-    }
-
+  function createAuthorization(resourceId: string, resouceLabel: string) {
     // If the user deletes an authorization and then creates a new one with the
     // same owner, we want to keep the ID so we don't create a new one.
     const existingAuthorization = group.authorizations.find(
@@ -230,6 +220,7 @@ function GroupFormInner({
                 value: selectedNewMember.id,
               }
             }
+            searchType="managed"
             onSearchChange={setMemberSearch}
             isLoading={isUsersLoading}
             options={newMembers.map((user) => ({

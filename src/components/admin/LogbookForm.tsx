@@ -184,25 +184,8 @@ export default function LogbookForm({ logbook, onSave }: Props) {
   function createAuthorization(
     ownerType: "User" | "Group" | "Token",
     ownerId: string,
+    ownerLabel: string,
   ) {
-    let ownerLabel: string | undefined;
-
-    if (ownerType === "User") {
-      ownerLabel = users?.find((user) => user.id === ownerId)?.name;
-    } else if (ownerType === "Group") {
-      ownerLabel = groups?.find((group) => group.id === ownerId)?.name;
-    } else {
-      ownerLabel = applications?.find(
-        (application) => application.id === ownerId,
-      )?.name;
-    }
-
-    // Should probably never happen, but we still want to catch it, because
-    // if this throws something else is wrong.
-    if (!ownerLabel) {
-      throw new Error("Could not find label for new authorization");
-    }
-
     // If the user deletes an authorization and then creates a new one with the
     // same owner, we want to keep the ID so we don't create a new one.
     const existingAuthorization = logbook.authorizations.find(
@@ -419,7 +402,9 @@ export default function LogbookForm({ logbook, onSave }: Props) {
         setOptionsSearch={setUserSearch}
         updatePermission={updateAuthorizationPermission}
         removeAuthorization={removeAuthorization}
-        createAuthorization={(ownerId) => createAuthorization("User", ownerId)}
+        createAuthorization={(ownerId, ownerLabel) =>
+          createAuthorization("User", ownerId, ownerLabel)
+        }
       />
 
       <div className="mt-2 text-gray-500">Group Authorizations</div>
@@ -447,7 +432,9 @@ export default function LogbookForm({ logbook, onSave }: Props) {
         setOptionsSearch={setGroupSearch}
         updatePermission={updateAuthorizationPermission}
         removeAuthorization={removeAuthorization}
-        createAuthorization={(ownerId) => createAuthorization("Group", ownerId)}
+        createAuthorization={(ownerId, ownerLabel) =>
+          createAuthorization("Group", ownerId, ownerLabel)
+        }
       />
 
       <div className="mt-2 text-gray-500">Applications</div>
@@ -478,7 +465,9 @@ export default function LogbookForm({ logbook, onSave }: Props) {
         setOptionsSearch={setApplicationSearch}
         updatePermission={updateAuthorizationPermission}
         removeAuthorization={removeAuthorization}
-        createAuthorization={(ownerId) => createAuthorization("Token", ownerId)}
+        createAuthorization={(ownerId, ownerLabel) =>
+          createAuthorization("Token", ownerId, ownerLabel)
+        }
       />
 
       <div className="flex justify-end mt-3 gap-3">

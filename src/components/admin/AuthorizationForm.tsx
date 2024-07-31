@@ -4,6 +4,7 @@ import { Permission } from "../../api";
 import Select, { ValuedOption } from "../Select";
 import { IconButton } from "../base";
 import ResourceListForm from "./ResourceListForm";
+import useDebounce from "../../hooks/useDebounce";
 
 export interface Authorization {
   value: string;
@@ -19,7 +20,7 @@ export interface Props {
   setOptionsSearch?: (search: string) => void;
   updatePermission: (authorization: string, permission: Permission) => void;
   removeAuthorization: (authorization: string) => void;
-  createAuthorization: (owner: string) => void;
+  createAuthorization: (ownerValue: string, ownerLabel: string) => void;
   getMoreOptions?: () => void;
 }
 
@@ -28,7 +29,7 @@ export default function AdminAuthorizationForm({
   emptyLabel,
   options,
   isOptionsLoading,
-  setOptionsSearch,
+  setOptionsSearch = () => {},
   updatePermission,
   removeAuthorization,
   createAuthorization,
@@ -38,6 +39,8 @@ export default function AdminAuthorizationForm({
     null,
   );
 
+  const onSearchChange = useDebounce(setOptionsSearch, 500);
+
   const tryCreateAuthorization = useCallback(
     (e: FormEvent<HTMLFormElement>) => {
       e.preventDefault();
@@ -45,10 +48,10 @@ export default function AdminAuthorizationForm({
         return;
       }
 
-      createAuthorization(selectedNewOwner.value);
+      createAuthorization(selectedNewOwner.value, selectedNewOwner.label);
       setSelectedNewOwner(null);
     },
-    [selectedNewOwner, setSelectedNewOwner, createAuthorization],
+    [selectedNewOwner?.value, setSelectedNewOwner, createAuthorization],
   );
 
   return (
@@ -74,7 +77,7 @@ export default function AdminAuthorizationForm({
 
               updatePermission(authorization.value, updatedPermission);
             }}
-            nonsearchable
+            searchType="none"
           />
 
           <svg
@@ -100,13 +103,14 @@ export default function AdminAuthorizationForm({
         <Select
           className="pr-12 w-full"
           value={selectedNewOwner}
-          onSearchChange={setOptionsSearch}
+          onSearchChange={onSearchChange}
           isLoading={isOptionsLoading}
           options={options || []}
           setValue={(value) => {
             const option = options.find((option) => option.value === value);
             setSelectedNewOwner(option || null);
           }}
+          searchType="managed"
           onBottomVisible={getMoreOptions}
         />
       }

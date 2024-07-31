@@ -5,24 +5,11 @@ import { ComponentProps, useEffect, useMemo, useState } from "react";
 import { useDraftsStore } from "../draftsStore";
 import Logo from "./Logo";
 import DevSelectUser from "./DevSelectUser";
+import useDebounce from "../hooks/useDebounce";
 
 interface Props extends ComponentProps<"div"> {
   search: string;
   onSearchChange: (search: string) => void;
-}
-
-function debounce<A extends unknown[]>(
-  func: (...args: A) => void,
-  timeout: number,
-): (...args: A) => void {
-  let timer: number;
-
-  return (...args: A) => {
-    clearTimeout(timer);
-    timer = setTimeout(() => {
-      func(...args);
-    }, timeout);
-  };
 }
 
 export default function Navbar({
@@ -36,10 +23,7 @@ export default function Navbar({
     Boolean(drafts["newEntry"]),
   );
 
-  const debouncedOnSearchChange = useMemo(
-    () => debounce(onSearchChange, 500),
-    [onSearchChange],
-  );
+  const debouncedOnSearchChange = useDebounce(onSearchChange, 500);
 
   function searchFor(value: string) {
     setStagedSearch(value);

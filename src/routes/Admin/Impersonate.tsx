@@ -34,6 +34,7 @@ export default function AdminImpersonate() {
           }))}
           placeholder="Select a user..."
           onSearchChange={setSearch}
+          searchType="managed"
           onBottomVisible={getMoreUsers}
         />
       </div>

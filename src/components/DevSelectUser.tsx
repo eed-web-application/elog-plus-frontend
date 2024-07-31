@@ -60,7 +60,7 @@ export default function DevSelectUser({ className }: { className?: string }) {
       className={twMerge("w-48", className)}
       value={accessCode}
       setValue={setAccessCode}
-      nonsearchable
+      searchType="none"
       options={Object.entries(users).map(([name, accessCode]) => ({
         label: name,
         value: accessCode,

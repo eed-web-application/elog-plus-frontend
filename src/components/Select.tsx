@@ -20,6 +20,8 @@ import SelectOption from "./SelectOption";
 export type ValuedOption = { label: string; value: string };
 export type Option = string | ValuedOption;
 
+export type SearchType = "managed" | "unmanaged" | "none";
+
 interface Props<O extends Option>
   extends Omit<ComponentProps<"input">, "value"> {
   value: Option | null;
@@ -28,7 +30,7 @@ interface Props<O extends Option>
   isLoading?: boolean;
   containerClassName?: string;
   invalid?: boolean;
-  nonsearchable?: boolean;
+  searchType?: SearchType;
   emptyLabel?: string;
   onSearchChange?: (search: string) => void;
   onBottomVisible?: () => void;
@@ -43,7 +45,7 @@ export default function Select<O extends Option>({
   containerClassName,
   placeholder,
   invalid,
-  nonsearchable,
+  searchType,
   emptyLabel,
   onSearchChange,
   onBottomVisible,
@@ -61,13 +63,14 @@ export default function Select<O extends Option>({
     [setSearch, onSearchChange],
   );
 
-  const filteredOptions = search
-    ? options.filter((option) =>
-        (typeof option === "string" ? option : option.label)
-          .toLowerCase()
-          .includes(search.toLowerCase()),
-      )
-    : options;
+  const filteredOptions =
+    searchType === "unmanaged" && search
+      ? options.filter((option) =>
+          (typeof option === "string" ? option : option.label)
+            .toLowerCase()
+            .includes(search.toLowerCase()),
+        )
+      : options;
 
   let valuesLabel: string | undefined;
   if (typeof value === "string") {
@@ -151,11 +154,11 @@ export default function Select<O extends Option>({
     >
       <input
         {...getInputProps({
-          type: nonsearchable ? "button" : "text",
+          type: searchType === "none" ? "button" : "text",
           className: twMerge(
             Input,
             invalid && InputInvalid,
-            nonsearchable && "cursor-pointer",
+            searchType === "none" && "cursor-pointer",
             className,
             // 72px is the width of the dropdown icon + add button + padding
             "pr-[72px]",
