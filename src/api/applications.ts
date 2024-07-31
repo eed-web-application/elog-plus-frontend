@@ -6,6 +6,7 @@ export interface Application {
   name: string;
   expiration: string;
   token: string;
+  applicationManaged: boolean;
 }
 
 export interface ApplicationWithAuth extends Application {

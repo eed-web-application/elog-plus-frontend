@@ -36,6 +36,7 @@ export default function AdminApplications() {
           label: application.name,
           link: `/admin/applications/${application.id}`,
           edited: applicationsEdited.includes(application.id),
+          readOnly: application.applicationManaged,
         }))}
         isLoading={isLoading}
         createLabel="Create application"

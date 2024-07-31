@@ -244,8 +244,8 @@ export default function LogbookForm({ logbook, onSave }: Props) {
       <div className="text-gray-500 mt-2">Tags</div>
       <ResourceListForm
         emptyLabel="No tags. Create one below."
-        disabled={
-          !newTag || Boolean(form.tags.find(({ name }) => name === newTag))
+        addable={
+          Boolean(newTag) && !form.tags.find(({ name }) => name === newTag)
         }
         onSubmit={createTag}
         select={
@@ -294,7 +294,7 @@ export default function LogbookForm({ logbook, onSave }: Props) {
           />
         }
         onSubmit={createShift}
-        disabled={!newShift}
+        addable={Boolean(newShift)}
         items={form.shifts.map((shift, index) => (
           <div
             key={shift.id}

@@ -5,6 +5,7 @@ export type Props = Omit<ComponentProps<"div">, "onSubmit"> & {
   items: ReactNode[];
   emptyLabel: string;
   select: ReactNode;
+  addable?: boolean;
   disabled?: boolean;
   onSubmit: (e: FormEvent<HTMLFormElement>) => void;
 };
@@ -13,6 +14,7 @@ export default function ResourceListForm({
   items,
   emptyLabel,
   select,
+  addable,
   disabled,
   onSubmit,
   className,
@@ -24,6 +26,7 @@ export default function ResourceListForm({
         "border rounded-lg bg-gray-50 w-full flex flex-col p-2",
         items.length === 0 &&
           "items-center justify-center text-lg text-gray-500",
+        disabled && "bg-gray-100 text-gray-500 border-gray-200",
         className,
       )}
       {...rest}

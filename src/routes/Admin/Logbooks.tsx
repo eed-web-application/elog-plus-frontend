@@ -45,6 +45,7 @@ export default function AdminLogbooks() {
           label: logbook.name.toUpperCase(),
           link: `/admin/logbooks/${logbook.id}`,
           edited: logbooksEdited.includes(logbook.id),
+          readOnly: false,
         }))}
         isLoading={isLogbooksLoading}
         createLabel="Create logbook"

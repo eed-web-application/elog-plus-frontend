@@ -29,6 +29,7 @@ export default function AdminUsers() {
           label: user.name,
           link: `/admin/users/${encodeURI(user.id)}/`,
           edited: usersEdited.includes(user.id),
+          readOnly: false,
         }))}
         isLoading={isLoading}
         createLabel="Create logbook"

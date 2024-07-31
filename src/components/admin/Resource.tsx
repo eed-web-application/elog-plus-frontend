@@ -9,6 +9,7 @@ export interface Item {
   label: string;
   link: string;
   edited: boolean;
+  readOnly: boolean;
 }
 
 export interface Props extends ComponentProps<"div"> {
@@ -118,7 +119,7 @@ export default function AdminResource({
             to={item.link}
             className={({ isActive }) =>
               twJoin(
-                "p-2 cursor-pointer focus:outline focus:z-0 outline-2 outline-blue-500 overflow-x-clip overflow-y-visible overflow-ellipsis",
+                "p-2 cursor-pointer focus:outline focus:z-0 outline-2 outline-blue-500 overflow-x-clip overflow-y-visible overflow-ellipsis flex",
                 isActive
                   ? "bg-blue-100 hover:bg-blue-200"
                   : "hover:bg-gray-100",
@@ -127,6 +128,22 @@ export default function AdminResource({
           >
             {item.label}
             <span className="text-gray-500">{item.edited && "*"}</span>
+            {item.readOnly && (
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={1.5}
+                stroke="currentColor"
+                className="w-5 h-5 ml-1 text-gray-500 self-center"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z"
+                />
+              </svg>
+            )}
           </NavLink>
         ))}
 

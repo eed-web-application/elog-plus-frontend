@@ -170,6 +170,7 @@ function ApplicationFormInner({
 
       <div className="text-gray-500 mt-2">Logbook Authorizations</div>
       <AdminAuthorizationForm
+        disabled={application.applicationManaged}
         emptyLabel="No logbook authorizations. Create one below."
         options={logbooksFiltered.map((logbook) => ({
           label: logbook.name.toUpperCase(),
@@ -187,22 +188,24 @@ function ApplicationFormInner({
         removeAuthorization={removeAuthorization}
         createAuthorization={createAuthorization}
       />
-      <div className="flex justify-end mt-3 gap-3">
-        <button
-          disabled={!updated}
-          className={twJoin(TextButton, "block")}
-          onClick={finishEditing}
-        >
-          Discard changes
-        </button>
-        <button
-          disabled={!updated}
-          className={twJoin(Button, "block")}
-          onClick={save}
-        >
-          Save
-        </button>
-      </div>
+      {!application.applicationManaged && (
+        <div className="flex justify-end mt-3 gap-3">
+          <button
+            disabled={!updated}
+            className={twJoin(TextButton, "block")}
+            onClick={finishEditing}
+          >
+            Discard changes
+          </button>
+          <button
+            disabled={!updated}
+            className={twJoin(Button, "block")}
+            onClick={save}
+          >
+            Save
+          </button>
+        </div>
+      )}
     </div>
   );
 }

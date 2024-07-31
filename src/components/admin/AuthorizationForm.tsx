@@ -17,6 +17,7 @@ export interface Props {
   emptyLabel: string;
   options: ValuedOption[];
   isOptionsLoading: boolean;
+  disabled?: boolean;
   setOptionsSearch?: (search: string) => void;
   updatePermission: (authorization: string, permission: Permission) => void;
   removeAuthorization: (authorization: string) => void;
@@ -29,6 +30,7 @@ export default function AdminAuthorizationForm({
   emptyLabel,
   options,
   isOptionsLoading,
+  disabled,
   setOptionsSearch = () => {},
   updatePermission,
   removeAuthorization,
@@ -56,6 +58,8 @@ export default function AdminAuthorizationForm({
 
   return (
     <ResourceListForm
+      disabled={disabled}
+      addable={!disabled}
       items={authorizations.map((authorization) => (
         <div
           key={authorization.value}
@@ -78,6 +82,7 @@ export default function AdminAuthorizationForm({
               updatePermission(authorization.value, updatedPermission);
             }}
             searchType="none"
+            disabled={disabled}
           />
 
           <svg
@@ -112,9 +117,10 @@ export default function AdminAuthorizationForm({
           }}
           searchType="managed"
           onBottomVisible={getMoreOptions}
+          disabled={disabled}
         />
       }
-      disabled={!selectedNewOwner}
+      addable={Boolean(selectedNewOwner)}
       onSubmit={tryCreateAuthorization}
     />
   );

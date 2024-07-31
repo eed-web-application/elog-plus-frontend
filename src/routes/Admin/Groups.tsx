@@ -34,6 +34,7 @@ export default function AdminGroups() {
           label: group.name,
           link: `/admin/groups/${group.id}`,
           edited: groupsEdited.includes(group.id),
+          readOnly: false,
         }))}
         isLoading={isLoading}
         createLabel="Create group"

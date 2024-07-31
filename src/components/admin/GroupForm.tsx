@@ -182,7 +182,7 @@ function GroupFormInner({
       <div className="text-gray-500 mt-2">Members</div>
       <ResourceListForm
         emptyLabel="No members. Add one below."
-        disabled={!selectedNewMember}
+        addable={Boolean(selectedNewMember)}
         onSubmit={addMember}
         items={form.members.map((member) => (
           <div
