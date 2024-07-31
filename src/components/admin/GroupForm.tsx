@@ -216,7 +216,7 @@ function GroupFormInner({
             className="pr-12 w-full"
             value={
               selectedNewMember && {
-                label: selectedNewMember.name,
+                label: `${selectedNewMember.name} (${selectedNewMember.email})`,
                 value: selectedNewMember.id,
               }
             }
@@ -224,7 +224,7 @@ function GroupFormInner({
             onSearchChange={setMemberSearch}
             isLoading={isUsersLoading}
             options={newMembers.map((user) => ({
-              label: user.name,
+              label: `${user.name} (${user.email})`,
               value: user.id,
             }))}
             setValue={(userId) => {

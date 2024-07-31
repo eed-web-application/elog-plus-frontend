@@ -396,7 +396,10 @@ export default function LogbookForm({ logbook, onSave }: Props) {
                   authorization.ownerId === user.id,
               ),
           )
-          .map((user) => ({ label: user.name, value: user.id }))}
+          .map((user) => ({
+            label: `${user.name} (${user.email})`,
+            value: user.id,
+          }))}
         isOptionsLoading={isUsersLoading}
         getMoreOptions={getMoreUsers}
         setOptionsSearch={setUserSearch}

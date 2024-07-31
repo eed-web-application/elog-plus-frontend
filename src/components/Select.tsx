@@ -185,7 +185,7 @@ export default function Select<O extends Option>({
           // Using styles from Input to ensure padding is correct
           Input,
           disabled && InputDisabled,
-          "absolute flex left-0 right-0 bottom-0 top-0 bg-transparent border-transparent pointer-events-none overflow-hidden",
+          "absolute flex left-0 right-0 bottom-0 top-0 bg-transparent border-transparent pointer-events-none overflow-hidden whitespace-nowrap",
           className,
         )}
       >
