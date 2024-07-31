@@ -1,5 +1,5 @@
 import { twJoin, twMerge } from "tailwind-merge";
-import { Group, GroupUpdation, Permission, updateGroup } from "../../api";
+import { Group, GroupUpdation, Permission, User, updateGroup } from "../../api";
 import { Button, IconButton, Input, InputInvalid, TextButton } from "../base";
 import { useGroupFormsStore, validateGroupForm } from "../../groupFormsStore";
 import useLogbooks from "../../hooks/useLogbooks";
@@ -32,9 +32,7 @@ function GroupFormInner({
   );
 
   const [memberSearch, setMemberSearch] = useState("");
-  const [selectedNewMember, setSelectedNewMember] = useState<string | null>(
-    null,
-  );
+  const [selectedNewMember, setSelectedNewMember] = useState<User | null>(null);
 
   const { logbooks, isLoading: isLogbooksLoading } = useLogbooks();
   const {
@@ -84,10 +82,7 @@ function GroupFormInner({
     setSelectedNewMember(null);
     setForm({
       ...form,
-      members: [
-        ...form.members,
-        users.find((user) => user.id === selectedNewMember)!,
-      ],
+      members: [...form.members, selectedNewMember],
     });
   }
 
@@ -229,14 +224,22 @@ function GroupFormInner({
         select={
           <Select
             className="pr-12 w-full"
-            value={selectedNewMember}
+            value={
+              selectedNewMember && {
+                label: selectedNewMember.name,
+                value: selectedNewMember.id,
+              }
+            }
             onSearchChange={setMemberSearch}
             isLoading={isUsersLoading}
             options={newMembers.map((user) => ({
               label: user.name,
               value: user.id,
             }))}
-            setValue={setSelectedNewMember}
+            setValue={(userId) => {
+              const user = newMembers.find((user) => user.id === userId);
+              setSelectedNewMember(user || null);
+            }}
             onBottomVisible={getMoreUsers}
           />
         }

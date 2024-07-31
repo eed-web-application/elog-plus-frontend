@@ -17,11 +17,12 @@ import useSelectList from "../hooks/useSelectList";
 import SelectList from "./SelectList";
 import SelectOption from "./SelectOption";
 
-export type Option = string | { label: string; value: string };
+export type ValuedOption = { label: string; value: string };
+export type Option = string | ValuedOption;
 
 interface Props<O extends Option>
   extends Omit<ComponentProps<"input">, "value"> {
-  value: string | null;
+  value: Option | null;
   setValue: (selected: string | null) => void;
   options: Readonly<O[]>;
   isLoading?: boolean;
@@ -69,12 +70,14 @@ export default function Select<O extends Option>({
     : options;
 
   let valuesLabel: string | undefined;
-  if (value) {
+  if (typeof value === "string") {
     const option = options.find(
       (option) =>
         (typeof option === "string" ? option : option.value) === value,
     );
     valuesLabel = typeof option === "string" ? option : option?.label;
+  } else if (value !== null) {
+    valuesLabel = value.label;
   }
 
   const { refs, floatingStyles, context } = useFloating({

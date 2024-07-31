@@ -1,7 +1,7 @@
 import { twJoin } from "tailwind-merge";
 import { FormEvent, useCallback, useState } from "react";
 import { Permission } from "../../api";
-import Select, { Option as SearchOpiton } from "../Select";
+import Select, { ValuedOption } from "../Select";
 import { IconButton } from "../base";
 import ResourceListForm from "./ResourceListForm";
 
@@ -14,7 +14,7 @@ export interface Authorization {
 export interface Props {
   authorizations: Authorization[];
   emptyLabel: string;
-  options: SearchOpiton[];
+  options: ValuedOption[];
   isOptionsLoading: boolean;
   setOptionsSearch?: (search: string) => void;
   updatePermission: (authorization: string, permission: Permission) => void;
@@ -34,7 +34,9 @@ export default function AdminAuthorizationForm({
   createAuthorization,
   getMoreOptions,
 }: Props) {
-  const [selectedNewOwner, setSelectedNewOwner] = useState<string | null>(null);
+  const [selectedNewOwner, setSelectedNewOwner] = useState<ValuedOption | null>(
+    null,
+  );
 
   const tryCreateAuthorization = useCallback(
     (e: FormEvent<HTMLFormElement>) => {
@@ -43,7 +45,7 @@ export default function AdminAuthorizationForm({
         return;
       }
 
-      createAuthorization(selectedNewOwner);
+      createAuthorization(selectedNewOwner.value);
       setSelectedNewOwner(null);
     },
     [selectedNewOwner, setSelectedNewOwner, createAuthorization],
@@ -101,7 +103,10 @@ export default function AdminAuthorizationForm({
           onSearchChange={setOptionsSearch}
           isLoading={isOptionsLoading}
           options={options || []}
-          setValue={setSelectedNewOwner}
+          setValue={(value) => {
+            const option = options.find((option) => option.value === value);
+            setSelectedNewOwner(option || null);
+          }}
           onBottomVisible={getMoreOptions}
         />
       }
