@@ -41,7 +41,7 @@ const SelectList = forwardRef<HTMLDivElement, Props>(function SelectList(
 
   return (
     <div ref={ref} {...rest}>
-      {isEmpty ? (
+      {isEmpty && !isLoading ? (
         <div className="py-3 w-full text-center text-gray-500">
           {emptyLabel || "No options"}
         </div>
