@@ -21,6 +21,7 @@ import AdminLogbooks from "./routes/Admin/Logbooks.tsx";
 import AdminGroups from "./routes/Admin/Groups.tsx";
 import AdminUsers from "./routes/Admin/Users.tsx";
 import AdminApplications from "./routes/Admin/Applications.tsx";
+import AdminImpersonate from "./routes/Admin/Impersonate.tsx";
 import { fetchEntry, ServerError, UnauthorizedError } from "./api";
 import "./index.css";
 import reportServerError from "./reportServerError.tsx";
@@ -76,6 +77,7 @@ const router = createBrowserRouter(
               path: "logbooks/:logbookId",
               element: <AdminLogbooks />,
             },
+
             {
               path: "users",
               element: <AdminUsers />,
@@ -93,6 +95,7 @@ const router = createBrowserRouter(
               path: "groups/:groupId",
               element: <AdminGroups />,
             },
+
             {
               path: "applications",
               element: <AdminApplications />,
@@ -100,6 +103,11 @@ const router = createBrowserRouter(
             {
               path: "applications/:applicationId",
               element: <AdminApplications />,
+            },
+
+            {
+              path: "impersonate",
+              element: <AdminImpersonate />,
             },
           ],
         },
