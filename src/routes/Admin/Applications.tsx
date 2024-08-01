@@ -7,6 +7,7 @@ import useApplications from "../../hooks/useApplications";
 import { useApplicationFormsStore } from "../../applicationFormsStore";
 import AdminResource from "../../components/admin/Resource";
 import NewApplicationDialog from "../../components/admin/NewApplicationDialog";
+import useDebounce from "../../hooks/useDebounce";
 
 export default function AdminApplications() {
   const [applicationSearch, setApplicationSearch] = useState("");
@@ -25,6 +26,8 @@ export default function AdminApplications() {
     toast.success("Saved application");
   }, []);
 
+  const onSearchChange = useDebounce(setApplicationSearch, 500);
+
   return (
     <NewApplicationDialog
       isOpen={isCreateOpen}
@@ -41,7 +44,7 @@ export default function AdminApplications() {
         isLoading={isLoading}
         createLabel="Create application"
         onCreate={() => setIsCreateOpen(true)}
-        onSearchChange={setApplicationSearch}
+        onSearchChange={onSearchChange}
         onBottomVisible={getMoreApplications}
       >
         {selectedApplicationId && (

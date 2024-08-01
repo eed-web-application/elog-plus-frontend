@@ -7,6 +7,7 @@ import useGroups from "../../hooks/useGroups";
 import { useGroupFormsStore } from "../../groupFormsStore";
 import AdminResource from "../../components/admin/Resource";
 import NewGroupDialog from "../../components/admin/NewGroupDialog";
+import useDebounce from "../../hooks/useDebounce";
 
 export default function AdminGroups() {
   const [groupSearch, setGroupSearch] = useState("");
@@ -22,6 +23,8 @@ export default function AdminGroups() {
   const onSave = useCallback(() => {
     toast.success("Saved group");
   }, []);
+
+  const onSearchChange = useDebounce(setGroupSearch, 500);
 
   return (
     <NewGroupDialog
@@ -39,7 +42,7 @@ export default function AdminGroups() {
         isLoading={isLoading}
         createLabel="Create group"
         onCreate={() => setIsCreateOpen(true)}
-        onSearchChange={setGroupSearch}
+        onSearchChange={onSearchChange}
         onBottomVisible={getMoreGroups}
       >
         {selectedGroupId && (

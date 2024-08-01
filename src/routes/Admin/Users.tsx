@@ -6,6 +6,7 @@ import UserForm from "../../components/admin/UserForm";
 import useUsers from "../../hooks/useUsers";
 import { useUserFormsStore } from "../../userFormsStore";
 import AdminResource from "../../components/admin/Resource";
+import useDebounce from "../../hooks/useDebounce";
 
 export default function AdminUsers() {
   const [userSearch, setUserSearch] = useState("");
@@ -21,6 +22,8 @@ export default function AdminUsers() {
     toast.success("Saved user");
   }, []);
 
+  const onSearchChange = useDebounce(setUserSearch, 500);
+
   return (
     <>
       <AdminResource
@@ -33,7 +36,7 @@ export default function AdminUsers() {
         }))}
         isLoading={isLoading}
         createLabel="Create logbook"
-        onSearchChange={setUserSearch}
+        onSearchChange={onSearchChange}
         onBottomVisible={getMoreUsers}
       >
         {selectedUserId && <UserForm userId={selectedUserId} onSave={onSave} />}
