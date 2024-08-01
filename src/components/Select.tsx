@@ -37,7 +37,7 @@ interface Props<O extends Option>
 }
 
 export default function Select<O extends Option>({
-  value,
+  value: selected,
   setValue,
   options,
   isLoading,
@@ -72,21 +72,25 @@ export default function Select<O extends Option>({
         )
       : options;
 
-  let valuesLabel: string | undefined;
-  if (typeof value === "string") {
+  let selectedLabel: string | undefined;
+  let selectedValue: string | undefined;
+  if (typeof selected === "string") {
+    selectedValue = selected;
+
     const option = options.find(
       (option) =>
-        (typeof option === "string" ? option : option.value) === value,
+        (typeof option === "string" ? option : option.value) === selected,
     );
-    valuesLabel = typeof option === "string" ? option : option?.label;
-  } else if (value !== null) {
-    valuesLabel = value.label;
+    selectedLabel = typeof option === "string" ? option : option?.label;
+  } else if (selected !== null) {
+    selectedValue = selected.value;
+    selectedLabel = selected.label;
   }
 
   const { refs, floatingStyles, context } = useFloating({
     open: open,
     onOpenChange: (open) => {
-      if (value && !open) {
+      if (selected && !open) {
         updateSearch("");
       }
 
@@ -163,7 +167,7 @@ export default function Select<O extends Option>({
             // 72px is the width of the dropdown icon + add button + padding
             "pr-[72px]",
           ),
-          placeholder: value || !placeholder ? "" : placeholder,
+          placeholder: selectedLabel || !placeholder ? "" : placeholder,
           value: search,
           onChange: (e: FormEvent<HTMLInputElement>) => {
             updateSearch(e.currentTarget.value);
@@ -190,7 +194,7 @@ export default function Select<O extends Option>({
         )}
       >
         <div className="flex-1 overflow-x-auto">
-          {value && !search ? valuesLabel : ""}
+          {selected && !search ? selectedLabel : ""}
         </div>
 
         <svg
@@ -229,7 +233,8 @@ export default function Select<O extends Option>({
               <SelectOption
                 isActive={activeIndex === index}
                 isSelected={
-                  value === (typeof option === "string" ? option : option.value)
+                  selectedValue ===
+                  (typeof option === "string" ? option : option.value)
                 }
                 {...getItemProps({
                   key: typeof option === "string" ? option : option.value,
