@@ -86,7 +86,7 @@ function MenuButtonDropDown({ editor }: { editor: Editor }) {
 
   return (
     <Select
-      nonsearchable
+      searchType="none"
       options={supportedOptions}
       value={selected}
       setValue={(value) =>
