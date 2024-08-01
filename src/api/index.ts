@@ -1,3 +1,5 @@
+import { useImpersonationStore } from "../impersonationStore";
+
 export const ENDPOINT = import.meta.env.API_ENDPOINT || "/api/elog";
 
 interface ErrorContext {
@@ -75,6 +77,10 @@ export async function fetch(
 
   if (import.meta.env.MODE === "development" && __GET_DEV_ACCESS_CODE()) {
     headers["x-vouch-idp-accesstoken"] = __GET_DEV_ACCESS_CODE() || "";
+  }
+  const impersonating = useImpersonationStore.getState().impersonating;
+  if (impersonating?.id) {
+    headers["Impersonate"] = impersonating.id;
   }
 
   const options = {

@@ -1,13 +1,34 @@
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { twMerge } from "tailwind-merge";
 import { Checkbox } from "../../components/base";
 import Select from "../../components/Select";
 import useUsers from "../../hooks/useUsers";
+import { useImpersonationStore } from "../../impersonationStore";
+import { useQueryClient } from "@tanstack/react-query";
 
 export default function AdminImpersonate() {
-  const [impersonating, setImpersonating] = useState<null | string>(null);
+  const queryClient = useQueryClient();
   const [search, setSearch] = useState("");
-  const { users, userMap, getMoreUsers } = useUsers({ search });
+
+  const impersonate = useImpersonationStore((state) => state.impersonate);
+  const impersonating = useImpersonationStore((state) => state.impersonating);
+
+  const [enabled, setEnabled] = useState(impersonating !== null);
+
+  const { users, userMap, getMoreUsers, isLoading } = useUsers({
+    search,
+  });
+
+  const onSelect = useCallback(
+    (userId: string | null) => {
+      const user = userId ? userMap[userId] || null : null;
+      impersonate(user);
+      if (user) {
+        queryClient.invalidateQueries();
+      }
+    },
+    [impersonate, queryClient, userMap],
+  );
 
   return (
     <div className="flex flex-col items-center justify-center h-full">
@@ -18,20 +39,32 @@ export default function AdminImpersonate() {
           <input
             type="checkbox"
             className={twMerge(Checkbox, "mr-2")}
-            checked={impersonating !== null}
-            onChange={(e) => setImpersonating(e.target.checked ? "" : null)}
+            checked={enabled}
+            onChange={(e) => {
+              if (e.target.checked) {
+                setEnabled(true);
+              } else {
+                setEnabled(false);
+                impersonate(null);
+              }
+            }}
           />
           Activate
         </label>
 
         <Select
-          disabled={impersonating === null}
-          value={impersonating}
-          setValue={setImpersonating}
+          disabled={!enabled}
+          value={
+            impersonating
+              ? { label: impersonating.name, value: impersonating.id }
+              : null
+          }
+          setValue={onSelect}
           options={users.map((user) => ({
             label: user.name,
             value: user.id,
           }))}
+          isLoading={isLoading}
           placeholder="Select a user..."
           onSearchChange={setSearch}
           searchType="managed"
