@@ -46,6 +46,7 @@ interface FetchOptions extends Omit<RequestInit, "body" | "headers"> {
   headers?: Record<string, string>;
   params?: ConstructorParameters<typeof URLSearchParams>[0];
   payloadKey?: string;
+  noImpersonating?: boolean;
 }
 
 export function __SET_DEV_ACCESS_CODE(code: string | null) {
@@ -66,6 +67,7 @@ export async function fetch(
   {
     method = "GET",
     headers = {},
+    noImpersonating = false,
     body,
     params,
     formData,
@@ -79,7 +81,7 @@ export async function fetch(
     headers["x-vouch-idp-accesstoken"] = __GET_DEV_ACCESS_CODE() || "";
   }
   const impersonating = useImpersonationStore.getState().impersonating;
-  if (impersonating?.id) {
+  if (impersonating?.id && !noImpersonating) {
     headers["Impersonate"] = impersonating.id;
   }
 

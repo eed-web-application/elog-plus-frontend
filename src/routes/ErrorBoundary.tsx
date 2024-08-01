@@ -61,7 +61,7 @@ export default function ErrorBoundary() {
   }
 
   return (
-    <div className="flex flex-col justify-center items-center w-screen h-screen">
+    <div className="flex flex-col justify-center items-center w-screen h-full">
       {inner}
     </div>
   );

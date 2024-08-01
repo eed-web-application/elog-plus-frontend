@@ -9,7 +9,7 @@ export interface Authorization {
   ownerType: "User" | "Group" | "Token";
   ownerName: string;
   resourceId: string;
-  resourceType: "Logbook";
+  resourceType: "Logbook" | "All";
   resourceName: string;
 }
 

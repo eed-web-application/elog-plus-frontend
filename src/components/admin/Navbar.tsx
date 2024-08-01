@@ -2,6 +2,8 @@ import { ComponentProps } from "react";
 import { Link, NavLink } from "react-router-dom";
 import { twJoin, twMerge } from "tailwind-merge";
 import Logo from "../Logo";
+import useMe from "../../hooks/useMe";
+import useIsRoot from "../../hooks/useIsRoot";
 
 const links = [
   {
@@ -170,6 +172,7 @@ const links = [
         />
       </svg>
     ),
+    conditional: () => useIsRoot(),
   },
 ];
 
@@ -177,6 +180,10 @@ export default function AdminNavbar({
   className,
   ...rest
 }: ComponentProps<"div">) {
+  const filtered = links.filter((link) =>
+    link.conditional ? link.conditional() : true,
+  );
+
   return (
     <div
       className={twMerge(
@@ -192,7 +199,7 @@ export default function AdminNavbar({
         <Logo className="inline" />
       </Link>
       <div className="flex z-10 justify-center items-center p-2 space-x-4">
-        {links.map(({ name, route, active, inactive }) => (
+        {filtered.map(({ name, route, active, inactive }) => (
           <NavLink
             to={route}
             key={route}

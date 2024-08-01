@@ -46,6 +46,10 @@ export function fetchUsers<A extends boolean | undefined>(
   });
 }
 
-export function fetchMe(): Promise<User> {
-  return fetch("v1/auth/me");
+export function fetchMe(): Promise<UserWithAuth> {
+  return fetch("v1/users/me");
+}
+
+export function fetchTrueMe(): Promise<UserWithAuth> {
+  return fetch("v1/users/me", { noImpersonating: true });
 }

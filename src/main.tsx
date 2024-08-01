@@ -25,6 +25,7 @@ import AdminImpersonate from "./routes/Admin/Impersonate.tsx";
 import { fetchEntry, ServerError, UnauthorizedError } from "./api";
 import "./index.css";
 import reportServerError from "./reportServerError.tsx";
+import ImpersonationContainer from "./components/ImpersonationContainer.tsx";
 
 const queryClient = new QueryClient();
 
@@ -154,7 +155,9 @@ window.addEventListener("unhandledrejection", (e) => {
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
   <React.StrictMode>
     <QueryClientProvider client={queryClient}>
-      <RouterProvider router={router} />
+      <ImpersonationContainer>
+        <RouterProvider router={router} />
+      </ImpersonationContainer>
       <ToastContainer hideProgressBar={true} />
     </QueryClientProvider>
   </React.StrictMode>,

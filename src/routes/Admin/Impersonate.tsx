@@ -19,15 +19,24 @@ export default function AdminImpersonate() {
     search,
   });
 
+  const onImpersonate = useCallback(() => {
+    queryClient.invalidateQueries({
+      predicate: (query) =>
+        query.queryKey[0] !== "user" && query.queryKey[1] !== "trueMe",
+    });
+    queryClient.removeQueries({
+      predicate: (query) =>
+        query.queryKey[0] !== "user" && query.queryKey[1] !== "trueMe",
+    });
+  }, [queryClient]);
+
   const onSelect = useCallback(
     (userId: string | null) => {
       const user = userId ? userMap[userId] || null : null;
       impersonate(user);
-      if (user) {
-        queryClient.invalidateQueries();
-      }
+      onImpersonate();
     },
-    [impersonate, queryClient, userMap],
+    [impersonate, onImpersonate, userMap],
   );
 
   return (
@@ -46,6 +55,7 @@ export default function AdminImpersonate() {
               } else {
                 setEnabled(false);
                 impersonate(null);
+                onImpersonate();
               }
             }}
           />
