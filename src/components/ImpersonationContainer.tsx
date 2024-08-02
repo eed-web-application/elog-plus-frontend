@@ -28,7 +28,7 @@ export default function ImpersonationContainer({
         </svg>
         <span className="font-medium">Impersonating:&nbsp;</span>
         <span className="">
-          {impersonating.name} ({impersonating.email})
+          {impersonating.gecos} ({impersonating.email})
         </span>
         <svg
           xmlns="http://www.w3.org/2000/svg"

@@ -4,6 +4,7 @@ import serializeParams, { ParamsObject } from "../utils/serializeParams";
 export interface User {
   id: string;
   name: string;
+  gecos: string;
   email: string;
 }
 

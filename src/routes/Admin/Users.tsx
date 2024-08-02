@@ -29,7 +29,7 @@ export default function AdminUsers() {
       <AdminResource
         home="/admin/users"
         items={users.map((user) => ({
-          label: user.name,
+          label: user.gecos,
           link: `/admin/users/${encodeURI(user.id)}/`,
           edited: usersEdited.includes(user.id),
           readOnly: false,

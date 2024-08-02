@@ -79,7 +79,7 @@ function UserFormInner({
           permission: DEFAULT_PERMISSION,
           ownerId: user.id,
           ownerType: "User",
-          ownerName: user.name,
+          ownerName: user.gecos,
           resourceId,
           resourceType: "Logbook",
           resourceName: resourceLabel,

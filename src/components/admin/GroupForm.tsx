@@ -190,7 +190,7 @@ function GroupFormInner({
             className="flex justify-between items-center px-2"
           >
             <div>
-              {member.name}
+              {member.gecos}
               <div className="text-sm text-gray-500">{member.email}</div>
             </div>
             <svg
@@ -216,7 +216,7 @@ function GroupFormInner({
             className="pr-12 w-full"
             value={
               selectedNewMember && {
-                label: `${selectedNewMember.name} (${selectedNewMember.email})`,
+                label: `${selectedNewMember.gecos} (${selectedNewMember.email})`,
                 value: selectedNewMember.id,
               }
             }
@@ -224,7 +224,7 @@ function GroupFormInner({
             onSearchChange={setMemberSearch}
             isLoading={isUsersLoading}
             options={newMembers.map((user) => ({
-              label: `${user.name} (${user.email})`,
+              label: `${user.gecos} (${user.email})`,
               value: user.id,
             }))}
             setValue={(userId) => {

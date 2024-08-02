@@ -397,7 +397,7 @@ export default function LogbookForm({ logbook, onSave }: Props) {
               ),
           )
           .map((user) => ({
-            label: `${user.name} (${user.email})`,
+            label: `${user.gecos} (${user.email})`,
             value: user.id,
           }))}
         isOptionsLoading={isUsersLoading}
