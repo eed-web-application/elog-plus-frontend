@@ -4,7 +4,7 @@ import { useFavoritesStore } from "../favoritesStore";
 import { useMemo } from "react";
 
 const CONTEXT_SIZE = 6;
-const ENTRIES_PER_PAGE = 10;
+const ENTRIES_PER_PAGE = 25;
 
 export type EntryQuery = {
   search: string;
