@@ -5,10 +5,13 @@ import Select from "../../components/Select";
 import useUsers from "../../hooks/useUsers";
 import { useImpersonationStore } from "../../impersonationStore";
 import { useQueryClient } from "@tanstack/react-query";
+import useDebounce from "../../hooks/useDebounce";
 
 export default function AdminImpersonate() {
   const queryClient = useQueryClient();
   const [search, setSearch] = useState("");
+
+  const onSearchChange = useDebounce(setSearch, 500);
 
   const impersonate = useImpersonationStore((state) => state.impersonate);
   const impersonating = useImpersonationStore((state) => state.impersonating);
@@ -76,7 +79,7 @@ export default function AdminImpersonate() {
           }))}
           isLoading={isLoading}
           placeholder="Select a user..."
-          onSearchChange={setSearch}
+          onSearchChange={onSearchChange}
           searchType="managed"
           onBottomVisible={getMoreUsers}
         />
