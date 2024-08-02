@@ -34,7 +34,7 @@ function UserFormInner({
 
   async function save() {
     await saveAuthorizations(user.authorizations, form.authorizations);
-    await queryClient.invalidateQueries({ queryKey: ["user", user.id] });
+    await queryClient.invalidateQueries({ queryKey: ["user", user.email] });
 
     finishEditing();
     onSave();
@@ -77,7 +77,7 @@ function UserFormInner({
         {
           id: existingAuthorization?.id,
           permission: DEFAULT_PERMISSION,
-          ownerId: user.id,
+          ownerId: user.email,
           ownerType: "User",
           ownerName: user.gecos,
           resourceId,

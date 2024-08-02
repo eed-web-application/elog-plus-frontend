@@ -81,8 +81,8 @@ export async function fetch(
     headers["x-vouch-idp-accesstoken"] = __GET_DEV_ACCESS_CODE() || "";
   }
   const impersonating = useImpersonationStore.getState().impersonating;
-  if (impersonating?.id && !noImpersonating) {
-    headers["Impersonate"] = impersonating.id;
+  if (impersonating?.email && !noImpersonating) {
+    headers["Impersonate"] = impersonating.email;
   }
 
   const options = {

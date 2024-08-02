@@ -50,7 +50,7 @@ function GroupFormInner({
   async function saveGroup() {
     const groupUpdation: GroupUpdation = {
       ...form,
-      members: form.members.map((member) => member.id),
+      members: form.members.map((member) => member.email),
     };
 
     await updateGroup(groupUpdation);
@@ -89,7 +89,7 @@ function GroupFormInner({
   function removeMember(memberId: string) {
     setForm({
       ...form,
-      members: form.members.filter((member) => member.id !== memberId),
+      members: form.members.filter((member) => member.email !== memberId),
     });
   }
 
@@ -149,7 +149,7 @@ function GroupFormInner({
   );
 
   const newMembers = users.filter(
-    (user) => !form.members.some((member) => user.id === member.id),
+    (user) => !form.members.some((member) => user.email === member.email),
   );
 
   return (
@@ -186,7 +186,7 @@ function GroupFormInner({
         onSubmit={addMember}
         items={form.members.map((member) => (
           <div
-            key={member.id}
+            key={member.email}
             className="flex justify-between items-center px-2"
           >
             <div>
@@ -201,7 +201,7 @@ function GroupFormInner({
               stroke="currentColor"
               tabIndex={0}
               className={twJoin(IconButton, "text-gray-500")}
-              onClick={() => removeMember(member.id)}
+              onClick={() => removeMember(member.email)}
             >
               <path
                 strokeLinecap="round"
@@ -217,7 +217,7 @@ function GroupFormInner({
             value={
               selectedNewMember && {
                 label: `${selectedNewMember.gecos} (${selectedNewMember.email})`,
-                value: selectedNewMember.id,
+                value: selectedNewMember.email,
               }
             }
             searchType="managed"
@@ -225,10 +225,10 @@ function GroupFormInner({
             isLoading={isUsersLoading}
             options={newMembers.map((user) => ({
               label: `${user.gecos} (${user.email})`,
-              value: user.id,
+              value: user.email,
             }))}
             setValue={(userId) => {
-              const user = newMembers.find((user) => user.id === userId);
+              const user = newMembers.find((user) => user.email === userId);
               setSelectedNewMember(user || null);
             }}
             onBottomVisible={getMoreUsers}

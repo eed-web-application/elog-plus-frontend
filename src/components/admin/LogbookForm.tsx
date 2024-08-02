@@ -393,12 +393,12 @@ export default function LogbookForm({ logbook, onSave }: Props) {
               !form.authorizations.some(
                 (authorization) =>
                   authorization.ownerType === "User" &&
-                  authorization.ownerId === user.id,
+                  authorization.ownerId === user.email,
               ),
           )
           .map((user) => ({
             label: `${user.gecos} (${user.email})`,
-            value: user.id,
+            value: user.email,
           }))}
         isOptionsLoading={isUsersLoading}
         getMoreOptions={getMoreUsers}

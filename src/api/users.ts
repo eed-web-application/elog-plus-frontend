@@ -13,7 +13,7 @@ export interface UserWithAuth extends User {
 }
 
 export function updateUser(user: UserWithAuth) {
-  return fetch(`v1/users/${user.id}`, {
+  return fetch(`v1/users/${user.email}`, {
     method: "PUT",
     body: user,
   });

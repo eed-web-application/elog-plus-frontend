@@ -69,13 +69,13 @@ export default function AdminImpersonate() {
           disabled={!enabled}
           value={
             impersonating
-              ? { label: impersonating.gecos, value: impersonating.id }
+              ? { label: impersonating.gecos, value: impersonating.email }
               : null
           }
           setValue={onSelect}
           options={users.map((user) => ({
             label: user.gecos,
-            value: user.id,
+            value: user.email,
           }))}
           isLoading={isLoading}
           placeholder="Select a user..."

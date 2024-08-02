@@ -30,8 +30,8 @@ export default function AdminUsers() {
         home="/admin/users"
         items={users.map((user) => ({
           label: user.gecos,
-          link: `/admin/users/${encodeURI(user.id)}/`,
-          edited: usersEdited.includes(user.id),
+          link: `/admin/users/${encodeURI(user.email)}/`,
+          edited: usersEdited.includes(user.email),
           readOnly: false,
         }))}
         isLoading={isLoading}
