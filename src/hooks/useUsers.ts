@@ -57,7 +57,7 @@ export default function useUsers<A extends boolean>({
     () =>
       users.reduce<Record<string, A extends true ? UserWithAuth : User>>(
         (acc, user) => {
-          acc[user.id] = user;
+          acc[user.email] = user;
           return acc;
         },
         {},
