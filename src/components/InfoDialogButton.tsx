@@ -63,7 +63,9 @@ export default function InfoDialogButton({
               <div>Server Version:</div>
             </div>
             <div className="flex flex-col">
-              <div>{import.meta.env.APP_VERSION}</div>
+              <div>
+                {import.meta.env.APP_VERSION} ({import.meta.env.COMMIT_HASH})
+              </div>
               <div>{version?.version || "\u00A0"}</div>
             </div>
           </div>
