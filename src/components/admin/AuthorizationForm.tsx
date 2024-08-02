@@ -2,7 +2,7 @@ import { twJoin } from "tailwind-merge";
 import { FormEvent, useCallback, useState } from "react";
 import { Permission } from "../../api";
 import Select, { ValuedOption } from "../Select";
-import { IconButton } from "../base";
+import { IconButton, IconButtonDisabled } from "../base";
 import ResourceListForm from "./ResourceListForm";
 import useDebounce from "../../hooks/useDebounce";
 
@@ -59,7 +59,7 @@ export default function AdminAuthorizationForm({
   return (
     <ResourceListForm
       disabled={disabled}
-      addable={!disabled}
+      addable={Boolean(selectedNewOwner)}
       items={authorizations.map((authorization) => (
         <div
           key={authorization.value}
@@ -92,8 +92,16 @@ export default function AdminAuthorizationForm({
             strokeWidth="1.5"
             stroke="currentColor"
             tabIndex={0}
-            className={twJoin(IconButton, "text-gray-500")}
-            onClick={() => removeAuthorization(authorization.value)}
+            className={twJoin(
+              IconButton,
+              disabled && IconButtonDisabled,
+              "text-gray-500",
+            )}
+            onClick={
+              disabled
+                ? () => {}
+                : () => removeAuthorization(authorization.value)
+            }
           >
             <path
               strokeLinecap="round"
@@ -120,7 +128,6 @@ export default function AdminAuthorizationForm({
           disabled={disabled}
         />
       }
-      addable={Boolean(selectedNewOwner)}
       onSubmit={tryCreateAuthorization}
     />
   );

@@ -1,5 +1,5 @@
 import { ComponentProps, FormEvent, ReactNode } from "react";
-import { twJoin, twMerge } from "tailwind-merge";
+import { twMerge } from "tailwind-merge";
 
 export type Props = Omit<ComponentProps<"div">, "onSubmit"> & {
   items: ReactNode[];
@@ -42,7 +42,7 @@ export default function ResourceListForm({
         <button
           type="submit"
           className="flex absolute top-0 right-0 bottom-0 justify-center items-center p-2.5 text-white bg-blue-500 rounded-r-lg disabled:text-gray-100 disabled:bg-blue-300"
-          disabled={disabled}
+          disabled={disabled || !addable}
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"

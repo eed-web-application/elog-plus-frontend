@@ -15,6 +15,9 @@ export const TextButton =
 export const IconButton =
   "w-9 h-9 p-2 hover:bg-gray-200 rounded-full cursor-pointer outline-2 outline-offset-0 outline-blue-500 focus:outline select-none";
 
+export const IconButtonDisabled =
+  "hover:bg-transparent focus:outline-none cursor-auto";
+
 export const BackDrop = "bg-gray-800 bg-opacity-60";
 
 export const Link =
