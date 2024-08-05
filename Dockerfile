@@ -11,6 +11,10 @@ ENV PATH="$PNPM_HOME:$PATH"
 
 RUN corepack enable
 
+# Need git for including the current commit hash in the build
+RUN apk update && apk upgrade && \
+    apk add --no-cache bash git openssh
+
 COPY . ./app
 WORKDIR /app
 
