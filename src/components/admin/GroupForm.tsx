@@ -1,5 +1,12 @@
 import { twJoin, twMerge } from "tailwind-merge";
-import { Group, GroupUpdation, Permission, User, updateGroup } from "../../api";
+import {
+  Group,
+  GroupUpdation,
+  Permission,
+  ServerError,
+  User,
+  updateGroup,
+} from "../../api";
 import { Button, IconButton, Input, InputInvalid, TextButton } from "../base";
 import { useGroupFormsStore, validateGroupForm } from "../../groupFormsStore";
 import useLogbooks from "../../hooks/useLogbooks";
@@ -12,6 +19,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import ResourceListForm from "./ResourceListForm";
 import useUsers from "../../hooks/useUsers";
 import Select from "../Select";
+import reportServerError from "../../reportServerError";
 
 export type Props = {
   onSave: () => void;
@@ -61,10 +69,19 @@ function GroupFormInner({
       return;
     }
 
-    await Promise.all([
-      saveGroup(),
-      saveAuthorizations(group.authorizations, form.authorizations),
-    ]);
+    try {
+      await Promise.all([
+        saveGroup(),
+        saveAuthorizations(group.authorizations, form.authorizations),
+      ]);
+    } catch (e) {
+      if (e instanceof ServerError) {
+        reportServerError("Could not save group", e);
+        return;
+      }
+
+      throw e;
+    }
 
     queryClient.invalidateQueries({ queryKey: ["groups"] });
     await queryClient.invalidateQueries({ queryKey: ["group", group.id] });
