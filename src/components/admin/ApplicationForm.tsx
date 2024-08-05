@@ -1,5 +1,10 @@
 import { twJoin, twMerge } from "tailwind-merge";
-import { ApplicationWithAuth, Logbook, Permission } from "../../api";
+import {
+  ApplicationWithAuth,
+  Logbook,
+  Permission,
+  ServerError,
+} from "../../api";
 import { Button, Input, TextButton } from "../base";
 import { useApplicationFormsStore } from "../../applicationFormsStore";
 import useLogbooks from "../../hooks/useLogbooks";
@@ -9,6 +14,7 @@ import useApplication from "../../hooks/useApplication";
 import Spinner from "../Spinner";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "react-toastify";
+import reportServerError from "../../reportServerError";
 
 interface Props {
   applicationId: string;
@@ -34,7 +40,17 @@ function ApplicationFormInner({
   const queryClient = useQueryClient();
 
   async function save() {
-    await saveAuthorizations(application.authorizations, form.authorizations);
+    try {
+      await saveAuthorizations(application.authorizations, form.authorizations);
+    } catch (e) {
+      if (e instanceof ServerError) {
+        reportServerError("Could not save application", e);
+        return;
+      }
+
+      throw e;
+    }
+
     await queryClient.invalidateQueries({
       queryKey: ["application", application.id],
     });
