@@ -442,7 +442,7 @@ export default function LogbookForm({ logbook, onSave }: Props) {
         }
       />
 
-      <div className="mt-2 text-gray-500">Applications</div>
+      <div className="mt-2 text-gray-500">Application Authorizations</div>
       <AdminAuthorizationForm
         authorizations={form.authorizations
           .filter((authorization) => authorization.ownerType === "Token")
