@@ -1,5 +1,5 @@
 import { twJoin } from "tailwind-merge";
-import { UserWithAuth, Permission, Logbook } from "../../api";
+import { UserWithAuth, Permission, Logbook, ServerError } from "../../api";
 import { Button, TextButton } from "../base";
 import { useUserFormsStore } from "../../userFormsStore";
 import useLogbooks from "../../hooks/useLogbooks";
@@ -8,6 +8,7 @@ import { saveAuthorizations } from "../../authorizationDiffing";
 import useUser from "../../hooks/useUser";
 import Spinner from "../Spinner";
 import { useQueryClient } from "@tanstack/react-query";
+import reportServerError from "../../reportServerError";
 
 interface Props {
   userId: string;
@@ -33,7 +34,16 @@ function UserFormInner({
   const queryClient = useQueryClient();
 
   async function save() {
-    await saveAuthorizations(user.authorizations, form.authorizations);
+    try {
+      await saveAuthorizations(user.authorizations, form.authorizations);
+    } catch (e) {
+      if (e instanceof ServerError) {
+        reportServerError("Could not save user", e);
+        return;
+      }
+
+      throw e;
+    }
     await queryClient.invalidateQueries({ queryKey: ["user", user.email] });
 
     finishEditing();
