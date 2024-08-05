@@ -16,6 +16,7 @@ RUN apk update && apk upgrade && \
     apk add --no-cache bash git openssh
 
 COPY . ./app
+COPY .git ./app/.git
 WORKDIR /app
 
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
