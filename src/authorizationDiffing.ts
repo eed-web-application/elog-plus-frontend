@@ -5,7 +5,7 @@ import {
   deleteAuthorization,
   updateAuthorization,
 } from "./api";
-import { LocalAuthorization } from "./logbookFormsStore";
+import { LocalAuthorization } from "./createAdminFormsStore";
 import reportServerError from "./reportServerError";
 
 export async function saveAuthorizations(

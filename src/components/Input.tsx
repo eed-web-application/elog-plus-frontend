@@ -39,8 +39,14 @@ export type InputProps<O> = {
   | ({ type: "multi-select" } & MultiSelectProps<O>)
 );
 
-function Select({ options, getOptionLabel, value, onChange }: SelectProps) {
+function Select(_: SelectProps) {
   return null;
 }
 
-export default function Input() {}
+export default function Input<O>(props: InputProps<O>) {
+  if (props.type === "select") {
+    return <Select {...props} />;
+  }
+
+  return null;
+}

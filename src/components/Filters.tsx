@@ -6,7 +6,6 @@ import { Input } from "./base.ts";
 import Chip from "./Chip.tsx";
 import useLogbooks from "../hooks/useLogbooks.ts";
 import useTags from "../hooks/useTags.ts";
-import { yyyymmddToDate, dateToYYYYMMDD } from "../utils/datetimeConversion.ts";
 import { Tag } from "../api/tags.ts";
 import { Logbook } from "../api/logbooks.ts";
 import FilterChipMultiSelect from "./FilterChipMultiSelect.tsx";

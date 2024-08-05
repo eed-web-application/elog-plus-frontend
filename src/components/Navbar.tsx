@@ -1,7 +1,7 @@
 import { twJoin, twMerge } from "tailwind-merge";
 import { Link } from "react-router-dom";
 import { Button, Input } from "./base";
-import { ComponentProps, useEffect, useMemo, useState } from "react";
+import { ComponentProps, useEffect, useState } from "react";
 import { useDraftsStore } from "../draftsStore";
 import Logo from "./Logo";
 import DevSelectUser from "./DevSelectUser";

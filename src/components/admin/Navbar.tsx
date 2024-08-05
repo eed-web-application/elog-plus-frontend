@@ -2,7 +2,6 @@ import { ComponentProps } from "react";
 import { Link, NavLink } from "react-router-dom";
 import { twJoin, twMerge } from "tailwind-merge";
 import Logo from "../Logo";
-import useMe from "../../hooks/useMe";
 import useIsRoot from "../../hooks/useIsRoot";
 
 const links = [

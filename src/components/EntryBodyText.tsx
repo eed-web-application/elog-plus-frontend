@@ -3,10 +3,10 @@ import { useNavigate } from "react-router-dom";
 import useEntryEditor from "../hooks/useEntryEditor";
 import { EditorContent } from "@tiptap/react";
 
-interface Props extends ComponentProps<typeof EditorContent> {
+export type Props = Omit<ComponentProps<typeof EditorContent>, "editor"> & {
   body: string;
   showEmptyLabel?: boolean;
-}
+};
 
 /**
  * Renders an entry's body text with sanitization and prose styling
