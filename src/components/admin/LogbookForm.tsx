@@ -89,21 +89,14 @@ export default function LogbookForm({ logbook, onSave }: Props) {
       })),
     };
 
-    try {
-      await updateLogbook(logbookUpdation);
+    await updateLogbook(logbookUpdation);
 
-      queryClient.invalidateQueries({
-        predicate: ({ queryKey }) =>
-          queryKey[0] === "tags" &&
-          Array.isArray(queryKey[1]) &&
-          (queryKey[1].includes(logbook.name) || queryKey[1].length === 0),
-      });
-    } catch (e) {
-      if (!(e instanceof ServerError)) {
-        throw e;
-      }
-      reportServerError("Could not save logbook", e);
-    }
+    queryClient.invalidateQueries({
+      predicate: ({ queryKey }) =>
+        queryKey[0] === "tags" &&
+        Array.isArray(queryKey[1]) &&
+        (queryKey[1].includes(logbook.name) || queryKey[1].length === 0),
+    });
   }
 
   async function save() {
@@ -111,10 +104,19 @@ export default function LogbookForm({ logbook, onSave }: Props) {
       return;
     }
 
-    await Promise.all([
-      saveLogbook(),
-      saveAuthorizations(logbook.authorizations, form.authorizations),
-    ]);
+    try {
+      await Promise.all([
+        saveLogbook(),
+        saveAuthorizations(logbook.authorizations, form.authorizations),
+      ]);
+    } catch (e) {
+      if (e instanceof ServerError) {
+        reportServerError("Could not save logbook", e);
+        return;
+      }
+
+      throw e;
+    }
 
     await queryClient.invalidateQueries({ queryKey: ["logbooks"] });
 
