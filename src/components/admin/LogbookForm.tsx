@@ -447,7 +447,7 @@ export default function LogbookForm({ logbook, onSave }: Props) {
         authorizations={form.authorizations
           .filter((authorization) => authorization.ownerType === "Token")
           .map((authorization) => ({
-            label: authorization.ownerId,
+            label: authorization.ownerName,
             value: authorization.ownerId,
             permission: authorization.permission,
           }))}
