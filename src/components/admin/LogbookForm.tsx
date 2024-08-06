@@ -378,6 +378,9 @@ export default function LogbookForm({ logbook, onSave }: Props) {
           </div>
         ))}
       />
+      {invalid.has("shiftOverlap") && (
+        <div className="text-red-500 mt-1">Shifts cannot overlap</div>
+      )}
 
       <div className="text-gray-500 mt-2">User Authorizations</div>
       <AdminAuthorizationForm

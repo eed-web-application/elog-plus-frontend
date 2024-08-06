@@ -5,6 +5,11 @@ export function dateToDatetimeString(date: Date) {
   return date.toISOString().slice(0, -1);
 }
 
+export function hhmmToMinutes(hhmm: string): number {
+  const [hour, minute] = hhmm.split(":").map((v) => parseInt(v, 10));
+  return hour * 60 + minute;
+}
+
 export function utcToLocal(utcTime: string): string {
   const [hour, minute] = utcTime.split(":").map((v) => parseInt(v, 10));
 
