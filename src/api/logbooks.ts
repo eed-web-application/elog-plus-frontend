@@ -48,16 +48,7 @@ export async function fetchLogbooks<A extends boolean | undefined>({
     params,
   });
 
-  // FIXME: Remove this when the proper API is implemented
-  return !includeAuth
-    ? logbooks
-    : logbooks.map((logbook: Logbook) => ({
-        ...logbook,
-        authorizations: (logbook.authorizations || []).map((auth) => ({
-          ...auth,
-          ownerName: auth.ownerId,
-        })),
-      }));
+  return logbooks;
 }
 
 export function updateLogbook(logbook: LogbookUpdation) {
