@@ -1,4 +1,4 @@
-import { ComponentProps, useCallback, useState } from "react";
+import { ComponentProps, useState } from "react";
 import { twJoin, twMerge } from "tailwind-merge";
 import {
   FloatingFocusManager,
@@ -22,26 +22,20 @@ export interface Props extends ComponentProps<"div"> {
   attachments: Attachment[];
 }
 
-/**
- * Two column masonry figure list with download buttons and a image preview modal
- */
-export default function EntryFigureList({
-  attachments,
-  className,
+function Figure({
+  figure,
+  index,
   ...rest
-}: Props) {
-  const figures = attachments.filter(
-    (attachment) => attachment.previewState === "Completed",
-  );
-  const [viewingFigure, setViewingFigure] = useState<string | null>(null);
+}: {
+  figure: Attachment;
+  index: number;
+} & ComponentProps<"div">) {
+  const [isOpen, setIsOpen] = useState(false);
+  const [isLoaded, setIsLoaded] = useState(false);
 
   const { refs, context } = useFloating({
-    open: Boolean(viewingFigure),
-    onOpenChange: (open) => {
-      if (!open) {
-        setViewingFigure(null);
-      }
-    },
+    open: isOpen,
+    onOpenChange: setIsOpen,
   });
 
   const click = useClick(context);
@@ -56,80 +50,48 @@ export default function EntryFigureList({
     role,
   ]);
 
-  const Figure = useCallback(
-    ({ figure, index }: { figure: Attachment; index: number }) => {
-      const [isLoaded, setIsLoaded] = useState(false);
-
-      return (
-        <div key={figure.id}>
-          <div className="flex relative">
-            <div className="mt-2 mb-1 text-gray-500">Figure {index + 1}</div>
-            <a
-              className={IconButton}
-              download={figure.fileName}
-              href={getAttachmentDownloadURL(figure.id)}
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth={1.5}
-                stroke="currentColor"
-                className="h-full"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"
-                />
-              </svg>
-            </a>
-          </div>
-          <img
-            src={getAttachmentPreviewURL(figure.id)}
-            tabIndex={0}
-            {...getReferenceProps()}
-            onClick={() => setViewingFigure(figure.id)}
-            className={twJoin(
-              "cursor-pointer w-full",
-              isLoaded ? "block" : "hidden",
-            )}
-            onLoad={() => setIsLoaded(true)}
-          />
-          {!isLoaded && <Spinner className="my-3 w-full" />}
-        </div>
-      );
-    },
-    [getReferenceProps],
-  );
-
   return (
     <>
-      <div className={twMerge("flex gap-3 pb-1", className)} {...rest}>
-        <div
-          className={twJoin(
-            "flex flex-col",
-            figures.length > 1 ? "basis-1/2" : "flex-1",
-          )}
-        >
-          {figures
-            .filter((_, index) => index % 2 === 0)
-            .map((figure, index) => (
-              <Figure figure={figure} index={index * 2} />
-            ))}
+      <div {...rest}>
+        <div className="flex relative">
+          <div className="mt-2 mb-1 text-gray-500">Figure {index + 1}</div>
+          <a
+            className={IconButton}
+            download={figure.fileName}
+            href={getAttachmentDownloadURL(figure.id)}
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth={1.5}
+              stroke="currentColor"
+              className="h-full"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"
+              />
+            </svg>
+          </a>
         </div>
-        {figures.length > 1 && (
-          <div className="flex flex-col basis-1/2">
-            {figures
-              .filter((_, index) => index % 2 === 1)
-              .map((figure, index) => (
-                <Figure figure={figure} index={index * 2 + 1} />
-              ))}
-          </div>
-        )}
+        <img
+          ref={refs.setReference}
+          {...getReferenceProps({
+            tabIndex: 0,
+            src: getAttachmentPreviewURL(figure.id),
+            className: twJoin(
+              "cursor-pointer w-full",
+              isLoaded ? "block" : "hidden",
+            ),
+            onLoad: () => setIsLoaded(true),
+          })}
+        />
+        {!isLoaded && <Spinner className="my-3 w-full" />}
       </div>
 
-      {viewingFigure && (
+      {isOpen && (
         <FloatingPortal>
           <FloatingOverlay
             lockScroll
@@ -151,7 +113,7 @@ export default function EntryFigureList({
                     "absolute top-0 left-0 m-3 !w-10 !h-10 !p-1 bg-gray-700 hover:bg-gray-600 text-gray-200 ring-blue-50",
                   )}
                   tabIndex={0}
-                  onClick={() => setViewingFigure(null)}
+                  onClick={() => setIsOpen(false)}
                 >
                   <path
                     strokeLinecap="round"
@@ -161,13 +123,54 @@ export default function EntryFigureList({
                 </svg>
                 <img
                   className="max-h-screen"
-                  src={getAttachmentPreviewURL(viewingFigure)}
+                  src={getAttachmentPreviewURL(figure.id)}
                 />
               </div>
             </FloatingFocusManager>
           </FloatingOverlay>
         </FloatingPortal>
       )}
+    </>
+  );
+}
+
+/**
+ * Two column masonry figure list with download buttons and a image preview modal
+ */
+export default function EntryFigureList({
+  attachments,
+  className,
+  ...rest
+}: Props) {
+  const figures = attachments.filter(
+    (attachment) => attachment.previewState === "Completed",
+  );
+
+  return (
+    <>
+      <div className={twMerge("flex gap-3 pb-1", className)} {...rest}>
+        <div
+          className={twJoin(
+            "flex flex-col",
+            figures.length > 1 ? "basis-1/2" : "flex-1",
+          )}
+        >
+          {figures
+            .filter((_, index) => index % 2 === 0)
+            .map((figure, index) => (
+              <Figure key={figure.id} figure={figure} index={index * 2} />
+            ))}
+        </div>
+        {figures.length > 1 && (
+          <div className="flex flex-col basis-1/2">
+            {figures
+              .filter((_, index) => index % 2 === 1)
+              .map((figure, index) => (
+                <Figure key={figure.id} figure={figure} index={index * 2 + 1} />
+              ))}
+          </div>
+        )}
+      </div>
     </>
   );
 }
