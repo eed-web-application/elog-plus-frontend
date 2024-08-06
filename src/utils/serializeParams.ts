@@ -1,4 +1,4 @@
-import { format } from "date-fns";
+import { dateToYYYYMMDD } from "./datetimeConversion";
 
 export type ParamsObject = Record<
   string,
@@ -20,7 +20,7 @@ export default function serializeParams(
         return [key, value.join(",")];
       }
       if (value instanceof Date) {
-        return [key, format(value, "yyyy-MM-dd")];
+        return [key, dateToYYYYMMDD(value)];
       }
 
       return [key, value.toString()];

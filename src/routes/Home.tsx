@@ -5,8 +5,8 @@ import {
   useOutlet,
   useSearchParams,
 } from "react-router-dom";
+import { yyyymmddToDate } from "../utils/datetimeConversion";
 import { twJoin } from "tailwind-merge";
-import { parse } from "date-fns";
 import Filters, { Filters as FiltersObject } from "../components/Filters";
 import Navbar from "../components/Navbar";
 import useEntries from "../hooks/useEntries";
@@ -39,12 +39,8 @@ function deserializeQuery(params: URLSearchParams): EntryQuery {
     logbooks: params.get("logbooks")?.split(",") ?? DEFAULT_QUERY.logbooks,
     tags: params.get("tags")?.split(",") ?? DEFAULT_QUERY.tags,
     requireAllTags: params.has("requireAllTags"),
-    startDate: startDate
-      ? parse(startDate, "yyyy-MM-dd", new Date())
-      : DEFAULT_QUERY.startDate,
-    endDate: endDate
-      ? parse(endDate, "yyyy-MM-dd", new Date())
-      : DEFAULT_QUERY.endDate,
+    startDate: startDate ? yyyymmddToDate(startDate) : DEFAULT_QUERY.startDate,
+    endDate: endDate ? yyyymmddToDate(endDate) : DEFAULT_QUERY.endDate,
     search: params.get("search") ?? DEFAULT_QUERY.search,
     sortByLogDate: params.has("sortByLogDate"),
     onlyFavorites: params.has("onlyFavorites"),

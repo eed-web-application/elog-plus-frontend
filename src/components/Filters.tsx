@@ -1,5 +1,4 @@
 import { useCallback } from "react";
-import { parse, format } from "date-fns";
 import { EntryQuery } from "../hooks/useEntries";
 import FilterChip from "./FilterChip.tsx";
 import { Input } from "./base.ts";
@@ -10,6 +9,7 @@ import { Tag } from "../api/tags.ts";
 import { Logbook } from "../api/logbooks.ts";
 import FilterChipMultiSelect from "./FilterChipMultiSelect.tsx";
 import FilterChipInput from "./FilterChipInput.tsx";
+import { dateToYYYYMMDD, yyyymmddToDate } from "../utils/datetimeConversion.ts";
 
 export type Filters = Pick<
   EntryQuery,
@@ -212,11 +212,9 @@ export default function Filters({ filters, setFilters }: Props) {
           className={Input}
           type="date"
           autoFocus
-          value={
-            filters.startDate ? format(filters.startDate, "yyyy-MM-dd") : ""
-          }
+          value={filters.startDate ? dateToYYYYMMDD(filters.startDate) : ""}
           onChange={(e) => {
-            const startDate = parse(e.target.value, "yyyy-MM-dd", new Date());
+            const startDate = yyyymmddToDate(e.target.value);
 
             if (!isNaN(startDate.getTime())) {
               setFilters({
@@ -247,9 +245,9 @@ export default function Filters({ filters, setFilters }: Props) {
           className={Input}
           type="date"
           autoFocus
-          value={filters.endDate ? format(filters.endDate, "yyyy-MM-dd") : ""}
+          value={filters.endDate ? dateToYYYYMMDD(filters.endDate) : ""}
           onChange={(e) => {
-            const endDate = parse(e.target.value, "yyyy-MM-dd", new Date());
+            const endDate = yyyymmddToDate(e.target.value);
 
             if (!isNaN(endDate.getTime())) {
               setFilters({
