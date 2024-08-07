@@ -25,7 +25,7 @@ function extractTagLabel(tag: Tag) {
   return `${tag.logbook.name.toUpperCase()}:${tag.name}`;
 }
 function extractTagKey(tag: Tag) {
-  return tag.name.toUpperCase();
+  return tag.id;
 }
 
 export interface Props {
