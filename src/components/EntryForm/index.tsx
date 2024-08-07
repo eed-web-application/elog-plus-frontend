@@ -1,4 +1,3 @@
-import { Suspense, lazy } from "react";
 import { twJoin, twMerge } from "tailwind-merge";
 import { useDropzone } from "react-dropzone";
 import { Link } from "react-router-dom";
@@ -8,7 +7,6 @@ import AttachmentCard from "../AttachmentCard";
 import { DraftFactory } from "../../draftsStore";
 import TextDivider from "../TextDivider";
 import { LocalAttachment } from "../../hooks/useAttachmentUploader";
-import Spinner from "../Spinner";
 import { dateToDatetimeString } from "../../utils/datetimeConversion";
 import useLogbooks from "../../hooks/useLogbooks";
 import LogbookForm from "./LogbookForm";
@@ -17,8 +15,7 @@ import ShiftSummaryForm from "./ShiftSummaryForm";
 import useEntryBuilder from "../../hooks/useEntryBuilder";
 import DateTimeInput from "../DateTimeInput";
 import useTags from "../../hooks/useTags";
-
-const EntryBodyTextEditor = lazy(() => import("../EntryBodyTextEditor"));
+import EntryBodyTextEditor from "../EntryBodyTextEditor";
 
 export interface Props {
   onEntrySaved: (id: string) => void;
@@ -59,7 +56,7 @@ export default function EntryForm({ onEntrySaved, kind = "newEntry" }: Props) {
   );
 
   return (
-    <Suspense fallback={<Spinner large className="mx-auto w-full" />}>
+    <>
       <Link
         to={{ pathname: "/", search: window.location.search }}
         className={twJoin(IconButton, "my-1 float-right")}
@@ -247,6 +244,6 @@ export default function EntryForm({ onEntrySaved, kind = "newEntry" }: Props) {
           />
         </form>
       </div>
-    </Suspense>
+    </>
   );
 }
