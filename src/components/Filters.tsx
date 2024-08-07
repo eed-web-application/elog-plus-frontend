@@ -55,7 +55,7 @@ export default function Filters({ filters, setFilters }: Props) {
   const logbookFilterLabel = useCallback(() => {
     const firstSelectedLogbook = filters.logbooks[0];
 
-    if (!firstSelectedLogbook || isLogbooksLoading || filters.onlyFavorites) {
+    if (!firstSelectedLogbook || filters.onlyFavorites) {
       return "Logbook";
     }
 
@@ -156,7 +156,7 @@ export default function Filters({ filters, setFilters }: Props) {
         className="mt-2 mr-3"
         label={logbookFilterLabel()}
         disabled={filters.onlyFavorites}
-        active={filters.logbooks.length !== 0 && !isLogbooksLoading}
+        active={filters.logbooks.length !== 0}
         onDisable={() => setFilters({ ...filters, logbooks: [] })}
         selected={filters.logbooks}
         setSelected={(selected) =>
@@ -165,7 +165,7 @@ export default function Filters({ filters, setFilters }: Props) {
             logbooks: selected,
           })
         }
-        isLoading={logbooks === null}
+        isLoading={isLogbooksLoading}
         options={(logbooks || []).map((logbook) => logbook.name.toUpperCase())}
         extractKey={(x) => x as string}
         extractLabel={(x) => x}
