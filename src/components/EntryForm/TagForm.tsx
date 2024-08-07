@@ -47,6 +47,7 @@ export default function TagForm({
       <label className={twMerge("text-gray-500", className)} {...rest}>
         Tags
         <MultiSelect
+          placeholder={isLoading ? "Loading..." : undefined}
           disabled={isLoading}
           isLoading={isLoading}
           options={tags.map(({ name, id }) => ({
