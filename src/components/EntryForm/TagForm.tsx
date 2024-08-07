@@ -27,7 +27,7 @@ export default function TagForm({
     tagMap,
     bumpTag,
     isLoading: isTagsLoading,
-  } = useTags({ logbooks, enabled: !isLoading });
+  } = useTags({ logbooks: logbooks?.map(({ id }) => id), enabled: !isLoading });
 
   const logbookMap = logbooks.reduce<Record<string, Logbook>>(
     (acc, logbook) => {

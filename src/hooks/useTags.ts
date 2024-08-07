@@ -1,5 +1,5 @@
 import { useTagUsageStore } from "../tagUsageStore";
-import { LogbookSummary, ServerError, Tag, fetchTags } from "../api";
+import { ServerError, Tag, fetchTags } from "../api";
 import reportServerError from "../reportServerError";
 import { useQuery } from "@tanstack/react-query";
 
@@ -11,7 +11,7 @@ export default function useTags({
   logbooks = [],
   enabled = true,
 }: {
-  logbooks?: LogbookSummary[];
+  logbooks?: string[];
   enabled?: boolean;
 } = {}) {
   const bumpTag = useTagUsageStore((state) => state.bump);
@@ -21,7 +21,7 @@ export default function useTags({
 
   const { data, isLoading } = useQuery({
     queryKey: ["tags", logbooks],
-    queryFn: () => fetchTags({ logbooks: logbooks.map(({ id }) => id) }),
+    queryFn: () => fetchTags({ logbooks }),
     enabled: enabled,
     staleTime: 5 * 60 * 1000,
     onError: (e) => {

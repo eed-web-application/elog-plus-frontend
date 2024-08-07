@@ -16,6 +16,7 @@ import InfoDialogButton from "../components/InfoDialogButton";
 import EntryListGrouped from "../components/EntryListGrouped";
 import serializeParams, { ParamsObject } from "../utils/serializeParams";
 import SideSheet from "../components/SideSheet";
+import useLogbooks from "../hooks/useLogbooks";
 
 // Import Sidebar from your local UI library
 // import Sidebar from "../../node_modules/ui/lib/Sidebar"; // Adjust the path as per your project structure
@@ -67,8 +68,20 @@ export default function Home() {
     [location.state, setSearchParams],
   );
 
-  const { isLoading, entries, getMoreEntries, reachedBottom } = useEntries({
-    query,
+  const { isLoading: isLogbooksLoading, logbookNameMap } = useLogbooks();
+  const {
+    isLoading: isEntriesLoading,
+    entries,
+    getMoreEntries,
+    reachedBottom,
+  } = useEntries({
+    enabled: !isLogbooksLoading,
+    query: {
+      ...query,
+      logbooks: isLogbooksLoading
+        ? []
+        : query.logbooks.map((name) => logbookNameMap[name.toLowerCase()].id),
+    },
     spotlight: spotlightSearch,
   });
 
@@ -107,6 +120,11 @@ export default function Home() {
 
   const outlet = useOutlet();
 
+  const isLoading = isEntriesLoading || isLogbooksLoading;
+  const includedLogbooks = isLogbooksLoading
+    ? []
+    : query.logbooks.map((name) => logbookNameMap[name.toLowerCase()].id);
+
   return (
     <div className="flex flex-col h-full">
       <div
@@ -133,7 +151,7 @@ export default function Home() {
           emptyLabel="No entries found"
           selected={location.pathname.split("/")[1]}
           isLoading={isLoading}
-          logbooksIncluded={query.logbooks}
+          logbooksIncluded={includedLogbooks}
           showReferences
           showFollowUps
           allowFavorite

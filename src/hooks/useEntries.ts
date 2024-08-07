@@ -18,6 +18,7 @@ export type EntryQuery = {
 };
 
 export interface Params extends Partial<EntryQuery> {
+  enabled?: boolean;
   spotlight?: string;
   query: EntryQuery;
   onSpotlightFetched?: () => void;
@@ -62,7 +63,7 @@ function useFavoriteEntries({
  * Manages fetching entries with filtering and spotlighting supporting
  * infnite scroll
  */
-export default function useEntries({ spotlight, query }: Params) {
+export default function useEntries({ enabled, spotlight, query }: Params) {
   // Since we want to include all the entries in the same day of the date
   // and the backend only returns entries before the date, we make sure the
   // date is at the end of the day
@@ -76,7 +77,7 @@ export default function useEntries({ spotlight, query }: Params) {
 
   const favoriteEntriesQuery = useFavoriteEntries({
     favorites: [...favorites],
-    enabled: query.onlyFavorites,
+    enabled: query.onlyFavorites && Boolean(enabled),
     sortByLogDate: query.sortByLogDate,
   });
 
@@ -88,7 +89,7 @@ export default function useEntries({ spotlight, query }: Params) {
     isFetchingNextPage,
     isInitialLoading,
   } = useInfiniteQuery({
-    enabled: !query.onlyFavorites,
+    enabled: !query.onlyFavorites && Boolean(enabled),
     queryKey: ["entries", query, spotlight],
     queryFn: async ({ pageParam, queryKey }) => {
       const query = queryKey[1] as EntryQuery;

@@ -15,6 +15,7 @@ export default function useLogbooks<A extends boolean>({
 } = {}): {
   logbooks: (A extends true ? LogbookWithAuth : Logbook)[];
   logbookMap: Record<string, A extends true ? LogbookWithAuth : Logbook>;
+  logbookNameMap: Record<string, A extends true ? LogbookWithAuth : Logbook>;
   isLoading: boolean;
 } {
   const { data, isLoading } = useQuery({
@@ -37,14 +38,21 @@ export default function useLogbooks<A extends boolean>({
         acc[logbook.id] = logbook;
         return acc;
       }, {});
+      const logbookNameMap = logbooks.reduce<
+        Record<string, A extends true ? LogbookWithAuth : Logbook>
+      >((acc, logbook) => {
+        acc[logbook.name] = logbook;
+        return acc;
+      }, {});
 
-      return { logbookMap, logbooks };
+      return { logbookMap, logbookNameMap, logbooks };
     },
   });
 
   return {
     logbooks: data?.logbooks || [],
     logbookMap: data?.logbookMap || {},
+    logbookNameMap: data?.logbookNameMap || {},
     isLoading,
   };
 }

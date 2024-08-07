@@ -6,7 +6,6 @@ import Chip from "./Chip.tsx";
 import useLogbooks from "../hooks/useLogbooks.ts";
 import useTags from "../hooks/useTags.ts";
 import { Tag } from "../api/tags.ts";
-import { Logbook } from "../api/logbooks.ts";
 import FilterChipMultiSelect from "./FilterChipMultiSelect.tsx";
 import FilterChipInput from "./FilterChipInput.tsx";
 import { dateToYYYYMMDD, yyyymmddToDate } from "../utils/datetimeConversion.ts";
@@ -25,11 +24,8 @@ export type Filters = Pick<
 function extractTagLabel(tag: Tag) {
   return `${tag.logbook.name.toUpperCase()}:${tag.name}`;
 }
-function extractLogbookLabel(logbook: Logbook) {
-  return logbook.name.toUpperCase();
-}
-function extractKey(tagOrLogbook: Tag | Logbook) {
-  return tagOrLogbook.id;
+function extractTagKey(tag: Tag) {
+  return tag.name.toUpperCase();
 }
 
 export interface Props {
@@ -38,27 +34,32 @@ export interface Props {
 }
 
 export default function Filters({ filters, setFilters }: Props) {
-  const { logbooks, logbookMap, isLoading: isLogbooksLoading } = useLogbooks();
+  const {
+    logbooks,
+    logbookNameMap,
+    isLoading: isLogbooksLoading,
+  } = useLogbooks();
+
   const {
     tags,
     tagMap,
     bumpTag,
     isLoading: isTagsLoading,
   } = useTags({
-    logbooks: filters.logbooks.map((id) => logbookMap[id]),
+    logbooks: isLogbooksLoading
+      ? []
+      : filters.logbooks.map((name) => logbookNameMap[name.toLowerCase()].id),
     enabled: !isLogbooksLoading,
   });
 
   const logbookFilterLabel = useCallback(() => {
-    const firstSelectedId = filters.logbooks[0];
+    const firstSelectedLogbook = filters.logbooks[0];
 
-    if (!firstSelectedId || isLogbooksLoading || filters.onlyFavorites) {
+    if (!firstSelectedLogbook || isLogbooksLoading || filters.onlyFavorites) {
       return "Logbook";
     }
 
-    const firstLogbook = logbookMap[firstSelectedId];
-
-    let label = firstLogbook.name.toUpperCase();
+    let label = firstSelectedLogbook.toUpperCase();
 
     if (filters.logbooks.length > 1) {
       label += ` and ${filters.logbooks.length - 1} other`;
@@ -68,7 +69,12 @@ export default function Filters({ filters, setFilters }: Props) {
     }
 
     return label;
-  }, [filters.logbooks, filters.onlyFavorites, logbookMap, isLogbooksLoading]);
+  }, [
+    filters.logbooks,
+    filters.onlyFavorites,
+    logbookNameMap,
+    isLogbooksLoading,
+  ]);
 
   const tagFilterLabel = useCallback(() => {
     const firstSelectedId = filters.tags[0];
@@ -150,7 +156,7 @@ export default function Filters({ filters, setFilters }: Props) {
         className="mt-2 mr-3"
         label={logbookFilterLabel()}
         disabled={filters.onlyFavorites}
-        active={filters.logbooks.length !== 0 && Boolean(logbooks)}
+        active={filters.logbooks.length !== 0 && !isLogbooksLoading}
         onDisable={() => setFilters({ ...filters, logbooks: [] })}
         selected={filters.logbooks}
         setSelected={(selected) =>
@@ -160,9 +166,9 @@ export default function Filters({ filters, setFilters }: Props) {
           })
         }
         isLoading={logbooks === null}
-        options={logbooks || []}
-        extractLabel={extractLogbookLabel}
-        extractKey={extractKey}
+        options={(logbooks || []).map((logbook) => logbook.name.toUpperCase())}
+        extractKey={(x) => x as string}
+        extractLabel={(x) => x}
       />
       <FilterChipMultiSelect
         className="mt-2 mr-3"
@@ -176,7 +182,7 @@ export default function Filters({ filters, setFilters }: Props) {
         isLoading={isTagsLoading}
         options={tags}
         extractLabel={extractTagLabel}
-        extractKey={extractKey}
+        extractKey={extractTagKey}
         searchButton={
           <button
             type="button"
