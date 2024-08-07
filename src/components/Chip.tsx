@@ -2,14 +2,14 @@ import React, { ComponentPropsWithRef, forwardRef } from "react";
 import { twJoin, twMerge } from "tailwind-merge";
 
 export interface Props extends ComponentPropsWithRef<"div"> {
-  delectable?: boolean;
+  deletable?: boolean;
   clickable?: boolean;
   leftIcon?: JSX.Element;
   onDelete?: (event: React.MouseEvent<SVGSVGElement, MouseEvent>) => void;
 }
 
 const Chip = forwardRef<HTMLDivElement, Props>(function Chip(
-  { delectable, clickable, className, children, leftIcon, onDelete, ...rest },
+  { deletable, clickable, className, children, leftIcon, onDelete, ...rest },
   ref,
 ) {
   const base = twJoin(
@@ -17,7 +17,7 @@ const Chip = forwardRef<HTMLDivElement, Props>(function Chip(
     clickable && "hover:bg-gray-200",
   );
 
-  if (!delectable && !leftIcon) {
+  if (!deletable && !leftIcon) {
     return (
       <div
         className={twMerge(
@@ -53,13 +53,13 @@ const Chip = forwardRef<HTMLDivElement, Props>(function Chip(
         className={twJoin(
           "py-0.5 leading-none",
           !leftIcon && "pl-1.5",
-          !delectable && "pr-1.5",
+          !deletable && "pr-1.5",
         )}
       >
         {children}
       </div>
 
-      {delectable && (
+      {deletable && (
         <svg
           xmlns="http://www.w3.org/2000/svg"
           fill="none"
