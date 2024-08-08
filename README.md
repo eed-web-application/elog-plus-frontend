@@ -28,7 +28,7 @@ Styling is done with [Tailwind](https://tailwindcss.com/). Right now, there are 
 
 #### Icons
 
-Besides the following expectations, all icons are from [Hero Icons](https://heroicons.com/) and are just used as inlined SVGs:
+Besides the following exceptions, all icons are from [Hero Icons](https://heroicons.com/) and are just used as inlined SVGs:
 
 - Attachment file icons are from FontAwesome
 - Editor menu icons are from [Remix Icon](https://remixicon.com/), where only the contents of the d attribute were copied over to the format used by Hero Icons.
