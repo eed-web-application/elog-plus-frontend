@@ -28,7 +28,7 @@ Styling is done with [Tailwind](https://tailwindcss.com/). Right now, there are 
 
 #### Icons
 
-Besides the following expectations, all icons are from [Hero Icons](https://heroicons.com/) and are just used as inlined SVGs:
+Besides the following exceptions, all icons are from [Hero Icons](https://heroicons.com/) and are just used as inlined SVGs:
 
 - Attachment file icons are from FontAwesome
 - Editor menu icons are from [Remix Icon](https://remixicon.com/), where only the contents of the d attribute were copied over to the format used by Hero Icons.
@@ -37,8 +37,8 @@ Besides the following expectations, all icons are from [Hero Icons](https://hero
 
 State is saved where ever it is most convenient (i.e., no big nasty Redux store 🎉):
 
-- UI state is managed by components themselves as the state is most likely be hierarchical and thus there is no need for a global state manager. However, some state is used in multiple places deep in the hierarchical and doesn't change often, so contexts are used to prevent prop drilling.
-- Server state (entries, logbooks, tags, etc.) is managed by [`react-query`](https://react-query.tanstack.com/), which is more like a cache than a state manager. It is usually used through a hook that wraps a `useQuery` call (see `src/hooks/useLogbooks.ts` for example). However, cache invalidation is a little bit more complicated ([big surpise](https://martinfowler.com/bliki/TwoHardThings.html)) and is not directly handled by the hook. Instead, when something invalidates a query, it calls `queryClient.invalidateQueries` with the appropriate key.
+- UI state is managed by components themselves as the state is most likely hierarchical and thus there is no need for a global state manager. However, some state is used in multiple places deep in the hierarchy and doesn't change often, so in these cases contexts are used to prevent prop drilling.
+- Server state (entries, logbooks, tags, etc.) is managed by [`react-query`](https://react-query.tanstack.com/) which is more like a cache than a state manager. It is usually used through a hook that wraps a `useQuery` call (see `src/hooks/useLogbooks.ts` for example). However, cache invalidation is a little bit more complicated ([big surpise](https://martinfowler.com/bliki/TwoHardThings.html)) and is not directly handled by the hook. Instead, when something invalidates a query, it calls `queryClient.invalidateQueries` with the appropriate key.
 - Complex local state is managed by a thin [`zustand`](https://github.com/pmndrs/zustand) store. This is useful for domain specific state that is not related to the server, but is too complex to be managed by a component. For example, the draft storage is managed by a zustand store. This is because the draft is used in multiple places and is too complex to be managed by a component. However, it is not related to the server, so it doesn't make sense to use `react-query`. It is also not hierarchical, so it doesn't make sense to use a context. Thus, zustand is used.
 
 ### Routing
@@ -47,4 +47,4 @@ Routing is done with React Router. There are two main pages: `Home` and `Admin`.
 
 ### Error Handling
 
-There are two types of errors: critical and noncritical. Critical errors cause the page to crash and shows an error page. Noncritical errors are recoverable and thus just display a toast. All unhandled errors are critical and cause the page to cash.
+There are two types of errors: critical and noncritical. Critical errors cause the page to crash and shows an error page. Noncritical errors are recoverable and thus just display a toast. All unhandled errors are critical and cause the page to crash.
