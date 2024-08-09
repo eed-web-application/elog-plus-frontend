@@ -1,4 +1,4 @@
-import { Node } from "@tiptap/core";
+import { Node, NodeViewProps } from "@tiptap/core";
 import Link from "@tiptap/extension-link";
 import Underline from "@tiptap/extension-underline";
 import {
@@ -11,18 +11,34 @@ import {
 import StarterKit from "@tiptap/starter-kit";
 import useEntry from "./useEntry";
 import EntryRow from "../components/EntryRow";
+import Spinner from "../components/Spinner";
+import { twJoin } from "tailwind-merge";
 
-const EntryReference = (props) => {
+const EntryReference = (props: NodeViewProps) => {
   const entryId = props.node.attrs.id;
   const entry = useEntry(entryId);
 
   if (!entry) {
-    return null;
+    return (
+      <NodeViewWrapper
+        className={twJoin(
+          "h-12 w-full flex items-center justify-center border rounded-lg my-2",
+          props.selected ? "bg-blue-50" : "bg-white",
+        )}
+      >
+        <Spinner />
+      </NodeViewWrapper>
+    );
   }
 
   return (
-    <NodeViewWrapper className="border rounded-lg">
-      <EntryRow entry={entry} />
+    <NodeViewWrapper className="border bg-white rounded-lg not-prose overflow-hidden my-2">
+      <EntryRow
+        data-drag-handle
+        selected={props.selected}
+        entry={entry}
+        disableToggleExpand
+      />
     </NodeViewWrapper>
   );
 };
@@ -30,7 +46,7 @@ const EntryReference = (props) => {
 const EntryReferenceExtension = Node.create({
   name: "EntryReference",
   group: "block",
-  atom: true,
+  draggable: true,
   addAttributes() {
     return {
       id: {
