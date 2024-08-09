@@ -82,7 +82,7 @@ function Figure({
             tabIndex: 0,
             src: getAttachmentPreviewURL(figure.id),
             className: twJoin(
-              "cursor-pointer w-full",
+              "cursor-pointer w-full my-0",
               isLoaded ? "block" : "hidden",
             ),
             onLoad: () => setIsLoaded(true),

@@ -267,7 +267,6 @@ export interface Props extends ComponentProps<"div"> {
   allowSupersede?: boolean;
   allowSpotlight?: boolean;
   allowSpotlightForFollowUps?: boolean;
-  disableToggleExpand?: boolean;
 }
 
 /**
@@ -292,7 +291,6 @@ const EntryRow = memo(
       allowSupersede,
       allowSpotlight,
       allowSpotlightForFollowUps,
-      disableToggleExpand,
       ...rest
     },
     ref,
@@ -429,8 +427,9 @@ const EntryRow = memo(
                 pathname: `/${entry.id}`,
                 search: window.location.search,
               }}
-              // see https://inclusive-components.design/cards/
-              className="truncate leading-[1.2] after:absolute after:left-0 after:right-0 after:bottom-0 after:top-0"
+              // See https://inclusive-components.design/cards/
+              className="truncate leading-[1.2] after:absolute after:left-0 after:right-0 after:bottom-0 after:top-0 text-inherit no-underline font-normal"
+              // Since the whole row is draggable, we don't want the link to be draggable
               draggable="false"
             >
               {referenceIcon}
@@ -548,30 +547,28 @@ const EntryRow = memo(
               />
             )}
           </FloatingDelayGroup>
-          {!disableToggleExpand && (
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={1.5}
-              stroke="currentColor"
-              tabIndex={0}
-              className={twMerge(
-                IconButton,
-                "z-0",
-                expanded && "rotate-180",
-                selected && "hover:bg-blue-200",
-                highlighted && "hover:bg-yellow-300",
-              )}
-              onClick={() => setExpanded((expanded) => !expanded)}
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M19.5 8.25l-7.5 7.5-7.5-7.5"
-              />
-            </svg>
-          )}
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            strokeWidth={1.5}
+            stroke="currentColor"
+            tabIndex={0}
+            className={twMerge(
+              IconButton,
+              "z-0",
+              expanded && "rotate-180",
+              selected && "hover:bg-blue-200",
+              highlighted && "hover:bg-yellow-300",
+            )}
+            onClick={() => setExpanded((expanded) => !expanded)}
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M19.5 8.25l-7.5 7.5-7.5-7.5"
+            />
+          </svg>
         </div>
         {expanded && fullEntry && (
           <>

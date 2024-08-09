@@ -32,12 +32,20 @@ const EntryReference = (props: NodeViewProps) => {
   }
 
   return (
-    <NodeViewWrapper className="border bg-white rounded-lg not-prose overflow-hidden my-2">
+    <NodeViewWrapper
+      data-drag-handle
+      className="border bg-white rounded-lg overflow-hidden my-2"
+    >
       <EntryRow
-        data-drag-handle
         selected={props.selected}
         entry={entry}
-        disableToggleExpand
+        showDate
+        showReferences
+        showFollowUps
+        allowFavorite
+        allowFollowUp
+        allowSupersede
+        allowSpotlightForFollowUps
       />
     </NodeViewWrapper>
   );
