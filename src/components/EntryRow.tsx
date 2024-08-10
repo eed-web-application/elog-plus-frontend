@@ -398,7 +398,7 @@ const EntryRow = memo(
           onDragStart={(e) => {
             e.dataTransfer.setData(
               "text/html",
-              `<entry-ref id="${entry.id}"></entry-ref>`,
+              `<elog-entry-ref id="${entry.id}"></entry-ref>`,
             );
             // TODO: Set the URL of the entry
             // e.dataTransfer.setData("text/uri-list", "https://www.mozilla.org");

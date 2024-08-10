@@ -66,13 +66,13 @@ const EntryReferenceExtension = Node.create({
   parseHTML() {
     return [
       {
-        tag: "entry-ref",
+        tag: "elog-entry-ref",
       },
     ];
   },
 
   renderHTML({ HTMLAttributes }) {
-    return ["entry-ref", mergeAttributes(HTMLAttributes)];
+    return ["elog-entry-ref", mergeAttributes(HTMLAttributes)];
   },
 
   addNodeView() {
