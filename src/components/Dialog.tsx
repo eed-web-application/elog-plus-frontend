@@ -55,7 +55,13 @@ const DialogTrigger = forwardRef<HTMLElement, PropsWithChildren<{}>>(
   },
 );
 
-function DialogContent({ children }: { children: JSX.Element }) {
+function DialogContent({
+  children,
+  returnFocus = true,
+}: {
+  children: JSX.Element;
+  returnFocus?: boolean;
+}) {
   const { context: floatingContext } = useDialog();
 
   if (!floatingContext.open) {
@@ -68,7 +74,10 @@ function DialogContent({ children }: { children: JSX.Element }) {
         lockScroll
         className={twJoin(BackDrop, "z-20 flex justify-center items-center")}
       >
-        <FloatingFocusManager context={floatingContext}>
+        <FloatingFocusManager
+          returnFocus={returnFocus}
+          context={floatingContext}
+        >
           {children}
         </FloatingFocusManager>
       </FloatingOverlay>
@@ -110,7 +119,10 @@ function DialogWindow<T extends ElementType = "div">({
           strokeWidth={1.5}
           stroke="currentColor"
           tabIndex={0}
-          className={twJoin(IconButton, "absolute top-0 left-0 m-1")}
+          className={twJoin(
+            IconButton,
+            "absolute top-0 right-0 border-none m-1",
+          )}
           onClick={() => setOpen(false)}
         >
           <path

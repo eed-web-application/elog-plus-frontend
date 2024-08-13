@@ -1,70 +1,36 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
-import {
-  useLocation,
-  useNavigate,
-  useOutlet,
-  useSearchParams,
-} from "react-router-dom";
-import { yyyymmddToDate } from "../utils/datetimeConversion";
+import { useCallback, useEffect, useState } from "react";
+import { useLocation, useNavigate, useOutlet } from "react-router-dom";
 import { twJoin } from "tailwind-merge";
-import Filters, { Filters as FiltersObject } from "../components/Filters";
+import Filters, { FilterOptions as FiltersObject } from "../components/Filters";
 import Navbar from "../components/Navbar";
 import useEntries from "../hooks/useEntries";
 import useIsSmallScreen from "../hooks/useIsSmallScreen";
 import { EntryQuery } from "../hooks/useEntries";
 import EntryListGrouped from "../components/EntryListGrouped";
-import serializeParams, { ParamsObject } from "../utils/serializeParams";
 import SideSheet from "../components/SideSheet";
 import useLogbooks from "../hooks/useLogbooks";
+import useEntryQuery, { DEFAULT_QUERY } from "../hooks/useEntryQuery";
 
 // Import Sidebar from your local UI library
 // import Sidebar from "../../node_modules/ui/lib/Sidebar"; // Adjust the path as per your project structure
 
-const DEFAULT_QUERY: EntryQuery = {
-  logbooks: [],
-  tags: [],
-  requireAllTags: false,
-  startDate: null,
-  endDate: null,
-  search: "",
-  sortByLogDate: false,
-  onlyFavorites: false,
-};
-
-function deserializeQuery(params: URLSearchParams): EntryQuery {
-  const startDate = params.get("startDate");
-  const endDate = params.get("endDate");
-
-  return {
-    logbooks: params.get("logbooks")?.split(",") ?? DEFAULT_QUERY.logbooks,
-    tags: params.get("tags")?.split(",") ?? DEFAULT_QUERY.tags,
-    requireAllTags: params.has("requireAllTags"),
-    startDate: startDate ? yyyymmddToDate(startDate) : DEFAULT_QUERY.startDate,
-    endDate: endDate ? yyyymmddToDate(endDate) : DEFAULT_QUERY.endDate,
-    search: params.get("search") ?? DEFAULT_QUERY.search,
-    sortByLogDate: params.has("sortByLogDate"),
-    onlyFavorites: params.has("onlyFavorites"),
-  };
-}
-
 export default function Home() {
   const isSmallScreen = useIsSmallScreen();
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [query, setEntryQuery] = useEntryQuery();
   const [spotlightSearch, setSpotlightSearch] = useState<string | undefined>(
     undefined,
   );
-  const query = useMemo(() => deserializeQuery(searchParams), [searchParams]);
   const location = useLocation();
   const navigate = useNavigate();
 
   const setQuery = useCallback(
     (query: EntryQuery, preserveState = false) => {
-      setSearchParams(serializeParams(query as ParamsObject), {
+      setEntryQuery(query, {
         replace: true,
         state: preserveState ? location.state : undefined,
       });
     },
-    [location.state, setSearchParams],
+    [location.state, setEntryQuery],
   );
 
   const { isLoading: isLogbooksLoading, logbookNameMap } = useLogbooks();
@@ -105,18 +71,6 @@ export default function Home() {
     }
   }, [entries, spotlight, setQuery, spotlightSearch]);
 
-  function onFiltersChange(filters: FiltersObject) {
-    if (query.logbooks.join(",") !== filters.logbooks.join(",")) {
-      filters.tags = [];
-    }
-
-    setQuery({ ...query, ...filters });
-  }
-
-  function onSearchChange(search: string) {
-    setQuery({ ...query, search });
-  }
-
   const outlet = useOutlet();
 
   const isLoading = isEntriesLoading || isLogbooksLoading;
@@ -136,9 +90,12 @@ export default function Home() {
           <Navbar
             className="mb-1"
             search={query.search}
-            onSearchChange={onSearchChange}
+            onSearchChange={(search) => setQuery({ ...query, search })}
           />
-          <Filters filters={query} setFilters={onFiltersChange} />
+          <Filters
+            filters={query}
+            onFiltersChange={(filters) => setQuery({ ...query, ...filters })}
+          />
         </div>
       </div>
       {/* <Sidebar />  */}

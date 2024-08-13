@@ -11,6 +11,7 @@ export interface Props
     | "showReferences"
     | "expandedByDefault"
     | "showDate"
+    | "allowExpanding"
     | "allowFavorite"
     | "allowFollowUp"
     | "allowSupersede"
@@ -21,6 +22,7 @@ export interface Props
   selected?: string;
   spotlight?: string;
   isLoading?: boolean;
+  onEntryClick?: (entry: Entry) => void;
 }
 
 /**
@@ -31,6 +33,7 @@ export default function EntryList({
   selected,
   spotlight,
   isLoading,
+  onEntryClick,
   ...rest
 }: Props) {
   const ref = useRef<HTMLDivElement>(null);
@@ -54,6 +57,7 @@ export default function EntryList({
             containerClassName={index === entries.length - 1 ? "" : "border-b"}
             highlighted={spotlight === entry.id}
             selected={entry.id === selected}
+            onClick={onEntryClick ? () => onEntryClick(entry) : undefined}
             {...rest}
           />
         ))}

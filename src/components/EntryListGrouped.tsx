@@ -48,6 +48,7 @@ const EntryListGrouped = forwardRef<HTMLDivElement, Props>(
       spotlight,
       showBackToTopButton = false,
       onBackToTop,
+      onEntryClick,
       ...rest
     },
     ref,
@@ -214,6 +215,7 @@ const EntryListGrouped = forwardRef<HTMLDivElement, Props>(
             highlighted={spotlight === entry.id}
             selected={entry.id === selected}
             dateBasedOn={dateBasedOn}
+            onClick={onEntryClick ? () => onEntryClick(entry) : undefined}
             {...rest}
           />,
         );

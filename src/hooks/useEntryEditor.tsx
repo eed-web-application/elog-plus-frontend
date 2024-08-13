@@ -42,6 +42,7 @@ const EntryReference = (props: NodeViewProps) => {
         showDate
         showReferences
         showFollowUps
+        allowExpanding
         allowFavorite
         allowFollowUp
         allowSupersede

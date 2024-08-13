@@ -10,7 +10,7 @@ import FilterChipMultiSelect from "./FilterChipMultiSelect.tsx";
 import FilterChipInput from "./FilterChipInput.tsx";
 import { dateToYYYYMMDD, yyyymmddToDate } from "../utils/datetimeConversion.ts";
 
-export type Filters = Pick<
+export type FilterOptions = Pick<
   EntryQuery,
   | "logbooks"
   | "tags"
@@ -29,11 +29,11 @@ function extractTagKey(tag: Tag) {
 }
 
 export interface Props {
-  filters: Filters;
-  setFilters: (filters: Filters) => void;
+  filters: FilterOptions;
+  onFiltersChange: (filters: FilterOptions) => void;
 }
 
-export default function Filters({ filters, setFilters }: Props) {
+export default function Filters({ filters, onFiltersChange }: Props) {
   const {
     logbooks,
     logbookNameMap,
@@ -117,6 +117,14 @@ export default function Filters({ filters, setFilters }: Props) {
       </>
     );
   }, [filters.tags, filters.onlyFavorites, tagMap, isTagsLoading]);
+
+  function setFilters(newFilters: FilterOptions) {
+    if (filters.logbooks.join(",") !== newFilters.logbooks.join(",")) {
+      newFilters.tags = [];
+    }
+
+    onFiltersChange(newFilters);
+  }
 
   const favoritesLabel = useCallback(() => {
     return filters.onlyFavorites ? (

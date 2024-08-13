@@ -251,7 +251,7 @@ function AttachmentList({
   );
 }
 
-export interface Props extends ComponentProps<"div"> {
+export interface Props extends Omit<ComponentProps<"div">, "onClick"> {
   entry: Entry;
   containerClassName?: string;
   className?: string;
@@ -262,11 +262,13 @@ export interface Props extends ComponentProps<"div"> {
   expandedByDefault?: boolean;
   showDate?: boolean;
   dateBasedOn?: "eventAt" | "loggedAt";
+  allowExpanding?: boolean;
   allowFavorite?: boolean;
   allowFollowUp?: boolean;
   allowSupersede?: boolean;
   allowSpotlight?: boolean;
   allowSpotlightForFollowUps?: boolean;
+  onClick?: (event: React.MouseEvent) => void;
 }
 
 /**
@@ -286,11 +288,13 @@ const EntryRow = memo(
       expandedByDefault,
       showDate,
       dateBasedOn = "eventAt",
+      allowExpanding,
       allowFavorite,
       allowFollowUp,
       allowSupersede,
       allowSpotlight,
       allowSpotlightForFollowUps,
+      onClick,
       ...rest
     },
     ref,
@@ -428,7 +432,17 @@ const EntryRow = memo(
                 search: window.location.search,
               }}
               // See https://inclusive-components.design/cards/
-              className="truncate leading-[1.2] after:absolute after:left-0 after:right-0 after:bottom-0 after:top-0 text-inherit no-underline font-normal"
+              className={twJoin(
+                "truncate leading-[1.2] after:absolute after:left-0 after:right-0 after:bottom-0 after:top-0 text-inherit no-underline font-normal",
+              )}
+              onClick={
+                onClick
+                  ? (e) => {
+                      e.preventDefault();
+                      onClick(e);
+                    }
+                  : undefined
+              }
               // Since the whole row is draggable, we don't want the link to be draggable
               draggable="false"
             >
@@ -547,28 +561,30 @@ const EntryRow = memo(
               />
             )}
           </FloatingDelayGroup>
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            strokeWidth={1.5}
-            stroke="currentColor"
-            tabIndex={0}
-            className={twMerge(
-              IconButton,
-              "z-0",
-              expanded && "rotate-180",
-              selected && "hover:bg-blue-200",
-              highlighted && "hover:bg-yellow-300",
-            )}
-            onClick={() => setExpanded((expanded) => !expanded)}
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M19.5 8.25l-7.5 7.5-7.5-7.5"
-            />
-          </svg>
+          {allowExpanding && (
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth={1.5}
+              stroke="currentColor"
+              tabIndex={0}
+              className={twMerge(
+                IconButton,
+                "z-0",
+                expanded && "rotate-180",
+                selected && "hover:bg-blue-200",
+                highlighted && "hover:bg-yellow-300",
+              )}
+              onClick={() => setExpanded((expanded) => !expanded)}
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M19.5 8.25l-7.5 7.5-7.5-7.5"
+              />
+            </svg>
+          )}
         </div>
         {expanded && fullEntry && (
           <>
