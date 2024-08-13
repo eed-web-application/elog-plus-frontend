@@ -75,7 +75,9 @@ export async function fetch(
     ...restOptions
   }: FetchOptions = {},
 ) {
-  headers["content-type"] = "application/json";
+  if (body) {
+    headers["Content-Type"] = "application/json";
+  }
 
   if (import.meta.env.MODE === "development" && __GET_DEV_ACCESS_CODE()) {
     headers["x-vouch-idp-accesstoken"] = __GET_DEV_ACCESS_CODE() || "";
