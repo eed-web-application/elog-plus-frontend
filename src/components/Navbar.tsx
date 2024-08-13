@@ -8,6 +8,7 @@ import DevSelectUser from "./DevSelectUser";
 import useDebounce from "../hooks/useDebounce";
 import Dialog from "./Dialog";
 import InfoDialog from "./InfoDialog";
+import BugReport from "./BugReport";
 
 interface Props extends ComponentProps<"div"> {
   search: string;
@@ -99,6 +100,8 @@ export default function Navbar({
         )}
       </Link>
 
+      <BugReport />
+
       <Dialog>
         <Dialog.Content>
           <InfoDialog />
@@ -110,9 +113,7 @@ export default function Navbar({
             viewBox="0 0 24 24"
             strokeWidth={1.5}
             stroke="currentColor"
-            className={
-              "ml-2 w-8 h-8 p-1 text-gray-800 hover:bg-gray-200 rounded-full cursor-pointer"
-            }
+            className="ml-2 w-8 h-8 p-1 text-gray-800 hover:bg-gray-200 rounded-full cursor-pointer"
           >
             <path
               strokeLinecap="round"
