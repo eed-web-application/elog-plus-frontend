@@ -1,7 +1,5 @@
 import { useCallback, useState } from "react";
-import NewAdminResourceDialog, {
-  Props as NewAdminResourceDialogProps,
-} from "./NewResourceDialog";
+import NewAdminResourceDialog from "./NewResourceDialog";
 import { twJoin } from "tailwind-merge";
 import { Input } from "../base";
 import { createApplication } from "../../api";
@@ -9,12 +7,7 @@ import { useNavigate } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
 import { yyyymmddToDate } from "../../utils/datetimeConversion";
 
-export type Props = Omit<
-  NewAdminResourceDialogProps,
-  "title" | "form" | "onSave"
->;
-
-export default function NewApplicationDialog({ onClose, ...rest }: Props) {
+export default function NewApplicationDialog() {
   const [name, setName] = useState("");
   const [expiration, setExpiration] = useState("");
 
@@ -33,12 +26,6 @@ export default function NewApplicationDialog({ onClose, ...rest }: Props) {
     return name && validateExpiration();
   }
 
-  function onClosed() {
-    onClose();
-    setName("");
-    setExpiration("");
-  }
-
   const saveApplication = useCallback(async () => {
     if (!validate()) {
       return;
@@ -53,38 +40,30 @@ export default function NewApplicationDialog({ onClose, ...rest }: Props) {
 
   return (
     <NewAdminResourceDialog
-      {...rest}
-      onClose={onClosed}
       title="New Application"
-      form={
-        <>
-          <label className="block mb-2 text-gray-500">
-            Name
-            <input
-              required
-              value={name}
-              className={twJoin(Input, "w-full block")}
-              onChange={(e) => setName(e.target.value)}
-            />
-          </label>
-          <label className="block mb-2 text-gray-500">
-            Expiration
-            <input
-              value={expiration}
-              className={twJoin(Input, "w-full block")}
-              onChange={(e) => setExpiration(e.target.value)}
-              type="date"
-            />
-            {/* error */}
-            {expiration && !validateExpiration() && (
-              <p className="text-red-500 mt-1">
-                Expiration must be in the future
-              </p>
-            )}
-          </label>
-        </>
-      }
       onSave={validate() ? saveApplication : undefined}
-    />
+    >
+      <label className="block mb-2 text-gray-500">
+        Name
+        <input
+          required
+          value={name}
+          className={twJoin(Input, "w-full block")}
+          onChange={(e) => setName(e.target.value)}
+        />
+      </label>
+      <label className="block mb-2 text-gray-500">
+        Expiration
+        <input
+          value={expiration}
+          className={twJoin(Input, "w-full block")}
+          onChange={(e) => setExpiration(e.target.value)}
+          type="date"
+        />
+        {expiration && !validateExpiration() && (
+          <p className="text-red-500 mt-1">Expiration must be in the future</p>
+        )}
+      </label>
+    </NewAdminResourceDialog>
   );
 }

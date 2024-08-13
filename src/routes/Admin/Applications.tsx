@@ -11,7 +11,6 @@ import useDebounce from "../../hooks/useDebounce";
 
 export default function AdminApplications() {
   const [applicationSearch, setApplicationSearch] = useState("");
-  const [isCreateOpen, setIsCreateOpen] = useState(false);
 
   const { applications, isLoading, getMoreApplications } = useApplications({
     search: applicationSearch,
@@ -29,31 +28,26 @@ export default function AdminApplications() {
   const onSearchChange = useDebounce(setApplicationSearch, 500);
 
   return (
-    <NewApplicationDialog
-      isOpen={isCreateOpen}
-      onClose={() => setIsCreateOpen(false)}
+    <AdminResource
+      home="/admin/applications"
+      items={applications.map((application) => ({
+        label: application.name,
+        link: `/admin/applications/${application.id}`,
+        edited: applicationsEdited.includes(application.id),
+        readOnly: application.applicationManaged,
+      }))}
+      isLoading={isLoading}
+      createLabel="Create application"
+      createDialog={<NewApplicationDialog />}
+      onSearchChange={onSearchChange}
+      onBottomVisible={getMoreApplications}
     >
-      <AdminResource
-        home="/admin/applications"
-        items={applications.map((application) => ({
-          label: application.name,
-          link: `/admin/applications/${application.id}`,
-          edited: applicationsEdited.includes(application.id),
-          readOnly: application.applicationManaged,
-        }))}
-        isLoading={isLoading}
-        createLabel="Create application"
-        onCreate={() => setIsCreateOpen(true)}
-        onSearchChange={onSearchChange}
-        onBottomVisible={getMoreApplications}
-      >
-        {selectedApplicationId && (
-          <ApplicationForm
-            applicationId={selectedApplicationId}
-            onSave={onSave}
-          />
-        )}
-      </AdminResource>
-    </NewApplicationDialog>
+      {selectedApplicationId && (
+        <ApplicationForm
+          applicationId={selectedApplicationId}
+          onSave={onSave}
+        />
+      )}
+    </AdminResource>
   );
 }

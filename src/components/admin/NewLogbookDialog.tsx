@@ -1,28 +1,16 @@
 import { useCallback, useState } from "react";
-import NewAdminResourceDialog, {
-  Props as NewAdminResourceDialogProps,
-} from "./NewResourceDialog";
+import NewAdminResourceDialog from "./NewResourceDialog";
 import { twJoin } from "tailwind-merge";
 import { Input } from "../base";
 import { createLogbook } from "../../api";
 import { useNavigate } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
 
-export type Props = Omit<
-  NewAdminResourceDialogProps,
-  "title" | "form" | "onSave"
->;
-
-export default function NewLogbookDialog({ onClose, ...rest }: Props) {
+export default function NewLogbookDialog() {
   const [name, setName] = useState("");
 
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-
-  function onClosed() {
-    onClose();
-    setName("");
-  }
 
   const saveLogbook = useCallback(async () => {
     if (!name) {
@@ -37,21 +25,18 @@ export default function NewLogbookDialog({ onClose, ...rest }: Props) {
 
   return (
     <NewAdminResourceDialog
-      {...rest}
-      onClose={onClosed}
       title="New logbook"
-      form={
-        <label className="block mb-2 text-gray-500">
-          Name
-          <input
-            required
-            value={name}
-            className={twJoin(Input, "w-full block")}
-            onChange={(e) => setName(e.target.value)}
-          />
-        </label>
-      }
       onSave={name ? saveLogbook : undefined}
-    />
+    >
+      <label className="block mb-2 text-gray-500">
+        Name
+        <input
+          required
+          value={name}
+          className={twJoin(Input, "w-full block")}
+          onChange={(e) => setName(e.target.value)}
+        />
+      </label>
+    </NewAdminResourceDialog>
   );
 }

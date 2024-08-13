@@ -11,7 +11,6 @@ import useDebounce from "../../hooks/useDebounce";
 
 export default function AdminGroups() {
   const [groupSearch, setGroupSearch] = useState("");
-  const [isCreateOpen, setIsCreateOpen] = useState(false);
 
   const { groups, isLoading, getMoreGroups } = useGroups({
     search: groupSearch,
@@ -27,28 +26,23 @@ export default function AdminGroups() {
   const onSearchChange = useDebounce(setGroupSearch, 500);
 
   return (
-    <NewGroupDialog
-      isOpen={isCreateOpen}
-      onClose={() => setIsCreateOpen(false)}
+    <AdminResource
+      home="/admin/groups"
+      items={groups.map((group) => ({
+        label: group.name,
+        link: `/admin/groups/${group.id}`,
+        edited: groupsEdited.includes(group.id),
+        readOnly: false,
+      }))}
+      isLoading={isLoading}
+      createLabel="Create group"
+      createDialog={<NewGroupDialog />}
+      onSearchChange={onSearchChange}
+      onBottomVisible={getMoreGroups}
     >
-      <AdminResource
-        home="/admin/groups"
-        items={groups.map((group) => ({
-          label: group.name,
-          link: `/admin/groups/${group.id}`,
-          edited: groupsEdited.includes(group.id),
-          readOnly: false,
-        }))}
-        isLoading={isLoading}
-        createLabel="Create group"
-        onCreate={() => setIsCreateOpen(true)}
-        onSearchChange={onSearchChange}
-        onBottomVisible={getMoreGroups}
-      >
-        {selectedGroupId && (
-          <GroupForm groupId={selectedGroupId} onSave={onSave} />
-        )}
-      </AdminResource>
-    </NewGroupDialog>
+      {selectedGroupId && (
+        <GroupForm groupId={selectedGroupId} onSave={onSave} />
+      )}
+    </AdminResource>
   );
 }

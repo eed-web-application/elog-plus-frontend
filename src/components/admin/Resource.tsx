@@ -4,6 +4,7 @@ import { NavLink } from "react-router-dom";
 import { twJoin } from "tailwind-merge";
 import Spinner from "../Spinner";
 import { Button, Input } from "../base";
+import Dialog from "../Dialog";
 
 export interface Item {
   label: string;
@@ -16,7 +17,8 @@ export interface Props extends ComponentProps<"div"> {
   items: Item[];
   isLoading?: boolean;
   home: string;
-  createLabel: string;
+  createLabel?: string;
+  createDialog?: JSX.Element;
   onCreate?: () => void;
   onSearchChange: (search: string) => void;
   onBottomVisible?: () => void;
@@ -28,7 +30,7 @@ export default function AdminResource({
   children,
   isLoading,
   createLabel,
-  onCreate,
+  createDialog,
   onSearchChange,
   onBottomVisible,
 }: Props) {
@@ -106,10 +108,15 @@ export default function AdminResource({
             </button>
           </form>
 
-          {onCreate && (
-            <button className={twJoin(Button, "ml-2")} onClick={onCreate}>
-              {createLabel}
-            </button>
+          {createLabel && createDialog && (
+            <Dialog>
+              <Dialog.Content>{createDialog}</Dialog.Content>
+              <Dialog.Trigger>
+                <button className={twJoin(Button, "ml-2")}>
+                  {createLabel}
+                </button>
+              </Dialog.Trigger>
+            </Dialog>
           )}
         </div>
 

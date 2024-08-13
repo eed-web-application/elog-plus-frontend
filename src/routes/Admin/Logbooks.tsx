@@ -16,7 +16,6 @@ export default function AdminLogbooks() {
     isLoading: isLogbooksLoading,
   } = useLogbooks({ requireWrite: true, includeAuth: true });
   const { logbookId: selectedLogbookId } = useParams();
-  const [isCreateOpen, setIsCreateOpen] = useState(false);
 
   const selectedLogbook = selectedLogbookId
     ? logbookMap[selectedLogbookId]
@@ -35,27 +34,22 @@ export default function AdminLogbooks() {
   );
 
   return (
-    <NewLogbookDialog
-      isOpen={isCreateOpen}
-      onClose={() => setIsCreateOpen(false)}
+    <AdminResource
+      home="/admin/logbooks"
+      items={logbooksSearched.map((logbook) => ({
+        label: logbook.name.toUpperCase(),
+        link: `/admin/logbooks/${logbook.id}`,
+        edited: logbooksEdited.includes(logbook.id),
+        readOnly: false,
+      }))}
+      isLoading={isLogbooksLoading}
+      createLabel="Create logbook"
+      createDialog={<NewLogbookDialog />}
+      onSearchChange={setLogbookSearch}
     >
-      <AdminResource
-        home="/admin/logbooks"
-        items={logbooksSearched.map((logbook) => ({
-          label: logbook.name.toUpperCase(),
-          link: `/admin/logbooks/${logbook.id}`,
-          edited: logbooksEdited.includes(logbook.id),
-          readOnly: false,
-        }))}
-        isLoading={isLogbooksLoading}
-        createLabel="Create logbook"
-        onCreate={() => setIsCreateOpen(true)}
-        onSearchChange={setLogbookSearch}
-      >
-        {selectedLogbook && (
-          <LogbookForm logbook={selectedLogbook} onSave={onSave} />
-        )}
-      </AdminResource>
-    </NewLogbookDialog>
+      {selectedLogbook && (
+        <LogbookForm logbook={selectedLogbook} onSave={onSave} />
+      )}
+    </AdminResource>
   );
 }

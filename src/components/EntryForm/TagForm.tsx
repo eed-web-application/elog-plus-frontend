@@ -1,10 +1,11 @@
-import { ComponentPropsWithoutRef } from "react";
+import { ComponentPropsWithoutRef, useState } from "react";
 import { twMerge } from "tailwind-merge";
 import MultiSelect from "../MultiSelect";
 import useTags from "../../hooks/useTags";
 import { Logbook } from "../../api";
-import useTagLogbookSelector from "../../hooks/useTagLogbookSelector";
 import { Draft } from "../../draftsStore";
+import Dialog from "../Dialog";
+import TagLogbookSelectorDialog from "../TagLogbookSelectorDialog";
 
 export interface Props
   extends Omit<ComponentPropsWithoutRef<"label">, "onBlur" | "onChange"> {
@@ -28,6 +29,10 @@ export default function TagForm({
     bumpTag,
     isLoading: isTagsLoading,
   } = useTags({ logbooks: logbooks?.map(({ id }) => id), enabled: !isLoading });
+  const [logbookSelect, setLogbookSelect] = useState<null | {
+    tag: string;
+    logbooks: Logbook[];
+  }>(null);
 
   const logbookMap = logbooks.reduce<Record<string, Logbook>>(
     (acc, logbook) => {
@@ -38,9 +43,6 @@ export default function TagForm({
   );
 
   isLoading = isLoading || isTagsLoading;
-
-  const { Dialog: LogbookSelectorDialog, select: selectLogbooks } =
-    useTagLogbookSelector();
 
   return (
     <>
@@ -96,24 +98,36 @@ export default function TagForm({
                 ),
             );
 
-            const selectedLogbooks = await selectLogbooks(
-              name,
-              logbooksWithoutTag,
-            );
-
-            if (!selectedLogbooks) {
-              return;
-            }
-
-            onChange(
-              value.concat(
-                selectedLogbooks.map((logbook) => ({ logbook, name })),
-              ),
-            );
+            setLogbookSelect({ tag: name, logbooks: logbooksWithoutTag });
           }}
         />
       </label>
-      {LogbookSelectorDialog}
+      <Dialog
+        controlled
+        isOpen={Boolean(logbookSelect)}
+        onOpenChange={(open) => {
+          if (!open) {
+            setLogbookSelect(null);
+          }
+        }}
+      >
+        <Dialog.Content>
+          <TagLogbookSelectorDialog
+            logbooks={logbookSelect?.logbooks || []}
+            tag={logbookSelect?.tag || ""}
+            onSelect={(selectedLogbooks) => {
+              onChange(
+                value.concat(
+                  selectedLogbooks.map((logbook) => ({
+                    logbook,
+                    name: logbookSelect?.tag || "",
+                  })),
+                ),
+              );
+            }}
+          />
+        </Dialog.Content>
+      </Dialog>
     </>
   );
 }
