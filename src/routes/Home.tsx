@@ -12,8 +12,6 @@ import Navbar from "../components/Navbar";
 import useEntries from "../hooks/useEntries";
 import useIsSmallScreen from "../hooks/useIsSmallScreen";
 import { EntryQuery } from "../hooks/useEntries";
-import InfoDialog from "../components/InfoDialog";
-import Dialog from "../components/Dialog";
 import EntryListGrouped from "../components/EntryListGrouped";
 import serializeParams, { ParamsObject } from "../utils/serializeParams";
 import SideSheet from "../components/SideSheet";
@@ -140,29 +138,6 @@ export default function Home() {
             search={query.search}
             onSearchChange={onSearchChange}
           />
-          <Dialog>
-            <Dialog.Content>
-              <InfoDialog />
-            </Dialog.Content>
-            <Dialog.Trigger>
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth={1.5}
-                stroke="currentColor"
-                className={
-                  "absolute m-3 top-0.5 right-0 w-8 h-8 p-1 text-gray-800 hover:bg-gray-200 rounded-full cursor-pointer"
-                }
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z"
-                />
-              </svg>
-            </Dialog.Trigger>
-          </Dialog>
           <Filters filters={query} setFilters={onFiltersChange} />
         </div>
       </div>

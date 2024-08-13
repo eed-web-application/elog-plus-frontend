@@ -6,6 +6,8 @@ import { useDraftsStore } from "../draftsStore";
 import Logo from "./Logo";
 import DevSelectUser from "./DevSelectUser";
 import useDebounce from "../hooks/useDebounce";
+import Dialog from "./Dialog";
+import InfoDialog from "./InfoDialog";
 
 interface Props extends ComponentProps<"div"> {
   search: string;
@@ -96,6 +98,30 @@ export default function Navbar({
           <div className="absolute top-0 right-0 w-4 h-4 text-black bg-gray-200 rounded-full shadow-xl translate-x-1.5 -translate-y-1.5 p-[3px]"></div>
         )}
       </Link>
+
+      <Dialog>
+        <Dialog.Content>
+          <InfoDialog />
+        </Dialog.Content>
+        <Dialog.Trigger>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            strokeWidth={1.5}
+            stroke="currentColor"
+            className={
+              "ml-2 w-8 h-8 p-1 text-gray-800 hover:bg-gray-200 rounded-full cursor-pointer"
+            }
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z"
+            />
+          </svg>
+        </Dialog.Trigger>
+      </Dialog>
     </div>
   );
 }
