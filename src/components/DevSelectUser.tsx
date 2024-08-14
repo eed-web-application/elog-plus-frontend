@@ -1,34 +1,14 @@
-import {
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-  useSyncExternalStore,
-} from "react";
+import { useEffect, useState } from "react";
 import Select from "./Select";
 import { UnauthorizedError, fetch } from "../api";
-import { __SET_DEV_ACCESS_CODE, __GET_DEV_ACCESS_CODE } from "../api";
 import { twMerge } from "tailwind-merge";
 
 export default function DevSelectUser({ className }: { className?: string }) {
-  const callbackRef = useRef<(() => void) | null>(null);
-
-  const setAccessCode = useCallback(function setAccessCode(
-    accessCode: string | null,
-  ) {
-    __SET_DEV_ACCESS_CODE(accessCode);
-    callbackRef.current?.();
-    window.location.reload();
-  }, []);
-
-  const wrapper = () => {
-    return __GET_DEV_ACCESS_CODE();
-  };
+  // Since the backend is using token-based authentication during development,
+  // we set a cookie, so that all requests, including image and file downloads,
+  // will include the access code. Then, the development reverse proxy will
+  // read the cookie and pass the access code as a header to the backend.
   const [users, setUsers] = useState<Record<string, string> | null>(null);
-  const accessCode = useSyncExternalStore((callback) => {
-    callbackRef.current = callback;
-    return () => (callbackRef.current = null);
-  }, wrapper);
 
   async function fetchUsers() {
     let users;
@@ -39,7 +19,7 @@ export default function DevSelectUser({ className }: { className?: string }) {
       users = await fetch("v1/mock/users-auth");
     } catch (err) {
       if (err instanceof UnauthorizedError) {
-        __SET_DEV_ACCESS_CODE(null);
+        document.cookie = "";
         users = await fetchUsers();
       }
     }
@@ -48,20 +28,28 @@ export default function DevSelectUser({ className }: { className?: string }) {
   }
 
   useEffect(() => {
-    fetchUsers();
+    if (!users) {
+      fetchUsers();
+    }
   }, []);
 
-  if (!users) {
-    return;
+  function setAccessCode(accessCode: string | null) {
+    if (!accessCode) {
+      return;
+    }
+
+    document.cookie = `dev-slac-vouch=${accessCode}; path=/`;
+    window.location.reload();
   }
 
   return (
     <Select
       className={twMerge("w-48", className)}
-      value={accessCode}
+      value={null}
       setValue={setAccessCode}
       searchType="none"
-      options={Object.entries(users).map(([name, accessCode]) => ({
+      isLoading={!users}
+      options={Object.entries(users || []).map(([name, accessCode]) => ({
         label: name,
         value: accessCode,
       }))}

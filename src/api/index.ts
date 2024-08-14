@@ -49,19 +49,6 @@ interface FetchOptions extends Omit<RequestInit, "body" | "headers"> {
   noImpersonating?: boolean;
 }
 
-export function __SET_DEV_ACCESS_CODE(code: string | null) {
-  if (code === null) {
-    localStorage.removeItem("dev-vouch-idp-accesstoken");
-    return;
-  }
-
-  localStorage.setItem("dev-vouch-idp-accesstoken", code);
-}
-
-export function __GET_DEV_ACCESS_CODE() {
-  return localStorage.getItem("dev-vouch-idp-accesstoken");
-}
-
 export async function fetch(
   url: string,
   {
@@ -79,9 +66,6 @@ export async function fetch(
     headers["Content-Type"] = "application/json";
   }
 
-  if (import.meta.env.MODE === "development" && __GET_DEV_ACCESS_CODE()) {
-    headers["x-vouch-idp-accesstoken"] = __GET_DEV_ACCESS_CODE() || "";
-  }
   const impersonating = useImpersonationStore.getState().impersonating;
   if (impersonating?.email && !noImpersonating) {
     headers["Impersonate"] = impersonating.email;
