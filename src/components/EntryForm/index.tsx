@@ -91,6 +91,7 @@ export default function EntryForm({ onEntrySaved, kind = "newEntry" }: Props) {
                 entry={kind[1]}
                 showDate
                 showFollowUps
+                allowExpanding
                 allowSpotlight
               />
             </div>

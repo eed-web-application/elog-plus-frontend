@@ -605,6 +605,7 @@ const EntryRow = memo(
                     showDate
                     showFollowUps
                     showReferences={showReferences}
+                    allowExpanding={allowExpanding}
                     allowFollowUp={allowFollowUp}
                     allowSupersede={allowSupersede}
                     allowSpotlight={allowSpotlightForFollowUps}
@@ -623,6 +624,7 @@ const EntryRow = memo(
                       showDate
                       showFollowUps={showFollowUps}
                       showReferences
+                      allowExpanding={allowExpanding}
                       allowFollowUp={allowFollowUp}
                       allowSupersede={allowSupersede}
                       allowSpotlight={allowSpotlightForFollowUps}

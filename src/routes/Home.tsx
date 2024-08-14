@@ -109,6 +109,7 @@ export default function Home() {
           logbooksIncluded={includedLogbooks}
           showReferences
           showFollowUps
+          allowExpanding
           allowFavorite
           allowFollowUp
           allowSupersede
