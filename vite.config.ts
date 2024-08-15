@@ -40,6 +40,10 @@ export default defineConfig(({ mode }) => {
             proxy.on("proxyReq", (proxyReq, req) => {
               const cookie = req.headers.cookie;
 
+              if (!cookie) {
+                return;
+              }
+
               const devSlacVouch = readCookie(cookie, "dev-slac-vouch");
 
               if (devSlacVouch) {
