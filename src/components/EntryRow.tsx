@@ -326,50 +326,65 @@ const EntryRow = memo(
     const triggerResize = useTriggerResize(entry.id);
 
     let referenceIcon;
+    const isReferenced = entry.referencedBy && entry.referencedBy?.length > 0;
+    const containsReferences =
+      entry.references?.length > 0 ||
+      ("referencesInBody" in entry && entry.referencesInBody);
 
-    if (
-      entry.referencedBy &&
-      entry.referencedBy?.length > 0 &&
-      entry.references?.length > 0
-    ) {
+    if (isReferenced && containsReferences) {
       referenceIcon = (
-        // https://remixicon.com/icon/arrow-left-right-line
         <Tooltip label="Referenced by and references other entries">
           <svg
             xmlns="http://www.w3.org/2000/svg"
+            fill="none"
             viewBox="0 0 24 24"
-            fill="currentColor"
+            strokeWidth={1.5}
+            stroke="currentColor"
             className="inline relative z-10 mr-1 w-4 h-4 text-gray-500"
           >
-            <path d="M16.0503 12.0498L21 16.9996L16.0503 21.9493L14.636 20.5351L17.172 17.9988L4 17.9996V15.9996L17.172 15.9988L14.636 13.464L16.0503 12.0498ZM7.94975 2.0498L9.36396 3.46402L6.828 5.9988L20 5.99955V7.99955L6.828 7.9988L9.36396 10.5351L7.94975 11.9493L3 6.99955L7.94975 2.0498Z" />
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M7.5 21 3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5"
+            />
           </svg>
         </Tooltip>
       );
-    } else if (entry.referencedBy && entry.referencedBy?.length > 0) {
+    } else if (isReferenced) {
       referenceIcon = (
         <Tooltip label="Referenced by other entries">
-          {/* https://remixicon.com/icon/arrow-go-back-line */}
           <svg
             xmlns="http://www.w3.org/2000/svg"
+            fill="none"
             viewBox="0 0 24 24"
-            fill="currentColor"
+            strokeWidth={1.5}
+            stroke="currentColor"
             className="inline relative z-10 mr-1 w-4 h-4 text-gray-500"
           >
-            <path d="M10.0003 5.00014L19.0002 5L19.0002 7L12.0003 7.00011L12.0002 17.1719L15.9499 13.2222L17.3642 14.6364L11.0002 21.0004L4.63623 14.6364L6.05044 13.2222L10.0002 17.172L10.0003 5.00014Z" />
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M8.25 9V5.25A2.25 2.25 0 0 1 10.5 3h6a2.25 2.25 0 0 1 2.25 2.25v13.5A2.25 2.25 0 0 1 16.5 21h-6a2.25 2.25 0 0 1-2.25-2.25V15M12 9l3 3m0 0-3 3m3-3H2.25"
+            />
           </svg>
         </Tooltip>
       );
-    } else if (entry.references?.length > 0) {
+    } else if (containsReferences) {
       referenceIcon = (
         <Tooltip label="References other entries">
-          {/* https://remixicon.com/icon/corner-up-left-line */}
           <svg
             xmlns="http://www.w3.org/2000/svg"
+            fill="none"
             viewBox="0 0 24 24"
-            fill="currentColor"
+            strokeWidth={1.5}
+            stroke="currentColor"
             className="inline relative z-10 mr-1 w-4 h-4 text-gray-500"
           >
-            <path d="M19.0003 10.0003L19.0004 19.0002L17.0004 19.0002L17.0003 12.0003L6.82845 12.0002L10.7782 15.9499L9.36396 17.3642L3 11.0002L9.36396 4.63623L10.7782 6.05044L6.8284 10.0002L19.0003 10.0003Z" />
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M8.25 9V5.25A2.25 2.25 0 0 1 10.5 3h6a2.25 2.25 0 0 1 2.25 2.25v13.5A2.25 2.25 0 0 1 16.5 21h-6a2.25 2.25 0 0 1-2.25-2.25V15m-3 0-3-3m0 0 3-3m-3 3H15"
+            />
           </svg>
         </Tooltip>
       );
