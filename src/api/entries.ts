@@ -19,13 +19,14 @@ interface EntrySummary {
   eventAt: Date;
   attachments: Attachment[];
   shifts: Shift[];
+  followUps: string[];
   followingUp?: string;
   references: string[];
   referencedBy: string[];
 }
 
 export interface EntryFull
-  extends Omit<EntrySummary, "followingUp" | "referencedBy"> {
+  extends Omit<EntrySummary, "followingUp" | "referencedBy" | "followUps"> {
   supersedeBy?: string;
   text: string;
   followUps: Entry[];

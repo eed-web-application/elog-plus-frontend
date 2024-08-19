@@ -251,6 +251,147 @@ function AttachmentList({
   );
 }
 
+function ReferenceIcon({
+  entry,
+  ...rest
+}: { entry: Entry } & ComponentProps<"svg">) {
+  const isReferenced = entry.referencedBy && entry.referencedBy?.length > 0;
+  const containsReferences =
+    entry.references?.length > 0 ||
+    ("referencesInBody" in entry && entry.referencesInBody);
+
+  if (isReferenced && containsReferences) {
+    return (
+      <Tooltip label="Referenced by and references other entries">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          strokeWidth={1.5}
+          stroke="currentColor"
+          {...rest}
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="M7.5 21 3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5"
+          />
+        </svg>
+      </Tooltip>
+    );
+  } else if (isReferenced) {
+    return (
+      <Tooltip label="Referenced by other entries">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          strokeWidth={1.5}
+          stroke="currentColor"
+          {...rest}
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="M8.25 9V5.25A2.25 2.25 0 0 1 10.5 3h6a2.25 2.25 0 0 1 2.25 2.25v13.5A2.25 2.25 0 0 1 16.5 21h-6a2.25 2.25 0 0 1-2.25-2.25V15M12 9l3 3m0 0-3 3m3-3H2.25"
+          />
+        </svg>
+      </Tooltip>
+    );
+  } else if (containsReferences) {
+    return (
+      <Tooltip label="References other entries">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          strokeWidth={1.5}
+          stroke="currentColor"
+          {...rest}
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="M8.25 9V5.25A2.25 2.25 0 0 1 10.5 3h6a2.25 2.25 0 0 1 2.25 2.25v13.5A2.25 2.25 0 0 1 16.5 21h-6a2.25 2.25 0 0 1-2.25-2.25V15m-3 0-3-3m0 0 3-3m-3 3H15"
+          />
+        </svg>
+      </Tooltip>
+    );
+  }
+
+  return null;
+}
+
+function FollowUpIcon({
+  entry,
+  ...rest
+}: { entry: Entry } & ComponentProps<"svg">) {
+  console.log(entry);
+  const hasFollowUps = entry.followUps.length > 0;
+  const isFollowingUp = Boolean(entry.followingUp);
+
+  if (hasFollowUps && isFollowingUp) {
+    return (
+      <Tooltip label="Is a follow up and has follow ups">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          strokeWidth={1.5}
+          stroke="currentColor"
+          {...rest}
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="M3 7.5 7.5 3m0 0L12 7.5M7.5 3v13.5m13.5 0L16.5 21m0 0L12 16.5m4.5 4.5V7.5"
+          />
+        </svg>
+      </Tooltip>
+    );
+  } else if (hasFollowUps) {
+    return (
+      <Tooltip label="Has follow ups">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          strokeWidth={1.5}
+          stroke="currentColor"
+          {...rest}
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="M3 4.5h14.25M3 9h9.75M3 13.5h9.75m4.5-4.5v12m0 0-3.75-3.75M17.25 21 21 17.25"
+          />
+        </svg>
+      </Tooltip>
+    );
+  } else if (isFollowingUp) {
+    return (
+      <Tooltip label="Is a follow up">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          strokeWidth={1.5}
+          stroke="currentColor"
+          {...rest}
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="M3 4.5h14.25M3 9h9.75M3 13.5h5.25m5.25-.75L17.25 9m0 0L21 12.75M17.25 9v12"
+          />
+        </svg>
+      </Tooltip>
+    );
+  }
+
+  return null;
+}
+
 export interface Props extends Omit<ComponentProps<"div">, "onClick"> {
   entry: Entry;
   containerClassName?: string;
@@ -325,71 +466,6 @@ const EntryRow = memo(
 
     const triggerResize = useTriggerResize(entry.id);
 
-    let referenceIcon;
-    const isReferenced = entry.referencedBy && entry.referencedBy?.length > 0;
-    const containsReferences =
-      entry.references?.length > 0 ||
-      ("referencesInBody" in entry && entry.referencesInBody);
-
-    if (isReferenced && containsReferences) {
-      referenceIcon = (
-        <Tooltip label="Referenced by and references other entries">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            strokeWidth={1.5}
-            stroke="currentColor"
-            className="inline relative z-10 mr-1 w-4 h-4 text-gray-500"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M7.5 21 3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5"
-            />
-          </svg>
-        </Tooltip>
-      );
-    } else if (isReferenced) {
-      referenceIcon = (
-        <Tooltip label="Referenced by other entries">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            strokeWidth={1.5}
-            stroke="currentColor"
-            className="inline relative z-10 mr-1 w-4 h-4 text-gray-500"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M8.25 9V5.25A2.25 2.25 0 0 1 10.5 3h6a2.25 2.25 0 0 1 2.25 2.25v13.5A2.25 2.25 0 0 1 16.5 21h-6a2.25 2.25 0 0 1-2.25-2.25V15M12 9l3 3m0 0-3 3m3-3H2.25"
-            />
-          </svg>
-        </Tooltip>
-      );
-    } else if (containsReferences) {
-      referenceIcon = (
-        <Tooltip label="References other entries">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            strokeWidth={1.5}
-            stroke="currentColor"
-            className="inline relative z-10 mr-1 w-4 h-4 text-gray-500"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M8.25 9V5.25A2.25 2.25 0 0 1 10.5 3h6a2.25 2.25 0 0 1 2.25 2.25v13.5A2.25 2.25 0 0 1 16.5 21h-6a2.25 2.25 0 0 1-2.25-2.25V15m-3 0-3-3m0 0 3-3m-3 3H15"
-            />
-          </svg>
-        </Tooltip>
-      );
-    }
-
     return (
       <div
         ref={ref}
@@ -461,18 +537,14 @@ const EntryRow = memo(
               // Since the whole row is draggable, we don't want the link to be draggable
               draggable="false"
             >
-              {referenceIcon}
-              {Boolean(entry.followingUp) && (
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 20 20"
-                  fill="currentColor"
-                  className="inline mr-1 w-4 h-4 text-gray-500"
-                >
-                  <path d="M3.505 2.365A41.369 41.369 0 019 2c1.863 0 3.697.124 5.495.365 1.247.167 2.18 1.108 2.435 2.268a4.45 4.45 0 00-.577-.069 43.141 43.141 0 00-4.706 0C9.229 4.696 7.5 6.727 7.5 8.998v2.24c0 1.413.67 2.735 1.76 3.562l-2.98 2.98A.75.75 0 015 17.25v-3.443c-.501-.048-1-.106-1.495-.172C2.033 13.438 1 12.162 1 10.72V5.28c0-1.441 1.033-2.717 2.505-2.914z" />
-                  <path d="M14 6c-.762 0-1.52.02-2.271.062C10.157 6.148 9 7.472 9 8.998v2.24c0 1.519 1.147 2.839 2.71 2.935.214.013.428.024.642.034.2.009.385.09.518.224l2.35 2.35a.75.75 0 001.28-.531v-2.07c1.453-.195 2.5-1.463 2.5-2.915V8.998c0-1.526-1.157-2.85-2.729-2.936A41.645 41.645 0 0014 6z" />
-                </svg>
-              )}
+              <ReferenceIcon
+                className="inline relative z-10 mr-1 w-4 h-4 text-gray-500"
+                entry={entry}
+              />
+              <FollowUpIcon
+                className="inline relative z-10 mr-1 w-4 h-4 text-gray-500"
+                entry={entry}
+              />
               {entry.title}
             </Link>
             <div className="flex items-center h-5">
