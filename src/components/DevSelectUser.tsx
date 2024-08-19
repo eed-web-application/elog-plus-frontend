@@ -19,7 +19,8 @@ export default function DevSelectUser({ className }: { className?: string }) {
       users = await fetch("v1/mock/users-auth");
     } catch (err) {
       if (err instanceof UnauthorizedError) {
-        document.cookie = "";
+        document.cookie =
+          "dev-slac-vouch=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;";
         users = await fetchUsers();
       }
     }
