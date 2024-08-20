@@ -20,10 +20,7 @@ export type Draft = Omit<
   EntryNew,
   "attachments" | "eventAt" | "tags" | "summarizes"
 > & {
-  /**
-   * `null` meaning checked but no date
-   */
-  eventAt?: Date | null;
+  eventAt?: Date;
   attachments: LocalUploadedAttachment[];
   tags: (string | NewTag)[];
   summarizes: {
