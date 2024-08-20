@@ -29,17 +29,19 @@ export default function Tooltip({
   children,
   label,
   placement,
+  disabled,
 }: {
   children: React.ReactElement;
   label: string;
   placement?: Placement;
+  disabled?: boolean;
 }) {
   const [isOpen, setIsOpen] = useState(false);
   const arrowRef = useRef(null);
 
   const { refs, floatingStyles, context } = useFloating({
     placement: placement || "top",
-    open: isOpen,
+    open: isOpen && !disabled,
     onOpenChange: setIsOpen,
     middleware: [
       offset(ARROW_HEIGHT + GAP),
@@ -88,7 +90,7 @@ export default function Tooltip({
           ref: refs.setReference,
         }),
       )}
-      {isOpen && (
+      {isOpen && !disabled && (
         <FloatingPortal>
           <div
             className="z-10 py-2 px-3 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-sm transition-opacity duration-300"

@@ -185,6 +185,11 @@ export default function EntryForm({ onEntrySaved, kind = "newEntry" }: Props) {
           )}
           {kind === "newEntry" && (
             <ShiftSummaryForm
+              tooltip={
+                draft.logbooks.length !== 1
+                  ? "Must have one logbook selected"
+                  : ""
+              }
               value={draft.summarizes}
               onChange={(summarizes) => updateDraft({ ...draft, summarizes })}
               shifts={logbookMap[draft.logbooks[0] || ""]?.shifts || []}
