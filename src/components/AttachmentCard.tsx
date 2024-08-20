@@ -28,6 +28,7 @@ export default function AttachmentCard({
 }: Props) {
   function remove(e: React.MouseEvent<SVGSVGElement, MouseEvent>) {
     e.stopPropagation();
+    e.preventDefault();
     onRemove?.();
   }
 
