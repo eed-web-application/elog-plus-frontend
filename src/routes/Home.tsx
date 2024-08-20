@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { useLocation, useNavigate, useOutlet } from "react-router-dom";
 import { twJoin } from "tailwind-merge";
-import Filters, { FilterOptions as FiltersObject } from "../components/Filters";
+import Filters from "../components/Filters";
 import Navbar from "../components/Navbar";
 import useEntries from "../hooks/useEntries";
 import useIsSmallScreen from "../hooks/useIsSmallScreen";

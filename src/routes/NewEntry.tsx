@@ -5,7 +5,6 @@ import { useEffect } from "react";
 import { toast } from "react-toastify";
 import useEntryQuery from "../hooks/useEntryQuery";
 import useLogbooks from "../hooks/useLogbooks";
-import Spinner from "../components/Spinner";
 
 export default function NewEntry() {
   const { state: customDraftProperties } = useLocation();
