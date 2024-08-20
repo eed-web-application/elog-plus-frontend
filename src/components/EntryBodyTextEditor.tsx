@@ -440,7 +440,11 @@ export default function EntryBodyTextEditor({
 
   useEffect(() => {
     function handler({ editor }: EditorEvents["update"]) {
-      onChange(editor.getHTML());
+      if (editor.isEmpty) {
+        onChange("");
+      } else {
+        onChange(editor.getHTML());
+      }
     }
 
     editor?.on("update", handler);
