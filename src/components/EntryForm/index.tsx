@@ -164,24 +164,25 @@ export default function EntryForm({ onEntrySaved, kind = "newEntry" }: Props) {
               onChange={() =>
                 updateDraft({
                   ...draft,
-                  eventAt: draft.eventAt === undefined ? null : undefined,
+                  eventAt: draft.eventAt === undefined ? new Date() : undefined,
                 })
               }
             />
-            Explicit event time
+            Override Event Time
           </label>
-          <DateTimeInput
-            disabled={draft.eventAt === undefined}
-            invalid={invalidFields.includes("eventAt")}
-            value={draft.eventAt ? dateToDatetimeString(draft.eventAt) : ""}
-            onChange={(date) =>
-              updateDraft({
-                ...draft,
-                eventAt: date,
-              })
-            }
-            className="block mb-2 w-full"
-          />
+          {draft.eventAt && (
+            <DateTimeInput
+              invalid={invalidFields.includes("eventAt")}
+              value={dateToDatetimeString(draft.eventAt)}
+              onChange={(date) =>
+                updateDraft({
+                  ...draft,
+                  eventAt: date || undefined,
+                })
+              }
+              className="block mb-2 w-full"
+            />
+          )}
           {kind === "newEntry" && (
             <ShiftSummaryForm
               value={draft.summarizes}
