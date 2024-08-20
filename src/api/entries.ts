@@ -14,6 +14,7 @@ interface EntrySummary {
   logbooks: LogbookSummary[];
   tags: Tag[];
   title: string;
+  isEmpty: boolean;
   loggedBy: string;
   loggedAt: Date;
   eventAt: Date;
@@ -26,8 +27,12 @@ interface EntrySummary {
 }
 
 export interface EntryFull
-  extends Omit<EntrySummary, "followingUp" | "referencedBy" | "followUps"> {
+  extends Omit<
+    EntrySummary,
+    "followingUp" | "referencedBy" | "followUps" | "isEmpty"
+  > {
   supersedeBy?: string;
+  isEmpty: boolean;
   text: string;
   followUps: Entry[];
   history?: Entry[];
@@ -60,6 +65,8 @@ function normalizeEntry<E extends Entry>(entry: E): E {
   entry.attachments = entry.attachments || [];
 
   if ("text" in entry) {
+    entry.isEmpty = entry.text.trim() === "";
+
     if (entry.followUps) {
       entry.followUps = entry.followUps.map(normalizeEntry);
     }
