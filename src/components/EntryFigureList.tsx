@@ -17,6 +17,7 @@ import {
 } from "../api";
 import { BackDrop, IconButton } from "./base";
 import Spinner from "./Spinner";
+import Tooltip from "./Tooltip";
 
 export interface Props extends ComponentProps<"div"> {
   attachments: Attachment[];
@@ -53,8 +54,21 @@ function Figure({
   return (
     <>
       <div {...rest}>
-        <div className="flex relative">
-          <div className="mt-2 mb-1 text-gray-500">Figure {index + 1}</div>
+        <div className="flex relative items-center text-gray-500">
+          <div className="flex whitespace-nowrap overflow-hidden">
+            Figure {index + 1} (
+            <Tooltip label={figure.fileName}>
+              {/* https://stackoverflow.com/questions/27983100/text-ellipsis-at-start-of-string-with-css */}
+              <div
+                className="flex-shrink truncate"
+                style={{ direction: "rtl" }}
+              >
+                &lrm;
+                {figure.fileName}
+              </div>
+            </Tooltip>
+            )
+          </div>
           <a
             className={IconButton}
             download={figure.fileName}
@@ -152,21 +166,31 @@ export default function EntryFigureList({
         <div
           className={twJoin(
             "flex flex-col",
-            figures.length > 1 ? "basis-1/2" : "flex-1",
+            figures.length > 1 ? "basis-1/2 w-1/2" : "flex-1",
           )}
         >
           {figures
             .filter((_, index) => index % 2 === 0)
             .map((figure, index) => (
-              <Figure key={figure.id} figure={figure} index={index * 2} />
+              <Figure
+                key={figure.id}
+                figure={figure}
+                index={index * 2}
+                className="flex-shrink overflow-hidden"
+              />
             ))}
         </div>
         {figures.length > 1 && (
-          <div className="flex flex-col basis-1/2">
+          <div className="flex flex-col basis-1/2 w-1/2">
             {figures
               .filter((_, index) => index % 2 === 1)
               .map((figure, index) => (
-                <Figure key={figure.id} figure={figure} index={index * 2 + 1} />
+                <Figure
+                  key={figure.id}
+                  figure={figure}
+                  index={index * 2 + 1}
+                  className="flex-shrink overflow-hidden"
+                />
               ))}
           </div>
         )}
