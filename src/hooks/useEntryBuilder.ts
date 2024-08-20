@@ -78,7 +78,7 @@ export default function useEntryBuilder({ kind, onEntrySaved }: Props) {
   const saveEntry = useCallback(
     async (newEntry: EntryNew) => {
       try {
-        if (kind === "newEntry") {
+        if (kind[0] === "newEntry") {
           return await createEntry(newEntry);
         }
         if (kind[0] === "superseding") {
@@ -138,7 +138,7 @@ export default function useEntryBuilder({ kind, onEntrySaved }: Props) {
       removeDraft();
 
       queryClient.invalidateQueries({ queryKey: ["entries"] });
-      if (kind !== "newEntry") {
+      if (kind[0] !== "newEntry") {
         queryClient.invalidateQueries({ queryKey: ["entry", kind[1].id] });
       }
       if (newEntry.summarizes) {

@@ -19,14 +19,14 @@ import EntryBodyTextEditor from "../EntryBodyTextEditor";
 
 export interface Props {
   onEntrySaved: (id: string) => void;
-  kind?: DraftFactory;
+  kind: DraftFactory;
 }
 
 /**
  * A form to either create a new entry, supersede an existing entry, or follow
  * up an entry
  */
-export default function EntryForm({ onEntrySaved, kind = "newEntry" }: Props) {
+export default function EntryForm({ onEntrySaved, kind }: Props) {
   const { logbookMap, isLoading: isLogbooksLoading } = useLogbooks({
     critical: false,
   });
@@ -78,7 +78,7 @@ export default function EntryForm({ onEntrySaved, kind = "newEntry" }: Props) {
         </svg>
       </Link>
       <div className="pb-2">
-        {kind === "newEntry" ? (
+        {kind[0] === "newEntry" ? (
           <div className="py-2 pl-3 mb-2 text-lg border-b">New entry</div>
         ) : (
           <>
@@ -183,7 +183,7 @@ export default function EntryForm({ onEntrySaved, kind = "newEntry" }: Props) {
               className="block mb-2 w-full"
             />
           )}
-          {kind === "newEntry" && (
+          {kind[0] === "newEntry" && (
             <ShiftSummaryForm
               tooltip={
                 draft.logbooks.length !== 1
@@ -242,7 +242,7 @@ export default function EntryForm({ onEntrySaved, kind = "newEntry" }: Props) {
             type="submit"
             className={twJoin(Button, "block ml-auto mt-2")}
             value={
-              kind === "newEntry"
+              kind[0] === "newEntry"
                 ? "Save"
                 : kind[0] === "followingUp"
                   ? "Follow up"

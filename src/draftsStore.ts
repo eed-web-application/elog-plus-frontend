@@ -34,7 +34,7 @@ export type DraftId = "newEntry" | `supersede/${string}` | `followUp/${string}`;
  * Information needed to start a draft
  */
 export type DraftFactory =
-  | "newEntry"
+  | ["newEntry", string[]]
   | ["followingUp", EntryFull]
   | ["superseding", EntryFull];
 
@@ -72,10 +72,10 @@ export const useDraftsStore = create(
         let draftId: DraftId;
         let defaultDraft: Draft;
 
-        if (factory === "newEntry") {
+        if (factory[0] === "newEntry") {
           draftId = "newEntry";
 
-          defaultDraft = DEFAULT_DRAFT;
+          defaultDraft = { ...DEFAULT_DRAFT, logbooks: factory[1] };
         } else if (factory[0] === "superseding") {
           draftId = `supersede/${factory[1].id}`;
 
