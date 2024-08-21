@@ -51,24 +51,29 @@ function Figure({
     role,
   ]);
 
+  // We want to show the extension of the file name while truncating the rest
+  const fileNameSplit = figure.fileName.split(".");
+
   return (
     <>
       <div {...rest}>
-        <div className="flex relative items-center text-gray-500">
-          <div className="flex whitespace-nowrap overflow-hidden">
-            Figure {index + 1} (
-            <Tooltip label={figure.fileName}>
-              {/* https://stackoverflow.com/questions/27983100/text-ellipsis-at-start-of-string-with-css */}
-              <div
-                className="flex-shrink truncate"
-                style={{ direction: "rtl" }}
-              >
-                &lrm;
-                {figure.fileName}
-              </div>
-            </Tooltip>
-            )
-          </div>
+        <div className="flex w-full relative items-center text-gray-500 overflow-hidden whitespace-nowrap">
+          Figure {index + 1} (
+          <Tooltip label={figure.fileName}>
+            <div className="flex-shrink flex overflow-hidden">
+              {fileNameSplit.length === 1 ? (
+                fileNameSplit[0]
+              ) : (
+                <>
+                  <span className="truncate">
+                    {fileNameSplit.slice(0, -1).join(".")}
+                  </span>
+                  .{figure.fileName.split(".")[fileNameSplit.length - 1]}
+                </>
+              )}
+            </div>
+          </Tooltip>
+          )
           <a
             className={IconButton}
             download={figure.fileName}
@@ -104,7 +109,6 @@ function Figure({
         />
         {!isLoaded && <Spinner className="my-3 w-full" />}
       </div>
-
       {isOpen && (
         <FloatingPortal>
           <FloatingOverlay
@@ -162,38 +166,22 @@ export default function EntryFigureList({
 
   return (
     <>
-      <div className={twMerge("flex gap-3 pb-1", className)} {...rest}>
-        <div
-          className={twJoin(
-            "flex flex-col",
-            figures.length > 1 ? "basis-1/2 w-1/2" : "flex-1",
-          )}
-        >
-          {figures
-            .filter((_, index) => index % 2 === 0)
-            .map((figure, index) => (
-              <Figure
-                key={figure.id}
-                figure={figure}
-                index={index * 2}
-                className="flex-shrink overflow-hidden"
-              />
-            ))}
-        </div>
-        {figures.length > 1 && (
-          <div className="flex flex-col basis-1/2 w-1/2">
-            {figures
-              .filter((_, index) => index % 2 === 1)
-              .map((figure, index) => (
-                <Figure
-                  key={figure.id}
-                  figure={figure}
-                  index={index * 2 + 1}
-                  className="flex-shrink overflow-hidden"
-                />
-              ))}
-          </div>
-        )}
+      <div
+        className={twMerge("flex flex-row flex-wrap pb-1", className)}
+        {...rest}
+      >
+        {figures.map((figure, index) => (
+          <Figure
+            key={figure.id}
+            figure={figure}
+            index={index * 2}
+            className={twJoin(
+              "overflow-hidden",
+              figures.length > 1 ? "basis-1/2" : "flex-1",
+              index % 2 === 0 ? "pr-1.5" : "pl-1.5",
+            )}
+          />
+        ))}
       </div>
     </>
   );
