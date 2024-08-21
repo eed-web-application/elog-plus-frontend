@@ -129,9 +129,9 @@ export default function EntryView({ entry }: Props) {
           </div>
         )}
       </div>
-      {(entry.text || entry.attachments.length > 0) && (
+      {(entry.text.trim() || entry.attachments.length > 0) && (
         <div className="py-2 px-3 border-t">
-          <EntryBodyText body={entry.text} />
+          {entry.text.trim() && <EntryBodyText body={entry.text} />}
           <EntryFigureList attachments={entry.attachments} />
           {attachments.length > 0 && (
             <>
