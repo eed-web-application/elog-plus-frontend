@@ -553,14 +553,16 @@ const EntryRow = memo(
                 </svg>
               )}
 
-              <ReferenceIcon
-                className="inline relative z-10 mr-1 w-4 h-4 text-gray-500"
-                entry={entry}
-              />
-              <FollowUpIcon
-                className="inline relative z-10 mr-1 w-4 h-4 text-gray-500"
-                entry={entry}
-              />
+              <FloatingDelayGroup delay={200}>
+                <ReferenceIcon
+                  className="inline relative z-10 mr-1 w-4 h-4 text-gray-500"
+                  entry={entry}
+                />
+                <FollowUpIcon
+                  className="inline relative z-10 mr-1 w-4 h-4 text-gray-500"
+                  entry={entry}
+                />
+              </FloatingDelayGroup>
               {entry.title}
             </Link>
             <div className="flex items-center h-5">
