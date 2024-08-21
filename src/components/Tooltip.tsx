@@ -15,6 +15,7 @@ import {
   FloatingArrow,
   arrow,
   Placement,
+  hide,
 } from "@floating-ui/react";
 import React, { useId, useRef, useState } from "react";
 
@@ -39,7 +40,7 @@ export default function Tooltip({
   const [isOpen, setIsOpen] = useState(false);
   const arrowRef = useRef(null);
 
-  const { refs, floatingStyles, context } = useFloating({
+  const { refs, floatingStyles, context, middlewareData } = useFloating({
     placement: placement || "top",
     open: isOpen && !disabled,
     onOpenChange: setIsOpen,
@@ -50,6 +51,7 @@ export default function Tooltip({
       arrow({
         element: arrowRef,
       }),
+      hide(),
     ],
     whileElementsMounted: autoUpdate,
   });
@@ -95,7 +97,12 @@ export default function Tooltip({
           <div
             className="z-10 py-2 px-3 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-sm transition-opacity duration-300"
             ref={refs.setFloating}
-            style={floatingStyles}
+            style={{
+              ...floatingStyles,
+              visibility: middlewareData.hide?.referenceHidden
+                ? "hidden"
+                : "visible",
+            }}
             id={id}
             {...getFloatingProps()}
           >
