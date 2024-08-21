@@ -74,7 +74,7 @@ export default function AdminImpersonate() {
           }
           setValue={onSelect}
           options={users.map((user) => ({
-            label: user.gecos,
+            label: `${user.gecos} (${user.email})`,
             value: user.email,
           }))}
           isLoading={isLoading}
