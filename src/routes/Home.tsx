@@ -1,5 +1,10 @@
 import { useCallback, useEffect, useState } from "react";
-import { useLocation, useNavigate, useOutlet } from "react-router-dom";
+import {
+  useLocation,
+  useMatch,
+  useNavigate,
+  useOutlet,
+} from "react-router-dom";
 import { twJoin } from "tailwind-merge";
 import Filters from "../components/Filters";
 import Navbar from "../components/Navbar";
@@ -78,6 +83,8 @@ export default function Home() {
     ? []
     : query.logbooks.map((name) => logbookNameMap[name.toLowerCase()].id);
 
+  const selected = useMatch({ path: "/:entryId" })?.params.entryId;
+
   return (
     <div className="flex flex-col h-full">
       <div
@@ -104,7 +111,7 @@ export default function Home() {
           containerClassName="min-w-[384px] flex-1"
           entries={entries || []}
           emptyLabel="No entries found"
-          selected={location.pathname.split("/")[1]}
+          selected={selected}
           isLoading={isLoading}
           logbooksIncluded={includedLogbooks}
           showReferences
