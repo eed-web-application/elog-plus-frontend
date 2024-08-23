@@ -84,6 +84,13 @@ export async function fetch(
     options,
   );
 
+  if (res.status === 302) {
+    // If the server responds with a 302, it means the user is not logged in
+    // and the server is redirecting to the login page. Therefore, we can just
+    // refresh the page to redirect the user to the login page.
+    window.location.reload();
+  }
+
   let responseData;
   try {
     responseData = await res.json();
@@ -96,11 +103,6 @@ export async function fetch(
       throw new NotFoundError(res, responseData);
     } else if (res.status === 401) {
       throw new UnauthorizedError(res, responseData);
-    } else if (res.status === 302) {
-      // If the server responds with a 302, it means the user is not logged in
-      // and the server is redirecting to the login page. Therefore, we can just
-      // refresh the page to redirect the user to the login page.
-      window.location.reload();
     } else {
       throw new InternalServerError(res, responseData);
     }
