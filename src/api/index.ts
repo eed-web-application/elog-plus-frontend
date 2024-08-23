@@ -71,10 +71,11 @@ export async function fetch(
     headers["Impersonate"] = impersonating.email;
   }
 
-  const options = {
+  const options: RequestInit = {
     method,
     headers: new Headers(headers),
     body: formData || (body ? JSON.stringify(body) : null),
+    redirect: "manual",
     ...restOptions,
   };
 
