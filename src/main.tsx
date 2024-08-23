@@ -22,7 +22,7 @@ import AdminGroups from "./routes/Admin/Groups.tsx";
 import AdminUsers from "./routes/Admin/Users.tsx";
 import AdminApplications from "./routes/Admin/Applications.tsx";
 import AdminImpersonate from "./routes/Admin/Impersonate.tsx";
-import { fetchEntry, ServerError, UnauthorizedError } from "./api";
+import { fetchEntry, ServerError } from "./api";
 import "./index.css";
 import reportServerError from "./reportServerError.tsx";
 import ImpersonationContainer from "./components/ImpersonationContainer.tsx";
@@ -31,12 +31,10 @@ const queryClient = new QueryClient();
 
 queryClient.setDefaultOptions({
   queries: {
-    retry: (failureCount, error) => {
-      if (error instanceof UnauthorizedError) {
-        return false;
-      }
-      return failureCount < 3;
-    },
+    // There is a lot of nuance to retrying correctly (only retry on 5xx errors,
+    // only retry on idempotent requests, etc.) and has a large impact on the
+    // response time of errors, so we disable it for now.
+    retry: false,
   },
 });
 
