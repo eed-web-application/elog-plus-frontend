@@ -121,16 +121,14 @@ const EntryListGrouped = forwardRef<HTMLDivElement, Props>(
 
     const virtualItems = virtualizer.getVirtualItems();
     const lastVirtualItem = virtualItems[virtualItems.length - 1];
+    const reachedBottom =
+      lastVirtualItem && lastVirtualItem.index >= items.length - 1;
 
     useEffect(() => {
-      if (!lastVirtualItem) {
-        return;
-      }
-
-      if (lastVirtualItem.index >= items.length - 1) {
+      if (reachedBottom) {
         onBottomVisible?.();
       }
-    }, [lastVirtualItem, items.length, onBottomVisible]);
+    }, [reachedBottom, onBottomVisible]);
 
     const mergedRef = useMergeRefs([ref, parentRef]);
 
@@ -149,7 +147,7 @@ const EntryListGrouped = forwardRef<HTMLDivElement, Props>(
         align: "center",
       });
       setPrevSpotlight(spotlight);
-    }, [spotlight, headerIndices, items, virtualizer, prevSpotlight]);
+    }, [spotlight, items, virtualizer, prevSpotlight]);
 
     if (entries.length === 0 && !isLoading && emptyLabel) {
       return (

@@ -121,7 +121,9 @@ export default function Home() {
           allowFollowUp
           allowSupersede
           allowSpotlightForFollowUps
-          onBottomVisible={reachedBottom ? undefined : getMoreEntries}
+          onBottomVisible={
+            reachedBottom || isEntriesLoading ? undefined : getMoreEntries
+          }
           dateBasedOn={query.sortByLogDate ? "loggedAt" : "eventAt"}
           spotlight={spotlight}
           showBackToTopButton={Boolean(spotlightSearch)}
