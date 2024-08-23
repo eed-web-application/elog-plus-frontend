@@ -1,6 +1,5 @@
 import { useTagUsageStore } from "../tagUsageStore";
-import { ServerError, Tag, fetchTags } from "../api";
-import reportServerError from "../reportServerError";
+import { Tag, fetchTags } from "../api";
 import { useQuery } from "@tanstack/react-query";
 
 /**
@@ -24,11 +23,8 @@ export default function useTags({
     queryFn: () => fetchTags({ logbooks }),
     enabled: enabled,
     staleTime: 5 * 60 * 1000,
-    onError: (e) => {
-      if (!(e instanceof ServerError)) {
-        throw e;
-      }
-      reportServerError("Could not retrieve tags", e);
+    meta: {
+      resource: "tags",
     },
     select: (tags) => {
       const tagMap = tags.reduce<Record<string, Tag>>((acc, tag) => {

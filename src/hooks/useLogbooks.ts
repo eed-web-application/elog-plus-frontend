@@ -1,5 +1,4 @@
-import { Logbook, LogbookWithAuth, ServerError, fetchLogbooks } from "../api";
-import reportServerError from "../reportServerError";
+import { Logbook, LogbookWithAuth, fetchLogbooks } from "../api";
 import { useQuery } from "@tanstack/react-query";
 
 export default function useLogbooks<A extends boolean>({
@@ -24,12 +23,8 @@ export default function useLogbooks<A extends boolean>({
     enabled,
     useErrorBoundary: critical,
     staleTime: 5 * 60 * 1000,
-    onError: (e) => {
-      if (!(e instanceof ServerError)) {
-        throw e;
-      }
-
-      reportServerError("Could not retrieve logbooks", e);
+    meta: {
+      resource: "logbooks",
     },
     select: (logbooks) => {
       const logbookMap = logbooks.reduce<

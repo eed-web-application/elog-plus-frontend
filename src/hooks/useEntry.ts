@@ -1,13 +1,9 @@
-import { ServerError, fetchEntry } from "../api";
+import { fetchEntry } from "../api";
 import { useQuery } from "@tanstack/react-query";
-import reportServerError from "../reportServerError";
 
 export default function useEntry(
   entryId?: string,
-  {
-    critical = true,
-    onError,
-  }: { critical?: boolean; onError?: () => void } = {},
+  { critical = true }: { critical?: boolean; onError?: () => void } = {},
 ) {
   const { data } = useQuery({
     queryKey: ["entry", entryId],
@@ -17,13 +13,8 @@ export default function useEntry(
     // This is here specifically, because the entry loader prefetches the
     // entries to be used here, so we set the staleTime to something small.
     staleTime: 100,
-    onError: (e) => {
-      if (!(e instanceof ServerError)) {
-        throw e;
-      }
-
-      reportServerError("Could not retrieve entry", e);
-      onError?.();
+    meta: {
+      resource: "entry",
     },
   });
 

@@ -8,7 +8,11 @@ import {
 } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import {
+  QueryCache,
+  QueryClient,
+  QueryClientProvider,
+} from "@tanstack/react-query";
 
 import Home from "./routes/Home.tsx";
 import Supersede from "./routes/Supersede.tsx";
@@ -27,7 +31,21 @@ import "./index.css";
 import reportServerError from "./reportServerError.tsx";
 import ImpersonationContainer from "./components/ImpersonationContainer.tsx";
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  queryCache: new QueryCache({
+    onError: (e, query) => {
+      if (!(e instanceof ServerError)) {
+        throw e;
+      }
+
+      if (query.meta?.resource) {
+        reportServerError(`Could not retrieve ${query.meta.resource}`, e);
+      } else {
+        reportServerError("Unexpected error", e);
+      }
+    },
+  }),
+});
 
 queryClient.setDefaultOptions({
   queries: {
