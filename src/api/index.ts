@@ -84,7 +84,12 @@ export async function fetch(
     options,
   );
 
-  if (res.status === 302) {
+  if (res.type === "opaqueredirect") {
+    if (import.meta.env.MODE === "development") {
+      throw new Error(
+        "Invalid `slac-vouch` during development. To use the staging server during development, login to the staging frontend in a separate tab, then copy the new `slac-vouch` cookie into localhost.",
+      );
+    }
     // If the server responds with a 302, it means the user is not logged in
     // and the server is redirecting to the login page. Therefore, we can just
     // refresh the page to redirect the user to the login page.
