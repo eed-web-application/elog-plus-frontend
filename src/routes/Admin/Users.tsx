@@ -29,13 +29,12 @@ export default function AdminUsers() {
       <AdminResource
         home="/admin/users"
         items={users.map((user) => ({
-          label: user.gecos,
+          label: `${user.gecos} (${user.email})`,
           link: `/admin/users/${encodeURI(user.email)}/`,
           edited: usersEdited.includes(user.email),
           readOnly: false,
         }))}
         isLoading={isLoading}
-        createLabel="Create logbook"
         onSearchChange={onSearchChange}
         onBottomVisible={getMoreUsers}
       >
