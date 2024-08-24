@@ -68,7 +68,7 @@ export default function FilterChipMultiSelect<O>({
   });
 
   const dismiss = useDismiss(context);
-  const click = useClick(context);
+  const click = useClick(context, { event: "mousedown" });
 
   const { getReferenceProps, getFloatingProps } = useInteractions([
     dismiss,
