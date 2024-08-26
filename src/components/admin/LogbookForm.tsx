@@ -9,7 +9,14 @@ import {
   LogbookWithAuth,
   Permission,
 } from "../../api";
-import { Button, IconButton, Input, InputInvalid, TextButton } from "../base";
+import {
+  Button,
+  Checkbox,
+  IconButton,
+  Input,
+  InputInvalid,
+  TextButton,
+} from "../base";
 import {
   useLogbookFormsStore,
   validateLogbookForm,
@@ -22,6 +29,7 @@ import useApplications from "../../hooks/useApplications";
 import AdminAuthorizationForm from "./AuthorizationForm";
 import { saveAuthorizations } from "../../authorizationDiffing";
 import ResourceListForm from "./ResourceListForm";
+import Tooltip from "../Tooltip";
 
 interface Props {
   logbook: LogbookWithAuth;
@@ -82,6 +90,8 @@ export default function LogbookForm({ logbook, onSave }: Props) {
       id: form.id,
       name: form.name,
       tags: resolvedTags,
+      readAll: form.readAll,
+      writeAll: form.writeAll,
       // Remove temp ids
       shifts: form.shifts.map(({ id, ...shift }) => ({
         ...(shift as Shift),
@@ -477,6 +487,51 @@ export default function LogbookForm({ logbook, onSave }: Props) {
           createAuthorization("Token", ownerId, ownerLabel)
         }
       />
+
+      <div className="mt-2 text-gray-500">Global Authorizations</div>
+      <div className="border rounded-lg bg-gray-50 p-2">
+        <Tooltip label="Anyone or anything can read from this logbook">
+          <label className="flex items-center text-gray-500">
+            <Tooltip.PositionReference>
+              <input
+                type="checkbox"
+                className={twJoin(Checkbox, "mr-2")}
+                checked={form.readAll}
+                onChange={(e) =>
+                  setForm({
+                    ...form,
+                    readAll: e.target.checked,
+                    writeAll: e.target.checked ? form.writeAll : false,
+                  })
+                }
+              />
+            </Tooltip.PositionReference>
+            Publicly readable
+          </label>
+        </Tooltip>
+
+        <Tooltip label="Anyone or anything can write to this logbook">
+          <label
+            className={twJoin(
+              "flex mt-2 items-center",
+              form.readAll ? "text-gray-500" : "text-gray-400",
+            )}
+          >
+            <Tooltip.PositionReference>
+              <input
+                type="checkbox"
+                className={twJoin(Checkbox, "mr-2")}
+                checked={form.writeAll}
+                onChange={(e) =>
+                  setForm({ ...form, writeAll: e.target.checked })
+                }
+                disabled={!form.readAll}
+              />
+            </Tooltip.PositionReference>
+            Publicly writable
+          </label>
+        </Tooltip>
+      </div>
 
       <div className="flex justify-end mt-3 gap-3">
         <button

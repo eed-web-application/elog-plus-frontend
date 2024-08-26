@@ -18,6 +18,8 @@ export interface LogbookSummary {
 export interface Logbook extends LogbookSummary {
   tags: Tag[];
   shifts: Shift[];
+  writeAll: boolean;
+  readAll: boolean;
 }
 
 export interface LogbookWithAuth extends Logbook {

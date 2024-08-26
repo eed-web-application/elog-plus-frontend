@@ -21,7 +21,8 @@ interface LocalTag extends Pick<Tag, "name"> {
   id?: Tag["id"];
 }
 
-interface LogbookForm extends Pick<LogbookWithAuth, "id" | "name"> {
+interface LogbookForm
+  extends Pick<LogbookWithAuth, "id" | "name" | "readAll" | "writeAll"> {
   tags: LocalTag[];
   shifts: LocalShift[];
   authorizations: LocalAuthorization[];
