@@ -70,11 +70,12 @@ export default function AdminAuthorizationForm({
           <Select
             className="w-32"
             value={authorization.permission}
-            options={["Write", "Read"]}
+            options={["Write", "Read", "Admin"]}
             setValue={(updatedPermission) => {
               if (
                 updatedPermission !== "Read" &&
-                updatedPermission !== "Write"
+                updatedPermission !== "Write" &&
+                updatedPermission !== "Admin"
               ) {
                 return;
               }

@@ -1,15 +1,15 @@
-import { Logbook, LogbookWithAuth, fetchLogbooks } from "../api";
+import { Logbook, LogbookWithAuth, Permission, fetchLogbooks } from "../api";
 import { useQuery } from "@tanstack/react-query";
 
 export default function useLogbooks<A extends boolean>({
   enabled = true,
   critical = true,
-  requireWrite = false,
+  requirePermission = "Read",
   includeAuth,
 }: {
   enabled?: boolean;
   critical?: boolean;
-  requireWrite?: boolean;
+  requirePermission?: Permission;
   includeAuth?: A;
 } = {}): {
   logbooks: (A extends true ? LogbookWithAuth : Logbook)[];
@@ -18,8 +18,8 @@ export default function useLogbooks<A extends boolean>({
   isLoading: boolean;
 } {
   const { data, isLoading } = useQuery({
-    queryKey: ["logbooks", includeAuth, requireWrite],
-    queryFn: () => fetchLogbooks<A>({ includeAuth, requireWrite }),
+    queryKey: ["logbooks", includeAuth, requirePermission],
+    queryFn: () => fetchLogbooks<A>({ includeAuth, requirePermission }),
     enabled,
     useErrorBoundary: critical,
     staleTime: 5 * 60 * 1000,

@@ -1,5 +1,5 @@
 import { fetch } from ".";
-import { Authorization } from "./authorizations";
+import { Authorization, Permission } from "./authorizations";
 import { Tag } from "./tags";
 
 export interface Shift {
@@ -33,10 +33,10 @@ export interface LogbookUpdation extends Omit<Logbook, "tags" | "shifts"> {
 
 export async function fetchLogbooks<A extends boolean | undefined>({
   includeAuth = false,
-  requireWrite = false,
+  requirePermission = "Read",
 }: {
   includeAuth?: A;
-  requireWrite?: boolean;
+  requirePermission?: Permission;
 } = {}): Promise<(A extends true ? LogbookWithAuth : Logbook)[]> {
   const params: Record<string, string> = {};
 
@@ -44,7 +44,7 @@ export async function fetchLogbooks<A extends boolean | undefined>({
     params.includeAuthorizations = "true";
   }
 
-  params.filterForAuthorizationTypes = requireWrite ? "Write" : "Read";
+  params.filterForAuthorizationTypes = requirePermission;
 
   const logbooks = await fetch("v1/logbooks", {
     params,

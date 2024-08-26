@@ -12,7 +12,7 @@ export default function NewEntry() {
   const [query, _] = useEntryQuery();
   const { logbookNameMap, isLoading: isLogbooksLoading } = useLogbooks({
     critical: false,
-    requireWrite: true,
+    requirePermission: "Write",
   });
 
   const logbooks = query.logbooks

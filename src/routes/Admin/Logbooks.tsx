@@ -14,7 +14,7 @@ export default function AdminLogbooks() {
     logbookMap,
     logbooks,
     isLoading: isLogbooksLoading,
-  } = useLogbooks({ requireWrite: true, includeAuth: true });
+  } = useLogbooks({ requirePermission: "Admin", includeAuth: true });
   const { logbookId: selectedLogbookId } = useParams();
 
   const selectedLogbook = selectedLogbookId
