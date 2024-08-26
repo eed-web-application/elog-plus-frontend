@@ -16,17 +16,31 @@ import {
   arrow,
   Placement,
   hide,
+  ReferenceType,
 } from "@floating-ui/react";
-import React, { useId, useRef, useState } from "react";
+import React, {
+  createContext,
+  isValidElement,
+  useContext,
+  useId,
+  useRef,
+  useState,
+} from "react";
 
 const ARROW_HEIGHT = 7;
 const GAP = 2;
 const DEFAULT_DELAY = 200;
 
+type ContextType = {
+  setPositionReference: (node: ReferenceType | null) => void;
+} | null;
+
+const DialogContext = createContext<ContextType>(null);
+
 /**
  * Shows tooltip when child is hovered. Only one child allowed.
  */
-export default function Tooltip({
+function Tooltip({
   children,
   label,
   placement,
@@ -50,6 +64,7 @@ export default function Tooltip({
       shift(),
       arrow({
         element: arrowRef,
+        padding: 8, // rounded-lg is 8px
       }),
       hide(),
     ],
@@ -73,7 +88,7 @@ export default function Tooltip({
   const child = React.Children.only(children);
 
   if (!React.isValidElement(child)) {
-    throw new Error("Tooltip.Tripper requires a single valid child");
+    throw new Error("Tooltip requires a single valid child");
   }
 
   // Merge all the interactions into prop getters
@@ -86,12 +101,16 @@ export default function Tooltip({
 
   return (
     <>
-      {React.cloneElement(
-        child,
-        getReferenceProps({
-          ref: refs.setReference,
-        }),
-      )}
+      <DialogContext.Provider
+        value={{ setPositionReference: refs.setPositionReference }}
+      >
+        {React.cloneElement(
+          child,
+          getReferenceProps({
+            ref: refs.setReference,
+          }),
+        )}
+      </DialogContext.Provider>
       {isOpen && !disabled && (
         <FloatingPortal>
           <div
@@ -118,3 +137,25 @@ export default function Tooltip({
     </>
   );
 }
+
+Tooltip.PositionReference = function TooltipPositionReference({
+  children,
+}: {
+  children: React.ReactElement;
+}) {
+  const context = useContext(DialogContext);
+
+  if (!context) {
+    throw new Error("Tooltip.PositionReference must be a child of Tooltip");
+  }
+
+  if (!isValidElement(children)) {
+    throw new Error("Tooltip.PositionReference requires a single valid child");
+  }
+
+  return React.cloneElement(children, {
+    ref: context.setPositionReference,
+  } as Record<string, unknown>);
+};
+
+export default Tooltip;
