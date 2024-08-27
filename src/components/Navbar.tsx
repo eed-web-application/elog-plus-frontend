@@ -10,6 +10,7 @@ import Dialog from "./Dialog";
 import InfoDialog from "./InfoDialog";
 import BugReport from "./BugReport";
 import EntrySearchBar, { Props as SearchProps } from "./EntrySearchBar";
+import AccountButton from "./AccountButton";
 
 export type Props = Pick<SearchProps, "search" | "onSearchChange"> &
   ComponentProps<"div">;
@@ -90,6 +91,8 @@ export default function Navbar({
           </svg>
         </Dialog.Trigger>
       </Dialog>
+
+      <AccountButton className="ml-2 w-8 h-8 p-1 text-gray-800 hover:bg-gray-200 rounded-full cursor-pointer" />
     </div>
   );
 }
