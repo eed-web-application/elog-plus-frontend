@@ -29,7 +29,7 @@ interface EntrySummary {
 export interface EntryFull
   extends Omit<
     EntrySummary,
-    "followingUp" | "referencedBy" | "followUps" | "isEmpty"
+    "followingUp" | "referencedBy" | "references" | "followUps" | "isEmpty"
   > {
   supersedeBy?: string;
   isEmpty: boolean;
@@ -37,6 +37,7 @@ export interface EntryFull
   followUps: Entry[];
   history?: Entry[];
   followingUp?: Entry;
+  references?: Entry[];
   referencedBy?: Entry[];
   referencesInBody: boolean;
 }
@@ -70,6 +71,9 @@ function normalizeEntry<E extends Entry>(entry: E): E {
     if (entry.followUps) {
       entry.followUps = entry.followUps.map(normalizeEntry);
     }
+    entry.references = entry.references
+      ? entry.references.map(normalizeEntry)
+      : undefined;
     entry.history = entry.history
       ? entry.history.map(normalizeEntry)
       : undefined;
@@ -126,17 +130,12 @@ export async function fetchEntry(id: string): Promise<EntryFull> {
       includeHistory: "true",
       includeFollowingUps: "true",
       includeReferencedBy: "true",
+      includeReferences: "true",
     },
   })) as EntryFull;
 
   const entry = normalizeEntry(data);
   return entry;
-}
-
-export async function fetchReferences(id: string): Promise<EntrySummary[]> {
-  const entries = await fetch(`v1/entries/${id}/references`);
-
-  return entries.map(normalizeEntry);
 }
 
 export function fetchShiftSummary(

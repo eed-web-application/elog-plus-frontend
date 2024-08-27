@@ -12,7 +12,6 @@ import TextDivider from "./TextDivider";
 import useSpotlightProps from "../hooks/useSpotlightProps";
 import useDisplayTags from "../hooks/useDisplayTags";
 import FavoriteButton from "./FavoriteButton";
-import useReferences from "../hooks/useReferences";
 
 export interface Props {
   entry: EntryFull;
@@ -27,9 +26,7 @@ export default function EntryView({ entry }: Props) {
   const spotlightProps = useSpotlightProps(entry.id);
   const tagNames = useDisplayTags(entry.tags, entry.logbooks.length);
 
-  const references = useReferences(
-    entry.referencesInBody ? undefined : entry.id,
-  );
+  console.log(entry.references);
 
   return (
     <>
@@ -191,12 +188,12 @@ export default function EntryView({ entry }: Props) {
           </div>
         </>
       )}
-      {references && references.length > 0 && (
+      {entry.references && entry.references.length > 0 && (
         <>
           <TextDivider>References</TextDivider>
           <div className="px-3 pb-3 mt-3">
             <EntryList
-              entries={references}
+              entries={entry.references}
               showDate
               showFollowUps
               allowExpanding
