@@ -479,7 +479,7 @@ const EntryRow = memo(
           onMouseEnter={triggerResize}
           onMouseLeave={triggerResize}
           className={twMerge(
-            "flex items-center group cursor-pointer relative h-12 hover:bg-gray-50",
+            "flex items-center group cursor-pointer relative h-12 hover:bg-gray-50 text-black",
             selected && "bg-blue-50",
             selected && "hover:bg-blue-100",
             highlighted && "bg-yellow-100",
@@ -523,7 +523,7 @@ const EntryRow = memo(
               }}
               // See https://inclusive-components.design/cards/
               className={twJoin(
-                "truncate leading-[1.2] after:absolute after:left-0 after:right-0 after:bottom-0 after:top-0 text-inherit no-underline font-normal",
+                "truncate leading-[1.2] after:absolute after:left-0 after:right-0 after:bottom-0 after:top-0 no-underline font-normal",
               )}
               onClick={
                 onClick
