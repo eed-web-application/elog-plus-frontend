@@ -26,8 +26,6 @@ export default function EntryView({ entry }: Props) {
   const spotlightProps = useSpotlightProps(entry.id);
   const tagNames = useDisplayTags(entry.tags, entry.logbooks.length);
 
-  console.log(entry.references);
-
   return (
     <>
       {!entry.supersedeBy && (
@@ -188,20 +186,22 @@ export default function EntryView({ entry }: Props) {
           </div>
         </>
       )}
-      {entry.references && entry.references.length > 0 && (
-        <>
-          <TextDivider>References</TextDivider>
-          <div className="px-3 pb-3 mt-3">
-            <EntryList
-              entries={entry.references}
-              showDate
-              showFollowUps
-              allowExpanding
-              allowSpotlight
-            />
-          </div>
-        </>
-      )}
+      {!entry.referencesInBody &&
+        entry.references &&
+        entry.references.length > 0 && (
+          <>
+            <TextDivider>References</TextDivider>
+            <div className="px-3 pb-3 mt-3">
+              <EntryList
+                entries={entry.references}
+                showDate
+                showFollowUps
+                allowExpanding
+                allowSpotlight
+              />
+            </div>
+          </>
+        )}
       {entry.referencedBy && entry.referencedBy.length > 0 && (
         <>
           <TextDivider>Referenced By</TextDivider>
