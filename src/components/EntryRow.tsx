@@ -574,9 +574,18 @@ const EntryRow = memo(
               <TagList tags={tagNames} entryId={entry.id} />
             </div>
           </div>
-          <AttachmentList attachments={entry.attachments} parentRef={rowRef} />
+          <AttachmentList
+            attachments={entry.attachments}
+            parentRef={rowRef}
+            className={
+              allowSpotlight || allowSupersede || allowFollowUp || allowFavorite
+                ? "mr-3"
+                : ""
+            }
+          />
+
           <FloatingDelayGroup delay={200}>
-            <div className="hidden pl-3 group-hover:flex">
+            <div className="hidden group-hover:flex">
               {allowSpotlight && (
                 <RowButton
                   tooltip="Spotlight"
@@ -666,6 +675,7 @@ const EntryRow = memo(
               />
             )}
           </FloatingDelayGroup>
+
           {allowExpanding && (
             <svg
               xmlns="http://www.w3.org/2000/svg"
