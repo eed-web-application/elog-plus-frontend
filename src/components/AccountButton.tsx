@@ -4,6 +4,7 @@ import {
   FloatingPortal,
   autoUpdate,
   offset,
+  safePolygon,
   shift,
   useDismiss,
   useFloating,
@@ -23,8 +24,6 @@ export default function AccountButton({
   const me = useTrueMe();
   const [open, setOpen] = useState(false);
 
-  console.log(open);
-
   const { refs, floatingStyles, context } = useFloating({
     open,
     onOpenChange: setOpen,
@@ -34,7 +33,10 @@ export default function AccountButton({
     whileElementsMounted: autoUpdate,
   });
 
-  const hover = useHover(context, { delay: { open: 0, close: 300 } });
+  const hover = useHover(context, {
+    delay: { open: 0, close: 300 },
+    handleClose: safePolygon(),
+  });
   const focus = useFocus(context);
   const dismiss = useDismiss(context);
 
