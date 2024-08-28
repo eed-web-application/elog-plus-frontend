@@ -411,6 +411,15 @@ export interface Props extends Omit<ComponentProps<"div">, "onClick"> {
   onClick?: (event: React.MouseEvent) => void;
 }
 
+const colors = [
+  "bg-red-300",
+  "bg-yellow-300",
+  "bg-green-300",
+  "bg-blue-300",
+  "bg-purple-300",
+  "bg-pink-300",
+];
+
 /**
  * Horizontal summary of an entry supporting actions (such as follow up or
  * spotlight) and expanding to see the body content and follows ups.
@@ -465,15 +474,20 @@ const EntryRow = memo(
 
     const triggerResize = useTriggerResize(entry.id);
 
+    // Random color based on the entry id
+    const color = colors[entry.id.charCodeAt(23) % colors.length];
+
     return (
       <div
         ref={ref}
         className={twMerge(
           containerClassName,
+          "pl-3 relative",
           expanded && fullEntry && "border-b",
         )}
         {...rest}
       >
+        <div className={twJoin("absolute left-0 top-0 bottom-0 w-3", color)} />
         <div
           ref={rowRef}
           onMouseEnter={triggerResize}
