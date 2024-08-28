@@ -462,15 +462,9 @@ const EntryRow = memo(
       Boolean(state.drafts[`supersede/${entry.id}`]),
     );
 
-    // FIXME: See https://github.com/eed-web-application/elog-plus/issues/248
-    const logbookIds = entry.logbooks.map(({ id }) => id);
-    const tags = entry.tags.filter((tag) =>
-      logbookIds.includes(tag.logbook.id),
-    );
-
     const spotlightProps = useSpotlightProps(entry.id);
     const date = dateBasedOn === "loggedAt" ? entry.loggedAt : entry.eventAt;
-    const tagNames = useDisplayTags(tags, entry.logbooks.length);
+    const tagNames = useDisplayTags(entry.tags, entry.logbooks.length);
 
     const triggerResize = useTriggerResize(entry.id);
 
