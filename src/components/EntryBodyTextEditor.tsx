@@ -26,27 +26,35 @@ const MenuButton = forwardRef<
   Omit<ComponentProps<"button">, "type"> & {
     disabled?: boolean;
     active?: boolean;
-    tooltip: string;
+    tooltip?: string;
   }
->(({ children, className, disabled, active, ...rest }, ref) => {
+>(({ children, className, disabled, active, tooltip, ...rest }, ref) => {
+  const inner = (
+    <button
+      ref={ref}
+      disabled={disabled}
+      className={twMerge(
+        "rounded text-black p-1 hover:bg-gray-100",
+        disabled && "text-gray-400 hover:bg-transparent",
+        active && "bg-blue-500 hover:bg-blue-600 text-white",
+        className,
+      )}
+      type="button"
+      // Don't want to lose focus
+      onMouseDown={(e) => e.preventDefault()}
+      {...rest}
+    >
+      {children}
+    </button>
+  );
+
+  if (!tooltip) {
+    return inner;
+  }
+
   return (
-    <Tooltip label={rest.tooltip} disabled={disabled}>
-      <button
-        ref={ref}
-        disabled={disabled}
-        className={twMerge(
-          "rounded text-black p-1 hover:bg-gray-100",
-          disabled && "text-gray-400 hover:bg-transparent",
-          active && "bg-blue-500 hover:bg-blue-600 text-white",
-          className,
-        )}
-        type="button"
-        // Don't want to lose focus
-        onMouseDown={(e) => e.preventDefault()}
-        {...rest}
-      >
-        {children}
-      </button>
+    <Tooltip label={tooltip} disabled={disabled}>
+      {inner}
     </Tooltip>
   );
 });
