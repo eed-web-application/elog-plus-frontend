@@ -468,8 +468,12 @@ const EntryRow = memo(
 
     const triggerResize = useTriggerResize(entry.id);
 
-    // Random color based on the entry id
-    const color = colors[entry.id.charCodeAt(23) % colors.length];
+    const colorHash = entry.logbooks.reduce(
+      (acc, { id }) => acc + id.charCodeAt(23),
+      0,
+    );
+
+    const color = colors[colorHash % colors.length];
 
     return (
       <div
