@@ -257,7 +257,7 @@ function ReferenceIcon({
 }: { entry: Entry } & ComponentProps<"svg">) {
   const isReferenced = entry.referencedBy && entry.referencedBy?.length > 0;
   const containsReferences =
-    entry.references?.length > 0 ||
+    (entry.references && entry.references.length > 0) ||
     ("referencesInBody" in entry && entry.referencesInBody);
 
   if (isReferenced && containsReferences) {
