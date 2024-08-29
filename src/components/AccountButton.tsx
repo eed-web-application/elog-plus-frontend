@@ -88,9 +88,8 @@ export default function AccountButton({
                       "p-3 rounded-none w-full text-left",
                     )}
                     onClick={() => {
-                      document.cookie =
-                        "slac-vouch=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;";
-                      window.location.reload();
+                      window.location.href =
+                        "https://vouch.slac.stanford.edu/logout?returnTo=https://accel-webapp-dev.slac.stanford.edu/elog";
                     }}
                   >
                     Logout
