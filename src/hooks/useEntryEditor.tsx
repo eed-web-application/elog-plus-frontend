@@ -34,7 +34,7 @@ const EntryReference = (props: NodeViewProps) => {
   return (
     <NodeViewWrapper
       data-drag-handle
-      className="border bg-white rounded-lg overflow-hidden my-2"
+      className="border bg-white rounded-lg overflow-clip my-2"
     >
       <EntryRow
         selected={props.selected}

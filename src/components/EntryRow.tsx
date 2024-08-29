@@ -8,6 +8,7 @@ import {
   ComponentProps,
   RefObject,
   memo,
+  useContext,
 } from "react";
 import { Link, LinkProps } from "react-router-dom";
 import {
@@ -38,6 +39,7 @@ import useTruncate from "../hooks/useTruncate";
 import useDisplayTags from "../hooks/useDisplayTags";
 import FavoriteButton from "./FavoriteButton";
 import TextDivider from "./TextDivider";
+import StickyEntryRow from "../StickyEntryRowContext";
 
 const ATTACHMENTS_PREVIEW_MAX_WIDTH = 1 / 4;
 
@@ -402,8 +404,6 @@ export interface Props extends Omit<ComponentProps<"div">, "onClick"> {
   expandedByDefault?: boolean;
   showDate?: boolean;
   dateBasedOn?: "eventAt" | "loggedAt";
-  stickyTop?: number;
-  depth?: number;
   allowExpanding?: boolean;
   allowFavorite?: boolean;
   allowFollowUp?: boolean;
@@ -497,8 +497,6 @@ const EntryRow = memo(
       expandedByDefault,
       showDate,
       dateBasedOn = "eventAt",
-      stickyTop = 0,
-      depth,
       allowExpanding,
       allowFavorite,
       allowFollowUp,
@@ -540,6 +538,14 @@ const EntryRow = memo(
     const colorHash = entry.id.charCodeAt(23);
     const color = colorGroup[colorHash % colorGroup.length];
 
+    const { usedHeight, zIndex } = useContext(StickyEntryRow);
+
+    const updatedStickEntryRowContext = {
+      zIndex: zIndex - 1,
+      usedHeight:
+        usedHeight + (rowRef.current?.getBoundingClientRect().height ?? 0),
+    };
+
     return (
       <div
         ref={ref}
@@ -561,12 +567,12 @@ const EntryRow = memo(
             selected && "hover:bg-blue-100",
             highlighted && "bg-yellow-100",
             highlighted && "hover:bg-yellow-200",
-            expanded && stickyTop !== undefined && "sticky z-20",
+            expanded && "sticky",
             className,
           )}
           style={{
-            top: expanded && stickyTop !== undefined ? stickyTop : undefined,
-            zIndex: expanded && depth !== undefined ? 100 - depth : undefined,
+            top: expanded ? usedHeight : undefined,
+            zIndex: expanded ? zIndex : undefined,
           }}
           draggable="true"
           data-drag-handle
@@ -784,10 +790,10 @@ const EntryRow = memo(
           )}
         </div>
         {expanded && fullEntry && (
-          <>
+          <StickyEntryRow.Provider value={updatedStickEntryRowContext}>
             <div
               className={twJoin(
-                "p-2 pb-1 bg-gray-100",
+                "px-3 pb-1 pt-2 bg-gray-100",
                 !fullEntry.text && "text-gray-500",
               )}
             >
@@ -795,23 +801,18 @@ const EntryRow = memo(
               <EntryFigureList attachments={fullEntry.attachments} />
             </div>
             {showFollowUps && fullEntry.followUps.length > 0 && (
-              <>
-                <div className="pt-2 pr-2 ml-6">
-                  <EntryList
-                    entries={fullEntry.followUps}
-                    showDate
-                    showFollowUps
-                    showReferences={showReferences}
-                    stickyTop={
-                      stickyTop !== undefined ? stickyTop + 48 : undefined
-                    }
-                    allowExpanding={allowExpanding}
-                    allowFollowUp={allowFollowUp}
-                    allowSupersede={allowSupersede}
-                    allowSpotlight={allowSpotlightForFollowUps}
-                  />
-                </div>
-              </>
+              <div className="pt-2 pr-2 ml-6">
+                <EntryList
+                  entries={fullEntry.followUps}
+                  showDate
+                  showFollowUps
+                  showReferences={showReferences}
+                  allowExpanding={allowExpanding}
+                  allowFollowUp={allowFollowUp}
+                  allowSupersede={allowSupersede}
+                  allowSpotlight={allowSpotlightForFollowUps}
+                />
+              </div>
             )}
             {showReferences &&
               fullEntry.referencedBy &&
@@ -824,9 +825,6 @@ const EntryRow = memo(
                       showDate
                       showFollowUps={showFollowUps}
                       showReferences
-                      stickyTop={
-                        stickyTop !== undefined ? stickyTop + 48 : undefined
-                      }
                       allowExpanding={allowExpanding}
                       allowFollowUp={allowFollowUp}
                       allowSupersede={allowSupersede}
@@ -835,7 +833,7 @@ const EntryRow = memo(
                   </div>
                 </>
               )}
-          </>
+          </StickyEntryRow.Provider>
         )}
       </div>
     );

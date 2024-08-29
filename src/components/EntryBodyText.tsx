@@ -53,7 +53,7 @@ export default function EntryBodyText({
       content: body,
       editorProps: {
         attributes: {
-          class: "prose max-w-none overflow-x-auto",
+          class: "prose max-w-none",
         },
       },
     },

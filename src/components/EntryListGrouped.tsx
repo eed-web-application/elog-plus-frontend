@@ -1,6 +1,7 @@
 import {
   forwardRef,
   useCallback,
+  useContext,
   useEffect,
   useMemo,
   useRef,
@@ -20,6 +21,7 @@ import EntryListHeader, {
   Props as EntryListHeaderProps,
 } from "./EntryListHeader";
 import { useResizeObserver } from "../hooks/useOnResize";
+import StickyEntryRow from "../StickyEntryRowContext";
 
 export interface Props extends EntryListProps {
   containerClassName: string;
@@ -83,6 +85,7 @@ const EntryListGrouped = forwardRef<HTMLDivElement, Props>(
     }, [entries, logbooksIncluded, dateBasedOn]);
 
     const stickyHeaderIndexRef = useRef(0);
+    const stickyEntryRowContext = useContext(StickyEntryRow);
 
     const virtualizer = useVirtualizer({
       count: items.length,
@@ -163,7 +166,7 @@ const EntryListGrouped = forwardRef<HTMLDivElement, Props>(
     }
 
     let currentGroup: JSX.Element[] = [];
-    let currentHeaderSize: number;
+    let currentHeaderSize: number = NaN;
 
     let groups;
 
@@ -174,12 +177,18 @@ const EntryListGrouped = forwardRef<HTMLDivElement, Props>(
         if (headerIndices.includes(virtualRow.index)) {
           if (currentGroup.length > 0) {
             groups.push(
-              <div
+              <StickyEntryRow.Provider
                 key={currentGroup[0].key}
-                className="mx-3 mt-3 rounded-lg border overflow-clip"
+                value={{
+                  zIndex: stickyEntryRowContext.zIndex - 1,
+                  usedHeight:
+                    stickyEntryRowContext.usedHeight + currentHeaderSize,
+                }}
               >
-                {currentGroup}
-              </div>,
+                <div className="mx-3 mt-3 rounded-lg border overflow-clip">
+                  {currentGroup}
+                </div>
+              </StickyEntryRow.Provider>,
             );
           }
 
@@ -200,7 +209,6 @@ const EntryListGrouped = forwardRef<HTMLDivElement, Props>(
               representative={entry}
             />,
           ];
-
           currentHeaderSize = virtualRow.size;
 
           return groups;
@@ -221,8 +229,6 @@ const EntryListGrouped = forwardRef<HTMLDivElement, Props>(
             selected={entry.id === selected}
             dateBasedOn={dateBasedOn}
             onClick={onEntryClick ? () => onEntryClick(entry) : undefined}
-            stickyTop={currentHeaderSize}
-            depth={1}
             {...rest}
           />,
         );
@@ -232,12 +238,17 @@ const EntryListGrouped = forwardRef<HTMLDivElement, Props>(
 
       if (currentGroup.length > 1) {
         groups.push(
-          <div
+          <StickyEntryRow.Provider
             key={currentGroup[0].key}
-            className="mx-3 mt-3 rounded-lg border overflow-clip"
+            value={{
+              zIndex: stickyEntryRowContext.zIndex - 1,
+              usedHeight: stickyEntryRowContext.usedHeight + currentHeaderSize,
+            }}
           >
-            {currentGroup}
-          </div>,
+            <div className="mx-3 mt-3 rounded-lg border overflow-clip">
+              {currentGroup}
+            </div>
+          </StickyEntryRow.Provider>,
         );
       }
     }
