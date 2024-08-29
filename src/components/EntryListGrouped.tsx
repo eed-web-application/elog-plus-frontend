@@ -178,6 +178,10 @@ const EntryListGrouped = forwardRef<HTMLDivElement, Props>(
     let groups;
 
     if (virtualItems.length > 1) {
+      const scrollOffset = Math.floor(
+        -virtualItems[1].start + virtualItems[0].size,
+      );
+
       groups = virtualItems.reduce<JSX.Element[]>((groups, virtualRow) => {
         const entry = items[virtualRow.index];
 
@@ -189,7 +193,9 @@ const EntryListGrouped = forwardRef<HTMLDivElement, Props>(
                 value={{
                   zIndex: stickyEntryRowContext.zIndex - 1,
                   usedHeight:
-                    stickyEntryRowContext.usedHeight + currentHeaderSize,
+                    scrollOffset +
+                    stickyEntryRowContext.usedHeight +
+                    currentHeaderSize,
                 }}
               >
                 <div className="mx-3 mt-3 rounded-lg border overflow-clip">
@@ -207,9 +213,7 @@ const EntryListGrouped = forwardRef<HTMLDivElement, Props>(
               ref={virtualizer.measureElement}
               className="sticky"
               style={{
-                top: `${Math.floor(
-                  -virtualItems[1].start + virtualItems[0].size,
-                )}px`,
+                top: `${scrollOffset}px`,
                 zIndex: 100,
               }}
               logbooksIncluded={logbooksIncluded}
@@ -249,7 +253,10 @@ const EntryListGrouped = forwardRef<HTMLDivElement, Props>(
             key={currentGroup[0].key}
             value={{
               zIndex: stickyEntryRowContext.zIndex - 1,
-              usedHeight: stickyEntryRowContext.usedHeight + currentHeaderSize,
+              usedHeight:
+                scrollOffset +
+                stickyEntryRowContext.usedHeight +
+                currentHeaderSize,
             }}
           >
             <div className="mx-3 mt-3 rounded-lg border overflow-clip">
