@@ -165,6 +165,13 @@ const EntryListGrouped = forwardRef<HTMLDivElement, Props>(
       );
     }
 
+    // This fixes a UX issue where expanding an entry embedded in another
+    // (e.g. a follow-up) would cause the scroll position to jump. This is
+    // would make expanded entry to be "pushed" up. So, a user would click
+    // on an entry to expand it, but the entry would be pushed up and out of
+    // view.
+    virtualizer.shouldAdjustScrollPositionOnItemSizeChange = () => false;
+
     let currentGroup: JSX.Element[] = [];
     let currentHeaderSize: number = NaN;
 
