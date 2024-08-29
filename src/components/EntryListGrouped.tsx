@@ -163,6 +163,7 @@ const EntryListGrouped = forwardRef<HTMLDivElement, Props>(
     }
 
     let currentGroup: JSX.Element[] = [];
+    let currentHeaderSize: number;
 
     let groups;
 
@@ -188,16 +189,19 @@ const EntryListGrouped = forwardRef<HTMLDivElement, Props>(
               data-header
               key={`header_${entry.id}`}
               ref={virtualizer.measureElement}
-              className="sticky z-20"
+              className="sticky"
               style={{
                 top: `${Math.floor(
                   -virtualItems[1].start + virtualItems[0].size,
                 )}px`,
+                zIndex: 100,
               }}
               logbooksIncluded={logbooksIncluded}
               representative={entry}
             />,
           ];
+
+          currentHeaderSize = virtualRow.size;
 
           return groups;
         }
@@ -214,6 +218,8 @@ const EntryListGrouped = forwardRef<HTMLDivElement, Props>(
             selected={entry.id === selected}
             dateBasedOn={dateBasedOn}
             onClick={onEntryClick ? () => onEntryClick(entry) : undefined}
+            stickyTop={currentHeaderSize}
+            depth={1}
             {...rest}
           />,
         );

@@ -402,6 +402,8 @@ export interface Props extends Omit<ComponentProps<"div">, "onClick"> {
   expandedByDefault?: boolean;
   showDate?: boolean;
   dateBasedOn?: "eventAt" | "loggedAt";
+  stickyTop?: number;
+  depth?: number;
   allowExpanding?: boolean;
   allowFavorite?: boolean;
   allowFollowUp?: boolean;
@@ -495,6 +497,8 @@ const EntryRow = memo(
       expandedByDefault,
       showDate,
       dateBasedOn = "eventAt",
+      stickyTop = 0,
+      depth,
       allowExpanding,
       allowFavorite,
       allowFollowUp,
@@ -552,13 +556,18 @@ const EntryRow = memo(
           onMouseEnter={triggerResize}
           onMouseLeave={triggerResize}
           className={twMerge(
-            "flex items-center group cursor-pointer relative h-12 hover:bg-gray-50 text-black",
+            "flex items-center group cursor-pointer relative h-12 hover:bg-gray-50 text-black bg-white",
             selected && "bg-blue-50",
             selected && "hover:bg-blue-100",
             highlighted && "bg-yellow-100",
             highlighted && "hover:bg-yellow-200",
+            expanded && stickyTop !== undefined && "sticky z-20",
             className,
           )}
+          style={{
+            top: expanded && stickyTop !== undefined ? stickyTop : undefined,
+            zIndex: expanded && depth !== undefined ? 100 - depth : undefined,
+          }}
           draggable="true"
           data-drag-handle
           data-entry-id={entry.id}
@@ -793,6 +802,9 @@ const EntryRow = memo(
                     showDate
                     showFollowUps
                     showReferences={showReferences}
+                    stickyTop={
+                      stickyTop !== undefined ? stickyTop + 48 : undefined
+                    }
                     allowExpanding={allowExpanding}
                     allowFollowUp={allowFollowUp}
                     allowSupersede={allowSupersede}
@@ -812,6 +824,9 @@ const EntryRow = memo(
                       showDate
                       showFollowUps={showFollowUps}
                       showReferences
+                      stickyTop={
+                        stickyTop !== undefined ? stickyTop + 48 : undefined
+                      }
                       allowExpanding={allowExpanding}
                       allowFollowUp={allowFollowUp}
                       allowSupersede={allowSupersede}

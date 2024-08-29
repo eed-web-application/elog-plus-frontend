@@ -11,6 +11,7 @@ export interface Props
     | "showReferences"
     | "expandedByDefault"
     | "showDate"
+    | "stickyTop"
     | "allowExpanding"
     | "allowFavorite"
     | "allowFollowUp"
@@ -49,7 +50,7 @@ export default function EntryList({
 
   return (
     <Observer>
-      <div className="overflow-hidden mb-2 rounded-lg border" ref={ref}>
+      <div className="mb-2 rounded-lg border" ref={ref}>
         {entries.map((entry, index) => (
           <EntryRow
             key={entry.id}
