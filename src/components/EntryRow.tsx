@@ -38,7 +38,6 @@ import useVariableTruncate from "../hooks/useVariableTruncate";
 import useTruncate from "../hooks/useTruncate";
 import useDisplayTags from "../hooks/useDisplayTags";
 import FavoriteButton from "./FavoriteButton";
-import TextDivider from "./TextDivider";
 import StickyEntryRow from "../StickyEntryRowContext";
 
 const ATTACHMENTS_PREVIEW_MAX_WIDTH = 1 / 4;
@@ -549,11 +548,7 @@ const EntryRow = memo(
     return (
       <div
         ref={ref}
-        className={twMerge(
-          containerClassName,
-          "pl-3 relative",
-          expanded && fullEntry && "pb-3",
-        )}
+        className={twMerge(containerClassName, "pl-3 relative")}
         {...rest}
       >
         <div className={twJoin("absolute left-0 top-0 bottom-0 w-3", color)} />
@@ -565,7 +560,7 @@ const EntryRow = memo(
             "flex items-center group cursor-pointer relative h-12 hover:bg-gray-50 text-black bg-white",
             selected && "bg-blue-50 hover:bg-blue-100",
             highlighted && "bg-yellow-100 hover:bg-yellow-200",
-            expanded && fullEntry && "sticky border-b",
+            expanded && "sticky border-b",
             className,
           )}
           style={{
@@ -799,7 +794,7 @@ const EntryRow = memo(
               <EntryFigureList attachments={fullEntry.attachments} />
             </div>
             {showFollowUps && fullEntry.followUps.length > 0 && (
-              <div className="pt-3 pr-2 ml-3">
+              <div className="pt-3 last:pb-3 pr-2 ml-3">
                 <EntryList
                   header="Follow Ups"
                   entries={fullEntry.followUps}
@@ -816,7 +811,7 @@ const EntryRow = memo(
             {showReferences &&
               fullEntry.referencedBy &&
               fullEntry.referencedBy.length > 0 && (
-                <div className="pt-3 pr-2 ml-3">
+                <div className="pt-3 last:pb-3 pr-2 ml-3">
                   <EntryList
                     header="Referenced By"
                     entries={fullEntry.referencedBy}

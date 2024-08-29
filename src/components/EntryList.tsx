@@ -60,7 +60,7 @@ export default function EntryList({
         {header && (
           <div
             ref={headerRef}
-            className="border-b gap-3 px-3 pt-1.5 pb-1 bg-gray-100 whitespace-nowrap sticky"
+            className="border-b gap-3 px-3 pt-1.5 pb-1 bg-gray-100 whitespace-nowrap sticky text-black"
             style={{
               zIndex: zIndex,
               top: usedHeight,
