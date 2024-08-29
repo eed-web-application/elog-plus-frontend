@@ -549,7 +549,11 @@ const EntryRow = memo(
     return (
       <div
         ref={ref}
-        className={twMerge(containerClassName, "pl-3 relative")}
+        className={twMerge(
+          containerClassName,
+          "pl-3 relative",
+          expanded && fullEntry && "pb-3",
+        )}
         {...rest}
       >
         <div className={twJoin("absolute left-0 top-0 bottom-0 w-3", color)} />
@@ -561,7 +565,7 @@ const EntryRow = memo(
             "flex items-center group cursor-pointer relative h-12 hover:bg-gray-50 text-black bg-white",
             selected && "bg-blue-50 hover:bg-blue-100",
             highlighted && "bg-yellow-100 hover:bg-yellow-200",
-            expanded && "sticky border-b",
+            expanded && fullEntry && "sticky border-b",
             className,
           )}
           style={{
@@ -795,8 +799,9 @@ const EntryRow = memo(
               <EntryFigureList attachments={fullEntry.attachments} />
             </div>
             {showFollowUps && fullEntry.followUps.length > 0 && (
-              <div className="py-2 pr-2 ml-6">
+              <div className="pt-3 pr-2 ml-3">
                 <EntryList
+                  header="Follow Ups"
                   entries={fullEntry.followUps}
                   showDate
                   showFollowUps
@@ -811,21 +816,19 @@ const EntryRow = memo(
             {showReferences &&
               fullEntry.referencedBy &&
               fullEntry.referencedBy.length > 0 && (
-                <>
-                  <TextDivider>Referenced By</TextDivider>
-                  <div className="py-2 pr-2 ml-6">
-                    <EntryList
-                      entries={fullEntry.referencedBy}
-                      showDate
-                      showFollowUps={showFollowUps}
-                      showReferences
-                      allowExpanding={allowExpanding}
-                      allowFollowUp={allowFollowUp}
-                      allowSupersede={allowSupersede}
-                      allowSpotlight={allowSpotlightForFollowUps}
-                    />
-                  </div>
-                </>
+                <div className="pt-3 pr-2 ml-3">
+                  <EntryList
+                    header="Referenced By"
+                    entries={fullEntry.referencedBy}
+                    showDate
+                    showFollowUps={showFollowUps}
+                    showReferences
+                    allowExpanding={allowExpanding}
+                    allowFollowUp={allowFollowUp}
+                    allowSupersede={allowSupersede}
+                    allowSpotlight={allowSpotlightForFollowUps}
+                  />
+                </div>
               )}
           </StickyEntryRow.Provider>
         )}

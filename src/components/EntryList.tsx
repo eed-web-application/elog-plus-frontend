@@ -1,8 +1,9 @@
-import { useRef } from "react";
+import { useContext, useRef } from "react";
 import { Entry } from "../api";
 import EntryRow, { Props as EntryRowProps } from "./EntryRow";
 import Spinner from "./Spinner";
 import { useResizeObserver } from "../hooks/useOnResize";
+import StickyEntryRow from "../StickyEntryRowContext";
 
 export interface Props
   extends Pick<
@@ -18,6 +19,7 @@ export interface Props
     | "allowSpotlight"
     | "allowSpotlightForFollowUps"
   > {
+  header?: string;
   entries: Entry[];
   selected?: string;
   spotlight?: string;
@@ -33,10 +35,12 @@ export default function EntryList({
   selected,
   spotlight,
   isLoading,
+  header,
   onEntryClick,
   ...rest
 }: Props) {
   const ref = useRef<HTMLDivElement>(null);
+  const headerRef = useRef<HTMLDivElement>(null);
   const Observer = useResizeObserver(ref.current);
 
   if (isLoading) {
@@ -47,20 +51,44 @@ export default function EntryList({
     return;
   }
 
+  const stickyHeader = headerRef.current?.getBoundingClientRect().height || 0;
+  const { zIndex, usedHeight } = useContext(StickyEntryRow);
+
   return (
     <Observer>
       <div className="overflow-clip rounded-lg border" ref={ref}>
-        {entries.map((entry, index) => (
-          <EntryRow
-            key={entry.id}
-            entry={entry}
-            containerClassName={index === entries.length - 1 ? "" : "border-b"}
-            highlighted={spotlight === entry.id}
-            selected={entry.id === selected}
-            onClick={onEntryClick ? () => onEntryClick(entry) : undefined}
-            {...rest}
-          />
-        ))}
+        {header && (
+          <div
+            ref={headerRef}
+            className="border-b gap-3 px-3 pt-1.5 pb-1 bg-gray-100 whitespace-nowrap sticky"
+            style={{
+              zIndex: zIndex,
+              top: usedHeight,
+            }}
+          >
+            {header}
+          </div>
+        )}
+        <StickyEntryRow.Provider
+          value={{
+            zIndex: zIndex - 1,
+            usedHeight: usedHeight + stickyHeader,
+          }}
+        >
+          {entries.map((entry, index) => (
+            <EntryRow
+              key={entry.id}
+              entry={entry}
+              containerClassName={
+                index === entries.length - 1 ? "" : "border-b"
+              }
+              highlighted={spotlight === entry.id}
+              selected={entry.id === selected}
+              onClick={onEntryClick ? () => onEntryClick(entry) : undefined}
+              {...rest}
+            />
+          ))}
+        </StickyEntryRow.Provider>
       </div>
     </Observer>
   );
