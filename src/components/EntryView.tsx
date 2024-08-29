@@ -1,7 +1,7 @@
 import { twJoin, twMerge } from "tailwind-merge";
 import { EntryFull } from "../api";
 import { Link } from "react-router-dom";
-import { Button, IconButton } from "./base";
+import { Button, IconButton, TextButton } from "./base";
 import EntryList from "./EntryList";
 import EntryBodyText from "./EntryBodyText";
 import Chip from "./Chip";
@@ -144,13 +144,13 @@ export default function EntryView({ entry }: Props) {
           )}
         </div>
       )}
-      <div className="px-3 pt-3 pb-2 text-right border-t">
+      <div className="p-3 text-right border-t">
         <Link
           to={{
             pathname: `/${entry.id}/supersede`,
             search: window.location.search,
           }}
-          className={twMerge(Button, "mr-3 inline-block ml-auto w-fit")}
+          className={twMerge(TextButton, "mr-3 inline-block ml-auto w-fit")}
         >
           Supersede
         </Link>
@@ -165,56 +165,52 @@ export default function EntryView({ entry }: Props) {
         </Link>
       </div>
       {entry.history && entry.history.length > 0 && (
-        <>
-          <TextDivider>History</TextDivider>
-          <div className="px-3 pb-3 mt-3">
-            <EntryList entries={entry.history} allowExpanding showDate />
-          </div>
-        </>
+        <div className="px-3 mb-3">
+          <EntryList
+            header="History"
+            entries={entry.history}
+            allowExpanding
+            showDate
+          />
+        </div>
       )}
       {entry.followUps.length > 0 && (
-        <>
-          <TextDivider>Follow Ups</TextDivider>
-          <div className="px-3 pb-3 mt-3">
-            <EntryList
-              entries={entry.followUps}
-              showDate
-              showFollowUps
-              allowExpanding
-              allowSpotlight
-            />
-          </div>
-        </>
+        <div className="px-3 mb-3">
+          <EntryList
+            header="Follow Ups"
+            entries={entry.followUps}
+            showDate
+            showFollowUps
+            allowExpanding
+            allowSpotlight
+          />
+        </div>
       )}
       {!entry.referencesInBody &&
         entry.references &&
         entry.references.length > 0 && (
-          <>
-            <TextDivider>References</TextDivider>
-            <div className="px-3 pb-3 mt-3">
-              <EntryList
-                entries={entry.references}
-                showDate
-                showFollowUps
-                allowExpanding
-                allowSpotlight
-              />
-            </div>
-          </>
-        )}
-      {entry.referencedBy && entry.referencedBy.length > 0 && (
-        <>
-          <TextDivider>Referenced By</TextDivider>
-          <div className="px-3 pb-3 mt-3">
+          <div className="px-3 mb-3">
             <EntryList
-              entries={entry.referencedBy}
+              header="References"
+              entries={entry.references}
               showDate
               showFollowUps
               allowExpanding
               allowSpotlight
             />
           </div>
-        </>
+        )}
+      {entry.referencedBy && entry.referencedBy.length > 0 && (
+        <div className="px-3 mb-3">
+          <EntryList
+            header="Referenced By"
+            entries={entry.referencedBy}
+            showDate
+            showFollowUps
+            allowExpanding
+            allowSpotlight
+          />
+        </div>
       )}
     </>
   );
