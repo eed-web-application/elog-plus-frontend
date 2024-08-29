@@ -177,7 +177,7 @@ const EntryListGrouped = forwardRef<HTMLDivElement, Props>(
 
     let groups;
 
-    if (items.length > 1) {
+    if (virtualItems.length > 1) {
       groups = virtualItems.reduce<JSX.Element[]>((groups, virtualRow) => {
         const entry = items[virtualRow.index];
 
