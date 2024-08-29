@@ -795,7 +795,7 @@ const EntryRow = memo(
               <EntryFigureList attachments={fullEntry.attachments} />
             </div>
             {showFollowUps && fullEntry.followUps.length > 0 && (
-              <div className="pt-2 pr-2 ml-6">
+              <div className="py-2 pr-2 ml-6">
                 <EntryList
                   entries={fullEntry.followUps}
                   showDate
@@ -813,7 +813,7 @@ const EntryRow = memo(
               fullEntry.referencedBy.length > 0 && (
                 <>
                   <TextDivider>Referenced By</TextDivider>
-                  <div className="pt-2 pr-2 ml-6">
+                  <div className="py-2 pr-2 ml-6">
                     <EntryList
                       entries={fullEntry.referencedBy}
                       showDate
