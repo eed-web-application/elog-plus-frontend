@@ -1,9 +1,8 @@
-import { useContext, useRef } from "react";
+import { useRef } from "react";
 import { Entry } from "../api";
 import EntryRow, { Props as EntryRowProps } from "./EntryRow";
 import Spinner from "./Spinner";
 import { useResizeObserver } from "../hooks/useOnResize";
-import StickyEntryRow from "../StickyEntryRowContext";
 
 export interface Props
   extends Pick<
