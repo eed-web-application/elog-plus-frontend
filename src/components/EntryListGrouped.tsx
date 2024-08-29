@@ -206,14 +206,17 @@ const EntryListGrouped = forwardRef<HTMLDivElement, Props>(
           return groups;
         }
 
+        const isLastOfGroup = headerIndices.includes(virtualRow.index + 1);
+
         currentGroup.push(
           <EntryRow
             key={entry.id}
             data-index={virtualRow.index}
-            data-last={headerIndices.includes(virtualRow.index + 1)}
+            data-last={isLastOfGroup}
             ref={virtualizer.measureElement}
             entry={entry}
             className="pr-2"
+            containerClassName={isLastOfGroup ? "" : "border-b"}
             highlighted={spotlight === entry.id}
             selected={entry.id === selected}
             dateBasedOn={dateBasedOn}
