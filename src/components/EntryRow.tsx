@@ -549,11 +549,7 @@ const EntryRow = memo(
     return (
       <div
         ref={ref}
-        className={twMerge(
-          containerClassName,
-          "pl-3 relative",
-          expanded && fullEntry && "border-b",
-        )}
+        className={twMerge(containerClassName, "pl-3 relative")}
         {...rest}
       >
         <div className={twJoin("absolute left-0 top-0 bottom-0 w-3", color)} />
@@ -563,11 +559,9 @@ const EntryRow = memo(
           onMouseLeave={triggerResize}
           className={twMerge(
             "flex items-center group cursor-pointer relative h-12 hover:bg-gray-50 text-black bg-white",
-            selected && "bg-blue-50",
-            selected && "hover:bg-blue-100",
-            highlighted && "bg-yellow-100",
-            highlighted && "hover:bg-yellow-200",
-            expanded && "sticky",
+            selected && "bg-blue-50 hover:bg-blue-100",
+            highlighted && "bg-yellow-100 hover:bg-yellow-200",
+            expanded && "sticky border-b",
             className,
           )}
           style={{
