@@ -113,10 +113,9 @@ function Figure({
         <FloatingPortal>
           <FloatingOverlay
             lockScroll
-            className={twMerge(
-              BackDrop,
-              "z-10 flex justify-center items-center",
-            )}
+            className={twMerge(BackDrop, "flex justify-center items-center")}
+            // Need to be higher than sticky entry rows which are <100
+            style={{ zIndex: 105 }}
           >
             <FloatingFocusManager context={context}>
               <div ref={refs.setFloating} {...getFloatingProps()}>
