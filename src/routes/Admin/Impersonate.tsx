@@ -4,11 +4,9 @@ import { Checkbox } from "../../components/base";
 import Select from "../../components/Select";
 import useUsers from "../../hooks/useUsers";
 import { useImpersonationStore } from "../../impersonationStore";
-import { useQueryClient } from "@tanstack/react-query";
 import useDebounce from "../../hooks/useDebounce";
 
 export default function AdminImpersonate() {
-  const queryClient = useQueryClient();
   const [search, setSearch] = useState("");
 
   const onSearchChange = useDebounce(setSearch, 500);
@@ -22,24 +20,12 @@ export default function AdminImpersonate() {
     search,
   });
 
-  const onImpersonate = useCallback(() => {
-    queryClient.invalidateQueries({
-      predicate: (query) =>
-        query.queryKey[0] !== "user" && query.queryKey[1] !== "trueMe",
-    });
-    queryClient.removeQueries({
-      predicate: (query) =>
-        query.queryKey[0] !== "user" && query.queryKey[1] !== "trueMe",
-    });
-  }, [queryClient]);
-
   const onSelect = useCallback(
     (userId: string | null) => {
       const user = userId ? userMap[userId] || null : null;
       impersonate(user);
-      onImpersonate();
     },
-    [impersonate, onImpersonate, userMap],
+    [impersonate, userMap],
   );
 
   return (
@@ -58,7 +44,6 @@ export default function AdminImpersonate() {
               } else {
                 setEnabled(false);
                 impersonate(null);
-                onImpersonate();
               }
             }}
           />

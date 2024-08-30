@@ -10,7 +10,7 @@ export default function useTrueMe({
   onError?: () => void;
 } = {}) {
   const { data } = useQuery({
-    queryKey: ["user", "trueMe"],
+    queryKey: ["trueMe"],
     enabled: enabled,
     queryFn: () => fetchTrueMe(),
     useErrorBoundary: critical,

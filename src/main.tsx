@@ -30,6 +30,7 @@ import { fetchEntry, ServerError } from "./api";
 import "./index.css";
 import reportServerError from "./reportServerError.tsx";
 import ImpersonationContainer from "./components/ImpersonationContainer.tsx";
+import { useImpersonationStore } from "./impersonationStore.ts";
 
 const queryClient = new QueryClient({
   queryCache: new QueryCache({
@@ -53,6 +54,18 @@ queryClient.setDefaultOptions({
     // only retry on idempotent requests, etc.) and has a large impact on the
     // response time of errors, so we disable it for now.
     retry: false,
+    // See #96
+    queryKeyHashFn: (queryKey) => {
+      const impersonating = useImpersonationStore.getState().impersonating;
+      if (
+        impersonating?.email &&
+        !window.location.pathname.startsWith("/elog/admin")
+      ) {
+        queryKey = queryKey.concat(impersonating.email);
+      }
+
+      return JSON.stringify(queryKey);
+    },
   },
 });
 

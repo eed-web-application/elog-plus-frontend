@@ -67,7 +67,12 @@ export async function fetch(
   }
 
   const impersonating = useImpersonationStore.getState().impersonating;
-  if (impersonating?.email && !noImpersonating) {
+  if (
+    impersonating?.email &&
+    !noImpersonating &&
+    // See #96
+    !window.location.pathname.startsWith("/elog/admin")
+  ) {
     headers["Impersonate"] = impersonating.email;
   }
 
