@@ -28,7 +28,7 @@ export default function EntryView({ entry }: Props) {
 
   return (
     <>
-      {!entry.supersedeBy && (
+      {!entry.supersededBy && (
         <Link
           {...spotlightProps}
           className={twJoin(IconButton, "my-1 float-right")}
@@ -48,6 +48,17 @@ export default function EntryView({ entry }: Props) {
         </Link>
       )}
       <FavoriteButton className="float-right my-1" entryId={entry.id} />
+      {entry.supersededBy && (
+        <div className="clear-both border-b">
+          <TextDivider>Superseded by</TextDivider>
+          <EntryRow
+            containerClassName="mt-1.5 mb-3.5 mx-3 rounded-lg border mb-2 overflow-hidden"
+            entry={entry.supersededBy}
+            showDate
+            allowExpanding
+          />
+        </div>
+      )}
       <div className={twJoin("px-3 pt-2", !entry.followingUp && "pb-2")}>
         <div className="-mb-1 text-lg">{entry.title}</div>
         <div className="text-sm text-gray-500 uppercase">
@@ -144,26 +155,28 @@ export default function EntryView({ entry }: Props) {
           )}
         </div>
       )}
-      <div className="p-3 text-right border-t">
-        <Link
-          to={{
-            pathname: `/${entry.id}/supersede`,
-            search: window.location.search,
-          }}
-          className={twMerge(TextButton, "mr-3 inline-block ml-auto w-fit")}
-        >
-          Supersede
-        </Link>
-        <Link
-          to={{
-            pathname: `/${entry.id}/follow-up`,
-            search: window.location.search,
-          }}
-          className={twJoin(Button, "inline-block ml-auto w-fit")}
-        >
-          Follow up
-        </Link>
-      </div>
+      {!entry.supersededBy && (
+        <div className="p-3 text-right border-t">
+          <Link
+            to={{
+              pathname: `/${entry.id}/supersede`,
+              search: window.location.search,
+            }}
+            className={twMerge(TextButton, "mr-3 inline-block ml-auto w-fit")}
+          >
+            Supersede
+          </Link>
+          <Link
+            to={{
+              pathname: `/${entry.id}/follow-up`,
+              search: window.location.search,
+            }}
+            className={twJoin(Button, "inline-block ml-auto w-fit")}
+          >
+            Follow up
+          </Link>
+        </div>
+      )}
       {entry.history && entry.history.length > 0 && (
         <div className="px-3 mb-3">
           <EntryList

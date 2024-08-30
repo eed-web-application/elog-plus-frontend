@@ -31,7 +31,7 @@ export interface EntryFull
     EntrySummary,
     "followingUp" | "referencedBy" | "references" | "followUps" | "isEmpty"
   > {
-  supersedeBy?: string;
+  supersededBy?: Entry;
   isEmpty: boolean;
   text: string;
   followUps: Entry[];
@@ -71,6 +71,9 @@ function normalizeEntry<E extends Entry>(entry: E): E {
     if (entry.followUps) {
       entry.followUps = entry.followUps.map(normalizeEntry);
     }
+    entry.supersededBy = entry.supersededBy
+      ? normalizeEntry(entry.supersededBy)
+      : undefined;
     entry.references = entry.references
       ? entry.references.map(normalizeEntry)
       : undefined;
@@ -131,6 +134,7 @@ export async function fetchEntry(id: string): Promise<EntryFull> {
       includeFollowingUps: "true",
       includeReferencedBy: "true",
       includeReferences: "true",
+      includeSupersededBy: "true",
     },
   })) as EntryFull;
 
