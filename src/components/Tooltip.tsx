@@ -114,13 +114,14 @@ function Tooltip({
       {isOpen && !disabled && (
         <FloatingPortal>
           <div
-            className="z-10 py-2 px-3 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-sm transition-opacity duration-300"
+            className="py-2 px-3 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-sm transition-opacity duration-300"
             ref={refs.setFloating}
             style={{
               ...floatingStyles,
               visibility: middlewareData.hide?.referenceHidden
                 ? "hidden"
                 : "visible",
+              zIndex: 120,
             }}
             id={id}
             {...getFloatingProps()}
