@@ -1,6 +1,6 @@
-import { twJoin } from "tailwind-merge";
+import { twJoin, twMerge } from "tailwind-merge";
 import { UserWithAuth, Permission, Logbook, ServerError } from "../../api";
-import { Button, TextButton } from "../base";
+import { Button, Input, TextButton } from "../base";
 import { useUserFormsStore } from "../../userFormsStore";
 import useLogbooks from "../../hooks/useLogbooks";
 import AdminAuthorizationForm from "./AuthorizationForm";
@@ -107,7 +107,27 @@ function UserFormInner({
 
   return (
     <div className="p-3 pt-5">
-      <div className="text-gray-500">Logbook Authorizations</div>
+      <label className="block text-gray-500">
+        Name
+        <input
+          disabled
+          type="text"
+          className={twMerge(Input, "block w-full")}
+          value={form.gecos}
+        />
+      </label>
+
+      <label className="block text-gray-500 mt-2">
+        Email
+        <input
+          disabled
+          type="text"
+          className={twMerge(Input, "block w-full")}
+          value={form.email}
+        />
+      </label>
+
+      <div className="text-gray-500 mt-2">Logbook Authorizations</div>
       <AdminAuthorizationForm
         emptyLabel="No logbook authorizations. Create one below."
         options={logbooksFiltered.map((logbook) => ({
