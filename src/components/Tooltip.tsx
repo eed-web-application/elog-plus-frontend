@@ -146,12 +146,12 @@ Tooltip.PositionReference = function TooltipPositionReference({
 }) {
   const context = useContext(DialogContext);
 
-  if (!context) {
-    throw new Error("Tooltip.PositionReference must be a child of Tooltip");
-  }
-
   if (!isValidElement(children)) {
     throw new Error("Tooltip.PositionReference requires a single valid child");
+  }
+
+  if (!context) {
+    return null;
   }
 
   return React.cloneElement(children, {
