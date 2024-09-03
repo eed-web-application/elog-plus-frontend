@@ -120,6 +120,9 @@ export default function useEntryBuilder({ kind, onEntrySaved }: Props) {
       }
     }
 
+    const canSummarize =
+      draft.logbooks.length === 1 && draft.summarizes.checked;
+
     const newEntry = {
       ...draft,
       attachments: draft.attachments.map(
@@ -127,7 +130,7 @@ export default function useEntryBuilder({ kind, onEntrySaved }: Props) {
         // attachment validator, so this is fine
         (attachment) => attachment.id as string,
       ),
-      summarizes: draft.summarizes.checked ? draft.summarizes : undefined,
+      summarizes: canSummarize ? draft.summarizes : undefined,
       tags: tagIds,
       // This should be fine as the validators should ensure that this Draft
       // is indeed a EntryNew
