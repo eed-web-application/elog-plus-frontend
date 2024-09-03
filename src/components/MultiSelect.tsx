@@ -7,8 +7,8 @@ import {
   offset,
   size,
   useClick,
-  useDismiss,
   useFloating,
+  useFocus,
   useInteractions,
   useRole,
 } from "@floating-ui/react";
@@ -136,11 +136,11 @@ export default function MultiSelect<C extends { custom: string }>({
 
   const role = useRole(context, { role: "listbox" });
   const click = useClick(context, { toggle: false });
-  const dismiss = useDismiss(context);
+  const focus = useFocus(context);
   const { getReferenceProps, getFloatingProps } = useInteractions([
     role,
     click,
-    dismiss,
+    focus,
   ]);
 
   const {
@@ -202,6 +202,7 @@ export default function MultiSelect<C extends { custom: string }>({
       )}
       {...getReferenceProps({
         onMouseDown: (e) => {
+          // Prevent blur when clicking on the input
           if (!(e.target instanceof HTMLInputElement)) {
             e.preventDefault();
           }
