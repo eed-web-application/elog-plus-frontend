@@ -283,8 +283,8 @@ export default function MultiSelect<C extends { custom: string }>({
             {filteredOptions.map((option, index) => (
               <SelectOption
                 isActive={activeIndex === index}
+                key={getValue(option)}
                 {...getItemProps({
-                  key: getValue(option),
                   onMouseDown: (e) => {
                     e.preventDefault();
                     toggleSelection(getValue(option));
