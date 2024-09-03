@@ -214,13 +214,16 @@ export default function MultiSelect<C extends { custom: string }>({
             deletable
             className="mr-2"
             key={"custom" in option ? option.custom : option.value}
-            onDelete={() =>
+            onDelete={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+
               setValue(
                 value.filter(
                   (otherOption) => getValue(otherOption) !== getValue(option),
                 ),
-              )
-            }
+              );
+            }}
           >
             {getLabel(option)}
           </Chip>

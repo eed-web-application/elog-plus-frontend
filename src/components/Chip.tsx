@@ -66,7 +66,7 @@ const Chip = forwardRef<HTMLDivElement, Props>(function Chip(
           viewBox="0 0 24 24"
           strokeWidth={1.5}
           stroke="currentColor"
-          className="px-1 w-7 hover:bg-gray-200"
+          className="px-1 w-7 hover:bg-gray-200 cursor-pointer"
           tabIndex={0}
           onClick={onDelete}
         >
