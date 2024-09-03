@@ -120,6 +120,7 @@ export default function EntryForm({ onEntrySaved, kind }: Props) {
               onBlur={() => validateField("title")}
             />
           </label>
+
           <LogbookForm
             className="block mb-2"
             value={draft.logbooks}
@@ -140,6 +141,7 @@ export default function EntryForm({ onEntrySaved, kind }: Props) {
             invalid={invalidFields.includes("logbooks")}
             onBlur={() => validateField("logbooks")}
           />
+
           <TagForm
             className="block mb-2"
             logbooks={
@@ -156,6 +158,7 @@ export default function EntryForm({ onEntrySaved, kind }: Props) {
               })
             }
           />
+
           <label className="flex items-center mb-1 text-gray-500">
             <input
               type="checkbox"
@@ -210,6 +213,7 @@ export default function EntryForm({ onEntrySaved, kind }: Props) {
               onChange={(text) => updateDraft({ ...draft, text })}
             />
           </div>
+
           <label className="block mb-2 text-gray-500">
             Attachments
             <div
@@ -238,6 +242,7 @@ export default function EntryForm({ onEntrySaved, kind }: Props) {
             </div>
             <input {...getInputProps()} />
           </label>
+
           <input
             type="submit"
             className={twJoin(Button, "block ml-auto mt-2")}

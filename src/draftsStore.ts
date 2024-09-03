@@ -11,6 +11,9 @@ export type LocalUploadedAttachment = Pick<
   "id" | "fileName" | "contentType"
 >;
 
+/**
+ * A newly created tag that hasn't been submitted to the server
+ */
 export type NewTag = { name: string; logbook: string };
 
 /**
@@ -32,6 +35,13 @@ export type DraftId = "newEntry" | `supersede/${string}` | `followUp/${string}`;
 
 /**
  * Information needed to start a draft
+ *
+ * - `newEntry`: Start a new entry draft
+ *   - `string[]`: Logbook IDs
+ * - `followingUp`: Start a draft for following up an entry
+ *   - `EntryFull`: Entry to follow up
+ * - `superseding`: Start a draft for superseding an entry
+ *   - `EntryFull`: Entry to supersede
  */
 export type DraftFactory =
   | ["newEntry", string[]]

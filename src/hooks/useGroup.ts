@@ -1,21 +1,18 @@
-import { GroupOptions, fetchGroup } from "../api";
+import { fetchGroup } from "../api";
 import { useQuery } from "@tanstack/react-query";
 
-export default function useGroup<A extends boolean, M extends boolean>(
+export default function useGroup(
   groupId?: string,
   {
     critical = true,
-    onError,
-    ...options
   }: {
     critical?: boolean;
-    onError?: () => void;
-  } & GroupOptions<A, M> = {},
+  } = {},
 ) {
   const { data } = useQuery({
-    queryKey: ["group", groupId, options],
+    queryKey: ["group", groupId],
     enabled: Boolean(groupId),
-    queryFn: () => fetchGroup<A, M>(groupId as string, options),
+    queryFn: () => fetchGroup(groupId as string),
     useErrorBoundary: critical,
     staleTime: 5 * 60 * 1000,
     meta: {

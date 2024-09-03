@@ -32,7 +32,7 @@ function GroupFormInner({
   group,
   onSave,
 }: {
-  group: Group<true, true>;
+  group: Group;
   onSave: () => void;
 }) {
   const { form, setForm, finishEditing } = useGroupFormsStore((state) =>
@@ -294,10 +294,7 @@ function GroupFormInner({
 }
 
 export default function GroupForm({ groupId, onSave }: Props) {
-  const group = useGroup(groupId, {
-    includeAuthorizations: true,
-    includeMembers: true,
-  });
+  const group = useGroup(groupId);
 
   if (!group) {
     return <Spinner className="mt-3 w-full" />;

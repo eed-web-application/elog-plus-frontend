@@ -39,7 +39,7 @@ export function useDialogProvider({ onOpenChange, ...rest }: DialogOptions) {
         setUncontrolledOpen(isOpen);
       }
     },
-    [rest.controlled],
+    [rest.controlled, onOpenChange],
   );
 
   const data = useFloating({
@@ -72,6 +72,9 @@ type ContextType = ReturnType<typeof useDialogProvider> | null;
 
 export const DialogContext = createContext<ContextType>(null);
 
+/**
+ * Get the dialog context, throws if not wrapped in <Dialog />
+ */
 export function useDialog() {
   const context = useContext(DialogContext);
 

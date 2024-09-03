@@ -31,6 +31,9 @@ function deserializeQuery(params: URLSearchParams): EntryQuery {
   };
 }
 
+/**
+ * Hook to get and update the entry query from the URL search params
+ */
 export default function useEntryQuery() {
   const [searchParams, setSearchParams] = useSearchParams();
 

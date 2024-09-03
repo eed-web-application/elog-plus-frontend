@@ -1,25 +1,18 @@
 import { useMemo } from "react";
-import { Group, GroupOptions, ServerError, fetchGroups } from "../api";
+import { GroupSummary, ResourceQuery, ServerError, fetchGroups } from "../api";
 import reportServerError from "../reportServerError";
 import { useInfiniteQuery } from "@tanstack/react-query";
 
 const GROUPS_PER_PAGE = 25;
 
-export type GroupsQuery<A extends boolean, M extends boolean> = GroupOptions<
-  A,
-  M
-> & {
-  search: string;
-};
-
-export default function useGroups<A extends boolean, M extends boolean>({
+export default function useGroups({
   enabled = true,
   critical = true,
   ...query
 }: {
   enabled?: boolean;
   critical?: boolean;
-} & GroupsQuery<A, M>) {
+} & ResourceQuery) {
   const {
     data,
     isLoading,
@@ -30,8 +23,8 @@ export default function useGroups<A extends boolean, M extends boolean>({
   } = useInfiniteQuery({
     queryKey: ["groups", query],
     queryFn: ({ pageParam, queryKey }) =>
-      fetchGroups<A, M>({
-        ...(queryKey[1] as GroupsQuery<A, M>),
+      fetchGroups({
+        ...(queryKey[1] as ResourceQuery),
         anchor: pageParam,
         limit: GROUPS_PER_PAGE,
       }),
@@ -57,7 +50,7 @@ export default function useGroups<A extends boolean, M extends boolean>({
   const groups = useMemo(() => data?.pages.flat() || [], [data?.pages]);
   const groupMap = useMemo(
     () =>
-      groups.reduce<Record<string, Group<A, M>>>((acc, group) => {
+      groups.reduce<Record<string, GroupSummary>>((acc, group) => {
         acc[group.id] = group;
         return acc;
       }, {}),

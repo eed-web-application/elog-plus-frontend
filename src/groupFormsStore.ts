@@ -3,7 +3,7 @@ import createAdminFormsStore, {
   LocalAuthorization,
 } from "./createAdminFormsStore";
 
-export interface GroupForm extends Omit<Group<true, true>, "authorizations"> {
+export interface GroupForm extends Omit<Group, "authorizations"> {
   authorizations: LocalAuthorization[];
 }
 

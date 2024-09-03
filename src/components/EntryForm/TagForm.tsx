@@ -1,4 +1,4 @@
-import { ComponentPropsWithoutRef, useState } from "react";
+import { ComponentPropsWithoutRef, useCallback, useState } from "react";
 import { twMerge } from "tailwind-merge";
 import MultiSelect from "../MultiSelect";
 import useTags from "../../hooks/useTags";
@@ -57,6 +57,19 @@ export default function TagForm({
     );
   }
 
+  const withoutTag = useCallback(
+    (tagName: string) => (logbook: Logbook) =>
+      !logbook.tags.some((tag) => tag.name === tagName) &&
+      // Need to take into account newly created tags
+      !value.some(
+        (tag) =>
+          typeof tag !== "string" &&
+          tag.logbook === logbook.id &&
+          tag.name === tagName,
+      ),
+    [value],
+  );
+
   return (
     <>
       <label className={twMerge("text-gray-500", className)} {...rest}>
@@ -72,31 +85,9 @@ export default function TagForm({
           onOptionSelected={bumpTag}
           value={selected}
           setValue={(tags) => onChange(tags)}
-          canCreate={(query) =>
-            logbooks.some(
-              (logbook) =>
-                !logbook.tags.some((tag) => tag.name === query) &&
-                // Need to take into account newly created tags
-                !value.some(
-                  (tag) =>
-                    typeof tag !== "string" &&
-                    tag.logbook === logbook.id &&
-                    tag.name === query,
-                ),
-            )
-          }
+          canCreate={(query) => logbooks.some(withoutTag(query))}
           onCreate={(name) => {
-            const logbooksWithoutTag = logbooks.filter(
-              (logbook) =>
-                !logbook.tags.some((tag) => tag.name === name) &&
-                // Need to take into account newly created tags
-                !value.some(
-                  (tag) =>
-                    typeof tag !== "string" &&
-                    tag.logbook === logbook.id &&
-                    tag.name === name,
-                ),
-            );
+            const logbooksWithoutTag = logbooks.filter(withoutTag(name));
 
             if (logbooksWithoutTag.length === 1) {
               onChange(

@@ -1,29 +1,25 @@
 import { fetch, Authorization, ResourceQuery, User } from ".";
 import serializeParams, { ParamsObject } from "../utils/serializeParams";
 
-export type Group<A extends boolean, M extends boolean> = {
+export type GroupSummary = {
   id: string;
   name: string;
   description: string;
-} & (A extends true ? { authorizations: Authorization[] } : {}) &
-  (M extends true ? { members: User[] } : {});
-
-export type GroupOptions<A extends boolean, M extends boolean> = {
-  includeAuthorizations?: A;
-  includeMembers?: M;
 };
 
-export type GroupQuery<A extends boolean, M extends boolean> = ResourceQuery &
-  GroupOptions<A, M>;
+export type Group = GroupSummary & {
+  authorizations: Authorization[];
+  members: User[];
+};
 
-export function fetchGroup<A extends boolean, M extends boolean>(
+export function fetchGroup(
   id: string,
-  options?: GroupOptions<A, M>,
-): Promise<Group<A, M>> {
+  options?: ResourceQuery,
+): Promise<Group> {
   const params = Object.assign(
     {
-      includeAuthorizations: false,
-      includeMembers: false,
+      includeAuthorizations: true,
+      includeMembers: true,
     },
     options,
   );
@@ -33,9 +29,7 @@ export function fetchGroup<A extends boolean, M extends boolean>(
   });
 }
 
-export function fetchGroups<A extends boolean, M extends boolean>(
-  query: GroupQuery<A, M>,
-): Promise<Group<A, M>[]> {
+export function fetchGroups(query: ResourceQuery): Promise<GroupSummary[]> {
   const params: ParamsObject = Object.assign(
     {
       includeAuthorizations: false,
@@ -47,7 +41,7 @@ export function fetchGroups<A extends boolean, M extends boolean>(
   return fetch("v1/groups", { params: serializeParams(params) });
 }
 
-export type GroupNew = Pick<Group<false, false>, "name" | "description"> & {
+export type GroupNew = Pick<GroupSummary, "name" | "description"> & {
   members: string[];
 };
 
@@ -59,7 +53,7 @@ export function createGroup(group: GroupNew) {
 }
 
 export type GroupUpdation = Pick<
-  Group<false, false>,
+  GroupSummary,
   "id" | "name" | "description"
 > & {
   members: string[];

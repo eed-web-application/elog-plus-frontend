@@ -1,7 +1,7 @@
 /** @type {import('tailwindcss').Config} */
 export default {
   content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
-  darkMode: "class",
+  darkMode: "selector",
   theme: {
     // If customizing md, one should also update `useIsSmallScreen.ts` as that
     // file hardcodes md's width
