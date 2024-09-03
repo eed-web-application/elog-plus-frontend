@@ -3,7 +3,7 @@ import { twMerge } from "tailwind-merge";
 import MultiSelect from "../MultiSelect";
 import useTags from "../../hooks/useTags";
 import { Logbook } from "../../api";
-import { Draft } from "../../draftsStore";
+import { Draft, NewTag } from "../../draftsStore";
 import Dialog from "../Dialog";
 import TagLogbookSelectorDialog from "../TagLogbookSelectorDialog";
 
@@ -44,6 +44,19 @@ export default function TagForm({
 
   isLoading = isLoading || isTagsLoading;
 
+  let selected: (string | (NewTag & { custom: string }))[] = [];
+
+  if (!isLoading) {
+    selected = value.map((tag) =>
+      typeof tag === "string"
+        ? tag
+        : {
+            ...tag,
+            custom: `${logbookMap[tag.logbook].name.toUpperCase()}:${tag.name}`,
+          },
+    );
+  }
+
   return (
     <>
       <label className={twMerge("text-gray-500", className)} {...rest}>
@@ -57,20 +70,7 @@ export default function TagForm({
             value: id,
           }))}
           onOptionSelected={bumpTag}
-          value={
-            isLoading
-              ? []
-              : value.map((tag) =>
-                  typeof tag === "string"
-                    ? tag
-                    : {
-                        ...tag,
-                        custom: `${logbookMap[
-                          tag.logbook
-                        ].name.toUpperCase()}:${tag.name}`,
-                      },
-                )
-          }
+          value={selected}
           setValue={(tags) => onChange(tags)}
           canCreate={(query) =>
             logbooks.some(
@@ -85,7 +85,7 @@ export default function TagForm({
                 ),
             )
           }
-          onCreate={async (name) => {
+          onCreate={(name) => {
             const logbooksWithoutTag = logbooks.filter(
               (logbook) =>
                 !logbook.tags.some((tag) => tag.name === name) &&
@@ -97,6 +97,16 @@ export default function TagForm({
                     tag.name === name,
                 ),
             );
+
+            if (logbooksWithoutTag.length === 1) {
+              onChange(
+                value.concat({
+                  logbook: logbooksWithoutTag[0].id,
+                  name,
+                }),
+              );
+              return;
+            }
 
             setLogbookSelect({ tag: name, logbooks: logbooksWithoutTag });
           }}

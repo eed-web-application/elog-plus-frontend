@@ -11,7 +11,7 @@ export type LocalUploadedAttachment = Pick<
   "id" | "fileName" | "contentType"
 >;
 
-type NewTag = { name: string; logbook: string };
+export type NewTag = { name: string; logbook: string };
 
 /**
  * An entry that hasn't been submitted to the server
