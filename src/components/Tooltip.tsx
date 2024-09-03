@@ -114,7 +114,7 @@ function Tooltip({
       {isOpen && !disabled && (
         <FloatingPortal>
           <div
-            className="py-2 px-3 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-sm transition-opacity duration-300"
+            className="py-2 px-3 text-sm font-medium bg-white border border-gray-200 text-gray-900 rounded-lg shadow-sm transition-opacity duration-300"
             ref={refs.setFloating}
             style={{
               ...floatingStyles,
@@ -131,6 +131,10 @@ function Tooltip({
               ref={arrowRef}
               context={context}
               height={ARROW_HEIGHT}
+              fill="white"
+              stroke="#E5E7EB"
+              strokeWidth={0.5}
+              className="drop-shadow-sm"
             />
           </div>
         </FloatingPortal>
