@@ -9,7 +9,7 @@ export default function useEntry(
     queryKey: ["entry", entryId],
     enabled: Boolean(entryId),
     queryFn: () => fetchEntry(entryId as string),
-    useErrorBoundary: critical,
+    throwOnError: critical,
     // This is here specifically, because the entry loader prefetches the
     // entries to be used here, so we set the staleTime to something small.
     staleTime: 100,

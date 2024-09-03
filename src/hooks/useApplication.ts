@@ -17,7 +17,7 @@ export default function useApplication<A extends boolean>(
     enabled: Boolean(applicationId),
     queryFn: () =>
       fetchApplication<A>(applicationId as string, includeAuthorizations),
-    useErrorBoundary: critical,
+    throwOnError: critical,
     staleTime: 5 * 60 * 1000,
     meta: {
       resource: "application",

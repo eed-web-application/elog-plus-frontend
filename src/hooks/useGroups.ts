@@ -1,6 +1,5 @@
 import { useMemo } from "react";
-import { GroupSummary, ResourceQuery, ServerError, fetchGroups } from "../api";
-import reportServerError from "../reportServerError";
+import { GroupSummary, ResourceQuery, fetchGroups } from "../api";
 import { useInfiniteQuery } from "@tanstack/react-query";
 
 const GROUPS_PER_PAGE = 25;
@@ -13,39 +12,30 @@ export default function useGroups({
   enabled?: boolean;
   critical?: boolean;
 } & ResourceQuery) {
-  const {
-    data,
-    isLoading,
-    fetchNextPage,
-    hasNextPage,
-    isFetchingNextPage,
-    isInitialLoading,
-  } = useInfiniteQuery({
-    queryKey: ["groups", query],
-    queryFn: ({ pageParam, queryKey }) =>
-      fetchGroups({
-        ...(queryKey[1] as ResourceQuery),
-        anchor: pageParam,
-        limit: GROUPS_PER_PAGE,
-      }),
-    enabled,
-    useErrorBoundary: critical,
-    staleTime: 5 * 60 * 1000,
-    onError: (e) => {
-      if (!(e instanceof ServerError)) {
-        throw e;
-      }
+  const { data, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } =
+    useInfiniteQuery({
+      queryKey: ["groups", query],
+      queryFn: ({ pageParam, queryKey }) =>
+        fetchGroups({
+          ...(queryKey[1] as ResourceQuery),
+          anchor: pageParam,
+          limit: GROUPS_PER_PAGE,
+        }),
+      enabled,
+      throwOnError: critical,
+      staleTime: 5 * 60 * 1000,
+      meta: {
+        resource: "groups",
+      },
+      initialPageParam: undefined as string | undefined,
+      getNextPageParam: (lastPage) => {
+        if (lastPage.length < GROUPS_PER_PAGE) {
+          return undefined;
+        }
 
-      reportServerError("Could not retrieve groups", e);
-    },
-    getNextPageParam: (lastPage) => {
-      if (lastPage.length < GROUPS_PER_PAGE) {
-        return undefined;
-      }
-
-      return lastPage[lastPage.length - 1].id;
-    },
-  });
+        return lastPage[lastPage.length - 1].id;
+      },
+    });
 
   const groups = useMemo(() => data?.pages.flat() || [], [data?.pages]);
   const groupMap = useMemo(
@@ -62,6 +52,6 @@ export default function useGroups({
     groupMap,
     isLoading: isLoading || isFetchingNextPage,
     getMoreGroups: fetchNextPage,
-    reachedBottom: !hasNextPage && !isInitialLoading,
+    reachedBottom: !hasNextPage && !isFetchingNextPage,
   };
 }

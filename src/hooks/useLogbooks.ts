@@ -21,7 +21,7 @@ export default function useLogbooks<A extends boolean>({
     queryKey: ["logbooks", includeAuth, requirePermission],
     queryFn: () => fetchLogbooks<A>({ includeAuth, requirePermission }),
     enabled,
-    useErrorBoundary: critical,
+    throwOnError: critical,
     staleTime: 5 * 60 * 1000,
     meta: {
       resource: "logbooks",

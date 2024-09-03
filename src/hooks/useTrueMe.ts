@@ -13,7 +13,7 @@ export default function useTrueMe({
     queryKey: ["trueMe"],
     enabled: enabled,
     queryFn: () => fetchTrueMe(),
-    useErrorBoundary: critical,
+    throwOnError: critical,
     staleTime: 5 * 60 * 1000,
     meta: {
       resource: "user",

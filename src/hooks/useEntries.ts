@@ -81,48 +81,50 @@ export default function useEntries({ enabled, spotlight, query }: Params) {
     sortByLogDate: query.sortByLogDate,
   });
 
-  const {
-    data,
-    isLoading,
-    fetchNextPage,
-    hasNextPage,
-    isFetchingNextPage,
-    isInitialLoading,
-  } = useInfiniteQuery({
-    enabled: !query.onlyFavorites && Boolean(enabled),
-    queryKey: ["entries", query, spotlight],
-    queryFn: async ({ pageParam, queryKey }) => {
-      const query = queryKey[1] as EntryQuery;
-      const spotlight = queryKey[2];
+  const key = {
+    ...query,
+    spotlight: spotlight || undefined,
+    favorites: query.onlyFavorites ? favorites : undefined,
+  };
 
-      const entries = await fetchEntries({
-        ...query,
-        startDate: query?.startDate || undefined,
-        endDate: query?.endDate || undefined,
-        anchor: pageParam || spotlight,
-        contextSize: pageParam === undefined && spotlight ? CONTEXT_SIZE : 0,
-        limit: ENTRIES_PER_PAGE,
-      });
+  const { data, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } =
+    useInfiniteQuery({
+      enabled: !query.onlyFavorites && Boolean(enabled),
+      queryKey: ["entries", key] as const,
+      queryFn: async ({ pageParam, queryKey }) => {
+        const query = queryKey[1];
 
-      if (query.onlyFavorites) {
-        return entries.filter((entry) => favorites.has(entry.id));
-      }
+        const entries = await fetchEntries({
+          ...query,
+          startDate: query?.startDate || undefined,
+          endDate: query?.endDate || undefined,
+          anchor: pageParam || query.spotlight,
+          contextSize:
+            pageParam === undefined && query.spotlight ? CONTEXT_SIZE : 0,
+          limit: ENTRIES_PER_PAGE,
+        });
 
-      return entries;
-    },
-    getNextPageParam: (lastPage) => {
-      // If last page isn't full, then there is no next page.
-      if (lastPage.length < ENTRIES_PER_PAGE) {
-        return;
-      }
+        if (query.favorites) {
+          const favorites = query.favorites;
+          return entries.filter((entry) => favorites.has(entry.id));
+        }
 
-      return lastPage[lastPage.length - 1]?.id;
-    },
-    // Using error boundary, because if we can't get entries, something
-    // is really wrong, and thus we don't want to show anything that may be
-    // invalid.
-    useErrorBoundary: true,
-  });
+        return entries;
+      },
+      initialPageParam: undefined as string | undefined,
+      getNextPageParam: (lastPage) => {
+        // If last page isn't full, then there is no next page.
+        if (lastPage.length < ENTRIES_PER_PAGE) {
+          return;
+        }
+
+        return lastPage[lastPage.length - 1]?.id;
+      },
+      // Throwing on error, because if we can't get entries, something
+      // is really wrong, and thus we don't want to show anything that may be
+      // invalid.
+      throwOnError: true,
+    });
 
   const entries = useMemo(() => data?.pages.flat(), [data?.pages]);
 
@@ -134,6 +136,6 @@ export default function useEntries({ enabled, spotlight, query }: Params) {
     entries,
     isLoading: isLoading || isFetchingNextPage,
     getMoreEntries: fetchNextPage,
-    reachedBottom: !hasNextPage && !isInitialLoading,
+    reachedBottom: !hasNextPage && !isFetchingNextPage,
   };
 }

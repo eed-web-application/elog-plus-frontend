@@ -16,7 +16,7 @@ export default function useUser<A extends boolean>(
     queryKey: ["user", userId, includeAuthorizations],
     enabled: Boolean(userId),
     queryFn: () => fetchUser<A>(userId as string, includeAuthorizations),
-    useErrorBoundary: critical,
+    throwOnError: critical,
     staleTime: 5 * 60 * 1000,
     meta: {
       resource: "user",

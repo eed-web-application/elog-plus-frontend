@@ -13,7 +13,7 @@ export default function useGroup(
     queryKey: ["group", groupId],
     enabled: Boolean(groupId),
     queryFn: () => fetchGroup(groupId as string),
-    useErrorBoundary: critical,
+    throwOnError: critical,
     staleTime: 5 * 60 * 1000,
     meta: {
       resource: "group",

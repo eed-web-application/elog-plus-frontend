@@ -13,7 +13,7 @@ export default function useMe({
     queryKey: ["user", "me"],
     enabled: enabled,
     queryFn: () => fetchMe(),
-    useErrorBoundary: critical,
+    throwOnError: critical,
     staleTime: 5 * 60 * 1000,
     meta: {
       resource: "user",
