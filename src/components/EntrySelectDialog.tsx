@@ -16,7 +16,7 @@ export default function EntrySelectDialog({
 }) {
   const { setOpen } = useDialog();
 
-  const [existingQuery, _] = useEntryQuery();
+  const existingQuery = useEntryQuery()[0];
   const [query, setQuery] = useState(existingQuery);
 
   useEffect(() => {

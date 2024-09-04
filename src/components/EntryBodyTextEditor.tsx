@@ -64,21 +64,12 @@ const MenuButton = forwardRef<
 const supportedOptions = ["Normal", "H1", "H2", "H3", "Code"] as const;
 // However, there are still other options that are supported, so if the user
 // uses a shortcut or another method to get the option, we still want to show it
-const allOptions = [
-  "Normal",
-  "H1",
-  "H2",
-  "H3",
-  "H4",
-  "H5",
-  "H6",
-  "Code",
-] as const;
+type AllOptions = "Normal" | "H1" | "H2" | "H3" | "H4" | "H5" | "H6" | "Code";
 
-function getFormat(editor: Editor): (typeof allOptions)[number] {
+function getFormat(editor: Editor): AllOptions {
   for (let i = 1; i <= 6; i++) {
     if (editor.isActive("heading", { level: i })) {
-      return `H${i}` as (typeof allOptions)[number];
+      return `H${i}` as AllOptions;
     }
   }
   if (editor.isActive("codeBlock")) {
@@ -87,7 +78,7 @@ function getFormat(editor: Editor): (typeof allOptions)[number] {
   return "Normal";
 }
 
-function setFormat(editor: Editor, format: (typeof allOptions)[number]) {
+function setFormat(editor: Editor, format: (typeof AllOptions)[number]) {
   if (format[0] === "H") {
     const level = parseInt(format[1]) as 1 | 2 | 3 | 4 | 5 | 6;
     editor.chain().focus().setHeading({ level }).run();
@@ -108,9 +99,7 @@ function MenuButtonDropDown({ editor }: { editor: Editor }) {
       searchType="none"
       options={supportedOptions}
       value={selected}
-      setValue={(value) =>
-        setFormat(editor, value as (typeof allOptions)[number])
-      }
+      setValue={(value) => setFormat(editor, value as AllOptions)}
       className="w-32 !py-0.5"
     />
   );

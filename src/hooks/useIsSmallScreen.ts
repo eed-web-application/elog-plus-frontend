@@ -1,9 +1,7 @@
 import { useEffect, useState } from "react";
 
 // Should be the same width as Tailwind's md
-// eslint-disable-next-line react-refresh/only-export-components
 const MD = 768;
-// eslint-disable-next-line react-refresh/only-export-components
 const QUERY = `(min-width: ${MD}px)`;
 
 export default function useIsSmallScreen() {

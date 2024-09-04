@@ -9,7 +9,7 @@ import useLogbooks from "../hooks/useLogbooks";
 export default function NewEntry() {
   const { state: customDraftProperties } = useLocation();
   const upsertDraft = useDraftsStore((state) => state.upsertDraft);
-  const [query, _] = useEntryQuery();
+  const query = useEntryQuery()[0];
   const { logbookNameMap, isLoading: isLogbooksLoading } = useLogbooks({
     critical: false,
     requirePermission: "Write",

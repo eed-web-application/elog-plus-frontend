@@ -33,9 +33,10 @@ function Dialog({ children, ...options }: Props) {
   );
 }
 
-const DialogTrigger = forwardRef<HTMLElement, PropsWithChildren<{}>>(
+const DialogTrigger = forwardRef<HTMLElement, PropsWithChildren<unknown>>(
   function DialogTrigger({ children, ...props }, propRef) {
     const context = useDialog();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const childrenRef = (children as any).ref;
 
     const ref = useMergeRefs([context.refs.setReference, propRef, childrenRef]);

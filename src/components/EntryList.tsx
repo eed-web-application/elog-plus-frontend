@@ -43,6 +43,9 @@ export default function EntryList({
   const headerRef = useRef<HTMLDivElement>(null);
   const Observer = useResizeObserver(ref.current);
 
+  const stickyHeader = headerRef.current?.getBoundingClientRect().height || 0;
+  const { zIndex, usedHeight } = useContext(StickyEntryRow);
+
   if (isLoading) {
     return <Spinner large className="my-4 mx-auto" />;
   }
@@ -50,9 +53,6 @@ export default function EntryList({
   if (entries.length === 0) {
     return;
   }
-
-  const stickyHeader = headerRef.current?.getBoundingClientRect().height || 0;
-  const { zIndex, usedHeight } = useContext(StickyEntryRow);
 
   return (
     <Observer>

@@ -1,3 +1,4 @@
+// Not used, see #40.
 export type TextProps = {
   value: string;
   onChange: (newValue: string) => void;
@@ -39,6 +40,7 @@ export type InputProps<O> = {
   | ({ type: "multi-select" } & MultiSelectProps<O>)
 );
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function Select(_: SelectProps) {
   return null;
 }
