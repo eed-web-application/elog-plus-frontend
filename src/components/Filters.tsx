@@ -44,13 +44,15 @@ export default function Filters({ filters, onFiltersChange }: Props) {
     tags,
     tagMap,
     bumpTag,
-    isLoading: isTagsLoading,
+    isLoading: isTagsFetching,
   } = useTags({
     logbooks: isLogbooksLoading
       ? []
       : filters.logbooks.map((name) => logbookNameMap[name.toLowerCase()].id),
     enabled: !isLogbooksLoading,
   });
+
+  const isTagsLoading = isLogbooksLoading || isTagsFetching;
 
   const logbookFilterLabel = useCallback(() => {
     const firstSelectedLogbook = filters.logbooks[0];
@@ -69,12 +71,7 @@ export default function Filters({ filters, onFiltersChange }: Props) {
     }
 
     return label;
-  }, [
-    filters.logbooks,
-    filters.onlyFavorites,
-    logbookNameMap,
-    isLogbooksLoading,
-  ]);
+  }, [filters.logbooks, filters.onlyFavorites]);
 
   const tagFilterLabel = useCallback(() => {
     const firstSelectedId = filters.tags[0];
