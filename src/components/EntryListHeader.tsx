@@ -134,6 +134,7 @@ const EntryListHeader = forwardRef<HTMLDivElement, Props>(
                       to={{
                         pathname: `/${summaryId}`,
                         search: window.location.search,
+                        hash: window.location.hash,
                       }}
                     >
                       <Chip
@@ -172,6 +173,7 @@ const EntryListHeader = forwardRef<HTMLDivElement, Props>(
                       to={{
                         pathname: "/new-entry",
                         search: window.location.search,
+                        hash: window.location.hash,
                       }}
                       state={{
                         logbooks: [logbookId],

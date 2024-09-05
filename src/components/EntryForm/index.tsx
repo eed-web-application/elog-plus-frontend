@@ -58,7 +58,11 @@ export default function EntryForm({ onEntrySaved, kind }: Props) {
   return (
     <>
       <Link
-        to={{ pathname: "/", search: window.location.search }}
+        to={{
+          pathname: "/",
+          search: window.location.search,
+          hash: window.location.hash,
+        }}
         className={twJoin(IconButton, "my-1 float-right")}
         onClick={removeDraft}
       >

@@ -19,7 +19,11 @@ export type EntryQuery = {
 
 export interface Params extends Partial<EntryQuery> {
   enabled?: boolean;
-  spotlight?: string;
+  /**
+   * Entry ID to base the rest of the query on (i.e., the anchor is always
+   * loaded and the rest of the entries loaded are before or after it)
+   */
+  anchor?: string;
   query: EntryQuery;
   onSpotlightFetched?: () => void;
 }
@@ -60,10 +64,10 @@ function useFavoriteEntries({
 }
 
 /**
- * Manages fetching entries with filtering and spotlighting supporting
+ * Manages fetching entries with filtering and anchoringsupporting
  * infnite scroll
  */
-export default function useEntries({ enabled, spotlight, query }: Params) {
+export default function useEntries({ enabled, anchor, query }: Params) {
   // Since we want to include all the entries in the same day of the date
   // and the backend only returns entries before the date, we make sure the
   // date is at the end of the day
@@ -83,7 +87,7 @@ export default function useEntries({ enabled, spotlight, query }: Params) {
 
   const key = {
     ...query,
-    spotlight: spotlight || undefined,
+    anchor: anchor || undefined,
     favorites: query.onlyFavorites ? favorites : undefined,
   };
 
@@ -98,9 +102,9 @@ export default function useEntries({ enabled, spotlight, query }: Params) {
           ...query,
           startDate: query?.startDate || undefined,
           endDate: query?.endDate || undefined,
-          anchor: pageParam || query.spotlight,
+          anchor: pageParam || query.anchor,
           contextSize:
-            pageParam === undefined && query.spotlight ? CONTEXT_SIZE : 0,
+            pageParam === undefined && query.anchor ? CONTEXT_SIZE : 0,
           limit: ENTRIES_PER_PAGE,
         });
 

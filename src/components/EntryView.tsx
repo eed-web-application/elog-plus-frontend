@@ -23,7 +23,7 @@ export default function EntryView({ entry }: Props) {
     (attachment) => attachment.previewState !== "Completed",
   );
 
-  const spotlightProps = useSpotlightProps(entry.id);
+  const spotlightProps = useSpotlightProps(entry);
   const tagNames = useDisplayTags(entry.tags, entry.logbooks.length);
 
   return (
@@ -161,6 +161,7 @@ export default function EntryView({ entry }: Props) {
             to={{
               pathname: `/${entry.id}/supersede`,
               search: window.location.search,
+              hash: window.location.hash,
             }}
             className={twMerge(TextButton, "mr-3 inline-block ml-auto w-fit")}
           >
@@ -170,6 +171,7 @@ export default function EntryView({ entry }: Props) {
             to={{
               pathname: `/${entry.id}/follow-up`,
               search: window.location.search,
+              hash: window.location.hash,
             }}
             className={twJoin(Button, "inline-block ml-auto w-fit")}
           >

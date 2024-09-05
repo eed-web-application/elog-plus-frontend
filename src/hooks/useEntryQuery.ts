@@ -15,7 +15,7 @@ export const DEFAULT_QUERY: EntryQuery = {
   onlyFavorites: false,
 };
 
-function deserializeQuery(params: URLSearchParams): EntryQuery {
+export function deserializeQuery(params: URLSearchParams): EntryQuery {
   const startDate = params.get("startDate");
   const endDate = params.get("endDate");
 

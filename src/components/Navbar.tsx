@@ -59,7 +59,11 @@ export default function Navbar({
         Admin Dashboard
       </Link>
       <Link
-        to={{ pathname: "/new-entry", search: window.location.search }}
+        to={{
+          pathname: "/new-entry",
+          search: window.location.search,
+          hash: window.location.hash,
+        }}
         className={twJoin(Button, "relative")}
       >
         New Entry

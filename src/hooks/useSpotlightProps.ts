@@ -1,11 +1,15 @@
 import { useContext } from "react";
 import IsPaneFullscreen from "../IsPaneFullscreenContext";
+import { Entry } from "../api";
+import { LinkProps } from "react-router-dom";
+import SpotlightContext from "../SpotlightContext";
 
 /**
- * Props passed to a Link component that will spotlight `entryId`.
+ * Props passed to a Link component that will spotlight `entry`.
  */
-export default function useSpotlightProps(entryId: string) {
+export default function useSpotlightProps(entry: Entry): LinkProps {
   const isPaneFullscreen = useContext(IsPaneFullscreen);
+  const setSpotlight = useContext(SpotlightContext);
 
   return {
     // If the pane is fullscreen, then we want to close it
@@ -13,8 +17,15 @@ export default function useSpotlightProps(entryId: string) {
     to: {
       pathname: isPaneFullscreen ? "/" : undefined,
       search: window.location.search,
+      hash: window.location.hash,
     },
     replace: !isPaneFullscreen,
-    state: { spotlight: entryId },
+    onClick: (e: React.MouseEvent) => {
+      if (!isPaneFullscreen) {
+        e.preventDefault();
+      }
+
+      setSpotlight?.(entry);
+    },
   };
 }

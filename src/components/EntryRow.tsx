@@ -68,7 +68,6 @@ function RowButton({
           entrySelected && "hover:bg-blue-200",
           entryHighlighted && "hover:bg-yellow-300",
         )}
-        tabIndex={0}
         onClick={(e) => {
           e.stopPropagation();
           onClick?.(e);
@@ -463,7 +462,7 @@ const EntryRow = memo(
       Boolean(state.drafts[`supersede/${entry.id}`]),
     );
 
-    const spotlightProps = useSpotlightProps(entry.id);
+    const spotlightProps = useSpotlightProps(entry);
     const date = dateBasedOn === "loggedAt" ? entry.loggedAt : entry.eventAt;
     const tagNames = useDisplayTags(entry.tags, entry.logbooks.length);
 
@@ -541,6 +540,7 @@ const EntryRow = memo(
               to={{
                 pathname: `/${entry.id}`,
                 search: window.location.search,
+                hash: window.location.hash,
               }}
               // See https://inclusive-components.design/cards/
               className={twJoin(
@@ -635,6 +635,7 @@ const EntryRow = memo(
                   to={{
                     pathname: `/${entry.id}/supersede`,
                     search: window.location.search,
+                    hash: window.location.hash,
                   }}
                   entrySelected={selected}
                   entryHighlighted={highlighted}
@@ -663,6 +664,7 @@ const EntryRow = memo(
                   to={{
                     pathname: `/${entry.id}/follow-up`,
                     search: window.location.search,
+                    hash: window.location.hash,
                   }}
                   entrySelected={selected}
                   entryHighlighted={highlighted}
