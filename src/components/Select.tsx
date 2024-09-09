@@ -236,8 +236,8 @@ export default function Select<O extends Option>({
                   selectedValue ===
                   (typeof option === "string" ? option : option.value)
                 }
+                key={typeof option === "string" ? option : option.value}
                 {...getItemProps({
-                  key: typeof option === "string" ? option : option.value,
                   ref: (el) => (listRef.current[index] = el),
                   onMouseDown: () => {
                     select(option);
