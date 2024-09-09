@@ -59,6 +59,7 @@ export default function EntryForm({ onEntrySaved, kind }: Props) {
   return (
     <>
       <Button
+        variant="icon"
         as={Link}
         to={{
           pathname: "/",
