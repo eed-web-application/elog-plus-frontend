@@ -3,8 +3,9 @@ import SideSheet from "../SideSheet";
 import { NavLink } from "react-router-dom";
 import { twJoin } from "tailwind-merge";
 import Spinner from "../Spinner";
-import { Button, Input } from "../base";
+import { Input } from "../base";
 import Dialog from "../Dialog";
+import Button from "../Button";
 
 export interface Item {
   label: string;
@@ -112,9 +113,9 @@ export default function AdminResource({
             <Dialog>
               <Dialog.Content>{createDialog}</Dialog.Content>
               <Dialog.Trigger>
-                <button className={twJoin(Button, "ml-2")}>
+                <Button type="button" className="ml-2">
                   {createLabel}
-                </button>
+                </Button>
               </Dialog.Trigger>
             </Dialog>
           )}

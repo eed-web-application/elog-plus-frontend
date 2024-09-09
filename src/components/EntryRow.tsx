@@ -22,7 +22,6 @@ import {
   useMergeRefs,
   useRole,
 } from "@floating-ui/react";
-import { IconButton } from "./base";
 import { Attachment, Entry } from "../api";
 import EntryList from "./EntryList";
 import Chip from "./Chip";
@@ -39,6 +38,7 @@ import useTruncate from "../hooks/useTruncate";
 import useDisplayTags from "../hooks/useDisplayTags";
 import FavoriteButton from "./FavoriteButton";
 import StickyEntryRow from "../StickyEntryRowContext";
+import Button from "./Button";
 
 const ATTACHMENTS_PREVIEW_MAX_WIDTH = 1 / 4;
 
@@ -61,14 +61,15 @@ function RowButton({
 >) {
   return (
     <Tooltip label={tooltip}>
-      <Link
+      <Button
+        as={Link}
+        variant="icon"
         className={twMerge(
-          IconButton,
           "z-0 relative",
           entrySelected && "hover:bg-blue-200",
           entryHighlighted && "hover:bg-yellow-300",
         )}
-        onClick={(e) => {
+        onClick={(e: React.MouseEvent<HTMLAnchorElement>) => {
           e.stopPropagation();
           onClick?.(e);
         }}
@@ -80,7 +81,7 @@ function RowButton({
             *
           </div>
         )}
-      </Link>
+      </Button>
     </Tooltip>
   );
 }
@@ -700,28 +701,30 @@ const EntryRow = memo(
           </FloatingDelayGroup>
 
           {allowExpanding && (
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={1.5}
-              stroke="currentColor"
-              tabIndex={0}
+            <Button
+              variant="icon"
+              onClick={() => setExpanded((expanded) => !expanded)}
               className={twMerge(
-                IconButton,
                 "z-0",
                 expanded && "rotate-180",
                 selected && "hover:bg-blue-200",
                 highlighted && "hover:bg-yellow-300",
               )}
-              onClick={() => setExpanded((expanded) => !expanded)}
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M19.5 8.25l-7.5 7.5-7.5-7.5"
-              />
-            </svg>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={1.5}
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M19.5 8.25l-7.5 7.5-7.5-7.5"
+                />
+              </svg>
+            </Button>
           )}
         </div>
         {expanded && fullEntry && (

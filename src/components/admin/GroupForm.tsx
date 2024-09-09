@@ -1,4 +1,4 @@
-import { twJoin, twMerge } from "tailwind-merge";
+import { twMerge } from "tailwind-merge";
 import {
   Group,
   GroupUpdation,
@@ -7,7 +7,7 @@ import {
   User,
   updateGroup,
 } from "../../api";
-import { Button, IconButton, Input, InputInvalid, TextButton } from "../base";
+import { Input, InputInvalid } from "../base";
 import { useGroupFormsStore, validateGroupForm } from "../../groupFormsStore";
 import useLogbooks from "../../hooks/useLogbooks";
 import AdminAuthorizationForm from "./AuthorizationForm";
@@ -20,6 +20,7 @@ import ResourceListForm from "./ResourceListForm";
 import useUsers from "../../hooks/useUsers";
 import Select from "../Select";
 import reportServerError from "../../reportServerError";
+import Button from "../Button";
 
 export type Props = {
   onSave: () => void;
@@ -210,22 +211,25 @@ function GroupFormInner({
               {member.gecos}
               <div className="text-sm text-gray-500">{member.email}</div>
             </div>
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth="1.5"
-              stroke="currentColor"
-              tabIndex={0}
-              className={twJoin(IconButton, "text-gray-500")}
+            <Button
+              variant="icon"
+              className="text-gray-500"
               onClick={() => removeMember(member.email)}
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M6 18L18 6M6 6l12 12"
-              />
-            </svg>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth="1.5"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              </svg>
+            </Button>
           </div>
         ))}
         select={
@@ -274,20 +278,21 @@ function GroupFormInner({
       />
 
       <div className="flex justify-end mt-3 gap-3">
-        <button
+        <Button
+          variant="text"
           disabled={!updated}
-          className={twJoin(TextButton, "block")}
+          className="block"
           onClick={finishEditing}
         >
           Discard changes
-        </button>
-        <button
+        </Button>
+        <Button
           disabled={!updated || invalid.size > 0}
-          className={twJoin(Button, "block")}
+          className="block"
           onClick={save}
         >
           Save
-        </button>
+        </Button>
       </div>
     </div>
   );

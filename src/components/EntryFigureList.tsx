@@ -15,9 +15,10 @@ import {
   getAttachmentDownloadURL,
   getAttachmentPreviewURL,
 } from "../api";
-import { BackDrop, IconButton } from "./base";
+import { BackDrop } from "./base";
 import Spinner from "./Spinner";
 import Tooltip from "./Tooltip";
+import Button from "./Button";
 
 export interface Props extends ComponentProps<"div"> {
   attachments: Attachment[];
@@ -74,8 +75,9 @@ function Figure({
             </div>
           </Tooltip>
           )
-          <a
-            className={IconButton}
+          <Button
+            as="a"
+            variant="icon"
             download={figure.fileName}
             href={getAttachmentDownloadURL(figure.id)}
           >
@@ -85,7 +87,6 @@ function Figure({
               viewBox="0 0 24 24"
               strokeWidth={1.5}
               stroke="currentColor"
-              className="h-full"
             >
               <path
                 strokeLinecap="round"
@@ -93,7 +94,7 @@ function Figure({
                 d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"
               />
             </svg>
-          </a>
+          </Button>
         </div>
         <img
           ref={refs.setReference}
@@ -119,25 +120,25 @@ function Figure({
           >
             <FloatingFocusManager context={context}>
               <div ref={refs.setFloating} {...getFloatingProps()}>
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth={1.5}
-                  stroke="currentColor"
-                  className={twMerge(
-                    IconButton,
-                    "absolute top-0 left-0 m-3 !w-10 !h-10 !p-1 bg-gray-700 hover:bg-gray-600 text-gray-200 ring-blue-50",
-                  )}
-                  tabIndex={0}
+                <Button
+                  variant="icon"
+                  className="absolute top-0 left-0 m-3 !w-10 !h-10 !p-1 bg-gray-700 hover:bg-gray-600 text-gray-200 ring-blue-50"
                   onClick={() => setIsOpen(false)}
                 >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M6 18L18 6M6 6l12 12"
-                  />
-                </svg>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth={1.5}
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M6 18L18 6M6 6l12 12"
+                    />
+                  </svg>
+                </Button>
                 <img
                   className="max-h-screen"
                   src={getAttachmentPreviewURL(figure.id)}

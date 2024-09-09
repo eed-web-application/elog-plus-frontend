@@ -4,7 +4,7 @@ import {
   FloatingFocusManager,
   FloatingOverlay,
 } from "@floating-ui/react";
-import { BackDrop, IconButton } from "./base";
+import { BackDrop } from "./base";
 import { twJoin, twMerge } from "tailwind-merge";
 import {
   ComponentPropsWithoutRef,
@@ -20,6 +20,7 @@ import {
   useDialogProvider,
   useDialog,
 } from "../hooks/useDialog";
+import Button from "./Button";
 
 export type Props = {
   children: React.ReactNode;
@@ -113,25 +114,25 @@ function DialogWindow<T extends ElementType = "div">({
     >
       {children}
       {showCloseButton && (
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-          strokeWidth={1.5}
-          stroke="currentColor"
-          tabIndex={0}
-          className={twJoin(
-            IconButton,
-            "absolute top-0 right-0 border-none m-1",
-          )}
+        <Button
+          variant="icon"
+          className="absolute top-0 right-0 border-none m-1"
           onClick={() => setOpen(false)}
         >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            d="M6 18L18 6M6 6l12 12"
-          />
-        </svg>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            strokeWidth={1.5}
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M6 18L18 6M6 6l12 12"
+            />
+          </svg>
+        </Button>
       )}
     </Component>
   );

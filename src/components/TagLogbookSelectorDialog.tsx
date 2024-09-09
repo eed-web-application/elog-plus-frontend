@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { twJoin } from "tailwind-merge";
-import { Button, Checkbox, CheckboxLabel, TextButton } from "./base";
+import { Checkbox, CheckboxLabel } from "./base";
 import { Logbook } from "../api";
 import Dialog from "./Dialog";
 import { useDialog } from "../hooks/useDialog";
+import Button from "./Button";
 
 export interface Props {
   tag: string;
@@ -50,16 +51,11 @@ export default function TagLogbookSelectorDialog({
         ))}
       </Dialog.Section>
       <Dialog.Section className="flex gap-3 justify-end">
-        <button
-          type="button"
-          className={TextButton}
-          onClick={() => setOpen(false)}
-        >
+        <Button type="button" variant="text" onClick={() => setOpen(false)}>
           Cancel
-        </button>
-        <button
+        </Button>
+        <Button
           type="button"
-          className={Button}
           disabled={selected.length === 0}
           onClick={() => {
             onSelect(selected);
@@ -67,7 +63,7 @@ export default function TagLogbookSelectorDialog({
           }}
         >
           Save
-        </button>
+        </Button>
       </Dialog.Section>
     </Dialog.Window>
   );

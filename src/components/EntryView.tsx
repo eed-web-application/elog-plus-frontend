@@ -1,7 +1,6 @@
-import { twJoin, twMerge } from "tailwind-merge";
+import { twJoin } from "tailwind-merge";
 import { EntryFull } from "../api";
 import { Link } from "react-router-dom";
-import { Button, IconButton, TextButton } from "./base";
 import EntryList from "./EntryList";
 import EntryBodyText from "./EntryBodyText";
 import Chip from "./Chip";
@@ -12,6 +11,7 @@ import TextDivider from "./TextDivider";
 import useSpotlightProps from "../hooks/useSpotlightProps";
 import useDisplayTags from "../hooks/useDisplayTags";
 import FavoriteButton from "./FavoriteButton";
+import Button from "./Button";
 
 export interface Props {
   entry: EntryFull;
@@ -29,9 +29,11 @@ export default function EntryView({ entry }: Props) {
   return (
     <>
       {!entry.supersededBy && (
-        <Link
+        <Button
+          as={Link}
+          variant="icon"
           {...spotlightProps}
-          className={twJoin(IconButton, "my-1 float-right")}
+          className="my-1 float-right"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -45,7 +47,7 @@ export default function EntryView({ entry }: Props) {
               clipRule="evenodd"
             />
           </svg>
-        </Link>
+        </Button>
       )}
       <FavoriteButton className="float-right my-1" entryId={entry.id} />
       {entry.supersededBy && (
@@ -157,26 +159,28 @@ export default function EntryView({ entry }: Props) {
       )}
       {!entry.supersededBy && (
         <div className="p-3 text-right border-t">
-          <Link
+          <Button
+            as={Link}
             to={{
               pathname: `/${entry.id}/supersede`,
               search: window.location.search,
               hash: window.location.hash,
             }}
-            className={twMerge(TextButton, "mr-3 inline-block ml-auto w-fit")}
+            className="mr-3 inline-block ml-auto w-fit"
           >
             Supersede
-          </Link>
-          <Link
+          </Button>
+          <Button
+            as={Link}
             to={{
               pathname: `/${entry.id}/follow-up`,
               search: window.location.search,
               hash: window.location.hash,
             }}
-            className={twJoin(Button, "inline-block ml-auto w-fit")}
+            className="inline-block ml-auto w-fit"
           >
             Follow up
-          </Link>
+          </Button>
         </div>
       )}
       {entry.history && entry.history.length > 0 && (

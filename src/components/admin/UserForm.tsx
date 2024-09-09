@@ -1,6 +1,6 @@
-import { twJoin, twMerge } from "tailwind-merge";
+import { twMerge } from "tailwind-merge";
 import { UserWithAuth, Permission, Logbook, ServerError } from "../../api";
-import { Button, Input, TextButton } from "../base";
+import { Input } from "../base";
 import { useUserFormsStore } from "../../userFormsStore";
 import useLogbooks from "../../hooks/useLogbooks";
 import AdminAuthorizationForm from "./AuthorizationForm";
@@ -9,6 +9,7 @@ import useUser from "../../hooks/useUser";
 import Spinner from "../Spinner";
 import { useQueryClient } from "@tanstack/react-query";
 import reportServerError from "../../reportServerError";
+import Button from "../Button";
 
 interface Props {
   userId: string;
@@ -147,20 +148,17 @@ function UserFormInner({
         createAuthorization={createAuthorization}
       />
       <div className="flex justify-end mt-3 gap-3">
-        <button
+        <Button
+          variant="text"
           disabled={!updated}
-          className={twJoin(TextButton, "block")}
+          className="block"
           onClick={finishEditing}
         >
           Discard changes
-        </button>
-        <button
-          disabled={!updated}
-          className={twJoin(Button, "block")}
-          onClick={save}
-        >
+        </Button>
+        <Button disabled={!updated} className="block" onClick={save}>
           Save
-        </button>
+        </Button>
       </div>
     </div>
   );

@@ -1,11 +1,11 @@
-import { twJoin, twMerge } from "tailwind-merge";
+import { twMerge } from "tailwind-merge";
 import {
   ApplicationWithAuth,
   Logbook,
   Permission,
   ServerError,
 } from "../../api";
-import { Button, Input, TextButton } from "../base";
+import { Input } from "../base";
 import { useApplicationFormsStore } from "../../applicationFormsStore";
 import useLogbooks from "../../hooks/useLogbooks";
 import AdminAuthorizationForm from "./AuthorizationForm";
@@ -15,6 +15,7 @@ import Spinner from "../Spinner";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "react-toastify";
 import reportServerError from "../../reportServerError";
+import Button from "../Button";
 
 interface Props {
   applicationId: string;
@@ -206,20 +207,18 @@ function ApplicationFormInner({
       />
       {!application.applicationManaged && (
         <div className="flex justify-end mt-3 gap-3">
-          <button
+          <Button
+            variant="text"
             disabled={!updated}
-            className={twJoin(TextButton, "block")}
+            className="block"
             onClick={finishEditing}
           >
             Discard changes
-          </button>
-          <button
-            disabled={!updated}
-            className={twJoin(Button, "block")}
-            onClick={save}
-          >
+          </Button>
+          {/* FIXME: Shouldn't need block here */}
+          <Button disabled={!updated} className="block" onClick={save}>
             Save
-          </button>
+          </Button>
         </div>
       )}
     </div>

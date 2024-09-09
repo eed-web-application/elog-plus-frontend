@@ -1,6 +1,5 @@
 import { twJoin, twMerge } from "tailwind-merge";
 import { Link } from "react-router-dom";
-import { Button } from "./base";
 import { ComponentProps, useEffect, useState } from "react";
 import { useDraftsStore } from "../draftsStore";
 import Logo from "./Logo";
@@ -11,6 +10,7 @@ import InfoDialog from "./InfoDialog";
 import BugReport from "./BugReport";
 import EntrySearchBar, { Props as SearchProps } from "./EntrySearchBar";
 import AccountButton from "./AccountButton";
+import Button from "./Button";
 
 export type Props = Pick<SearchProps, "search" | "onSearchChange"> &
   ComponentProps<"div">;
@@ -52,25 +52,27 @@ export default function Navbar({
         <DevSelectUser className="mr-2" />
       )}
 
-      <Link
+      <Button
+        as={Link}
         to={{ pathname: "/admin/logbooks" }}
-        className={twJoin(Button, "mr-2 text-sm flex items-center")}
+        className="mr-2 text-sm flex items-center"
       >
         Admin Dashboard
-      </Link>
-      <Link
+      </Button>
+      <Button
+        as={Link}
         to={{
           pathname: "/new-entry",
           search: window.location.search,
           hash: window.location.hash,
         }}
-        className={twJoin(Button, "relative")}
+        className="relative"
       >
         New Entry
         {hasNewEntryDraft && (
           <div className="absolute top-0 right-0 w-4 h-4 text-black bg-gray-200 rounded-full shadow-xl translate-x-1.5 -translate-y-1.5 p-[3px]"></div>
         )}
-      </Link>
+      </Button>
 
       <BugReport />
 

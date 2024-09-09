@@ -9,14 +9,7 @@ import {
   LogbookWithAuth,
   Permission,
 } from "../../api";
-import {
-  Button,
-  Checkbox,
-  IconButton,
-  Input,
-  InputInvalid,
-  TextButton,
-} from "../base";
+import { Checkbox, Input, InputInvalid } from "../base";
 import {
   useLogbookFormsStore,
   validateLogbookForm,
@@ -30,6 +23,7 @@ import AdminAuthorizationForm from "./AuthorizationForm";
 import { saveAuthorizations } from "../../authorizationDiffing";
 import ResourceListForm from "./ResourceListForm";
 import Tooltip from "../Tooltip";
+import Button from "../Button";
 
 interface Props {
   logbook: LogbookWithAuth;
@@ -274,22 +268,25 @@ export default function LogbookForm({ logbook, onSave }: Props) {
             className="flex justify-between items-center px-2"
           >
             <div className="truncate flex-1">{tag.name}</div>
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth="1.5"
-              stroke="currentColor"
-              tabIndex={0}
-              className={twJoin(IconButton, "text-gray-500")}
+            <Button
+              variant="icon"
+              className="text-gray-500"
               onClick={() => removeTag(index)}
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M6 18L18 6M6 6l12 12"
-              />
-            </svg>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth="1.5"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              </svg>
+            </Button>
           </div>
         ))}
       />
@@ -369,22 +366,25 @@ export default function LogbookForm({ logbook, onSave }: Props) {
                 }}
               />
             </div>
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth="1.5"
-              stroke="currentColor"
-              tabIndex={0}
-              className={twJoin(IconButton, "text-gray-500")}
+            <Button
+              variant="icon"
+              className="text-gray-500"
               onClick={() => removeShift(index)}
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M6 18L18 6M6 6l12 12"
-              />
-            </svg>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth="1.5"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              </svg>
+            </Button>
           </div>
         ))}
       />
@@ -534,20 +534,21 @@ export default function LogbookForm({ logbook, onSave }: Props) {
       </div>
 
       <div className="flex justify-end mt-3 gap-3">
-        <button
+        <Button
+          variant="text"
           disabled={!updated}
-          className={twJoin(TextButton, "block")}
+          className="block"
           onClick={finishEditing}
         >
           Discard changes
-        </button>
-        <button
+        </Button>
+        <Button
           disabled={!updated || invalid.size > 0}
-          className={twJoin(Button, "block")}
+          className="block"
           onClick={save}
         >
           Save
-        </button>
+        </Button>
       </div>
     </div>
   );

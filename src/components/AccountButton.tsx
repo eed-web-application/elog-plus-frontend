@@ -15,7 +15,7 @@ import {
 import useTrueMe from "../hooks/useTrueMe";
 import Spinner from "./Spinner";
 import { twMerge } from "tailwind-merge";
-import { TextButton } from "./base";
+import Button from "./Button";
 
 export default function AccountButton({
   className,
@@ -82,18 +82,16 @@ export default function AccountButton({
                     <div>{me.gecos}</div>
                     <div className="text-gray-500 text-sm">{me.email}</div>
                   </div>
-                  <button
-                    className={twMerge(
-                      TextButton,
-                      "p-3 rounded-none w-full text-left",
-                    )}
+                  <Button
+                    variant="text"
+                    className="p-3 rounded-none w-full text-left"
                     onClick={() => {
                       window.location.href =
                         "https://vouch.slac.stanford.edu/logout?returnTo=https://accel-webapp-dev.slac.stanford.edu/elog";
                     }}
                   >
                     Logout
-                  </button>
+                  </Button>
                 </>
               )}
             </div>

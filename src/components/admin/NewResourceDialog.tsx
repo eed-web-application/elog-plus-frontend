@@ -1,7 +1,7 @@
 import { PropsWithChildren } from "react";
 import Dialog from "../Dialog";
-import { Button, TextButton } from "../base";
 import { useDialog } from "../../hooks/useDialog";
+import Button from "../Button";
 
 export type Props = PropsWithChildren<{
   title: string;
@@ -30,19 +30,17 @@ export default function NewAdminResourceDialog({
       </Dialog.Section>
       <Dialog.Section>{children}</Dialog.Section>
       <Dialog.Section className="flex gap-3 justify-end">
-        <button
-          type="button"
-          className={TextButton}
-          onClick={() => setOpen(false)}
-        >
+        <Button variant="text" type="button" onClick={() => setOpen(false)}>
           Cancel
-        </button>
-        <input
+        </Button>
+        <Button
           value="Save"
           type="submit"
           className={Button}
           disabled={!onSave}
-        />
+        >
+          Save
+        </Button>
       </Dialog.Section>
     </Dialog.Window>
   );
