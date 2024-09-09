@@ -16,6 +16,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "react-toastify";
 import reportServerError from "../../reportServerError";
 import Button from "../Button";
+import { useState } from "react";
 
 interface Props {
   applicationId: string;
@@ -40,7 +41,10 @@ function ApplicationFormInner({
   );
   const queryClient = useQueryClient();
 
+  const [saving, setSaving] = useState(false);
+
   async function save() {
+    setSaving(true);
     try {
       await saveAuthorizations(application.authorizations, form.authorizations);
     } catch (e) {
@@ -57,6 +61,7 @@ function ApplicationFormInner({
     });
 
     finishEditing();
+    setSaving(false);
     onSave();
   }
 
@@ -207,16 +212,10 @@ function ApplicationFormInner({
       />
       {!application.applicationManaged && (
         <div className="flex justify-end mt-3 gap-3">
-          <Button
-            variant="text"
-            disabled={!updated}
-            className="block"
-            onClick={finishEditing}
-          >
+          <Button variant="text" disabled={!updated} onClick={finishEditing}>
             Discard changes
           </Button>
-          {/* FIXME: Shouldn't need block here */}
-          <Button disabled={!updated} className="block" onClick={save}>
+          <Button disabled={!updated} onClick={save} isLoading={saving}>
             Save
           </Button>
         </div>

@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { twMerge } from "tailwind-merge";
 import { UserWithAuth, Permission, Logbook, ServerError } from "../../api";
 import { Input } from "../base";
@@ -33,8 +34,10 @@ function UserFormInner({
     state.startEditing(user),
   );
   const queryClient = useQueryClient();
+  const [saving, setSaving] = useState(false);
 
   async function save() {
+    setSaving(true);
     try {
       await saveAuthorizations(user.authorizations, form.authorizations);
     } catch (e) {
@@ -48,6 +51,7 @@ function UserFormInner({
     await queryClient.invalidateQueries({ queryKey: ["user", user.email] });
 
     finishEditing();
+    setSaving(false);
     onSave();
   }
 
@@ -148,15 +152,10 @@ function UserFormInner({
         createAuthorization={createAuthorization}
       />
       <div className="flex justify-end mt-3 gap-3">
-        <Button
-          variant="text"
-          disabled={!updated}
-          className="block"
-          onClick={finishEditing}
-        >
+        <Button variant="text" disabled={!updated} onClick={finishEditing}>
           Discard changes
         </Button>
-        <Button disabled={!updated} className="block" onClick={save}>
+        <Button disabled={!updated} onClick={save} isLoading={saving}>
           Save
         </Button>
       </div>

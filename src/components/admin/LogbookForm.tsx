@@ -40,6 +40,8 @@ export default function LogbookForm({ logbook, onSave }: Props) {
   );
   const queryClient = useQueryClient();
 
+  const [saving, setSaving] = useState(false);
+
   const [newTag, setNewTag] = useState<string>("");
   const [newShift, setNewShift] = useState<string>("");
 
@@ -108,6 +110,7 @@ export default function LogbookForm({ logbook, onSave }: Props) {
       return;
     }
 
+    setSaving(true);
     try {
       await Promise.all([
         saveLogbook(),
@@ -125,6 +128,7 @@ export default function LogbookForm({ logbook, onSave }: Props) {
     await queryClient.invalidateQueries({ queryKey: ["logbooks"] });
 
     finishEditing();
+    setSaving(false);
     onSave();
   }
 
@@ -534,18 +538,13 @@ export default function LogbookForm({ logbook, onSave }: Props) {
       </div>
 
       <div className="flex justify-end mt-3 gap-3">
-        <Button
-          variant="text"
-          disabled={!updated}
-          className="block"
-          onClick={finishEditing}
-        >
+        <Button variant="text" disabled={!updated} onClick={finishEditing}>
           Discard changes
         </Button>
         <Button
           disabled={!updated || invalid.size > 0}
-          className="block"
           onClick={save}
+          isLoading={saving}
         >
           Save
         </Button>

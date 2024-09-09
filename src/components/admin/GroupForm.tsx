@@ -56,6 +56,8 @@ function GroupFormInner({
 
   const queryClient = useQueryClient();
 
+  const [saving, setSaving] = useState(false);
+
   async function saveGroup() {
     const groupUpdation: GroupUpdation = {
       ...form,
@@ -69,6 +71,8 @@ function GroupFormInner({
     if (invalid.size > 0) {
       return;
     }
+
+    setSaving(true);
 
     try {
       await Promise.all([
@@ -88,6 +92,7 @@ function GroupFormInner({
     await queryClient.invalidateQueries({ queryKey: ["group", group.id] });
 
     finishEditing();
+    setSaving(false);
     onSave();
   }
 
@@ -278,18 +283,13 @@ function GroupFormInner({
       />
 
       <div className="flex justify-end mt-3 gap-3">
-        <Button
-          variant="text"
-          disabled={!updated}
-          className="block"
-          onClick={finishEditing}
-        >
+        <Button variant="text" disabled={!updated} onClick={finishEditing}>
           Discard changes
         </Button>
         <Button
           disabled={!updated || invalid.size > 0}
-          className="block"
           onClick={save}
+          isLoading={saving}
         >
           Save
         </Button>
