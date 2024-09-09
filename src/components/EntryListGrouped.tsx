@@ -305,7 +305,7 @@ const EntryListGrouped = forwardRef<HTMLDivElement, Props>(
             </>
           )}
           <Spinner
-            large
+            size="large"
             className={twJoin("mx-auto my-4", !isLoading && "invisible")}
           />
         </div>
