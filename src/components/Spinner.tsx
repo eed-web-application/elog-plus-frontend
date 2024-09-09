@@ -2,16 +2,22 @@ import { twMerge } from "tailwind-merge";
 import { SVGProps } from "react";
 
 interface Props extends SVGProps<SVGSVGElement> {
-  large?: boolean;
+  size?: "tiny" | "regular" | "large";
 }
 
-export default function Spinner({ className, large = false, ...rest }: Props) {
+export default function Spinner({
+  className,
+  size = "regular",
+  ...rest
+}: Props) {
   return (
     <svg
       aria-hidden="true"
       className={twMerge(
-        "w-8 h-8 text-gray-200 animate-spin fill-blue-600",
-        large && "w-10 h-10",
+        "text-gray-200 animate-spin fill-blue-600",
+        size === "tiny" && "w-5 h-5",
+        size === "regular" && "w-8 h-8",
+        size === "large" && "w-10 h-10",
         className,
       )}
       viewBox="0 0 100 101"

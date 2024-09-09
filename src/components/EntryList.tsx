@@ -47,7 +47,7 @@ export default function EntryList({
   const { zIndex, usedHeight } = useContext(StickyEntryRow);
 
   if (isLoading) {
-    return <Spinner large className="my-4 mx-auto" />;
+    return <Spinner size="large" className="my-4 mx-auto" />;
   }
 
   if (entries.length === 0) {

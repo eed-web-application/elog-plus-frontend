@@ -5,6 +5,7 @@ import {
   JSXElementConstructor,
 } from "react";
 import { twMerge } from "tailwind-merge";
+import Spinner from "./Spinner";
 
 type IntrinsicAttributes<
   E extends
@@ -15,6 +16,7 @@ type IntrinsicAttributes<
 interface OwnProps<E extends ElementType = ElementType> {
   as?: E;
   variant?: keyof typeof variants;
+  isLoading?: boolean;
 }
 
 export type Props<E extends ElementType> = OwnProps<E> &
@@ -28,7 +30,7 @@ const variants = {
 };
 
 const Button = forwardRef(function Button<E extends ElementType>(
-  { as, className, variant, ...rest }: Props<E>,
+  { as, className, variant, isLoading, children, ...rest }: Props<E>,
   ref: ComponentPropsWithRef<E>["ref"],
 ) {
   const Component = as ?? "button";
@@ -36,7 +38,22 @@ const Button = forwardRef(function Button<E extends ElementType>(
   const twVariant = variants[variant ?? "button"];
 
   return (
-    <Component ref={ref} className={twMerge(twVariant, className)} {...rest} />
+    <Component
+      ref={ref}
+      className={twMerge(twVariant, isLoading && "relative", className)}
+      {...rest}
+    >
+      {isLoading ? (
+        <>
+          <div className="absolute inset-0 flex items-center justify-center">
+            <Spinner size="tiny" />
+          </div>
+          <div className="invisible">{children}</div>
+        </>
+      ) : (
+        children
+      )}
+    </Component>
   );
 }) as <E extends ElementType = "button">(props: Props<E>) => JSX.Element;
 
