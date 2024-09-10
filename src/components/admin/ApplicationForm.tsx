@@ -1,9 +1,7 @@
 import { twMerge } from "tailwind-merge";
-import { ApplicationWithAuth, Logbook, ServerError } from "../../api";
+import { ApplicationWithAuth, ServerError } from "../../api";
 import { Input } from "../base";
 import { useApplicationFormsStore } from "../../applicationFormsStore";
-import useLogbooks from "../../hooks/useLogbooks";
-import AdminAuthorizationForm from "./AuthorizationForm";
 import { saveAuthorizations } from "../../authorizationDiffing";
 import useApplication from "../../hooks/useApplication";
 import Spinner from "../Spinner";
@@ -12,6 +10,7 @@ import { toast } from "react-toastify";
 import reportServerError from "../../reportServerError";
 import Button from "../Button";
 import { useState } from "react";
+import LogbookAuthorizationForm from "./LogbookAuthorizationForm";
 
 interface Props {
   applicationId: string;
@@ -20,13 +19,9 @@ interface Props {
 
 function ApplicationFormInner({
   application,
-  logbooks,
-  isLogbooksLoading,
   onSave,
 }: {
   application: ApplicationWithAuth;
-  logbooks: Logbook[];
-  isLogbooksLoading: boolean;
   onSave: () => void;
 }) {
   const {
@@ -62,11 +57,6 @@ function ApplicationFormInner({
     setSaving(false);
     onSave();
   }
-
-  const logbooksFiltered = logbooks.filter(
-    (logbook) =>
-      !form.authorizations.some((auth) => auth.resourceId === logbook.id),
-  );
 
   return (
     <div className="p-3 pt-5">
@@ -129,38 +119,17 @@ function ApplicationFormInner({
       </label>
 
       <div className="text-gray-500 mt-2">Logbook Authorizations</div>
-      <AdminAuthorizationForm
+      <LogbookAuthorizationForm
         disabled={application.applicationManaged}
-        emptyLabel="No logbook authorizations. Create one below."
-        options={logbooksFiltered.map((logbook) => ({
-          label: logbook.name.toUpperCase(),
-          value: logbook.id,
-        }))}
-        isOptionsLoading={isLogbooksLoading}
-        authorizations={form.authorizations
-          .filter((auth) => auth.resourceType === "Logbook")
-          .map((auth) => ({
-            value: auth.resourceId,
-            label: auth.resourceName.toUpperCase(),
-            permission: auth.permission,
-          }))}
-        updatePermission={(resourceId, permission) =>
-          updateAuthorization({ resourceId }, permission)
-        }
-        removeAuthorization={(resourceId) =>
-          removeAuthorization({ resourceId })
-        }
-        createAuthorization={(resourceId, resourceName) =>
-          createAuthorization({
-            ownerId: application.id,
-            ownerType: "Token",
-            ownerName: form.name,
-            resourceId,
-            resourceType: "Logbook",
-            resourceName,
-          })
-        }
+        ownerId={application.id}
+        ownerType="Token"
+        ownerName={application.name}
+        authorizations={form.authorizations}
+        updateAuthorization={updateAuthorization}
+        removeAuthorization={removeAuthorization}
+        createAuthorization={createAuthorization}
       />
+
       {!application.applicationManaged && (
         <div className="flex justify-end mt-3 gap-3">
           <Button variant="text" disabled={!updated} onClick={finishEditing}>
@@ -176,7 +145,6 @@ function ApplicationFormInner({
 }
 
 export default function ApplicationForm({ applicationId, onSave }: Props) {
-  const { logbooks, isLoading } = useLogbooks();
   const application = useApplication(applicationId, {
     includeAuthorizations: true,
   });
@@ -185,12 +153,5 @@ export default function ApplicationForm({ applicationId, onSave }: Props) {
     return <Spinner className="mt-3 w-full" />;
   }
 
-  return (
-    <ApplicationFormInner
-      application={application}
-      logbooks={logbooks}
-      isLogbooksLoading={isLoading}
-      onSave={onSave}
-    />
-  );
+  return <ApplicationFormInner application={application} onSave={onSave} />;
 }

@@ -1,16 +1,15 @@
 import { useState } from "react";
 import { twMerge } from "tailwind-merge";
-import { UserWithAuth, Logbook, ServerError } from "../../api";
+import { UserWithAuth, ServerError } from "../../api";
 import { Input } from "../base";
 import { useUserFormsStore } from "../../userFormsStore";
-import useLogbooks from "../../hooks/useLogbooks";
-import AdminAuthorizationForm from "./AuthorizationForm";
 import { saveAuthorizations } from "../../authorizationDiffing";
 import useUser from "../../hooks/useUser";
 import Spinner from "../Spinner";
 import { useQueryClient } from "@tanstack/react-query";
 import reportServerError from "../../reportServerError";
 import Button from "../Button";
+import LogbookAuthorizationForm from "./LogbookAuthorizationForm";
 
 interface Props {
   userId: string;
@@ -19,13 +18,9 @@ interface Props {
 
 function UserFormInner({
   user,
-  logbooks,
-  isLogbooksLoading,
   onSave,
 }: {
   user: UserWithAuth;
-  logbooks: Logbook[];
-  isLogbooksLoading: boolean;
   onSave: () => void;
 }) {
   const {
@@ -58,11 +53,6 @@ function UserFormInner({
     onSave();
   }
 
-  const logbooksFiltered = logbooks.filter(
-    (logbook) =>
-      !form.authorizations.some((auth) => auth.resourceId === logbook.id),
-  );
-
   return (
     <div className="p-3 pt-5">
       <label className="block text-gray-500">
@@ -86,37 +76,16 @@ function UserFormInner({
       </label>
 
       <div className="text-gray-500 mt-2">Logbook Authorizations</div>
-      <AdminAuthorizationForm
-        emptyLabel="No logbook authorizations. Create one below."
-        options={logbooksFiltered.map((logbook) => ({
-          label: logbook.name.toUpperCase(),
-          value: logbook.id,
-        }))}
-        isOptionsLoading={isLogbooksLoading}
-        authorizations={form.authorizations
-          .filter((auth) => auth.resourceType === "Logbook")
-          .map((auth) => ({
-            value: auth.resourceId,
-            label: auth.resourceName.toUpperCase(),
-            permission: auth.permission,
-          }))}
-        updatePermission={(resourceId, permission) =>
-          updateAuthorization({ resourceId }, permission)
-        }
-        removeAuthorization={(resourceId) =>
-          removeAuthorization({ resourceId })
-        }
-        createAuthorization={(resourceId, resourceName) =>
-          createAuthorization({
-            ownerId: user.email,
-            ownerType: "User",
-            ownerName: user.gecos,
-            resourceId,
-            resourceType: "Logbook",
-            resourceName,
-          })
-        }
+      <LogbookAuthorizationForm
+        ownerId={user.email}
+        ownerType="User"
+        ownerName={user.gecos}
+        authorizations={form.authorizations}
+        updateAuthorization={updateAuthorization}
+        removeAuthorization={removeAuthorization}
+        createAuthorization={createAuthorization}
       />
+
       <div className="flex justify-end mt-3 gap-3">
         <Button variant="text" disabled={!updated} onClick={finishEditing}>
           Discard changes
@@ -130,19 +99,11 @@ function UserFormInner({
 }
 
 export default function UserForm({ userId, onSave }: Props) {
-  const { logbooks, isLoading } = useLogbooks();
   const user = useUser(userId, { includeAuthorizations: true });
 
   if (!user) {
     return <Spinner className="mt-3 w-full" />;
   }
 
-  return (
-    <UserFormInner
-      user={user}
-      logbooks={logbooks}
-      isLogbooksLoading={isLoading}
-      onSave={onSave}
-    />
-  );
+  return <UserFormInner user={user} onSave={onSave} />;
 }

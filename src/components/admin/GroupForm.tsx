@@ -8,8 +8,6 @@ import {
 } from "../../api";
 import { Input, InputInvalid } from "../base";
 import { useGroupFormsStore, validateGroupForm } from "../../groupFormsStore";
-import useLogbooks from "../../hooks/useLogbooks";
-import AdminAuthorizationForm from "./AuthorizationForm";
 import { saveAuthorizations } from "../../authorizationDiffing";
 import { FormEvent, useState } from "react";
 import useGroup from "../../hooks/useGroup";
@@ -20,6 +18,7 @@ import useUsers from "../../hooks/useUsers";
 import Select from "../Select";
 import reportServerError from "../../reportServerError";
 import Button from "../Button";
+import LogbookAuthorizationForm from "./LogbookAuthorizationForm";
 
 export type Props = {
   onSave: () => void;
@@ -46,7 +45,6 @@ function GroupFormInner({
   const [memberSearch, setMemberSearch] = useState("");
   const [selectedNewMember, setSelectedNewMember] = useState<User | null>(null);
 
-  const { logbooks, isLoading: isLogbooksLoading } = useLogbooks();
   const {
     users,
     isLoading: isUsersLoading,
@@ -118,11 +116,6 @@ function GroupFormInner({
       members: form.members.filter((member) => member.email !== memberId),
     });
   }
-
-  const logbooksFiltered = logbooks.filter(
-    (logbook) =>
-      !form.authorizations.some((auth) => auth.resourceId === logbook.id),
-  );
 
   const newMembers = users.filter(
     (user) => !form.members.some((member) => user.email === member.email),
@@ -216,36 +209,14 @@ function GroupFormInner({
       />
 
       <div className="text-gray-500 mt-2">Logbook Authorizations</div>
-      <AdminAuthorizationForm
-        emptyLabel="No logbook authorizations. Create one below."
-        options={logbooksFiltered.map((logbook) => ({
-          label: logbook.name.toUpperCase(),
-          value: logbook.id,
-        }))}
-        isOptionsLoading={isLogbooksLoading}
-        authorizations={form.authorizations
-          .filter((auth) => auth.resourceType === "Logbook")
-          .map((auth) => ({
-            value: auth.resourceId,
-            label: auth.resourceName.toUpperCase(),
-            permission: auth.permission,
-          }))}
-        updatePermission={(resourceId, permission) =>
-          updateAuthorization({ resourceId }, permission)
-        }
-        removeAuthorization={(resourceId) =>
-          removeAuthorization({ resourceId })
-        }
-        createAuthorization={(resourceId, resourceName) =>
-          createAuthorization({
-            ownerId: group.id,
-            ownerType: "Group",
-            ownerName: group.name,
-            resourceId,
-            resourceType: "Logbook",
-            resourceName,
-          })
-        }
+      <LogbookAuthorizationForm
+        ownerId={group.id}
+        ownerType="Group"
+        ownerName={group.name}
+        authorizations={form.authorizations}
+        updateAuthorization={updateAuthorization}
+        removeAuthorization={removeAuthorization}
+        createAuthorization={createAuthorization}
       />
 
       <div className="flex justify-end mt-3 gap-3">

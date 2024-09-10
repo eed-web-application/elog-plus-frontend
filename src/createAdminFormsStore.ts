@@ -13,7 +13,9 @@ export interface AdminResource {
   authorizations: LocalAuthorization[];
 }
 
-type AuthorizationPartial = Partial<Omit<Authorization, "id" | "permission">>;
+export type AuthorizationPartial = Partial<
+  Omit<Authorization, "id" | "permission">
+>;
 
 export type AdminFormsState<T extends AdminResource> = {
   forms: Record<string, T>;

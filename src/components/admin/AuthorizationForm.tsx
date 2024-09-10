@@ -17,6 +17,7 @@ export interface Props {
   options: ValuedOption[];
   isOptionsLoading: boolean;
   disabled?: boolean;
+  manualSearch?: boolean;
   setOptionsSearch?: (search: string) => void;
   updatePermission: (authorization: string, permission: Permission) => void;
   removeAuthorization: (authorization: string) => void;
@@ -30,6 +31,7 @@ export default function AdminAuthorizationForm({
   options,
   isOptionsLoading,
   disabled,
+  manualSearch,
   setOptionsSearch = () => {},
   updatePermission,
   removeAuthorization,
@@ -119,7 +121,7 @@ export default function AdminAuthorizationForm({
             const option = options.find((option) => option.value === value);
             setSelectedNewOwner(option || null);
           }}
-          searchType="managed"
+          searchType={manualSearch ? "managed" : "unmanaged"}
           onBottomVisible={getMoreOptions}
           disabled={disabled}
         />
