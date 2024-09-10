@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { twMerge } from "tailwind-merge";
-import { UserWithAuth, Permission, Logbook, ServerError } from "../../api";
+import { UserWithAuth, Logbook, ServerError } from "../../api";
 import { Input } from "../base";
 import { useUserFormsStore } from "../../userFormsStore";
 import useLogbooks from "../../hooks/useLogbooks";
@@ -17,8 +17,6 @@ interface Props {
   onSave: () => void;
 }
 
-const DEFAULT_PERMISSION: Permission = "Read";
-
 function UserFormInner({
   user,
   logbooks,
@@ -30,9 +28,14 @@ function UserFormInner({
   isLogbooksLoading: boolean;
   onSave: () => void;
 }) {
-  const { form, setForm, finishEditing } = useUserFormsStore((state) =>
-    state.startEditing(user),
-  );
+  const {
+    form,
+    updated,
+    createAuthorization,
+    removeAuthorization,
+    updateAuthorization,
+    finishEditing,
+  } = useUserFormsStore((state) => state.startEditing(user));
   const queryClient = useQueryClient();
   const [saving, setSaving] = useState(false);
 
@@ -54,56 +57,6 @@ function UserFormInner({
     setSaving(false);
     onSave();
   }
-
-  function updateAuthorizationPermission(
-    resourceId: string,
-    permission: Permission,
-  ) {
-    setForm({
-      ...form,
-      authorizations: form.authorizations.map((otherAuthorization) =>
-        otherAuthorization.resourceId === resourceId
-          ? { ...otherAuthorization, permission }
-          : otherAuthorization,
-      ),
-    });
-  }
-
-  function removeAuthorization(resourceId: string) {
-    setForm({
-      ...form,
-      authorizations: form.authorizations.filter(
-        (otherAuthorization) => otherAuthorization.resourceId !== resourceId,
-      ),
-    });
-  }
-
-  function createAuthorization(resourceId: string, resourceLabel: string) {
-    // If the user deletes an authorization and then creates a new one with the
-    // same owner, we want to keep the ID so we don't create a new one.
-    const existingAuthorization = user.authorizations.find(
-      (authorization) => authorization.resourceId === resourceId,
-    );
-
-    setForm({
-      ...form,
-      authorizations: [
-        ...form.authorizations,
-        {
-          id: existingAuthorization?.id,
-          permission: DEFAULT_PERMISSION,
-          ownerId: user.email,
-          ownerType: "User",
-          ownerName: user.gecos,
-          resourceId,
-          resourceType: "Logbook",
-          resourceName: resourceLabel,
-        },
-      ],
-    });
-  }
-
-  const updated = JSON.stringify(form) !== JSON.stringify(user);
 
   const logbooksFiltered = logbooks.filter(
     (logbook) =>
@@ -147,9 +100,22 @@ function UserFormInner({
             label: auth.resourceName.toUpperCase(),
             permission: auth.permission,
           }))}
-        updatePermission={updateAuthorizationPermission}
-        removeAuthorization={removeAuthorization}
-        createAuthorization={createAuthorization}
+        updatePermission={(resourceId, permission) =>
+          updateAuthorization({ resourceId }, permission)
+        }
+        removeAuthorization={(resourceId) =>
+          removeAuthorization({ resourceId })
+        }
+        createAuthorization={(resourceId, resourceName) =>
+          createAuthorization({
+            ownerId: user.email,
+            ownerType: "User",
+            ownerName: user.gecos,
+            resourceId,
+            resourceType: "Logbook",
+            resourceName,
+          })
+        }
       />
       <div className="flex justify-end mt-3 gap-3">
         <Button variant="text" disabled={!updated} onClick={finishEditing}>

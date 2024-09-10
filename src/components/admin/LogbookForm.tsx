@@ -7,7 +7,6 @@ import {
   Shift,
   updateLogbook,
   LogbookWithAuth,
-  Permission,
 } from "../../api";
 import { Checkbox, Input, InputInvalid } from "../base";
 import {
@@ -30,14 +29,18 @@ interface Props {
   onSave: () => void;
 }
 
-const DEFAULT_PERMISSION: Permission = "Read";
-
 let idCounter = 0;
 
 export default function LogbookForm({ logbook, onSave }: Props) {
-  const { form, setForm, finishEditing } = useLogbookFormsStore((state) =>
-    state.startEditing(logbook),
-  );
+  const {
+    form,
+    updated,
+    setForm,
+    finishEditing,
+    createAuthorization,
+    removeAuthorization,
+    updateAuthorization,
+  } = useLogbookFormsStore((state) => state.startEditing(logbook));
   const queryClient = useQueryClient();
 
   const [saving, setSaving] = useState(false);
@@ -168,58 +171,6 @@ export default function LogbookForm({ logbook, onSave }: Props) {
     setForm({ ...form, shifts: newShifts });
   }
 
-  function updateAuthorizationPermission(
-    ownerId: string,
-    permission: Permission,
-  ) {
-    setForm({
-      ...form,
-      authorizations: form.authorizations.map((otherAuthorization) =>
-        otherAuthorization.ownerId === ownerId
-          ? { ...otherAuthorization, permission }
-          : otherAuthorization,
-      ),
-    });
-  }
-
-  function removeAuthorization(ownerId: string) {
-    setForm({
-      ...form,
-      authorizations: form.authorizations.filter(
-        (otherAuthorization) => otherAuthorization.ownerId !== ownerId,
-      ),
-    });
-  }
-
-  function createAuthorization(
-    ownerType: "User" | "Group" | "Token",
-    ownerId: string,
-    ownerLabel: string,
-  ) {
-    // If the user deletes an authorization and then creates a new one with the
-    // same owner, we want to keep the ID so we don't create a new one.
-    const existingAuthorization = logbook.authorizations.find(
-      (authorization) => authorization.ownerId === ownerId,
-    );
-
-    setForm({
-      ...form,
-      authorizations: [
-        ...form.authorizations,
-        {
-          id: existingAuthorization?.id,
-          permission: DEFAULT_PERMISSION,
-          ownerId,
-          ownerType,
-          ownerName: ownerLabel,
-          resourceId: form.id,
-          resourceType: "Logbook",
-          resourceName: form.name,
-        },
-      ],
-    });
-  }
-
   function changeShiftName(index: number, name: string) {
     const updatedShifts = [...form.shifts];
     updatedShifts[index] = { ...updatedShifts[index], name };
@@ -229,8 +180,6 @@ export default function LogbookForm({ logbook, onSave }: Props) {
       shifts: updatedShifts,
     });
   }
-
-  const updated = JSON.stringify(form) !== JSON.stringify(logbook);
 
   return (
     <div className="p-3 pt-5">
@@ -422,10 +371,19 @@ export default function LogbookForm({ logbook, onSave }: Props) {
         isOptionsLoading={isUsersLoading}
         getMoreOptions={getMoreUsers}
         setOptionsSearch={setUserSearch}
-        updatePermission={updateAuthorizationPermission}
-        removeAuthorization={removeAuthorization}
+        updatePermission={(ownerId, permission) =>
+          updateAuthorization({ ownerId }, permission)
+        }
+        removeAuthorization={(ownerId) => removeAuthorization({ ownerId })}
         createAuthorization={(ownerId, ownerLabel) =>
-          createAuthorization("User", ownerId, ownerLabel)
+          createAuthorization({
+            ownerId,
+            ownerType: "User",
+            ownerName: ownerLabel,
+            resourceId: form.id,
+            resourceType: "Logbook",
+            resourceName: form.name,
+          })
         }
       />
 
@@ -452,10 +410,19 @@ export default function LogbookForm({ logbook, onSave }: Props) {
         isOptionsLoading={isGroupsLoading}
         getMoreOptions={getMoreGroups}
         setOptionsSearch={setGroupSearch}
-        updatePermission={updateAuthorizationPermission}
-        removeAuthorization={removeAuthorization}
+        updatePermission={(ownerId, permission) =>
+          updateAuthorization({ ownerId }, permission)
+        }
+        removeAuthorization={(ownerId) => removeAuthorization({ ownerId })}
         createAuthorization={(ownerId, ownerLabel) =>
-          createAuthorization("Group", ownerId, ownerLabel)
+          createAuthorization({
+            ownerId,
+            ownerType: "Group",
+            ownerName: ownerLabel,
+            resourceId: form.id,
+            resourceType: "Logbook",
+            resourceName: form.name,
+          })
         }
       />
 
@@ -485,10 +452,19 @@ export default function LogbookForm({ logbook, onSave }: Props) {
         isOptionsLoading={isApplicationsLoading}
         getMoreOptions={getMoreApplications}
         setOptionsSearch={setApplicationSearch}
-        updatePermission={updateAuthorizationPermission}
-        removeAuthorization={removeAuthorization}
+        updatePermission={(ownerId, permission) =>
+          updateAuthorization({ ownerId }, permission)
+        }
+        removeAuthorization={(ownerId) => removeAuthorization({ ownerId })}
         createAuthorization={(ownerId, ownerLabel) =>
-          createAuthorization("Token", ownerId, ownerLabel)
+          createAuthorization({
+            ownerId,
+            ownerType: "Token",
+            ownerName: ownerLabel,
+            resourceId: form.id,
+            resourceType: "Logbook",
+            resourceName: form.name,
+          })
         }
       />
 

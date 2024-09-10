@@ -2,7 +2,6 @@ import { twMerge } from "tailwind-merge";
 import {
   Group,
   GroupUpdation,
-  Permission,
   ServerError,
   User,
   updateGroup,
@@ -27,8 +26,6 @@ export type Props = {
   groupId: string;
 };
 
-const DEFAULT_PERMISSION: Permission = "Read";
-
 function GroupFormInner({
   group,
   onSave,
@@ -36,9 +33,15 @@ function GroupFormInner({
   group: Group;
   onSave: () => void;
 }) {
-  const { form, setForm, finishEditing } = useGroupFormsStore((state) =>
-    state.startEditing(group),
-  );
+  const {
+    form,
+    updated,
+    setForm,
+    createAuthorization,
+    updateAuthorization,
+    removeAuthorization,
+    finishEditing,
+  } = useGroupFormsStore((state) => state.startEditing(group));
 
   const [memberSearch, setMemberSearch] = useState("");
   const [selectedNewMember, setSelectedNewMember] = useState<User | null>(null);
@@ -115,56 +118,6 @@ function GroupFormInner({
       members: form.members.filter((member) => member.email !== memberId),
     });
   }
-
-  function updateAuthorizationPermission(
-    resourceId: string,
-    permission: Permission,
-  ) {
-    setForm({
-      ...form,
-      authorizations: form.authorizations.map((otherAuthorization) =>
-        otherAuthorization.resourceId === resourceId
-          ? { ...otherAuthorization, permission }
-          : otherAuthorization,
-      ),
-    });
-  }
-
-  function removeAuthorization(resourceId: string) {
-    setForm({
-      ...form,
-      authorizations: form.authorizations.filter(
-        (otherAuthorization) => otherAuthorization.resourceId !== resourceId,
-      ),
-    });
-  }
-
-  function createAuthorization(resourceId: string, resouceLabel: string) {
-    // If the user deletes an authorization and then creates a new one with the
-    // same owner, we want to keep the ID so we don't create a new one.
-    const existingAuthorization = group.authorizations.find(
-      (authorization) => authorization.resourceId === resourceId,
-    );
-
-    setForm({
-      ...form,
-      authorizations: [
-        ...form.authorizations,
-        {
-          id: existingAuthorization?.id,
-          permission: DEFAULT_PERMISSION,
-          ownerId: group.id,
-          ownerType: "Group",
-          ownerName: group.name,
-          resourceId,
-          resourceType: "Logbook",
-          resourceName: resouceLabel,
-        },
-      ],
-    });
-  }
-
-  const updated = JSON.stringify(form) !== JSON.stringify(group);
 
   const logbooksFiltered = logbooks.filter(
     (logbook) =>
@@ -277,9 +230,22 @@ function GroupFormInner({
             label: auth.resourceName.toUpperCase(),
             permission: auth.permission,
           }))}
-        updatePermission={updateAuthorizationPermission}
-        removeAuthorization={removeAuthorization}
-        createAuthorization={createAuthorization}
+        updatePermission={(resourceId, permission) =>
+          updateAuthorization({ resourceId }, permission)
+        }
+        removeAuthorization={(resourceId) =>
+          removeAuthorization({ resourceId })
+        }
+        createAuthorization={(resourceId, resourceName) =>
+          createAuthorization({
+            ownerId: group.id,
+            ownerType: "Group",
+            ownerName: group.name,
+            resourceId,
+            resourceType: "Logbook",
+            resourceName,
+          })
+        }
       />
 
       <div className="flex justify-end mt-3 gap-3">

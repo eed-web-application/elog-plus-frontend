@@ -1,10 +1,5 @@
 import { twMerge } from "tailwind-merge";
-import {
-  ApplicationWithAuth,
-  Logbook,
-  Permission,
-  ServerError,
-} from "../../api";
+import { ApplicationWithAuth, Logbook, ServerError } from "../../api";
 import { Input } from "../base";
 import { useApplicationFormsStore } from "../../applicationFormsStore";
 import useLogbooks from "../../hooks/useLogbooks";
@@ -23,8 +18,6 @@ interface Props {
   onSave: () => void;
 }
 
-const DEFAULT_PERMISSION: Permission = "Read";
-
 function ApplicationFormInner({
   application,
   logbooks,
@@ -36,9 +29,14 @@ function ApplicationFormInner({
   isLogbooksLoading: boolean;
   onSave: () => void;
 }) {
-  const { form, setForm, finishEditing } = useApplicationFormsStore((state) =>
-    state.startEditing(application),
-  );
+  const {
+    form,
+    updated,
+    createAuthorization,
+    updateAuthorization,
+    removeAuthorization,
+    finishEditing,
+  } = useApplicationFormsStore((state) => state.startEditing(application));
   const queryClient = useQueryClient();
 
   const [saving, setSaving] = useState(false);
@@ -64,66 +62,6 @@ function ApplicationFormInner({
     setSaving(false);
     onSave();
   }
-
-  function updateAuthorizationPermission(
-    resourceId: string,
-    permission: Permission,
-  ) {
-    setForm({
-      ...form,
-      authorizations: form.authorizations.map((otherAuthorization) =>
-        otherAuthorization.resourceId === resourceId
-          ? { ...otherAuthorization, permission }
-          : otherAuthorization,
-      ),
-    });
-  }
-
-  function removeAuthorization(resourceId: string) {
-    setForm({
-      ...form,
-      authorizations: form.authorizations.filter(
-        (otherAuthorization) => otherAuthorization.resourceId !== resourceId,
-      ),
-    });
-  }
-
-  function createAuthorization(resourceId: string) {
-    const resouceLabel = logbooks.find(
-      (logbook) => logbook.id === resourceId,
-    )?.name;
-
-    // Should probably never happen, but we still want to catch it, because
-    // if this throws something else is wrong.
-    if (!resouceLabel) {
-      throw new Error("Could not find label for new authorization");
-    }
-
-    // If the user deletes an authorization and then creates a new one with the
-    // same owner, we want to keep the ID so we don't create a new one.
-    const existingAuthorization = application.authorizations.find(
-      (authorization) => authorization.resourceId === resourceId,
-    );
-
-    setForm({
-      ...form,
-      authorizations: [
-        ...form.authorizations,
-        {
-          id: existingAuthorization?.id,
-          permission: DEFAULT_PERMISSION,
-          ownerId: application.id,
-          ownerType: "Token",
-          ownerName: application.name,
-          resourceId,
-          resourceType: "Logbook",
-          resourceName: resouceLabel,
-        },
-      ],
-    });
-  }
-
-  const updated = JSON.stringify(form) !== JSON.stringify(application);
 
   const logbooksFiltered = logbooks.filter(
     (logbook) =>
@@ -206,9 +144,22 @@ function ApplicationFormInner({
             label: auth.resourceName.toUpperCase(),
             permission: auth.permission,
           }))}
-        updatePermission={updateAuthorizationPermission}
-        removeAuthorization={removeAuthorization}
-        createAuthorization={createAuthorization}
+        updatePermission={(resourceId, permission) =>
+          updateAuthorization({ resourceId }, permission)
+        }
+        removeAuthorization={(resourceId) =>
+          removeAuthorization({ resourceId })
+        }
+        createAuthorization={(resourceId, resourceName) =>
+          createAuthorization({
+            ownerId: application.id,
+            ownerType: "Token",
+            ownerName: form.name,
+            resourceId,
+            resourceType: "Logbook",
+            resourceName,
+          })
+        }
       />
       {!application.applicationManaged && (
         <div className="flex justify-end mt-3 gap-3">
