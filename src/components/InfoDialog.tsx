@@ -23,7 +23,7 @@ export default function InfoDialog() {
     if (!version) {
       fetch();
     }
-  }, [version]);
+  }, [version, fetch]);
 
   return (
     <Dialog.Window

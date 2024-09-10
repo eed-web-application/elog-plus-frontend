@@ -35,7 +35,7 @@ export default function AdminResource({
   onSearchChange,
   onBottomVisible,
 }: Props) {
-  const loaderRef = useRef(null);
+  const loaderRef = useRef<HTMLDivElement | null>(null);
 
   const hasItems = items.length > 0;
 
@@ -55,13 +55,16 @@ export default function AdminResource({
       },
     );
 
+    let loader = null;
+
     if (loaderRef.current) {
+      loader = loaderRef.current;
       observer.observe(loaderRef.current);
     }
 
     return () => {
-      if (loaderRef.current) {
-        observer.unobserve(loaderRef.current);
+      if (loader) {
+        observer.unobserve(loader);
       }
     };
   }, [onBottomVisible, hasItems]);

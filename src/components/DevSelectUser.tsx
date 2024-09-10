@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Select from "./Select";
 import { UnauthorizedError, fetch } from "../api";
 import { twMerge } from "tailwind-merge";
@@ -10,7 +10,7 @@ export default function DevSelectUser({ className }: { className?: string }) {
   // read the cookie and pass the access code as a header to the backend.
   const [users, setUsers] = useState<Record<string, string> | null>(null);
 
-  async function fetchUsers() {
+  const fetchUsers = useCallback(async () => {
     let users;
 
     // GET /v1/mock/users-auth will return 401 if the access code is invalid.
@@ -26,13 +26,13 @@ export default function DevSelectUser({ className }: { className?: string }) {
     }
 
     setUsers(users);
-  }
+  }, [setUsers]);
 
   useEffect(() => {
     if (!users) {
       fetchUsers();
     }
-  }, []);
+  }, [fetchUsers, users]);
 
   function setAccessCode(accessCode: string | null) {
     if (!accessCode) {

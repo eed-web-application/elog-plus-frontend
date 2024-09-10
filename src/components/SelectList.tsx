@@ -12,7 +12,7 @@ const SelectList = forwardRef<HTMLDivElement, Props>(function SelectList(
   { isLoading, isEmpty, emptyLabel, onBottomVisible, children, ...rest },
   ref,
 ) {
-  const loaderRef = useRef(null);
+  const loaderRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     // Don't want to fire onBottomVisible when there are no items or when loading.
@@ -28,13 +28,16 @@ const SelectList = forwardRef<HTMLDivElement, Props>(function SelectList(
       },
     );
 
+    let loader = null;
+
     if (loaderRef.current) {
+      loader = loaderRef.current;
       observer.observe(loaderRef.current);
     }
 
     return () => {
-      if (loaderRef.current) {
-        observer.unobserve(loaderRef.current);
+      if (loader) {
+        observer.unobserve(loader);
       }
     };
   }, [onBottomVisible, isEmpty, isLoading]);

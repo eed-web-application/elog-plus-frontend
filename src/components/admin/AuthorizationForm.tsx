@@ -52,7 +52,7 @@ export default function AdminAuthorizationForm({
       createAuthorization(selectedNewOwner.value, selectedNewOwner.label);
       setSelectedNewOwner(null);
     },
-    [selectedNewOwner?.value, setSelectedNewOwner, createAuthorization],
+    [selectedNewOwner, createAuthorization],
   );
 
   return (
