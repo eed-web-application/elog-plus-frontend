@@ -23,6 +23,7 @@ import { saveAuthorizations } from "../../authorizationDiffing";
 import ResourceListForm from "./ResourceListForm";
 import Tooltip from "../Tooltip";
 import Button from "../Button";
+import TimeInput from "../TimeInput";
 
 interface Props {
   logbook: LogbookWithAuth;
@@ -273,47 +274,34 @@ export default function LogbookForm({ logbook, onSave }: Props) {
               onChange={(e) => changeShiftName(index, e.currentTarget.value)}
             />
             <div className="flex gap-2 items-center self-end">
-              <input
-                className={twMerge(
-                  Input,
-                  invalid.has(`shiftFrom/${shift.id}`) && InputInvalid,
-                  "w-32",
-                )}
-                type="time"
+              <TimeInput
+                className="w-32"
                 value={
                   form.shifts[index].from
                     ? utcToLocal(form.shifts[index].from)
                     : ""
                 }
-                onChange={(e) => {
+                onChange={(value) => {
                   const updatedShifts = [...form.shifts];
                   updatedShifts[index] = {
                     ...updatedShifts[index],
-                    from: e.currentTarget.value
-                      ? localToUtc(e.currentTarget.value)
-                      : "",
+                    from: value ? localToUtc(value) : "",
                   };
                   setForm({ ...form, shifts: updatedShifts });
                 }}
               />
               <div className="text-gray-500">to</div>
-              <input
-                className={twMerge(
-                  Input,
-                  invalid.has(`shiftTo/${shift.id}`) && InputInvalid,
-                  "w-32",
-                )}
-                type="time"
+              <TimeInput
+                invalid={invalid.has(`shiftTo/${shift.id}`)}
+                className="w-32"
                 value={
                   form.shifts[index].to ? utcToLocal(form.shifts[index].to) : ""
                 }
-                onChange={(e) => {
+                onChange={(value) => {
                   const updatedShifts = [...form.shifts];
                   updatedShifts[index] = {
                     ...updatedShifts[index],
-                    to: e.currentTarget.value
-                      ? localToUtc(e.currentTarget.value)
-                      : "",
+                    to: value ? localToUtc(value) : "",
                   };
                   setForm({ ...form, shifts: updatedShifts });
                 }}

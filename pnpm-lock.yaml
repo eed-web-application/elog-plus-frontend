@@ -68,6 +68,9 @@ dependencies:
   react-router-dom:
     specifier: ^6.26.1
     version: 6.26.1(react-dom@18.3.1)(react@18.3.1)
+  react-time-picker:
+    specifier: ^7.0.0
+    version: 7.0.0(@types/react-dom@18.3.0)(@types/react@18.3.5)(react-dom@18.3.1)(react@18.3.1)
   react-toastify:
     specifier: ^10.0.5
     version: 10.0.5(react-dom@18.3.1)(react@18.3.1)
