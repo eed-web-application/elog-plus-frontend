@@ -33,12 +33,7 @@ export default function NewAdminResourceDialog({
         <Button variant="text" type="button" onClick={() => setOpen(false)}>
           Cancel
         </Button>
-        <Button
-          value="Save"
-          type="submit"
-          className={Button}
-          disabled={!onSave}
-        >
+        <Button value="Save" type="submit" disabled={!onSave}>
           Save
         </Button>
       </Dialog.Section>
