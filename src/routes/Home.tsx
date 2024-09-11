@@ -142,21 +142,19 @@ export default function Home() {
             !isSmallScreen && "px-12",
           )}
         >
-          <div className="container m-auto">
-            <Navbar
-              className="mb-1"
-              search={query.search}
-              onSearchChange={(search) =>
-                setEntryQuery({ ...query, search }, { replace: true })
-              }
-            />
-            <Filters
-              filters={query}
-              onFiltersChange={(filters) =>
-                setEntryQuery({ ...query, ...filters }, { replace: true })
-              }
-            />
-          </div>
+          <Navbar
+            className="mb-1"
+            search={query.search}
+            onSearchChange={(search) =>
+              setEntryQuery({ ...query, search }, { replace: true })
+            }
+          />
+          <Filters
+            filters={query}
+            onFiltersChange={(filters) =>
+              setEntryQuery({ ...query, ...filters }, { replace: true })
+            }
+          />
         </div>
 
         <SideSheet sheetBody={outlet}>
