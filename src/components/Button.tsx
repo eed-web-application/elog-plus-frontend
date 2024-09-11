@@ -27,6 +27,10 @@ const variants = {
     "cursor-pointer py-1 px-2 bg-blue-500 rounded-lg text-white border border-blue-500 hover:bg-blue-600 hover:border-blue-600 outline-2 focus:outline outline-blue-300 outline-offset-0 disabled:cursor-auto disabled:bg-blue-300 disabled:border-blue-300 disabled:hover:bg-blue-300 disabled:text-gray-100",
   text: "cursor-pointer py-1 px-2 rounded-lg font-medium text-blue-500 hover:bg-blue-100 disabled:hover:bg-transparent disabled:text-blue-200",
   icon: "w-9 h-9 p-2 hover:bg-gray-200 rounded-full cursor-pointer outline-2 outline-offset-0 outline-blue-500 focus:outline select-none disable:hover:bg-transparent disable:focus:outline-none disable:cursor-auto",
+  iconLarge:
+    "w-8 h-8 p-1 text-gray-800 hover:bg-gray-200 rounded-full cursor-pointer outline-2 outline-offset-0 outline-blue-500 focus:outline select-none disable:hover:bg-transparent disable:focus:outline-none disable:cursor-auto",
+  iconSquare:
+    "w-9 h-9 p-1 hover:bg-gray-200 rounded cursor-pointer outline-2 outline-offset-0 outline-blue-500 focus:outline select-none disable:hover:bg-transparent disable:focus:outline-none disable:cursor-auto",
 };
 
 const Button = forwardRef(function Button<E extends ElementType>(
