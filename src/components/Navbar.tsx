@@ -11,6 +11,7 @@ import BugReport from "./BugReport";
 import EntrySearchBar, { Props as SearchProps } from "./EntrySearchBar";
 import AccountButton from "./AccountButton";
 import Button from "./Button";
+import useIsRoot from "../hooks/useIsRoot";
 
 export type Props = Pick<SearchProps, "search" | "onSearchChange"> &
   ComponentProps<"div">;
@@ -21,6 +22,7 @@ export default function Navbar({
   onSearchChange,
   ...rest
 }: Props) {
+  const isRoot = useIsRoot();
   const [stagedSearch, setStagedSearch] = useState(search);
   const hasNewEntryDraft = useDraftsStore(({ drafts }) =>
     Boolean(drafts["newEntry"]),
@@ -52,13 +54,15 @@ export default function Navbar({
         <DevSelectUser className="mr-2" />
       )}
 
-      <Button
-        as={Link}
-        to={{ pathname: "/admin/logbooks" }}
-        className="mr-2 text-sm flex items-center"
-      >
-        Admin Dashboard
-      </Button>
+      {isRoot && (
+        <Button
+          as={Link}
+          to={{ pathname: "/admin/logbooks" }}
+          className="mr-2 text-sm flex items-center"
+        >
+          Admin Dashboard
+        </Button>
+      )}
       <Button
         as={Link}
         to={{
