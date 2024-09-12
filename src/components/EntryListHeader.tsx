@@ -6,6 +6,7 @@ import { dateToYYYYMMDD } from "../utils/datetimeConversion";
 import { ComponentProps, forwardRef } from "react";
 import Chip from "./Chip";
 import Tooltip from "./Tooltip";
+import useIsSmallScreen from "../hooks/useIsSmallScreen";
 
 export interface Props extends ComponentProps<"div"> {
   logbooksIncluded: string[];
@@ -64,6 +65,7 @@ function getHeaderInfo(
   return info;
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 function ShiftButton({
   shift: { id, name, logbookId, logbook },
   summaryId,
@@ -171,6 +173,10 @@ function getHeaderKey(
   return JSON.stringify(getHeaderInfo(logbooksIncluded, entry, dateBasedOn));
 }
 
+function useHeaderHeight() {
+  return useIsSmallScreen() ? 60 : 40;
+}
+
 // eslint-disable-next-line react-refresh/only-export-components
 const EntryListHeader = forwardRef<HTMLDivElement, Props>(
   (
@@ -232,6 +238,12 @@ const EntryListHeader = forwardRef<HTMLDivElement, Props>(
     getHeaderKey: typeof getHeaderKey;
   }
 ).getHeaderKey = getHeaderKey;
+(
+  EntryListHeader as typeof EntryListHeader & {
+    useHeaderHeight: typeof useHeaderHeight;
+  }
+).useHeaderHeight = useHeaderHeight;
 export default EntryListHeader as typeof EntryListHeader & {
   getHeaderKey: typeof getHeaderKey;
+  useHeaderHeight: typeof useHeaderHeight;
 };

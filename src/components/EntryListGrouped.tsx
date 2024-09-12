@@ -58,6 +58,7 @@ const EntryListGrouped = forwardRef<HTMLDivElement, Props>(
     const [prevSpotlight, setPrevSpotlight] = useState<string | null>(null);
     const parentRef = useRef<HTMLDivElement | null>(null);
     const Observer = useResizeObserver(parentRef.current);
+    const headerHeight = EntryListHeader.useHeaderHeight();
 
     const [items, headerIndices] = useMemo(() => {
       const items = [];
@@ -84,35 +85,46 @@ const EntryListGrouped = forwardRef<HTMLDivElement, Props>(
       return [items, headerIndices];
     }, [entries, logbooksIncluded, dateBasedOn]);
 
-    const stickyHeaderIndexRef = useRef(0);
     const stickyEntryRowContext = useContext(StickyEntryRow);
 
     const virtualizer = useVirtualizer({
       count: items.length,
       getScrollElement: () => parentRef.current,
-      estimateSize: useCallback(() => 48, []),
+      estimateSize: useCallback(
+        (i) => {
+          const isLastInGroup =
+            headerIndices.includes(i + 1) || i === items.length - 1;
+
+          if (headerIndices.includes(i)) {
+            return headerHeight;
+          } else if (isLastInGroup) {
+            return 48 + 12;
+          }
+
+          return 48 + 1;
+        },
+        [headerIndices, items.length, headerHeight],
+      ),
       overscan: 25,
       measureElement(el) {
+        let height = el.getBoundingClientRect().height;
         // This extra space accounts for the margin between entry groups.
-        // It is put on the last entry of the group, because once the last entry
-        // is not rendered, then the whole group is not rendered and thus the
-        // margin is no longer in the layout.
         if (el.getAttribute("data-last") === "true") {
-          return el.getBoundingClientRect().height + 12;
+          height += 12;
         }
-        return el.getBoundingClientRect().height;
+        return height;
       },
       rangeExtractor: useCallback(
         (range: Range) => {
-          const topHeader = [...headerIndices]
-            .reverse()
-            .find((index) => index <= range.startIndex);
+          const topHeader =
+            [...headerIndices]
+              .reverse()
+              .find((index) => index <= range.startIndex) || 0;
 
           const indices = defaultRangeExtractor(range);
 
-          stickyHeaderIndexRef.current = topHeader || 0;
-          if (!indices.includes(stickyHeaderIndexRef.current)) {
-            indices.unshift(stickyHeaderIndexRef.current);
+          if (!indices.includes(topHeader)) {
+            indices.unshift(topHeader);
           }
 
           return indices;
@@ -152,6 +164,16 @@ const EntryListGrouped = forwardRef<HTMLDivElement, Props>(
       setPrevSpotlight(spotlight);
     }, [spotlight, items, virtualizer, prevSpotlight]);
 
+    const scrollOffset = virtualItems.length === 0 ? 0 : -virtualItems[0].start;
+
+    const stickyContext = useMemo(() => {
+      return {
+        zIndex: stickyEntryRowContext.zIndex - 1,
+        usedHeight:
+          scrollOffset + stickyEntryRowContext.usedHeight + headerHeight,
+      };
+    }, [stickyEntryRowContext, scrollOffset, headerHeight]);
+
     if (entries.length === 0 && !isLoading && emptyLabel) {
       return (
         <div
@@ -173,15 +195,10 @@ const EntryListGrouped = forwardRef<HTMLDivElement, Props>(
     virtualizer.shouldAdjustScrollPositionOnItemSizeChange = () => false;
 
     let currentGroup: JSX.Element[] = [];
-    let currentHeaderSize: number = NaN;
 
     let groups;
 
     if (virtualItems.length > 1) {
-      const scrollOffset = Math.floor(
-        -virtualItems[1].start + virtualItems[0].size,
-      );
-
       groups = virtualItems.reduce<JSX.Element[]>((groups, virtualRow) => {
         const entry = items[virtualRow.index];
 
@@ -190,13 +207,7 @@ const EntryListGrouped = forwardRef<HTMLDivElement, Props>(
             groups.push(
               <StickyEntryRow.Provider
                 key={currentGroup[0].key}
-                value={{
-                  zIndex: stickyEntryRowContext.zIndex - 1,
-                  usedHeight:
-                    scrollOffset +
-                    stickyEntryRowContext.usedHeight +
-                    currentHeaderSize,
-                }}
+                value={stickyContext}
               >
                 <div className="mx-3 mt-3 rounded-lg border overflow-clip">
                   {currentGroup}
@@ -220,7 +231,6 @@ const EntryListGrouped = forwardRef<HTMLDivElement, Props>(
               representative={entry}
             />,
           ];
-          currentHeaderSize = virtualRow.size;
 
           return groups;
         }
@@ -251,13 +261,7 @@ const EntryListGrouped = forwardRef<HTMLDivElement, Props>(
         groups.push(
           <StickyEntryRow.Provider
             key={currentGroup[0].key}
-            value={{
-              zIndex: stickyEntryRowContext.zIndex - 1,
-              usedHeight:
-                scrollOffset +
-                stickyEntryRowContext.usedHeight +
-                currentHeaderSize,
-            }}
+            value={stickyContext}
           >
             <div className="mx-3 mt-3 rounded-lg border overflow-clip">
               {currentGroup}
