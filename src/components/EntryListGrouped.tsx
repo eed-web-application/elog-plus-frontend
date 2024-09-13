@@ -164,7 +164,10 @@ const EntryListGrouped = forwardRef<HTMLDivElement, Props>(
       setPrevSpotlight(spotlight);
     }, [spotlight, items, virtualizer, prevSpotlight]);
 
-    const scrollOffset = virtualItems.length === 0 ? 0 : -virtualItems[0].start;
+    const scrollOffset =
+      virtualItems.length === 0
+        ? 0
+        : virtualItems[0].size - virtualItems[1].start;
 
     const stickyContext = useMemo(() => {
       return {
