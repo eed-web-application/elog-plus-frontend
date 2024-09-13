@@ -125,7 +125,7 @@ function TagList({ tags, entryId }: { tags: string[]; entryId: string }) {
 
   const mergedDrawerRef = useMergeRefs([refs.setReference, drawerRef]);
 
-  useOnResize(updateTruncation, containerRef.current || undefined, entryId);
+  useOnResize(updateTruncation, entryId, containerRef.current || undefined);
   useLayoutEffect(updateTruncation);
 
   return (
@@ -181,10 +181,12 @@ function AttachmentList({
   attachments,
   className,
   parentRef,
+  entryId,
   ...rest
 }: {
   attachments: Attachment[];
   parentRef: RefObject<HTMLDivElement>;
+  entryId: string;
 } & ComponentProps<"div">) {
   const figuresFirst = [...attachments];
   const containerRef = useRef(null);
@@ -208,7 +210,7 @@ function AttachmentList({
 
   const end = overflowIndex ?? attachments.length;
 
-  useOnResize(updateTruncation, containerRef.current || undefined);
+  useOnResize(updateTruncation, entryId, containerRef.current || undefined);
   useLayoutEffect(updateTruncation);
 
   return (
@@ -478,14 +480,11 @@ const EntryRow = memo(
 
     const { usedHeight, zIndex } = useContext(StickyEntryRow);
 
-    const updatedStickEntryRowContext = useMemo(
-      () => ({
-        zIndex: zIndex - 1,
-        usedHeight:
-          usedHeight + (rowRef.current?.getBoundingClientRect().height ?? 0),
-      }),
-      [usedHeight, zIndex],
-    );
+    const updatedStickEntryRowContext = {
+      zIndex: zIndex - 1,
+      usedHeight:
+        usedHeight + (rowRef.current?.getBoundingClientRect().height ?? 0),
+    };
 
     const showLoader = useDelayedLoader(!fullEntry && expanded);
 
@@ -603,18 +602,26 @@ const EntryRow = memo(
                   .map(({ name }) => name.toUpperCase())
                   .join(", ")} • ${entry.loggedBy}`}
               </div>
-              <TagList tags={tagNames} entryId={entry.id} />
+              {tagNames.length > 0 && (
+                <TagList tags={tagNames} entryId={entry.id} />
+              )}
             </div>
           </div>
-          <AttachmentList
-            attachments={entry.attachments}
-            parentRef={rowRef}
-            className={
-              allowSpotlight || allowSupersede || allowFollowUp || allowFavorite
-                ? "mr-3"
-                : ""
-            }
-          />
+          {entry.attachments.length > 0 && (
+            <AttachmentList
+              attachments={entry.attachments}
+              parentRef={rowRef}
+              entryId={entry.id}
+              className={
+                allowSpotlight ||
+                allowSupersede ||
+                allowFollowUp ||
+                allowFavorite
+                  ? "mr-1.5"
+                  : ""
+              }
+            />
+          )}
 
           <FloatingDelayGroup delay={200}>
             <div className="hidden group-hover:flex">
