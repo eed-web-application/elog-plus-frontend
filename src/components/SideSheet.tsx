@@ -61,7 +61,7 @@ export default function SideSheet({
           )}
           <Pane
             className={twJoin(
-              "overflow-y-auto pb-3 basis-1/2 ",
+              "overflow-y-auto pb-3 basis-1/2 relative",
               !isSmallScreen && "min-w-[384px]",
             )}
             home={home}

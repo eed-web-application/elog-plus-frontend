@@ -31,6 +31,7 @@ import "./index.css";
 import reportServerError from "./reportServerError.tsx";
 import ImpersonationContainer from "./components/ImpersonationContainer.tsx";
 import { useImpersonationStore } from "./impersonationStore.ts";
+import SheetErrorBoundary from "./components/SheetErrorBoundary.tsx";
 
 const queryClient = new QueryClient({
   queryCache: new QueryCache({
@@ -151,22 +152,26 @@ const router = createBrowserRouter(
               loader: entryLoader,
               shouldRevalidate,
               element: <Supersede />,
+              errorElement: <SheetErrorBoundary goal="supersede an entry" />,
             },
             {
               path: ":entryId/follow-up",
               loader: entryLoader,
               shouldRevalidate,
               element: <FollowUp />,
+              errorElement: <SheetErrorBoundary goal="follow up an entry" />,
             },
             {
               path: ":entryId",
               loader: entryLoader,
               shouldRevalidate,
               element: <ViewEntry />,
+              errorElement: <SheetErrorBoundary goal="view an entry" />,
             },
             {
               path: "new-entry",
               element: <NewEntry />,
+              errorElement: <SheetErrorBoundary goal="create a new entry" />,
             },
           ],
         },
