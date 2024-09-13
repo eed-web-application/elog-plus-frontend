@@ -9,6 +9,7 @@ import {
   RefObject,
   memo,
   useContext,
+  useMemo,
 } from "react";
 import { Link, LinkProps } from "react-router-dom";
 import {
@@ -475,11 +476,14 @@ const EntryRow = memo(
 
     const { usedHeight, zIndex } = useContext(StickyEntryRow);
 
-    const updatedStickEntryRowContext = {
-      zIndex: zIndex - 1,
-      usedHeight:
-        usedHeight + (rowRef.current?.getBoundingClientRect().height ?? 0),
-    };
+    const updatedStickEntryRowContext = useMemo(
+      () => ({
+        zIndex: zIndex - 1,
+        usedHeight:
+          usedHeight + (rowRef.current?.getBoundingClientRect().height ?? 0),
+      }),
+      [usedHeight, zIndex],
+    );
 
     return (
       <div
