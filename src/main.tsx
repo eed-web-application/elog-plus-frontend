@@ -69,16 +69,17 @@ queryClient.setDefaultOptions({
   },
 });
 
-function entryLoader({ params }: { params: Params }) {
+async function entryLoader({ params }: { params: Params }) {
   if (params.entryId) {
     const entryId = params.entryId as string;
 
-    return queryClient
-      .prefetchQuery({
+    await Promise.race([
+      queryClient.prefetchQuery({
         queryKey: ["entry", entryId],
         queryFn: () => fetchEntry(entryId),
-      })
-      .then(() => null);
+      }),
+      new Promise((resolve) => setTimeout(resolve, 200)),
+    ]);
   }
   return null;
 }

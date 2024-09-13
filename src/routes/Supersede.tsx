@@ -2,6 +2,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import EntryForm from "../components/EntryForm";
 import useEntry from "../hooks/useEntry";
+import Spinner from "../components/Spinner";
 
 export default function Supersede() {
   const navigate = useNavigate();
@@ -10,7 +11,7 @@ export default function Supersede() {
   const entry = useEntry(entryId);
 
   if (!entry) {
-    return;
+    return <Spinner size="large" className="mx-auto my-4 w-full" />;
   }
 
   return (
