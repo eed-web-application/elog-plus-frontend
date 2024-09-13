@@ -40,6 +40,8 @@ import useDisplayTags from "../hooks/useDisplayTags";
 import FavoriteButton from "./FavoriteButton";
 import StickyEntryRow from "../StickyEntryRowContext";
 import Button from "./Button";
+import useDelayedLoader from "../hooks/useDelayedLoader";
+import Spinner from "./Spinner";
 
 const ATTACHMENTS_PREVIEW_MAX_WIDTH = 1 / 4;
 
@@ -485,6 +487,10 @@ const EntryRow = memo(
       [usedHeight, zIndex],
     );
 
+    const showLoader = useDelayedLoader(!fullEntry && expanded);
+
+    const open = showLoader || (expanded && fullEntry);
+
     return (
       <div
         ref={ref}
@@ -504,12 +510,12 @@ const EntryRow = memo(
             "flex items-center group cursor-pointer relative h-12 hover:bg-gray-50 text-black bg-white",
             selected && "bg-blue-50 hover:bg-blue-100",
             highlighted && "bg-yellow-100 hover:bg-yellow-200",
-            expanded && "sticky border-b",
+            open && "sticky border-b",
             className,
           )}
           style={{
-            top: expanded ? usedHeight : undefined,
-            zIndex: expanded ? zIndex : undefined,
+            top: open ? usedHeight : undefined,
+            zIndex: open ? zIndex : undefined,
           }}
           draggable="true"
           data-drag-handle
@@ -731,11 +737,16 @@ const EntryRow = memo(
             </Button>
           )}
         </div>
+        {showLoader && (
+          <div className="py-2 bg-gray-100">
+            <Spinner className="mx-auto" />
+          </div>
+        )}
         {expanded && fullEntry && (
           <StickyEntryRow.Provider value={updatedStickEntryRowContext}>
             <div
               className={twJoin(
-                "px-3 pb-1 pt-2 bg-gray-100",
+                "px-3 py-2 bg-gray-100",
                 !fullEntry.text && "text-gray-500",
               )}
             >
@@ -743,7 +754,7 @@ const EntryRow = memo(
               <EntryFigureList attachments={fullEntry.attachments} />
             </div>
             {showFollowUps && fullEntry.followUps.length > 0 && (
-              <div className="pt-3 last:pb-3 pr-2 ml-3">
+              <div className="pt-3 last:pb-3 pr-2 pl-3 bg-gray-50">
                 <EntryList
                   header="Follow Ups"
                   entries={fullEntry.followUps}
@@ -760,7 +771,7 @@ const EntryRow = memo(
             {showReferences &&
               fullEntry.referencedBy &&
               fullEntry.referencedBy.length > 0 && (
-                <div className="pt-3 last:pb-3 pr-2 ml-3">
+                <div className="pt-3 last:pb-3 pr-2 pl-3 bg-gray-50">
                   <EntryList
                     header="Referenced By"
                     entries={fullEntry.referencedBy}
