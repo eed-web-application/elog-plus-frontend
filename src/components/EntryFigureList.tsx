@@ -80,6 +80,7 @@ function Figure({
             variant="icon"
             download={figure.fileName}
             href={getAttachmentDownloadURL(figure.id)}
+            className="flex-shrink-0"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
