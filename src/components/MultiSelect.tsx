@@ -200,11 +200,11 @@ export default function MultiSelect<C extends { custom: string }>({
         },
       })}
     >
-      <div className="flex flex-wrap flex-1 items-center">
+      <div className="flex flex-wrap flex-1">
         {selected.map((option) => (
           <Chip
             deletable
-            className="mr-2"
+            className="mr-2 my-[1px]"
             key={"custom" in option ? option.custom : option.value}
             onDelete={(e) => {
               e.preventDefault();
