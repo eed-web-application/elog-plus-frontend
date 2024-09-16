@@ -167,7 +167,6 @@ export default function Select<O extends Option>({
             // 72px is the width of the dropdown icon + add button + padding
             "pr-[72px]",
           ),
-          placeholder: selectedLabel || !placeholder ? "" : placeholder,
           value: search,
           onChange: (e: FormEvent<HTMLInputElement>) => {
             updateSearch(e.currentTarget.value);
@@ -193,8 +192,13 @@ export default function Select<O extends Option>({
           className,
         )}
       >
-        <div className="flex-1 overflow-x-auto">
-          {selected && !search ? selectedLabel : ""}
+        <div
+          className={twJoin(
+            "flex-1 overflow-x-auto",
+            !selected && !search && "text-gray-500",
+          )}
+        >
+          {selected && !search ? selectedLabel : search ? "" : placeholder}
         </div>
 
         <svg
