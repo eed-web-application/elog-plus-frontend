@@ -67,21 +67,20 @@ export default function FilterChipMultiSelect<O>({
     whileElementsMounted: autoUpdate,
   });
 
-  const dismiss = useDismiss(context);
-  const click = useClick(context, { event: "mousedown" });
+  const dismiss = useDismiss(context, { bubbles: true });
+  const click = useClick(context, { event: "mousedown", toggle: true });
 
   const { getReferenceProps, getFloatingProps } = useInteractions([
-    dismiss,
     click,
+    dismiss,
   ]);
 
+  const { selectList, activeIndex, listRef } = useSelectList({ context, open });
   const {
     getFloatingProps: getListFloatingProps,
     getReferenceProps: getInputProps,
     getItemProps,
-    activeIndex,
-    listRef,
-  } = useSelectList({ context, open });
+  } = useInteractions([selectList]);
 
   const filteredOptions = search
     ? options.filter((option) =>

@@ -1,5 +1,5 @@
 import { ComponentProps, FormEvent, useCallback, useState } from "react";
-import { twMerge } from "tailwind-merge";
+import { twJoin, twMerge } from "tailwind-merge";
 import { Input, InputDisabled, InputInvalid } from "./base";
 import {
   FloatingPortal,
@@ -10,6 +10,7 @@ import {
   useClick,
   useDismiss,
   useFloating,
+  useFocus,
   useInteractions,
   useRole,
 } from "@floating-ui/react";
@@ -115,20 +116,13 @@ export default function Select<O extends Option>({
 
   const role = useRole(context, { role: "listbox" });
   const click = useClick(context);
+  const focus = useFocus(context);
   const dismiss = useDismiss(context);
-  const { getReferenceProps, getFloatingProps } = useInteractions([
-    role,
-    click,
-    dismiss,
-  ]);
+  const { selectList, activeIndex, listRef } = useSelectList({ context, open });
 
-  const {
-    getFloatingProps: getListFloatingProps,
-    getReferenceProps: getInputProps,
-    getItemProps,
-    activeIndex,
-    listRef,
-  } = useSelectList({ context, open });
+  const { getReferenceProps, getFloatingProps, getItemProps } = useInteractions(
+    [role, click, focus, dismiss, selectList],
+  );
 
   const select = useCallback(
     (option: O) => {
@@ -151,13 +145,9 @@ export default function Select<O extends Option>({
 
   return (
     // Flex is to fix weird layout issues when the input is a button
-    <div
-      {...getReferenceProps({
-        className: twMerge("relative flex", containerClassName),
-      })}
-    >
+    <div className={twMerge("relative flex", containerClassName)}>
       <input
-        {...getInputProps({
+        {...getReferenceProps({
           type: searchType === "none" ? "button" : "text",
           className: twMerge(
             Input,
@@ -224,14 +214,12 @@ export default function Select<O extends Option>({
             isEmpty={filteredOptions.length === 0}
             emptyLabel={emptyLabel}
             onBottomVisible={onBottomVisible}
-            {...getFloatingProps(
-              getListFloatingProps({
-                ref: refs.setFloating,
-                style: floatingStyles,
-                className:
-                  "max-h-64 overflow-y-auto rounded-lg shadow text-black bg-white z-10",
-              }),
-            )}
+            {...getFloatingProps({
+              ref: refs.setFloating,
+              style: floatingStyles,
+              className:
+                "max-h-64 overflow-y-auto rounded-lg shadow text-black bg-white z-10",
+            })}
           >
             {filteredOptions.map((option, index) => (
               <SelectOption

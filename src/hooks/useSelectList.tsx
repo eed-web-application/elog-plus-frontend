@@ -1,9 +1,4 @@
-import {
-  FloatingContext,
-  useFocus,
-  useInteractions,
-  useListNavigation,
-} from "@floating-ui/react";
+import { FloatingContext, useListNavigation } from "@floating-ui/react";
 import { useRef, useState } from "react";
 
 export default function useSelectList({
@@ -16,7 +11,6 @@ export default function useSelectList({
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
   const listRef = useRef<(HTMLElement | null)[]>([]);
 
-  const focus = useFocus(context);
   const listNav = useListNavigation(context, {
     listRef,
     activeIndex,
@@ -34,5 +28,5 @@ export default function useSelectList({
     loop: true,
   });
 
-  return { ...useInteractions([focus, listNav]), listRef, activeIndex };
+  return { selectList: listNav, listRef, activeIndex };
 }

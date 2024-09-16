@@ -137,19 +137,10 @@ export default function MultiSelect<C extends { custom: string }>({
   const role = useRole(context, { role: "listbox" });
   const click = useClick(context, { toggle: false });
   const focus = useFocus(context);
-  const { getReferenceProps, getFloatingProps } = useInteractions([
-    role,
-    click,
-    focus,
-  ]);
-
-  const {
-    getFloatingProps: getListFloatingProps,
-    getReferenceProps: getInputProps,
-    getItemProps,
-    activeIndex,
-    listRef,
-  } = useSelectList({ context, open });
+  const { selectList, activeIndex, listRef } = useSelectList({ context, open });
+  const { getReferenceProps, getFloatingProps, getItemProps } = useInteractions(
+    [role, click, focus, selectList],
+  );
 
   function createCustomOption() {
     if (!search) {
@@ -230,26 +221,25 @@ export default function MultiSelect<C extends { custom: string }>({
           </Chip>
         ))}
         <input
-          {...getInputProps({
-            type: "text",
-            role: "combobox",
-            placeholder: value && !placeholder ? "" : placeholder,
-            value: untrimedSearch,
-            className: "flex-1 outline-none bg-transparent w-fit",
-            onChange: (e: FormEvent<HTMLInputElement>) =>
-              setSearch(e.currentTarget.value),
-            onKeyDown: onInputKeyDown,
-            size: untrimedSearch.length + 1,
-            disabled,
-            onFocus: (e: FocusEvent<HTMLInputElement>) => {
-              onFocus?.(e);
-              setFocused(true);
-            },
-            onBlur: (e: FocusEvent<HTMLInputElement>) => {
-              onBlur?.(e);
-              setFocused(false);
-            },
-          })}
+          type="text"
+          role="combobox"
+          placeholder={value && !placeholder ? "" : placeholder}
+          value={untrimedSearch}
+          className="flex-1 outline-none bg-transparent w-fit"
+          onChange={(e: FormEvent<HTMLInputElement>) =>
+            setSearch(e.currentTarget.value)
+          }
+          onKeyDown={onInputKeyDown}
+          size={untrimedSearch.length + 1}
+          disabled={disabled}
+          onFocus={(e: FocusEvent<HTMLInputElement>) => {
+            onFocus?.(e);
+            setFocused(true);
+          }}
+          onBlur={(e: FocusEvent<HTMLInputElement>) => {
+            onBlur?.(e);
+            setFocused(false);
+          }}
         />
       </div>
 
@@ -260,6 +250,13 @@ export default function MultiSelect<C extends { custom: string }>({
         strokeWidth="1.5"
         stroke="currentColor"
         className="self-center ml-auto w-6 h-6 text-gray-500 cursor-pointer"
+        onClick={(e) => {
+          if (open) {
+            e.preventDefault();
+            e.stopPropagation();
+            setOpen(false);
+          }
+        }}
       >
         <path
           strokeLinecap="round"
@@ -270,14 +267,12 @@ export default function MultiSelect<C extends { custom: string }>({
       {open && (
         <SelectList
           isLoading={isLoading}
-          {...getFloatingProps(
-            getListFloatingProps({
-              ref: refs.setFloating,
-              style: floatingStyles,
-              className:
-                "max-h-64 overflow-y-auto rounded-lg shadow text-black bg-white z-10",
-            }),
-          )}
+          {...getFloatingProps({
+            ref: refs.setFloating,
+            style: floatingStyles,
+            className:
+              "max-h-64 overflow-y-auto rounded-lg shadow text-black bg-white z-10",
+          })}
         >
           <>
             {filteredOptions.map((option, index) => (
