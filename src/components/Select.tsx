@@ -45,7 +45,7 @@ export default function Select<O extends Option>({
   containerClassName,
   placeholder,
   invalid,
-  searchType,
+  searchType = "unmanaged",
   emptyLabel,
   onSearchChange,
   onBottomVisible,
