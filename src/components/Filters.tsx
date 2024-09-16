@@ -5,7 +5,7 @@ import { Input } from "./base.ts";
 import Chip from "./Chip.tsx";
 import useLogbooks from "../hooks/useLogbooks.ts";
 import useTags from "../hooks/useTags.ts";
-import { Tag } from "../api/tags.ts";
+import { Logbook, Shift, Tag } from "../api";
 import FilterChipMultiSelect from "./FilterChipMultiSelect.tsx";
 import FilterChipInput from "./FilterChipInput.tsx";
 import { dateToYYYYMMDD, yyyymmddToDate } from "../utils/datetimeConversion.ts";
@@ -15,6 +15,7 @@ export type FilterOptions = Pick<
   | "logbooks"
   | "tags"
   | "requireAllTags"
+  | "shifts"
   | "startDate"
   | "endDate"
   | "sortByLogDate"
@@ -26,6 +27,9 @@ function extractTagLabel(tag: Tag) {
 }
 function extractTagKey(tag: Tag) {
   return tag.id;
+}
+function extractShiftKey(shift: Shift) {
+  return shift.id;
 }
 
 export interface Props {
@@ -40,15 +44,17 @@ export default function Filters({ filters, onFiltersChange }: Props) {
     isLoading: isLogbooksLoading,
   } = useLogbooks();
 
+  const selectedLogbooks = isLogbooksLoading
+    ? []
+    : filters.logbooks.map((name) => logbookNameMap[name.toLowerCase()]);
+
   const {
     tags,
     tagMap,
     bumpTag,
     isLoading: isTagsFetching,
   } = useTags({
-    logbooks: isLogbooksLoading
-      ? []
-      : filters.logbooks.map((name) => logbookNameMap[name.toLowerCase()].id),
+    logbooks: selectedLogbooks.map((logbook) => logbook.id),
     enabled: !isLogbooksLoading,
   });
 
@@ -115,9 +121,54 @@ export default function Filters({ filters, onFiltersChange }: Props) {
     );
   }, [filters.tags, filters.onlyFavorites, tagMap, isTagsLoading]);
 
+  const shifts = isLogbooksLoading
+    ? []
+    : selectedLogbooks.flatMap((logbook) =>
+        logbook.shifts.map((shift) => ({
+          ...shift,
+          logbook,
+        })),
+      );
+
+  const shiftFilterLabel = () => {
+    const firstSelectedShift = filters.shifts[0];
+    const firstShift = shifts.find((shift) => shift.id === firstSelectedShift);
+
+    if (
+      !firstSelectedShift ||
+      !firstShift ||
+      isTagsLoading ||
+      filters.onlyFavorites
+    ) {
+      return "Shifts";
+    }
+
+    let label =
+      selectedLogbooks.length === 1
+        ? firstShift.name
+        : `${firstShift.logbook.name.toUpperCase()}:${firstShift.name}`;
+
+    if (filters.shifts.length > 1) {
+      label += ` and ${filters.shifts.length - 1} other`;
+      if (filters.shifts.length > 2) {
+        label += "s";
+      }
+    }
+
+    return label;
+  };
+
+  const extractShiftLabel = (shift: Shift & { logbook: Logbook }) => {
+    if (selectedLogbooks.length === 1) {
+      return shift.name;
+    }
+    return `${shift.logbook.name.toUpperCase()}:${shift.name}`;
+  };
+
   function setFilters(newFilters: FilterOptions) {
     if (filters.logbooks.join(",") !== newFilters.logbooks.join(",")) {
       newFilters.tags = [];
+      newFilters.shifts = [];
     }
 
     onFiltersChange(newFilters);
@@ -156,9 +207,8 @@ export default function Filters({ filters, onFiltersChange }: Props) {
   }, [filters.onlyFavorites]);
 
   return (
-    <div className="flex flex-wrap">
+    <div className="flex flex-wrap gap-3">
       <FilterChipMultiSelect
-        className="mt-2 mr-3"
         label={logbookFilterLabel()}
         disabled={filters.onlyFavorites}
         active={filters.logbooks.length !== 0}
@@ -176,7 +226,6 @@ export default function Filters({ filters, onFiltersChange }: Props) {
         extractLabel={(x) => x}
       />
       <FilterChipMultiSelect
-        className="mt-2 mr-3"
         label={tagFilterLabel()}
         disabled={filters.onlyFavorites}
         active={filters.tags.length !== 0 && !isTagsLoading}
@@ -203,8 +252,19 @@ export default function Filters({ filters, onFiltersChange }: Props) {
           </button>
         }
       />
+      <FilterChipMultiSelect
+        label={shiftFilterLabel()}
+        disabled={filters.onlyFavorites}
+        active={filters.shifts.length !== 0 && !isTagsLoading}
+        onDisable={() => setFilters({ ...filters, shifts: [] })}
+        selected={filters.shifts}
+        setSelected={(selected) => setFilters({ ...filters, shifts: selected })}
+        isLoading={isTagsLoading}
+        options={shifts}
+        extractLabel={extractShiftLabel}
+        extractKey={extractShiftKey}
+      />
       <FilterChipInput
-        className="mt-2 mr-3"
         label={
           filters.startDate && !filters.onlyFavorites
             ? filters.startDate.toLocaleDateString("en-us", {
@@ -237,7 +297,6 @@ export default function Filters({ filters, onFiltersChange }: Props) {
         />
       </FilterChipInput>
       <FilterChipInput
-        className="mt-2 mr-3"
         label={
           filters.endDate && !filters.onlyFavorites
             ? filters.endDate.toLocaleDateString("en-us", {
@@ -270,7 +329,6 @@ export default function Filters({ filters, onFiltersChange }: Props) {
         />
       </FilterChipInput>
       <FilterChip
-        className="mt-2 mr-3"
         label="Sort by log date"
         active={filters.sortByLogDate}
         showCheck
@@ -279,7 +337,6 @@ export default function Filters({ filters, onFiltersChange }: Props) {
         }
       />
       <FilterChip
-        className="mt-2 mr-3"
         label={favoritesLabel()}
         active={filters.onlyFavorites}
         onClick={() =>

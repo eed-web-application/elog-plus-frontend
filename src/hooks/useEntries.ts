@@ -11,6 +11,7 @@ export type EntryQuery = {
   logbooks: string[];
   tags: string[];
   requireAllTags: boolean;
+  shifts: string[];
   startDate: Date | null;
   endDate: Date | null;
   sortByLogDate: boolean;
@@ -111,6 +112,13 @@ export default function useEntries({ enabled, anchor, query }: Params) {
         if (query.favorites) {
           const favorites = query.favorites;
           return entries.filter((entry) => favorites.has(entry.id));
+        }
+
+        // FIXME: Waiting on https://github.com/eed-web-application/elog-plus/issues/285
+        if (query.shifts.length > 0) {
+          return entries.filter((entry) =>
+            entry.shifts.some((shift) => query.shifts.includes(shift.id)),
+          );
         }
 
         return entries;
