@@ -50,12 +50,14 @@ const Button = forwardRef(function Button<E extends ElementType>(
 
   let buttonClassName = variants[variant ?? "button"];
 
-  if (state === "selected") {
-    buttonClassName = twMerge(buttonClassName, iconStates.selected);
-  } else if (state === "highlighted") {
-    buttonClassName = twMerge(buttonClassName, iconStates.highlighted);
-  } else {
-    buttonClassName = twMerge(buttonClassName, iconStates.neutral);
+  if (variant?.startsWith("icon")) {
+    if (state === "selected") {
+      buttonClassName = twMerge(buttonClassName, iconStates.selected);
+    } else if (state === "highlighted") {
+      buttonClassName = twMerge(buttonClassName, iconStates.highlighted);
+    } else {
+      buttonClassName = twMerge(buttonClassName, iconStates.neutral);
+    }
   }
 
   return (
