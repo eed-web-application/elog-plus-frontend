@@ -9,9 +9,8 @@ import {
   RefObject,
   memo,
   useContext,
-  useMemo,
 } from "react";
-import { Link, LinkProps } from "react-router-dom";
+import { Link } from "react-router-dom";
 import {
   FloatingDelayGroup,
   FloatingPortal,
@@ -48,17 +47,13 @@ const ATTACHMENTS_PREVIEW_MAX_WIDTH = 1 / 4;
 function RowButton({
   children,
   tooltip,
-  entrySelected,
-  entryHighlighted,
   onClick,
   marked = false,
   ...rest
 }: PropsWithChildren<
-  LinkProps & {
+  ComponentProps<typeof Button<typeof Link>> & {
     tooltip: string;
     active?: boolean;
-    entrySelected?: boolean;
-    entryHighlighted?: boolean;
     marked?: boolean;
   }
 >) {
@@ -66,12 +61,8 @@ function RowButton({
     <Tooltip label={tooltip}>
       <Button
         as={Link}
-        variant="icon"
-        className={twMerge(
-          "z-0 relative",
-          entrySelected && "hover:bg-blue-200",
-          entryHighlighted && "hover:bg-yellow-300",
-        )}
+        variant="iconSmall"
+        className="z-0 relative"
         onClick={(e: React.MouseEvent<HTMLAnchorElement>) => {
           e.stopPropagation();
           onClick?.(e);
@@ -489,6 +480,11 @@ const EntryRow = memo(
     const showLoader = useDelayedLoader(!fullEntry && expanded);
 
     const open = showLoader || (expanded && fullEntry);
+    const buttonState = highlighted
+      ? "highlighted"
+      : selected
+        ? "selected"
+        : "neutral";
 
     return (
       <div
@@ -628,8 +624,7 @@ const EntryRow = memo(
               {allowSpotlight && (
                 <RowButton
                   tooltip="Spotlight"
-                  entrySelected={selected}
-                  entryHighlighted={highlighted}
+                  state={buttonState}
                   {...spotlightProps}
                 >
                   <svg
@@ -655,8 +650,7 @@ const EntryRow = memo(
                     search: window.location.search,
                     hash: window.location.hash,
                   }}
-                  entrySelected={selected}
-                  entryHighlighted={highlighted}
+                  state={buttonState}
                   marked={hasSupersedingDraft}
                 >
                   <svg
@@ -684,8 +678,7 @@ const EntryRow = memo(
                     search: window.location.search,
                     hash: window.location.hash,
                   }}
-                  entrySelected={selected}
-                  entryHighlighted={highlighted}
+                  state={buttonState}
                   marked={hasFollowUpDraft}
                 >
                   <svg
@@ -707,11 +700,8 @@ const EntryRow = memo(
             {allowFavorite && (
               <FavoriteButton
                 entryId={entry.id}
-                className={twMerge(
-                  "z-0",
-                  selected && "hover:bg-blue-200",
-                  highlighted && "hover:bg-yellow-300",
-                )}
+                state={buttonState}
+                className="z-0"
                 favoriteIconClassName="hidden group-hover:block"
               />
             )}
@@ -719,14 +709,10 @@ const EntryRow = memo(
 
           {allowExpanding && (
             <Button
-              variant="icon"
+              variant="iconSmall"
               onClick={() => setExpanded((expanded) => !expanded)}
-              className={twMerge(
-                "z-0",
-                expanded && "rotate-180",
-                selected && "hover:bg-blue-200",
-                highlighted && "hover:bg-yellow-300",
-              )}
+              state={buttonState}
+              className={twMerge("z-0", expanded && "rotate-180")}
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
