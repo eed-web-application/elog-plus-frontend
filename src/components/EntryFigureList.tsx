@@ -77,7 +77,7 @@ function Figure({
           )
           <Button
             as="a"
-            variant="icon"
+            variant="iconSmall"
             download={figure.fileName}
             href={getAttachmentDownloadURL(figure.id)}
             className="flex-shrink-0"
