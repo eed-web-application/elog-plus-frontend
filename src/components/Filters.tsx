@@ -1,11 +1,11 @@
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 import { EntryQuery } from "../hooks/useEntries";
 import FilterChip from "./FilterChip.tsx";
 import { Input } from "./base.ts";
 import Chip from "./Chip.tsx";
 import useLogbooks from "../hooks/useLogbooks.ts";
 import useTags from "../hooks/useTags.ts";
-import { Logbook, Shift, Tag } from "../api";
+import { ShiftWithLogbook, Tag } from "../api";
 import FilterChipMultiSelect from "./FilterChipMultiSelect.tsx";
 import FilterChipInput from "./FilterChipInput.tsx";
 import { dateToYYYYMMDD, yyyymmddToDate } from "../utils/datetimeConversion.ts";
@@ -28,7 +28,7 @@ function extractTagLabel(tag: Tag) {
 function extractTagKey(tag: Tag) {
   return tag.id;
 }
-function extractShiftKey(shift: Shift) {
+function extractShiftKey(shift: ShiftWithLogbook) {
   return shift.id;
 }
 
@@ -44,9 +44,11 @@ export default function Filters({ filters, onFiltersChange }: Props) {
     isLoading: isLogbooksLoading,
   } = useLogbooks();
 
-  const selectedLogbooks = isLogbooksLoading
-    ? []
-    : filters.logbooks.map((name) => logbookNameMap[name.toLowerCase()]);
+  const selectedLogbooks = useMemo(() => {
+    return isLogbooksLoading
+      ? []
+      : filters.logbooks.map((name) => logbookNameMap[name.toLowerCase()]);
+  }, [filters.logbooks, logbookNameMap, isLogbooksLoading]);
 
   const {
     tags,
@@ -121,16 +123,27 @@ export default function Filters({ filters, onFiltersChange }: Props) {
     );
   }, [filters.tags, filters.onlyFavorites, tagMap, isTagsLoading]);
 
-  const shifts = isLogbooksLoading
-    ? []
-    : selectedLogbooks.flatMap((logbook) =>
-        logbook.shifts.map((shift) => ({
-          ...shift,
-          logbook,
-        })),
-      );
+  console.log(logbooks);
 
-  const shiftFilterLabel = () => {
+  const shifts = useMemo(() => {
+    let shifts: ShiftWithLogbook[];
+
+    if (isLogbooksLoading) {
+      shifts = [];
+    } else if (selectedLogbooks.length === 0) {
+      shifts = logbooks.flatMap((logbook) =>
+        logbook.shifts.map((shift) => ({ ...shift, logbook })),
+      );
+    } else {
+      shifts = selectedLogbooks.flatMap((logbook) =>
+        logbook.shifts.map((shift) => ({ ...shift, logbook })),
+      );
+    }
+
+    return shifts;
+  }, [isLogbooksLoading, logbooks, selectedLogbooks]);
+
+  const shiftFilterLabel = useCallback(() => {
     const firstSelectedShift = filters.shifts[0];
     const firstShift = shifts.find((shift) => shift.id === firstSelectedShift);
 
@@ -156,14 +169,23 @@ export default function Filters({ filters, onFiltersChange }: Props) {
     }
 
     return label;
-  };
+  }, [
+    filters.onlyFavorites,
+    filters.shifts,
+    isTagsLoading,
+    selectedLogbooks.length,
+    shifts,
+  ]);
 
-  const extractShiftLabel = (shift: Shift & { logbook: Logbook }) => {
-    if (selectedLogbooks.length === 1) {
-      return shift.name;
-    }
-    return `${shift.logbook.name.toUpperCase()}:${shift.name}`;
-  };
+  const extractShiftLabel = useCallback(
+    (shift: ShiftWithLogbook) => {
+      if (selectedLogbooks.length === 1) {
+        return shift.name;
+      }
+      return `${shift.logbook.name.toUpperCase()}:${shift.name}`;
+    },
+    [selectedLogbooks],
+  );
 
   function setFilters(newFilters: FilterOptions) {
     if (filters.logbooks.join(",") !== newFilters.logbooks.join(",")) {

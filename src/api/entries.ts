@@ -3,7 +3,7 @@ import {
   LogbookSummary,
   NotFoundError,
   ResourceQuery,
-  Shift,
+  ShiftWithLogbook,
   Tag,
   fetch,
 } from ".";
@@ -19,7 +19,7 @@ interface EntrySummary {
   loggedAt: Date;
   eventAt: Date;
   attachments: Attachment[];
-  shifts: Shift[];
+  shifts: ShiftWithLogbook[];
   followUps: string[];
   followingUp?: string;
   references: string[];

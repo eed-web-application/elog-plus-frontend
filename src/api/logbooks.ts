@@ -7,6 +7,9 @@ export interface Shift {
   name: string;
   from: string;
   to: string;
+}
+
+export interface ShiftWithLogbook extends Shift {
   logbook: LogbookSummary;
 }
 
