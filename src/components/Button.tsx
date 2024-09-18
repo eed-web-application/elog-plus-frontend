@@ -30,7 +30,7 @@ const iconStates = {
 };
 
 const iconBase =
-  "text-gray-800 hover:bg-gray-200 focus:bg-gray-200 cursor-pointer select-none disable:hover:bg-transparent disable:focus:bg-transparent disable:cursor-auto outline-none";
+  "hover:bg-gray-200 focus:bg-gray-200 cursor-pointer select-none disable:hover:bg-transparent disable:focus:bg-transparent disable:cursor-auto outline-none";
 
 const variants = {
   button:
