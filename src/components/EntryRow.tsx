@@ -36,7 +36,6 @@ import { useOnResize, useTriggerResize } from "../hooks/useOnResize";
 import useVariableTruncate from "../hooks/useVariableTruncate";
 import useTruncate from "../hooks/useTruncate";
 import useDisplayTags from "../hooks/useDisplayTags";
-import FavoriteButton from "./FavoriteButton";
 import StickyEntryRow from "../StickyEntryRowContext";
 import Button from "./Button";
 import useDelayedLoader from "../hooks/useDelayedLoader";
@@ -697,14 +696,15 @@ const EntryRow = memo(
                 </RowButton>
               )}
             </div>
-            {allowFavorite && (
-              <FavoriteButton
-                entryId={entry.id}
-                state={buttonState}
-                className="z-0"
-                favoriteIconClassName="hidden group-hover:block"
-              />
-            )}
+            {/* See #105 */}
+            {/* {allowFavorite && ( */}
+            {/*   <FavoriteButton */}
+            {/*     entryId={entry.id} */}
+            {/*     state={buttonState} */}
+            {/*     className="z-0" */}
+            {/*     favoriteIconClassName="hidden group-hover:block" */}
+            {/*   /> */}
+            {/* )} */}
           </FloatingDelayGroup>
 
           {allowExpanding && (
