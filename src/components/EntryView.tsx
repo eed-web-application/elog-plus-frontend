@@ -98,7 +98,7 @@ export default function EntryView({ entry }: Props) {
         {entry.eventAt &&
           entry.eventAt.getTime() !== entry.loggedAt.getTime() && (
             <div>
-              <div className="text-gray-500">Event occurrend at</div>
+              <div className="text-gray-500">Event occurred at</div>
               {entry.eventAt.toLocaleString("en-us", {
                 year: "numeric",
                 month: "short",
