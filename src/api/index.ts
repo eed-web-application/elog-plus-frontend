@@ -26,13 +26,6 @@ export class InternalServerError extends ServerError {
   }
 }
 
-export class UnauthorizedError extends ServerError {
-  constructor(res: Response, context?: ErrorContext) {
-    super("Unauthorized", res, context);
-    this.name = "UnauthorizedError";
-  }
-}
-
 export class NotFoundError extends ServerError {
   constructor(res: Response, context?: ErrorContext) {
     super("Could not find resource", res, context);
@@ -89,7 +82,7 @@ export async function fetch(
     options,
   );
 
-  if (res.type === "opaqueredirect") {
+  if (res.type === "opaqueredirect" || res.status === 401) {
     if (import.meta.env.MODE === "development") {
       throw new Error(
         "Invalid `slac-vouch` during development. To use the staging server during development, login to the staging frontend in a separate tab, then copy the new `slac-vouch` cookie into localhost.",
@@ -111,8 +104,6 @@ export async function fetch(
   if (!res.ok) {
     if (res.status === 404) {
       throw new NotFoundError(res, responseData);
-    } else if (res.status === 401) {
-      throw new UnauthorizedError(res, responseData);
     } else {
       throw new InternalServerError(res, responseData);
     }
