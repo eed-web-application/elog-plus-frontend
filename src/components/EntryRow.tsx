@@ -601,7 +601,7 @@ const EntryRow = memo(
             />
           )}
 
-          <div className="flex flex-col justify-center items-center pl-2 w-16 group-hover:hidden">
+          <div className="flex flex-col justify-center items-center pl-2 group-hover:hidden">
             {showDate && (
               <div className="text-sm">
                 {date.toLocaleDateString("en-us", {
