@@ -1,7 +1,11 @@
 import { useCallback, useMemo } from "react";
 import { yyyymmddToDate } from "../utils/datetimeConversion";
 import { EntryQuery } from "./useEntries";
-import { NavigateOptions, useSearchParams } from "react-router-dom";
+import {
+  createSearchParams,
+  NavigateOptions,
+  useSearchParams,
+} from "react-router-dom";
 import serializeParams, { ParamsObject } from "../utils/serializeParams";
 
 export const DEFAULT_QUERY: EntryQuery = {
@@ -31,6 +35,10 @@ export function deserializeQuery(params: URLSearchParams): EntryQuery {
     sortByLogDate: params.has("sortByLogDate"),
     onlyFavorites: params.has("onlyFavorites"),
   };
+}
+
+export function serializeQuery(query: EntryQuery): URLSearchParams {
+  return createSearchParams(serializeParams(query as ParamsObject));
 }
 
 /**

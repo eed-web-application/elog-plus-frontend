@@ -1,3 +1,4 @@
+import { useContext } from "react";
 import { twJoin } from "tailwind-merge";
 import { EntryFull } from "../api";
 import { Link } from "react-router-dom";
@@ -12,6 +13,8 @@ import useSpotlightProps from "../hooks/useSpotlightProps";
 import useDisplayTags from "../hooks/useDisplayTags";
 import FavoriteButton from "./FavoriteButton";
 import Button from "./Button";
+import IsPaneFullscreenContext from "../IsPaneFullscreenContext";
+import { DEFAULT_QUERY, serializeQuery } from "../hooks/useEntryQuery";
 
 export interface Props {
   entry: EntryFull;
@@ -23,6 +26,7 @@ export default function EntryView({ entry }: Props) {
     (attachment) => attachment.previewState !== "Completed",
   );
 
+  const isPaneFullscreen = useContext(IsPaneFullscreenContext);
   const spotlightProps = useSpotlightProps(entry);
   const tagNames = useDisplayTags(entry.tags, entry.logbooks.length);
 
@@ -113,23 +117,51 @@ export default function EntryView({ entry }: Props) {
         {entry.shifts.length > 0 && (
           <div>
             <div className="text-gray-500">During</div>
-            {entry.shifts.length === 1
-              ? entry.shifts[0].name
-              : entry.shifts
-                  .map(
-                    ({ name, logbook }) =>
-                      `${logbook.name.toUpperCase()}:${name}`,
-                  )
-                  .join(", ")}
+            <div className="flex flex-wrap">
+              {entry.shifts.map(({ id, name, logbook }) => (
+                <Chip
+                  key={id}
+                  className="mt-0.5 mr-1.5"
+                  clickable
+                  as={Link}
+                  to={{
+                    pathname: isPaneFullscreen ? "/" : undefined,
+                    search: serializeQuery({
+                      ...DEFAULT_QUERY,
+                      logbooks: [logbook.name.toUpperCase()],
+                      shifts: [id],
+                    }).toString(),
+                    hash: window.location.hash,
+                  }}
+                >
+                  {logbook.name.toUpperCase()}:{name}
+                </Chip>
+              ))}
+            </div>
           </div>
         )}
         {entry.tags.length > 0 && (
           <div>
             <div className="text-gray-500">Tags</div>
             <div className="flex flex-wrap">
-              {tagNames.map((tag) => (
-                <Chip key={tag} className="mt-0.5 mr-1.5">
-                  {tag}
+              {tagNames.map(({ label, ids }) => (
+                <Chip
+                  key={label}
+                  className="mt-0.5 mr-1.5"
+                  clickable
+                  as={Link}
+                  to={{
+                    pathname: isPaneFullscreen ? "/" : undefined,
+                    search: serializeQuery({
+                      ...DEFAULT_QUERY,
+                      tags: ids,
+                      requireAllTags: ids.length > 1,
+                    }).toString(),
+                    hash: window.location.hash,
+                  }}
+                >
+                  {/* search: `?tags=${ids.join(",")}${ids.length > 1 ? "&requireAllTags=true" : ""}`, */}
+                  {label}
                 </Chip>
               ))}
             </div>

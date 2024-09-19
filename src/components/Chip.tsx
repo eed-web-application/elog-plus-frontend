@@ -1,49 +1,63 @@
-import React, { ComponentPropsWithRef, forwardRef } from "react";
+import {
+  ComponentPropsWithRef,
+  ElementType,
+  forwardRef,
+  JSXElementConstructor,
+} from "react";
 import { twJoin, twMerge } from "tailwind-merge";
 
-export interface Props extends ComponentPropsWithRef<"div"> {
+type IntrinsicAttributes<
+  E extends
+    | keyof JSX.IntrinsicElements
+    | JSXElementConstructor<Record<string, unknown>>,
+> = JSX.LibraryManagedAttributes<E, ComponentPropsWithRef<E>>;
+
+interface OwnProps<E extends ElementType = ElementType> {
+  as?: E;
   deletable?: boolean;
   clickable?: boolean;
   leftIcon?: JSX.Element;
   onDelete?: (event: React.MouseEvent<SVGSVGElement, MouseEvent>) => void;
 }
 
-const Chip = forwardRef<HTMLDivElement, Props>(function Chip(
-  { deletable, clickable, className, children, leftIcon, onDelete, ...rest },
-  ref,
+export type Props<E extends ElementType> = OwnProps<E> &
+  Omit<IntrinsicAttributes<E>, keyof OwnProps>;
+
+const Chip = forwardRef(function Chip<E extends ElementType>(
+  {
+    as,
+    deletable,
+    clickable,
+    className,
+    children,
+    leftIcon,
+    onDelete,
+    ...rest
+  }: Props<E>,
+  ref: ComponentPropsWithRef<E>["ref"],
 ) {
   const base = twJoin(
-    "border-gray-400 border text-sm rounded-full flex justify-center items-center whitespace-nowrap w-fit",
-    clickable && "hover:bg-gray-200",
+    "border-gray-400 border text-sm rounded-full flex justify-center items-center whitespace-nowrap w-fit outline-none",
+    clickable && "hover:bg-gray-200 focus:bg-gray-200",
   );
+
+  const Component = as ?? "div";
 
   if (!deletable && !leftIcon) {
     return (
-      <div
-        className={twMerge(
-          base,
-          "px-1.5 py-0.5 leading-none",
-          clickable && "cursor-pointer",
-          className,
-        )}
+      <Component
+        className={twMerge(base, "px-1.5 py-0.5 leading-none", className)}
         ref={ref}
-        tabIndex={clickable ? 0 : undefined}
         {...rest}
       >
         {children}
-      </div>
+      </Component>
     );
   }
 
   return (
-    <div
-      className={twMerge(
-        base,
-        "overflow-hidden",
-        clickable && "cursor-pointer",
-        className,
-      )}
-      tabIndex={clickable ? 0 : undefined}
+    <Component
+      className={twMerge(base, "overflow-hidden", className)}
       ref={ref}
       {...rest}
     >
@@ -67,7 +81,6 @@ const Chip = forwardRef<HTMLDivElement, Props>(function Chip(
           strokeWidth={1.5}
           stroke="currentColor"
           className="px-1 w-7 hover:bg-gray-200 cursor-pointer"
-          tabIndex={0}
           onClick={onDelete}
         >
           <path
@@ -77,8 +90,10 @@ const Chip = forwardRef<HTMLDivElement, Props>(function Chip(
           />
         </svg>
       )}
-    </div>
+    </Component>
   );
 });
 
-export default Chip;
+export default Chip as <E extends ElementType = "div">(
+  props: Props<E>,
+) => JSX.Element;

@@ -1,7 +1,7 @@
 import { Tag } from "../api";
 
 /**
- * Returns an array of tag names to display for a given array of tags.
+ * Returns an array of tag labels to display for a given array of tags.
  * If the logbook count is 1, then all the tag names are returned without
  * modification. If the logbook count is greater than 1, then the logbook name
  * is prepended to each tag name if the tag is not common among all logbooks.
@@ -9,20 +9,20 @@ import { Tag } from "../api";
 export default function useDisplayTags(
   tags: Tag[],
   logbookCount: number,
-): string[] {
+): { label: string; ids: string[] }[] {
   if (logbookCount === 1) {
-    return tags.map((tag) => tag.name);
+    return tags.map((tag) => ({ label: tag.name, ids: [tag.id] }));
   }
 
-  const tagNameCount: Record<string, number> = {};
+  const tagNameCount: Record<string, string[]> = {};
   const tagNames = [];
   const displayedAlready = new Set();
 
   for (const tag of tags) {
     if (tag.name in tagNameCount) {
-      tagNameCount[tag.name] += 1;
+      tagNameCount[tag.name].push(tag.id);
     } else {
-      tagNameCount[tag.name] = 1;
+      tagNameCount[tag.name] = [tag.id];
     }
   }
 
@@ -31,11 +31,14 @@ export default function useDisplayTags(
       continue;
     }
 
-    if (tagNameCount[tag.name] === logbookCount) {
-      tagNames.push(tag.name);
+    if (tagNameCount[tag.name].length === logbookCount) {
+      tagNames.push({ label: tag.name, ids: tagNameCount[tag.name] });
       displayedAlready.add(tag.name);
     } else {
-      tagNames.push(`${tag.logbook.name.toUpperCase()}:${tag.name}`);
+      tagNames.push({
+        label: `${tag.logbook.name.toUpperCase()}:${tag.name}`,
+        ids: [tag.id],
+      });
     }
   }
 

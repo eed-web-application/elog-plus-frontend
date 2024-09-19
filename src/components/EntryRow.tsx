@@ -130,7 +130,7 @@ function TagList({ tags, entryId }: { tags: string[]; entryId: string }) {
             "ml-1.5",
             overflowIndex !== null && index >= overflowIndex && "invisible",
           )}
-          ref={(el) => (tagsRef.current[index] = el)}
+          ref={(el: HTMLElement | null) => (tagsRef.current[index] = el)}
         >
           {tag}
         </Chip>
@@ -581,7 +581,10 @@ const EntryRow = memo(
                   .join(", ")} • ${entry.loggedBy}`}
               </div>
               {tagNames.length > 0 && (
-                <TagList tags={tagNames} entryId={entry.id} />
+                <TagList
+                  tags={tagNames.map(({ label }) => label)}
+                  entryId={entry.id}
+                />
               )}
             </div>
           </div>
