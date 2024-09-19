@@ -24,6 +24,10 @@ export function uploadAttachment(file: File) {
   });
 }
 
+export function fetchQueuedAttachments(): Promise<Attachment[]> {
+  return fetch("v1/attachment/queued");
+}
+
 export function getAttachmentPreviewURL(id: string) {
   return `${ENDPOINT}/v1/attachment/${id}/preview.jpg`;
 }

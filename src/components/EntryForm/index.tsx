@@ -17,6 +17,10 @@ import DateTimeInput from "../DateTimeInput";
 import useTags from "../../hooks/useTags";
 import EntryBodyTextEditor from "../EntryBodyTextEditor";
 import Button from "../Button";
+import { useState } from "react";
+import useQueuedAttachments from "../../hooks/useQueuedAttachments";
+import Figure from "../Figure";
+import TruncatedFileName from "../TruncatedFileName";
 
 export interface Props {
   onEntrySaved: (id: string) => void;
@@ -32,6 +36,8 @@ export default function EntryForm({ onEntrySaved, kind }: Props) {
     critical: false,
   });
   const { tagMap } = useTags();
+  const [queueExpanded, setQueueExpanded] = useState(false);
+  const queuedAttachments = useQueuedAttachments();
 
   const {
     draft,
@@ -52,7 +58,12 @@ export default function EntryForm({ onEntrySaved, kind }: Props) {
     onDrop: uploadAttachments,
   });
 
-  const attachments = (draft.attachments as LocalAttachment[]).concat(
+  const nonQueuedAttachments = draft.attachments.filter(
+    (attachment) =>
+      !(queuedAttachments || []).some((queued) => queued.id === attachment.id),
+  );
+
+  const attachments = (nonQueuedAttachments as LocalAttachment[]).concat(
     attachmentsUploading,
   );
 
@@ -249,6 +260,71 @@ export default function EntryForm({ onEntrySaved, kind }: Props) {
             </div>
             <input {...getInputProps()} />
           </label>
+
+          <div className="bg-gray-50 overflow-hidden rounded-lg border">
+            <button
+              className={twJoin(
+                "w-full px-3 py-1 whitespace-nowrap flex flex-wrap justify-between items-center bg-gray-100 hover:bg-gray-200 cursor-pointer",
+                queueExpanded && "border-b",
+              )}
+              onClick={() => setQueueExpanded(!queueExpanded)}
+            >
+              <h3 className="text-lg">Print Queue</h3>
+
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={1.5}
+                stroke="currentColor"
+                className={twJoin("size-6", queueExpanded && "rotate-180")}
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M19.5 8.25l-7.5 7.5-7.5-7.5"
+                />
+              </svg>
+            </button>
+
+            {queueExpanded && (
+              <div className="flex flex-wrap p-3 gap-3">
+                {(queuedAttachments || []).map((attachment) => (
+                  <Figure
+                    key={attachment.id}
+                    figure={attachment}
+                    label={
+                      <label className="flex w-full relative items-center overflow-hidden whitespace-nowrap">
+                        <input
+                          type="checkbox"
+                          className={twMerge(Checkbox, "mr-1.5")}
+                          checked={draft.attachments.some(
+                            (a) => a.id === attachment.id,
+                          )}
+                          onChange={(e) => {
+                            if (e.target.checked) {
+                              updateDraft({
+                                ...draft,
+                                attachments: [...draft.attachments, attachment],
+                              });
+                            } else {
+                              updateDraft({
+                                ...draft,
+                                attachments: draft.attachments.filter(
+                                  (a) => a.id !== attachment.id,
+                                ),
+                              });
+                            }
+                          }}
+                        />
+                        <TruncatedFileName fileName={attachment.fileName} />
+                      </label>
+                    }
+                  />
+                ))}
+              </div>
+            )}
+          </div>
 
           <Button className="block ml-auto mt-2">
             {kind[0] === "newEntry"
