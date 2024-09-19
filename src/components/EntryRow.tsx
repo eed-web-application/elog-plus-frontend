@@ -501,7 +501,7 @@ const EntryRow = memo(
           onMouseEnter={triggerResize}
           onMouseLeave={triggerResize}
           className={twMerge(
-            "flex items-center group cursor-pointer relative h-12 hover:bg-gray-50 text-black bg-white",
+            "flex items-center group pl-4 cursor-pointer relative h-12 hover:bg-gray-50 text-black bg-white",
             selected && "bg-blue-50 hover:bg-blue-100",
             highlighted && "bg-yellow-100 hover:bg-yellow-200",
             open && "sticky border-b",
@@ -523,23 +523,6 @@ const EntryRow = memo(
             // e.dataTransfer.setData("text/uri-list", "https://www.mozilla.org");
           }}
         >
-          <div className="flex flex-col justify-center items-center px-2 w-16">
-            {showDate && (
-              <div className="text-sm">
-                {date.toLocaleDateString("en-us", {
-                  month: "short",
-                  day: "numeric",
-                })}
-              </div>
-            )}
-            <div className="leading-none">
-              {date.toLocaleString("en-us", {
-                hour: "numeric",
-                minute: "numeric",
-                hourCycle: "h23",
-              })}
-            </div>
-          </div>
           <div className="flex overflow-hidden flex-col flex-1 py-1">
             <Link
               to={{
@@ -617,6 +600,24 @@ const EntryRow = memo(
               }
             />
           )}
+
+          <div className="flex flex-col justify-center items-center pl-2 w-16 group-hover:hidden">
+            {showDate && (
+              <div className="text-sm">
+                {date.toLocaleDateString("en-us", {
+                  month: "short",
+                  day: "numeric",
+                })}
+              </div>
+            )}
+            <div className="leading-none text-gray-500 text-sm">
+              {date.toLocaleString("en-us", {
+                hour: "numeric",
+                minute: "numeric",
+                hourCycle: "h23",
+              })}
+            </div>
+          </div>
 
           <FloatingDelayGroup delay={200}>
             <div className="hidden group-hover:flex">
