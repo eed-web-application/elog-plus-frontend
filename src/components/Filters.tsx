@@ -123,8 +123,6 @@ export default function Filters({ filters, onFiltersChange }: Props) {
     );
   }, [filters.tags, filters.onlyFavorites, tagMap, isTagsLoading]);
 
-  console.log(logbooks);
-
   const shifts = useMemo(() => {
     let shifts: ShiftWithLogbook[];
 
