@@ -604,7 +604,13 @@ const EntryRow = memo(
             />
           )}
 
-          <div className="flex flex-col justify-center items-center pl-2 group-hover:hidden">
+          <div
+            className={twJoin(
+              "flex flex-col justify-center items-center pl-2",
+              (allowSpotlight || allowFollowUp || allowSupersede) &&
+                "group-hover:hidden",
+            )}
+          >
             {showDate && (
               <div className="text-sm">
                 {date.toLocaleDateString("en-us", {
