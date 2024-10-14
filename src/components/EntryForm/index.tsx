@@ -246,14 +246,14 @@ export default function EntryForm({ onEntrySaved, kind }: Props) {
               {attachments.length === 0
                 ? "Drag and drop"
                 : attachments.map((attachment) => (
-                    <AttachmentCard
-                      key={attachment.id || attachment.fileName}
-                      className="mr-3 mb-3"
-                      isLoading={!attachment.id}
-                      attachment={attachment}
-                      onRemove={() => removeAttachment(attachment)}
-                    />
-                  ))}
+                  <AttachmentCard
+                    key={attachment.id || attachment.fileName}
+                    className="mr-3 mb-3"
+                    isLoading={!attachment.id}
+                    attachment={attachment}
+                    onRemove={() => removeAttachment(attachment)}
+                  />
+                ))}
               {isDragActive && (
                 <div className="absolute top-0 right-0 bottom-0 left-0 bg-gray-500 bg-opacity-20" />
               )}
@@ -263,6 +263,7 @@ export default function EntryForm({ onEntrySaved, kind }: Props) {
 
           <div className="bg-gray-50 overflow-hidden rounded-lg border">
             <button
+              type="button"
               className={twJoin(
                 "w-full px-3 py-1 whitespace-nowrap flex flex-wrap justify-between items-center bg-gray-100 hover:bg-gray-200 cursor-pointer",
                 queueExpanded && "border-b",
